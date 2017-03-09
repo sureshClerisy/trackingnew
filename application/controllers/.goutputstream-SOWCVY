@@ -1,0 +1,531 @@
+<?php
+
+/**
+* Truck stop Api Controller
+*  
+*/
+
+class Assignedloads extends Admin_Controller{
+
+	public $username;
+	public $password;
+	public $id;
+	public $accountID;
+	public $rows;
+	private $pickupDate;
+	private $userId;
+	private $orign_city;
+	private $orign_state;
+	private $Rpm_value;
+	private $saveDead;
+	private $saveCalPayment;
+	public $finalArray;
+	public $wsdl_url;
+	public $diesel_rate_per_gallon;
+	public $driver_pay_miles_cargo;
+	public $total_tax;
+	public $deadMilePaid;
+	public $deadMileNotPaid;
+	public $payForDeadMile;
+	public $iftaTax;
+	public $tarps;
+	public $det_time;
+	public $tollsTax;
+	public $data;
+	
+	function __construct(){
+
+		parent::__construct();
+		
+		$this->id 			= $this->config->item('truck_id');	
+		$this->username 	= $this->config->item('truck_username');
+		$this->password 	= $this->config->item('truck_password');
+		$this->url 			= $this->config->item('truck_url');
+		$this->userRoleId = $this->session->role;
+		$this->pickupDate 	= date('Y-m-d');
+		
+		$this->load->model('Vehicle');
+		$this->load->model('BrokersModel');
+
+		$this->userId 		= $this->session->loggedUser_id;
+		$this->orign_state  = $this->Vehicle->get_vehicles_state($this->session->admin_id);
+		
+		$this->load->model('Job');
+		$this->load->model('Billing');
+		$this->load->library('Htmldom');
+		$this->load->helper('truckstop');
+		
+		$this->Rpm_value = 0;
+		//$this->userId = 6;	
+		$this->saveDead = '';
+		$this->finalArray = array();
+		$this->wsdl_url = 'http://webservices.truckstop.com/V13/Searching/LoadSearch.svc?wsdl'; //Live Mode Api
+		$this->diesel_rate_per_gallon = 2.50;
+		$this->driver_pay_miles_cargo = 0.45;
+		$this->total_tax = 50;
+		
+		$this->deadMilePaid = 0;
+		$this->deadMileNotPaid = 0;
+		$this->payForDeadMile = 0.45;
+		$this->iftaTax = 50;
+		$this->tarps = 0;
+		$this->det_time = 0;
+		$this->tollsTax = 0;
+		
+		$this->data = array();
+	}
+	
+	public function index() {
+		
+		//List of all dispatchers with their drivers
+		$this->load->model("Driver");
+		$userId = false;
+		if($this->userRoleId == _DISPATCHER){
+			$userId = $this->userId;
+		}
+		$allVehicles = $this->Driver->getDriversList($userId);
+		$dispatcherList = $this->Driver->getDispatcherList($userId); //for add all drivers under every dispatcher
+		$teamList = $this->Driver->getDriversListAsTeam($userId);
+		$vDriversList = array();
+		if(!empty($allVehicles) && is_array($allVehicles)){	
+			$vDriversList = $allVehicles;
+
+			if(is_array($teamList) && count($teamList) > 0){
+				foreach ($teamList as $key => $value) {
+					$value["label"] = "_team";
+					array_unshift($vDriversList, $value);
+				}
+			}
+			foreach ($dispatcherList as $key => $value) {
+				array_unshift($vDriversList, $value);
+			}
+			
+			if($this->userRoleId != _DISPATCHER){
+				$new = array("id"=>"","profile_image"=>"","driverName"=>"All Groups","label"=>"","username"=>"","latitude"=>"","longitude"=>"","vid"=>"","city"=>"","vehicle_address"=>"","state"=>"");
+				array_unshift($vDriversList, $new);
+			}
+		}
+
+
+		$newDestlabel = array();
+		$gVehicleId = false;
+
+		if(isset($_COOKIE["_globalDropdown"]) && !empty($_COOKIE["_globalDropdown"])){
+
+			$gDropdown = json_decode($_COOKIE["_globalDropdown"],true);
+			if ($gDropdown["label"] == "_idispatcher") {  //A Dispatcher's All drivers
+				$gVehicleId = false;
+				$drivers = $this->Driver->getDriversList($gDropdown["dispId"]);
+				$filteredVehicles = array();
+				foreach ($drivers as $key => $value) {
+					array_push($filteredVehicles, $value["vid"]);
+				}
+				$jobs = $this->getSingleVehicleLoads($this->userId,$filteredVehicles,"dispatcher"); //Fetch Loads by vehicle id(s)
+				$this->data['table_title'] =  "Dispatcher : ".$gDropdown["username"];
+				$this->data['vehicleIdRepeat'] = '';
+			}else if (empty(trim($gDropdown["label"]))) { //All Groups
+				$gVehicleId = false;
+				$this->data['table_title'] = "All Groups";
+				$jobs = $this->getSingleVehicleLoads($this->userId,array(),"all"); //Fetch Loads by vehicle id(s)
+				$this->data['vehicleIdRepeat'] = '';
+			}else{	//Single Driver
+				$gVehicleId = $gDropdown["vid"];
+				$statesAddress = $this->Vehicle->get_vehicles_address($this->orign_state,$this->userId,$gVehicleId);
+				$vehicleIdRepeat = $statesAddress[0]['id'];	
+				$results = $this->Vehicle->getLastLoadRecord($statesAddress[0]['id']);
+				if ( !empty($results) ){
+					$this->origin_state = $results['DestinationState'];
+					$this->origin_city = $results['DestinationCity'];
+				} else {
+					$this->origin_state = $statesAddress['0']['state'];
+					$this->origin_city = $statesAddress['0']['city'];
+				}
+				$this->data['table_title'] = 'Truck-'.$statesAddress[0]['label'].' '.$this->origin_city.'-'.$this->origin_state;
+				$this->data['vehicleIdRepeat'] = $vehicleIdRepeat;
+				if($gDropdown["label"] == "_team"){
+					$jobs = $this->getSingleVehicleLoads($this->userId, $vehicleIdRepeat,"team");	
+				}else{
+					$jobs = $this->getSingleVehicleLoads($this->userId, $vehicleIdRepeat);	
+				}
+			}
+		}else{
+			if($this->userRoleId == _DISPATCHER){
+				$drivers = $this->Driver->getDriversList($this->userId);
+				$filteredVehicles = array();
+				foreach ($drivers as $key => $value) {
+					array_push($filteredVehicles, $value["vid"]);
+				}
+				$jobs = $this->getSingleVehicleLoads($this->userId,$filteredVehicles,"dispatcher"); //Fetch Loads by vehicle id(s)
+				$this->data['table_title'] =  "Dispatcher : ".$this->session->userdata('loggedUser_username');
+				$this->data['vehicleIdRepeat'] = '';
+			}else{
+				$this->data['table_title'] = "All Groups";
+				$jobs = $this->getSingleVehicleLoads($this->userId,array(),"all"); //Fetch Loads by vehicle id(s)
+				$this->data['vehicleIdRepeat'] = '';
+			}
+		}
+
+		
+			$this->data['labelArray'] = $vDriversList;		
+			$this->data['loadSource'] = 'truckstop.com';
+			$this->data["selectedDriver"] = isset($gDropdown) ? $gDropdown : "";
+		if ( count($jobs) > 0 ) {
+			$this->data['assigned_loads'] = $jobs;
+			echo json_encode($this->data);
+		} else {
+			$this->data['assigned_loads'] = array();
+			$this->data['vehicleIdRepeat'] = '';
+			echo json_encode($this->data);
+		}
+	}
+	
+	public function getChangeDriverLoads( $vehilceId = null) {
+		$objPost = json_decode(file_get_contents('php://input'),true);
+		$loadSource = '';
+		if(isset($objPost["scopeType"]) && ($objPost["scopeType"] == "driver" || $objPost["scopeType"] == "team" ) && count($objPost["scope"]) == 1){
+			$statesAddress 	= $this->Vehicle->get_vehicle_address($vehilceId);	
+			$results = $this->Vehicle->getLastLoadRecord($vehilceId);
+			if ( !empty($results) ){
+				$this->origin_state = $results['DestinationState'];
+				$this->origin_city = $results['DestinationCity'];
+			} else {
+				$this->origin_state = $statesAddress['state'];
+				$this->origin_city = $statesAddress['city'];
+			}
+			
+			$newlabel= 'Truck-'.$statesAddress['label'].'-'.$this->origin_city.'-'.$this->origin_state;
+			$this->data['vehicleIdRepeat'] = $vehilceId;
+		}else if(isset($objPost["scopeType"]) && $objPost["scopeType"] == "all"){
+			$newlabel = "All Groups";
+		}else{
+			$newlabel = "Dispatcher";
+		}
+		
+		$jobs = $this->getSingleVehicleLoads($this->userId,$objPost["scope"],$objPost["scopeType"]); //Fetch Loads by vehicle id(s)
+		
+		$this->data['table_title'] =  $newlabel;
+		$this->data['assigned_loads'] = $jobs;
+
+		echo json_encode($this->data);
+	}
+	
+	public function fetchVehicleAddress( $vehicleId = null ) {
+		$result = $this->Job->fetchVehicleAddress( $vehicleId);
+		if ( !empty($result) ) {
+			$this->data = $result;
+		}
+		
+		echo json_encode($this->data);
+	}
+	
+	/**
+	 * Fetching loads which are custom added via vika dispatch source
+	 */
+	 
+	public function ourLoads() {
+		$statesAddress = $this->Vehicle->get_vehicles_address($this->orign_state,$this->userId);
+		
+		$vehicleIdRepeat = $statesAddress[0]['id'];	
+		
+		/*** Get All Label Array ****/
+		$vehicleList = array();
+		$vehicleList = $statesAddress;
+	
+		$newDestlabel = array();
+		if($statesAddress[0]['destination_address'] != '')
+		{
+			$newDestlabel = explode(',', $statesAddress[0]['destination_address']);
+		} else {
+			array_push($newDestlabel,$statesAddress[0]['state'],$statesAddress[0]['city'],date('Y-m-d'));
+		}
+		
+		$source = 'Vika Dispatch';  				// Fetching added loads under Vika Dispatch
+		$jobs = $this->getSingleVehicleLoads($this->userId, $vehicleIdRepeat, $source);
+		
+		$this->data['assigned_loads'] = $jobs;
+		$this->data['table_title'] = 'Truck-'.$statesAddress[0]['label'].' '.$newDestlabel[1].'-'.$newDestlabel[0];
+		$this->data['statesAddress'] 	= $statesAddress;
+		$this->data['vehicleIdRepeat'] = $vehicleIdRepeat;
+		$this->data['labelArray'] = $vehicleList;
+		
+		$this->data['DriverName'] = $statesAddress['0']['driverName'];
+		$this->data['TruckLabel'] = $statesAddress['0']['label'];
+		$this->data['Abbrevation'] = $statesAddress['0']['abbrevation'];
+		$this->data['loadSource'] = $source;
+		echo json_encode($this->data);
+	}
+	
+
+	/**
+	 *  Deleting the assigned load
+	 */ 
+	 
+	public function deleteAssignedLoad( $loadId = null ) {
+		$result = $this->Job->deleteAssignedLoad( $loadId );
+		if ( $result ) {
+			echo json_encode(array('success' =>  true ));
+		} else {
+			echo json_encode(array('success' =>  false ));
+		}
+	}
+	
+	/**
+	 * Generating the invoice 
+	 */ 
+	 
+	public function generateInvoice( $loadId = null ) {
+		$pathGen = str_replace('application/', '', APPPATH);
+		$data = array();
+		$docPrimaryId = '';
+		$data['jobRecord'] = $this->Job->FetchSingleJob($loadId);
+		$documents = $this->Billing->fetchDocToBundle($loadId);
+		pr($data['jobRecord']); die;
+		$cookieVariable = get_cookie('setLanguageGlobalVariable');
+		$this->lang->load('loads',$cookieVariable);
+		
+		//~ pr($data['jobRecord']); die;
+		if ( empty($documents) || count($documents) < 2 ) {
+			$errorMessage = $this->lang->line('errRateOrPod');
+			echo json_encode(array('showError' => 1,'errorMessage' => $errorMessage));
+		} else {			
+			$errorMessage = $this->lang->line('errPlease').' ';
+			$showError = 0;
+			$billingErr = 0;
+			$woRefNo = 0;
+			if ( $data['jobRecord']['shipper_name'] == '' ||  $data['jobRecord']['consignee_name'] == '' || $data['jobRecord']['transportComp_name'] == '' ) {
+				$billingErr = 1;
+				$errorMessage .= $this->lang->line('errBillingDetails');
+				$showError = 1;
+			}
+			
+			if ( $data['jobRecord']['woRefno'] == '' ) {
+				if ( $billingErr == 1 ) {
+					$errorMessage = str_replace('.','',$errorMessage);
+					$errorMessage .= ' '.$this->lang->line('errAnd').' ';
+				} else {
+					$errorMessage .= ' '.$this->lang->line('errEnter').' ';
+				}
+				$showError = 1;
+				$errorMessage .= $this->lang->line('errWorkOrdNo');
+				$woRefNo = 1;
+			}
+			
+			
+			if ( $data['jobRecord']['TruckCompanyName'] == 'undefined' || $data['jobRecord']['TruckCompanyName'] == '' ) {
+				if ( $billingErr == 1  || $woRefNo == 1) {
+					$errorMessage = str_replace('.','',$errorMessage);
+					$errorMessage .= ' '.$this->lang->line('errAnd').' ';
+				}
+				$showError = 1;
+				$errorMessage .= $this->lang->line('errGenerateBroker');
+			}
+			
+			//~ if ( $data['jobRecord']['invoiceNo'] == '' ) {
+				//~ if ( $billingErr == 1  || $woRefNo == 1) {
+					//~ $errorMessage = str_replace('.','',$errorMessage);
+					//~ $errorMessage .= ' '.$this->lang->line('errAnd').' ';
+				//~ }
+				//~ $showError = 1;
+				//~ $errorMessage .= $this->lang->line('errGenerateInvoice');
+			//~ }
+			
+			if ( $showError == 0 ) {
+				
+				if ( $data['jobRecord']['invoiceNo'] == '' || $data['jobRecord']['invoiceNo'] == null  || $data['jobRecord']['invoiceNo'] == 'undefined' || $data['jobRecord']['invoiceNo'] == 0 ) {
+					$retArray = $this->Billing->generateInvoiceNumber($data['jobRecord']['id']);
+					$data['jobRecord']['invoiceNo'] = $retArray['invoiceNo'];
+					$data['jobRecord']['invoicedDate'] = $retArray['invoicedDate'];
+				}
+								
+				$html = $this->load->view('invoice', $data, true); 
+				$invoiceResult = $this->Billing->fetchUploadedDocs( $loadId, 'invoice');
+				$fileName = "invoice_".time().".pdf";
+				$pdfFilePath = $pathGen."assets/uploads/documents/invoice/".$fileName;
+		 
+				$this->load->library('m_pdf');
+				$this->m_pdf->pdf->WriteHTML($html);
+				//~ $this->m_pdf->pdf->Output($pdfFilePath, "D");    
+				$this->m_pdf->pdf->Output($pdfFilePath, "F"); 
+				
+				$response['error'] = false;
+				//~ $response['data'] = $this->upload->data();
+
+				if (substr(php_uname(), 0, 7) == "Windows"){ 
+					//pclose(popen("start /B ". $cmd, "r"));  
+					$response['data']['cmd'] = 'Windows';
+				} 
+				else { 					
+					$thumbFolder = 'thumb_invoice';
+					$raw_name = explode('.',$fileName);
+					$cmd = 'cd '.$pathGen."assets/uploads/documents/invoice/";
+					$cmd .= '; convert -thumbnail x600 '.$fileName.'[0] -flatten ../'.$thumbFolder.'/thumb_'.$raw_name[0].'.jpg';
+					$response['data']['cmd'] = $cmd;
+					exec($cmd . " > /dev/null &");   
+				}
+				 
+				if ( !empty($invoiceResult) && $invoiceResult['doc_name'] != '' ) {
+					if(file_exists($pathGen."assets/uploads/documents/invoice/".$invoiceResult['doc_name'])){
+						unlink($pathGen."assets/uploads/documents/invoice/".$invoiceResult['doc_name']);
+					}
+					
+					$unlink_name = explode('.',$invoiceResult['doc_name']);
+					if(file_exists($pathGen."assets/uploads/documents/thumb_invoice/thumb_".$unlink_name[0].'.jpg')){
+						unlink($pathGen."assets/uploads/documents/thumb_invoice/thumb_".$unlink_name[0].'.jpg');
+					}
+					$docPrimaryId = $invoiceResult['id'];
+				} 
+				
+				$this->Job->insertDocumentEntry($fileName, $loadId, 'invoice', $docPrimaryId);
+				
+				$this->mergingPdf($loadId);
+				//~ $data['documents'] = $this->Job->getDocsList($loadId);
+				$billingLoads = $this->Billing->getInProgressLoads();
+				echo json_encode(array('results' => $data, 'showError' => $showError, 'errorMessage' => $errorMessage, 'billingLoads' => $billingLoads));  
+			} else {
+				echo json_encode(array('showError' => $showError, 'errorMessage' => $errorMessage));  
+			}
+		}
+	}
+	
+	/**
+	 * Merging PDF files
+	 */
+	 
+	public function mergingPdf( $loadId = null ) {
+		$pdf = $this->load->library('m_pdf');
+		$pdf = new mPDF();
+		$pdf->SetImportUse();
+		$pathGen = str_replace('application/', '', APPPATH);
+		
+		$documents = $this->Billing->fetchDocToBundle($loadId);
+		$invoiceResult = $this->Billing->fetchUploadedDocs( $loadId, 'bundle');
+		$files = array();
+		if ( !empty($documents) ) {
+			foreach( $documents as $docs ) {
+				$files[] = "assets/uploads/documents/{$docs['doc_type']}/{$docs['doc_name']}";
+			}			
+		}
+		
+		$temp = $files[1];
+		$files[1] = $files[2];
+		$files[2] = $temp;
+		
+		if ( !empty($files) && (count($files) == 3) ) {
+			for ($i = 0; $i < count($files); $i++ ) {
+				$ext = explode('.',$files[$i]);
+				if ( strtolower($ext[1]) == 'png' || strtolower($ext[1]) == 'jpg' || strtolower($ext[1]) == 'jpeg' ) {
+					$pdf->AddPage('P','A4');
+					$pdf->WriteHTML('<img src="'.$files[$i].'" />');
+				} else if ( strtolower($ext[1]) == 'xlsx' ) {
+					
+				} else {
+					$pagecount = $pdf->setSourceFile($pathGen.$files[$i]);	
+					for($j = 1; $j <= $pagecount ; $j++)
+					{
+						$tplidx = $pdf->importPage(($j), '/MediaBox'); // template index.
+						$pdf->addPage('P','A4');// orientation can be P|L
+						$pdf->useTemplate($tplidx, 0, 0, 0, 0, TRUE);                   
+					}
+				}
+			}
+			
+			$fileName = "bundle_".time().".pdf";
+			$pdfFilePath = $pathGen."assets/uploads/documents/bundle/".$fileName;
+
+			$pdf->Output($pdfFilePath, "F"); 
+			
+				if (substr(php_uname(), 0, 7) == "Windows"){ 
+					//pclose(popen("start /B ". $cmd, "r"));  
+					$response['data']['cmd'] = 'Windows';
+				} 
+				else { 					
+					$thumbFolder = 'thumb_bundle';
+					$raw_name = explode('.',$fileName);
+					$cmd = 'cd '.$pathGen."assets/uploads/documents/bundle/";
+					$cmd .= '; convert -thumbnail x600 '.$fileName.'[0] -flatten ../'.$thumbFolder.'/thumb_'.$raw_name[0].'.jpg';
+					$response['data']['cmd'] = $cmd;
+					exec($cmd . " > /dev/null &");   
+				}
+			
+			$docPrimaryId = '';
+			if ( !empty($invoiceResult) && $invoiceResult['doc_name'] != '' ) {
+				if(file_exists($pathGen."assets/uploads/documents/bundle/".$invoiceResult['doc_name'])){
+					unlink($pathGen."assets/uploads/documents/bundle/".$invoiceResult['doc_name']);
+				}
+				
+				$unlink_name = explode('.',$invoiceResult['doc_name']);
+				if(file_exists($pathGen."assets/uploads/documents/bundle_invoice/thumb_".$unlink_name[0].'.jpg')){
+					unlink($pathGen."assets/uploads/documents/bundle_invoice/thumb_".$unlink_name[0].'.jpg');
+				}
+				$docPrimaryId = $invoiceResult['id'];
+			} 
+			
+			$this->Job->insertDocumentEntry($fileName, $loadId, 'bundle', $docPrimaryId); 
+		}
+		return true;
+	} 
+	
+	public function mergingPdf1( $loadId = null ) {
+		$loadId = 33;
+		$pdf = $this->load->library('m_pdf');
+		$pdf = new mPDF();
+		$pdf->SetImportUse();
+		$pathGen = str_replace('application/', '', APPPATH);
+		
+		$documents = $this->Billing->fetchDocToBundle($loadId);
+		$invoiceResult = $this->Billing->fetchUploadedDocs( $loadId, 'bundle');
+		$files = array();
+		if ( !empty($documents) ) {
+			foreach( $documents as $docs ) {
+				$files[] = "assets/uploads/documents/{$docs['doc_type']}/{$docs['doc_name']}";
+			}			
+		}
+		
+		for ($i = 0; $i < count($files); $i++ ) {
+				$ext = explode('.',$files[$i]);
+				if ( strtolower($ext[1]) == 'png' || strtolower($ext[1]) == 'jpg' || strtolower($ext[1]) == 'jpeg' ) {
+					$pdf->AddPage('L','A4');
+					$pdf->WriteHTML('<img src="'.$files[$i].'" />');
+				} else if ( strtolower($ext[1]) == 'xlsx' ) {
+					
+				} else if ( $ext[1] == 'txt' ) {
+					$result = file_get_contents($files[$i]);
+					$pdf->AddPage('L','A4');
+					$pdf->WriteHTML($result);
+				} else {
+					$pagecount = $pdf->setSourceFile($pathGen.$files[$i]);	
+					for($j = 1; $j <= $pagecount ; $j++)
+					{
+						$tplidx = $pdf->importPage(($j), '/MediaBox'); // template index.
+						$pdf->addPage('L','A4');// orientation can be P|L
+						$pdf->useTemplate($tplidx, 0, 0, 0, 0, TRUE);                   
+					}
+				}
+			}
+			
+			$fileName = "bundle_".time().".pdf";
+			$pdfFilePath = $pathGen."assets/uploads/documents/bundle/".$fileName;
+
+			$pdf->Output('tes.pdf', "D"); 
+		
+		
+	} 
+	
+	/**
+	 * Fetching Broker list on add load
+	 */
+	 
+	public function getBrokersList( $loadId = null ) {
+		$brokersData = $this->BrokersModel->getBrokersList();
+		if ( !empty($brokersData) ) 
+			$this->data['brokersList'] = $brokersData;
+			
+		$getBrokerLoad = $this->BrokersModel->getBrokerDetail( $loadId );
+		$this->data['brokerLoadDetail'] = $getBrokerLoad;
+		echo json_encode($this->data);
+	} 
+	
+}
+
+
+

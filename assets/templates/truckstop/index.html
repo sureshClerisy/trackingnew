@@ -1,0 +1,178 @@
+<!--script>
+jQuery(function(){
+if(!window.google||!window.google.maps){
+	
+  var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = 'http://maps.google.com/maps/api/js?key=AIzaSyBSPVGmxdOqe2yrxzla4iezs00zWe_p6j4&libraries=places,geometry';
+    document.body.appendChild(script);
+}
+else{
+
+ // initAutocomplete();
+}});
+</script-->
+
+      <!-- START PAGE CONTENT WRAPPER -->
+      <div class="page-content-wrapper ">
+        <!-- START PAGE CONTENT -->
+        <div class="content sm-gutter">
+          <!-- START CONTAINER FLUID -->
+          <div class="container-fluid padding-25 sm-padding-10">
+			  
+					
+			  <div class="col-middle loader-outer" ng-show="autoFetchLoads == true">
+					<!-- START PANEL -->
+					<div class="loader-inner">
+					<div class="full-height">
+						<div class="panel-body text-center">
+							<img class="image-responsive-height demo-mw-50" src="assets/img/demo/progress.svg" alt="Progress">
+						</div>
+					</div>
+					</div>
+					<!-- END PANEL -->
+                </div>
+                
+			<div class="row invocie-block-row">
+				
+				<div class="col-md-12 col-xlg-12">
+					<!--h2 class="operate-class oprate-dashbord">Search Loads</h2-->
+					<div class="label_select_box">
+						<!-- <div class="show-new-search show-new-search1">
+							<button class="btn btn-primary" ng-click="showNewSearchPopup()">New Search</button>
+						</div> -->
+						
+						<div class="label-select-box-filters" ng-show = "fetchnewsearch == false">
+							<span class="glymphic-span" ng-show="newChangeDriverLoads == true"><i class="glyphicon glyphicon-refresh spinning"></i></span>
+						</div>
+						
+						<!-- <div class="show-new-search reset-search" ng-show = "fetchnewsearch == true" >
+							<button class="btn btn-primary" data-toggle="modal" ng-click="reloadCurrentState()">Reset</button>
+						</div> -->
+					</div>
+				</div>
+			</div>
+	
+			<div class="row invocie-block-row">
+				<div class="col-md-12 col-xlg-12">
+					<div class="load-new-block-table">
+						<div class="panel-body search-position start-over search-change-right fix-page srp-search">
+							<!--div class="load-tabe-auto job-list truckstopJobs" ng-repeat="(key, loadData) in loadsData" ng-show="search_label == 'all' || search_label == tableTitle[$index]" -->
+							
+							<div class="load-tabe-auto job-list truckstopJobs map-load-section textCenter" ng-show ="notShowDataTable == false">
+								<span class="textCenter-span">No Search Parameter Selected</span>
+							</div>
+							
+							<div class="load-tabe-auto job-list truckstopJobs map-load-section" ng-show = "notShowDataTable == true">
+								
+								<h2 class="itenary-truck-heading small-heading-h2">{{tableTitle[0]}}<a ng-click="editNewSearch()" ng-show = "fetchnewsearch == true || fetchnewMainSearch == true" title="Edit Search" class="icon-action edit round-shape"><i class="fa fa-edit"></i></a></h2>
+									 
+								<div class="loadtable">
+								  <div class="dataTables_wrapper no-footer"> 
+									<table id="data" datatable="ng" dt-options="dtOptions" width="100%" class="fixed-thead table table-striped" cell-padding="0" cell-spacing="0">
+									<thead>
+										<tr>
+											<th>{{ languageArray.bondLoadTableThHeading }}</th>
+											<th>{{ languageCommonVariables.commonTableThPhone }}</th>
+											<th>{{ languageArray.trlrLoadTableThHeading }}</th>
+											<th>AGE</th>  
+											<th>F/L</th> 
+											<th>PICKUP</th> 
+											<th>ORIGIN</th>
+											<th>ST</th>
+											<th>DIST</th>
+											<th>Destination</th>
+											<th>ST</th>											
+											<!-- <th>DIST</th>	 -->
+											<th>PAYMENT</th> 										
+											<th>RPM</th> 										
+											<th>MILES</th> 
+											<th>LENGTH</th> 										
+											<th>Weight</th>  
+											<!-- <th>EXP</th> -->
+											<th>COMPANY</th>
+											<th>FUEl</th> 
+											<th>DEAD MI</th>  
+											<th>Profit</th>  
+											<th>Profit %</th>  
+											<th class="text-center">{{ languageCommonVariables.commonTableThAction }}</th>
+										</tr>
+									</thead>
+									<tbody>
+										
+										<tr ng-class="{'visited' : value.visited}" data-pickdate="{{value.pickDate}}" data-uinfo="{{value.ID}}" my-repeat-directive ng-repeat="(key3,value) in loadsData track by value.ID" >
+										<!--tr data-uinfo="{{value.ID}}" ng-repeat="(key3,value) in combined = loadsData.concat(tes)"  -->
+										
+											<td>{{value.Bond}}</td>
+											<td>{{value.PointOfContactPhone}}</td>
+											<td class="short-width">{{value.Equipment}}</td>
+											<td>{{value.Age}}</td>
+											<td>{{value.LoadType}}</td>
+											<td>{{value.PickUpDate}}</td>
+											<td class="give-size"><span>{{value.OriginCity|capitalize}}</span></td>
+											<td class=" state-capital">{{value.OriginState}}</td>
+											<td class="">{{value.OriginDistance}}</td>											
+											<td class="give-size ex-large-width"><span>{{value.DestinationCity|capitalize}}</span></td>
+											<td class="state-capital">{{value.DestinationState}}</td>
+											<!-- <td class="text-center ">{{value.DestinationDistance}}</td>-->
+											<td class="" ng-class="value.highlight == 1 ? 'highlight' : ''">{{value.Payment | currency:"$":2}}</td>	
+											<td class="">{{ value.RPM | currency:"$":2  }}</td>	
+											<td class="">{{value.Miles}}</td>
+											<td class="">{{value.Length | number:0}}</td>
+											<td class="">{{value.Weight}}</td>
+											<!-- <td class="text-center">{{value.ExperienceFactor}}</td> -->
+											<td class="give-size"><span>{{value.CompanyName|capitalize}}</span></td>
+											<td class="give-size">{{value.FuelCost|capitalize}}</td>					
+											<!--td class="text-center" ng-if='value.deadmiles != null'>{{value.deadmiles}}-->
+											<td>{{value.deadmiles}}</td>
+											<td>{{value.profitAmount | currency:"$":2 }}</td>
+											<td>{{value.percent}}</td>
+
+											<!--td class="text-center" ng-if='value.deadmiles == null' >
+												<a ng-click='get_distance(value.OriginCity,value.OriginState, $parent.$index, key3);' id='{{value.Age}}'>
+												<i class='fa fa-map-marker' aria-hidden='true'></i>
+												</a>
+											</td-->
+										
+																
+											<td class="text-center short-width"> 
+												<!--a href="#" class="icon-action edit"><i class="fa fa-edit"></i></a--> 
+											<span class="action-image-cover">
+												<a title="Load Detail" class="" ng-click="clickMatchLoadDetail(value.ID,'',value.deadmiles,value.Payment,value.TotalCost,value.pickDate)" >
+												<img src="pages/img/search-icon.png">
+												</a>
+												<a title="Special Information" class="" ng-click="fetchSpecialNote(value.ID)" >
+												<img src="pages/img/info-icon.png">
+												</a>
+												<a title="Not Interested" class="" ng-click="removeLoad(value.ID,$event)" >
+												<img src="pages/img/delete-icon.png">
+												</a>
+											</span>	
+												<!--a ng-click="notInterested($index)" title="Not Interested">
+													<img src="assets/images/cross.png" />
+												</a-->
+												
+												<!--a title="Special Information" class="" ng-click="fetchSpecialNote(value.ID)" >
+													<img src="pages/img/info.png" /></a>
+													<a title="Not Interested" class="" ng-click="removeLoad(value.ID)" >
+													<img src="pages/img/cancel.png" />
+												</a-->
+											</td>
+										</tr>
+									</tbody>
+								</table>
+								
+								<!--button class="btn btn-primary" ng-click="newpageRecords(apiPageNo)" ng-show="showApiPageNo ==  true">Load More</button-->
+
+								</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<ng-include src="'./assets/templates/truckstop/modals.html'"></ng-include>

@@ -1,0 +1,45 @@
+<div ng-show="showLogin == true">
+	<div class="login-head">
+		<!--h5>Vika Logistics</h5--> 
+		<img src ='assets/img/vikalogo.png'  alt = ''>
+	</div>
+	<div class="login-main">
+		<div class="login-outer">
+			<div class="alert alert-danger" role="alert" ng-show="logmsg == true&&invalidUsermsg!= true">
+			<button class="close" data-dismiss="alert"></button>
+			{{ languageCommonVariables.Inactivity5Minutes }}	
+			</div>
+		<div class="alert alert-danger" role="alert" ng-show="invalidUsermsg == true">
+			<button class="close" ng-click = "closeInvalidLogin()"></button>
+			{{Message}} 	
+		</div>
+		<img src ='assets/img/login-img.png' class = 'login-img' alt = '' >
+		<div class="login-inner-head">
+			<h4 class="ng-binding" >{{ languageCommonVariables.loginHeading }}</h4>
+			<h5 class="ng-binding" >{{ languageCommonVariables.loginSubHeading }}</h5>
+		</div>
+		<form name="loginForm" id="form-login" class="p-t-15 " role="form">
+			<!-- START Form Control-->
+			<div class="form-group form-group-default login-form-class">
+				<label>{{ languageCommonVariables.loginUsernameLabel }}</label>
+				<div class="controls">
+				<input type="text" class="form-control" placeholder="Username" name="username" ng-model="login.username" required focus/>
+				</div>
+			</div>
+			<!-- END Form Control-->
+			<!-- START Form Control-->
+			<div class="form-group form-group-default login-form-class">
+				<label>{{ languageCommonVariables.loginPasswordLabel }}</label>
+				<div class="controls">
+				<input type="password" class="form-control" placeholder="Password" ng-model="login.password" required/>
+				</div>
+			</div>
+			<!-- START Form Control-->
+
+			<div class="login-btn-main">
+				<button type="submit" class="width-35 pull-right btn btn-sm btn-primary" ng-click="doLogin(); closeLoginError()" data-ng-disabled="loginForm.$invalid">{{ languageCommonVariables.loginSignInButton }}</button>
+			</div>
+		</form>
+		</div>
+	</div>
+</div>

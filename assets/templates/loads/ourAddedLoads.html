@@ -1,0 +1,154 @@
+
+      <!-- START PAGE CONTENT WRAPPER -->
+      <div class="page-content-wrapper ">
+        <!-- START PAGE CONTENT -->
+        <div class="content sm-gutter">
+          <!-- START CONTAINER FLUID -->
+			<div class="container-fluid padding-25 sm-padding-10">
+				<canvas id="viewport" style="display: none;"></canvas>
+			   <div ng-show="alertdeletemsg == true" class="alert alert-success" role="alert">
+					<button ng-click = "hideloadmessage()" class="close"></button>
+					{{Message}}
+				</div>
+			
+				
+				<div class="col-middle loader-outer" ng-show="autoFetchLoads == true">
+					<!-- START PANEL -->
+					<div class="loader-inner">
+					<div class="full-height">
+						<div class="panel-body text-center">
+							<img class="image-responsive-height demo-mw-50" src="assets/img/demo/progress.svg" alt="Progress">
+						</div>
+					</div>
+					</div>
+					<!-- END PANEL -->
+                </div>
+                
+			  
+			<div class="row">
+				<div class="col-md-12 col-xlg-12">
+					<div class="commen-heading assigned-load-page">
+						<h2 class="oprate-dashbord">Our Loads ({{tableTitle[0]}}) </h2>
+						<div class="label_select_box">
+							<div class="label-select-box-filters" ng-show = "fetchnewsearch == false">
+								<ui-select class="mdrivers" ng-model="search_label" theme="bootstrap" on-select="onSelectVehicleCallback($item, $model); changeDriverLoads(search_label);" required>
+									<ui-select-match class="ui-select-match" placeholder="{{ languageArray.planselectdriver }}">{{selectedDriver}}</ui-select-match>
+									<ui-select-choices class="ui-select-choices" group-by="groupFind" repeat="item in labelArray| filter: $select.search">
+										<div ng-bind-html="trustAsHtml((item.driverName + ' - ' + item.label | highlight: $select.search))"></div>
+									</ui-select-choices>
+								</ui-select>
+								
+								<!--span class="glymphic-span" ng-show="newChangeDriverLoads == true"><i class="glyphicon glyphicon-refresh spinning"></i></span-->
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			
+			<div class="row invocie-block-row">
+				<div class="col-md-12 col-xlg-12">
+					<div class="load-new-block-table">
+						<div class="panel-body add-new-data">
+							<div class="load-tabe-auto job-list truckstopJobs map-load-section">
+								<div class="loadtable">
+									<a href="javascript:void(0);" class="add-new-data-button"> 
+										 <button ng-click="addNewLoad();" class="btn btn-primary"> Add Load</button>
+									</a>
+									 <div class="export-options-container"></div>
+								<div class="dataTables_wrapper no-footer"> 
+								<table id="data" datatable="ng" dt-options="dtOptions" width="100%" class="fixed-thead table table-striped" cell-padding="0" cell-spacing="0">
+									<thead>
+										<tr>
+											<!--th>{{ languageCommonVariables.commonTableThPhone }}</th-->
+											<th>{{ languageArray.trlrLoadTableThHeading }}</th>
+											<th>{{ languageArray.planthfl }}</th>
+											<th>{{ languageArray.planthpickup }}</th> 
+											<th>{{ languageCommonVariables.origin }}</th>
+											<th>{{ languageCommonVariables.destination }}</th>
+											<th>{{ languageArray.planthpayment }}</th>
+											<th>{{ languageArray.planthrpm }}</th>
+											<th>{{ languageArray.planthmiles }}</th>
+											<th>{{ languageArray.planthdeadmiles }}</th>
+											<th>{{ languageArray.planthlength }}</th>
+											<th>{{ languageArray.planthweight }}</th>
+											<th>{{ languageArray.planthcompany }}</th>
+											<th>{{ languageCommonVariables.commonTableThStatus }}</th>
+											<th class="text-center">{{ languageCommonVariables.commonTableThAction }}</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr data-uinfo="{{value.truckstopID}}" ng-class="{'visited' : value.visited}" data-pickdate="{{value.pickDate}}" ng-repeat="value in assignedLoads track by value.id">
+											<!--td>{{ value.PointOfContactPhone }}</td-->
+											<td>{{ value.equipment_options }}</td>
+											<td>{{ value.LoadType }} </td>
+											<td>{{value.PickupDate}}</td>
+											<td class="text-same-lower">{{ value.PickupAddress}}</td>
+											<td class="text-same-lower" >{{ value.DestinationAddress}}</td>
+											<td class="">{{ value.PaymentAmount | currency:"$":2 }}</td>
+											<td class="">{{ value.PaymentAmount / value.Mileage | number: 2 }}</td>
+											<td class="">{{ value.Mileage }}</td>
+											<td class="">{{ value.deadmiles }}</td>
+											<td class="">{{ value.Length }}</td>
+											<td class="">{{ value.Weight }}</td>
+											<td class="company_name"><span class="text-comp-name">{{ value.companyName|capitalize }}</span></td>
+											<td>{{ value.JobStatus }}</td>
+											
+											<td class="text-center action-btn-ryt"> 
+												<div class="export-options-container pull-right">
+													<div class="exportOptions">
+														<div class="DTTT btn-group">
+															<!--a class="btn btn-default DTTT_button_xls" data-original-title="Truck Route" ui-jq="tooltip" ng-click="showAssignedLoad(value)">
+																<span><img src="pages/img/route.png"></span>
+															</a-->
+															<a class="btn btn-default DTTT_button_pdf" data-original-title="Load Detail" ui-jq="tooltip" ng-click="clickMatchLoadDetail(value.truckstopID, value.id, value.deadmiles, value.PaymentAmount, value.totalCost, value.pickDate )">
+																<span><i class="fa fa-search" aria-hidden="true"></i></span>
+															</a>
+															<a class="btn btn-default DTTT_button_copy" data-original-title="Delete load" ui-jq="tooltip" ng-click="removeLoadDelete(value.id,$index)">
+																<span><i class="fa fa-trash" aria-hidden="true"></i></span>
+															</a>
+															<a class="btn btn-default DTTT_button_csv" data-original-title="Export as CSV" ui-jq="tooltip" ng-click="exportCsv($event,'loads',value.id)">
+																<span><i class="pg-grid"></i></span>
+															</a>
+														</div>
+													</div>
+												</div>	
+												
+											</td>
+										</tr>
+									</tbody>
+								</table>
+								</div>
+								
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		
+		
+		<!--start of map section-->
+		<div ng-show="showRouteOnMap == true"> 
+			<div class="commen-heading iteration-map show-map-on-top load-margin">
+				<h2 class="oprate-dashbord">{{languageArray.routeMap}}</h2>
+			</div>
+			<div class="show-load-map-section">
+				<div class="show-google-map-route assign-load-map-cover">
+					<div id="map_canvas" style="height:600px; position: relative; overflow: hidden;">
+						
+					</div>            
+				</div>
+				
+			</div>
+		</div>
+		<!--end of map section-->
+		
+		
+	</div>
+</div>
+ 
+<ng-include src="'./assets/templates/truckstop/modals.html'"></ng-include>
+

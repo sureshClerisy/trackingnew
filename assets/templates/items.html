@@ -1,0 +1,240 @@
+
+
+
+<div class="container-fluid container-fixed-lg bg-white">
+	 <div class="panel panel-transparent" >
+        <div class="panel-heading">
+            <div class="panel-title">Pages Default Tables Style
+            </div>
+            <div class="pull-right">
+                <div class="col-xs-12">
+                    <input type="text" id="search-table" class="form-control pull-right" placeholder="Searchdd" ng-keyup="filter($event)">
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+<div>
+    <table id="myTable" datatable="ng" class="row-border hover" dt-options="dtOptions" dt-columns="dtColumns" dt-instance="dtInstance" ui-options="options">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>FirstName</th>
+            <th>LastName</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="item in data">
+            <td>{{ item.id }}</td>
+            <td>{{ item.title }}</td>
+            <td>{{ item.description }}</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+</div>
+
+
+
+
+<div class="container-fluid container-fixed-lg bg-white">
+ 
+    <div class="panel panel-transparent" >
+        <div class="panel-heading">
+            <div class="panel-title">Pages Default Tables Style
+            </div>
+            <div class="pull-right">
+                <div class="col-xs-12">
+                    <input type="text" id="search-table" class="form-control pull-right" placeholder="Searchdd" ng-keyup="filter($event)">
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="panel-body">
+			<table class="table" datatable="ng" >
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Position</th>
+						<th>Office</th>
+						<th>Age</th>
+						<th>Start date</th>
+						<th>Salary</th>
+					</tr>
+				</thead>
+
+
+				<tbody>
+					<tr>
+						<td>Tiger Nixon</td>
+						<td>System Architect</td>
+						<td>Edinburgh</td>
+						<td>61</td>
+						<td>2011/04/25</td>
+						<td>$320,800</td>
+					</tr>
+					<tr>
+						<td>Garrett Winters</td>
+						<td>Accountant</td>
+						<td>Tokyo</td>
+						<td>63</td>
+						<td>2011/07/25</td>
+						<td>$170,750</td>
+					</tr>
+					<tr>
+						<td>Ashton Cox</td>
+						<td>Junior Technical Author</td>
+						<td>San Francisco</td>
+						<td>66</td>
+						<td>2009/01/12</td>
+						<td>$86,000</td>
+					</tr>
+					<tr>
+						<td>Cedric Kelly</td>
+						<td>Senior Javascript Developer</td>
+						<td>Edinburgh</td>
+						<td>22</td>
+						<td>2012/03/29</td>
+						<td>$433,060</td>
+					</tr>
+					<tr>
+						<td>Garrett Winters</td>
+						<td>Accountant</td>
+						<td>Tokyo</td>
+						<td>63</td>
+						<td>2011/07/25</td>
+						<td>$170,750</td>
+					</tr>
+					<tr>
+						<td>Ashton Cox</td>
+						<td>Junior Technical Author</td>
+						<td>San Francisco</td>
+						<td>66</td>
+						<td>2009/01/12</td>
+						<td>$86,000</td>
+					</tr>
+					<tr>
+						<td>Cedric Kelly</td>
+						<td>Senior Javascript Developer</td>
+						<td>Edinburgh</td>
+						<td>22</td>
+						<td>2012/03/29</td>
+						<td>$433,060</td>
+					</tr>
+					<tr>
+						<td>Airi Satou</td>
+						<td>Accountant</td>
+						<td>Tokyo</td>
+						<td>33</td>
+						<td>2008/11/28</td>
+						<td>$162,700</td>
+					</tr>
+					<tr>
+						<td>Brielle Williamson</td>
+						<td>Integration Specialist</td>
+						<td>New York</td>
+						<td>61</td>
+						<td>2012/12/02</td>
+						<td>$372,000</td>
+					</tr>
+					<tr ng-repeat="value in data">
+						<td>test</td>
+						<td>{{ value.title }}</td>
+						<td>{{ value.description }}</td>
+						
+						<td>33</td>
+						<td>2008/11/28</td>
+						<td>$162,700</td>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+        </div>
+    </div>
+  
+</div>
+
+
+
+
+<!--div class="container-fluid container-fixed-lg bg-white">
+   
+    <div class="panel panel-transparent" >
+        <div class="panel-heading">
+            <div class="panel-title">Pages Default Tables Style
+            </div>
+            <div class="pull-right">
+                <div class="col-xs-12">
+                    <input type="text" id="search-table" class="form-control pull-right" placeholder="Searchdd" ng-keyup="filter($event)">
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="panel-body">
+            <table class="table table-hover demo-table-search" id="tableWithSearch" ui-jq="dataTable" ui-options="options">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>
+							<a href="javascript:void(0)" ng-click="sortType = 'title'; sortReverse = !sortReverse">
+								<span ng-show="sortType == 'title' && !sortReverse" class="fa fa-caret-down"></span>
+								<span ng-show="sortType == 'title' && sortReverse" class="fa fa-caret-up"></span>
+							</a>
+
+						</th>
+                        <th> desc
+							</th>
+                        <th>Status</th>
+                        <th>Last Update</th>
+                    </tr>
+                </thead>
+                <tbody>
+					<tr dir-paginate="value in data | itemsPerPage:10 | orderBy:sortType:sortReverse" total-items="totalItems">
+						<td>{{ ((pageNumber- 1) * 5) + ($index + 1) }}</td>
+						<td>{{ value.title }}</td>
+						<td>{{ value.description }}</td>
+						<td>
+						<button data-toggle="modal" ng-click="edit(value.id)" data-target="#edit-data" class="btn btn-primary">Edit</button>
+						<button ng-click="remove(value,$index)" class="btn btn-danger">Delete</button>
+						</td>
+					</tr>
+				</tbody>
+            </table>
+        </div>
+        
+        <div class="panel-body">
+            <table class="table table-hover demo-table-search" id="tableWithSearch1" ui-jq="dataTable" ui-options="options">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>
+							<a href="javascript:void(0)" ng-click="sortType = 'title'; sortReverse = !sortReverse">
+								<span ng-show="sortType == 'title' && !sortReverse" class="fa fa-caret-down"></span>
+								<span ng-show="sortType == 'title' && sortReverse" class="fa fa-caret-up"></span>
+							</a>
+						</th>
+                        <th> desc
+							</th>
+                        <th>Status</th>
+                        <th>Last Update</th>
+                    </tr>
+                </thead>
+                <tbody>
+					<tr dir-paginate="value in data | itemsPerPage:10 | orderBy:sortType:sortReverse" total-items="totalItems">
+						<td>{{ ((pageNumber- 1) * 5) + ($index + 1) }}</td>
+						<td>{{ value.title }}</td>
+						<td>{{ value.description }}</td>
+						<td>
+						<button data-toggle="modal" ng-click="edit(value.id)" data-target="#edit-data" class="btn btn-primary">Edit</button>
+						<button ng-click="remove(value,$index)" class="btn btn-danger">Delete</button>
+						</td>
+					</tr>
+				</tbody>
+            </table>
+        </div>
+    </div>
+
+</div-->
+
+
+

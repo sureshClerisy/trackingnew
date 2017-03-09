@@ -1,0 +1,77 @@
+
+<!--Changing driver from truck-->
+<div class="modal fade slide-up" id="changeDriverOnTruck1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="popup-overlay">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content-wrapper">
+			<div class="modal-content">
+			
+				<div class="modal-header model-heading-main">
+					<div class="model-heading-inner">
+						<h4 class="modal-title" id="myModalLabel">{{ languageArray.areUSure }}</h4>
+						<!--button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button-->
+					</div>
+				</div>
+			 
+				<div class="modal-body main-pop-body">
+					<div class="popup-body-bg">
+						<div class="form-group-attached1">
+							<div class="row clearfix">
+								<div class='col-lg-12'>
+									<div pg-form-group class="form-group form-group-default form-special-info">
+										{{ truckData.driverName }}{{ languageArray.associatedWith }} -{{ truckName }}. {{ languageArray.wantToChange }}
+									</div>
+								</div>
+							</div>
+												
+								
+							</div>
+						</div>
+					</div>
+					
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="changeDriverOrNot('yes',dtype,dindex)" aria-label="Close">{{ languageArray.yes }}</button>
+					<button class="btn btn-primary" data-dismiss="modal" ng-click="changeDriverOrNot('no',dtype,dindex)" aria-label="Close">{{ languageArray.no }}</button>
+				</div>
+			</div>
+		</div>
+	</div>  
+	</div>  
+			<!--------table-full-width------>
+</div>
+
+
+
+
+<!-- Confirm Delete Modal -->
+
+<div class="modal fade slide-up confirm-delete " id="changeDriverOnTruck" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="popup-overlay">
+		<div class="popup-main">
+			<div class="popup-main-table">
+				<div class="popup-table-cell">
+					<div class="confirm-main-content-">
+						<div class="popconfirm-img">
+							<img src="pages/img/confirm-icon.png">
+						</div>
+						<h2 class="confirm-heading">{{ languageArray.areUSure }}</h2>
+						<p>{{ truckData.driverName }}{{ languageArray.associatedWith }} -{{ truckName }}. {{ languageArray.wantToChange }}</p>
+						<div class="line-image">
+							<img src="pages/img/confirm-line.png">
+						</div>
+						<div class="confirm-btn-section">
+							<a href="" class="common-item confirm-yes yes-btn" ng-click="changeDriverOrNot('yes',dtype,dindex)" ><button class="btn btn-primary btn-cons m-b-10" type="button"><i class="fa fa-check"></i> <span class="bold">{{ languageArray.yes }}</span>
+								</button></a>
+							
+							<a href="" class="common-item no-btn" ng-click="changeDriverOrNot('no',dtype,dindex)"><button class="btn btn-danger btn-cons m-b-10" type="button"><i class="fa fa-close"></i><span class="bold"> {{ languageArray.no}} </span></button></a>
+							
+						</div>
+						
+					</div>
+				</div>
+			</div>
+		</div>
+<!-- 	table-full-width  -->
+	</div>
+</div>
+<!-- Confirm Delete Modal -->

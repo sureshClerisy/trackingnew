@@ -1,0 +1,433 @@
+<!-- START PAGE CONTENT WRAPPER -->
+      <div class="page-content-wrapper ">
+        <!-- START PAGE CONTENT -->
+        <div class="content sm-gutter">
+          <!-- START CONTAINER FLUID -->
+			<div class="container-fluid padding-25 sm-padding-10">
+				<canvas id="viewport" style="display: none;"></canvas>
+			   <div ng-show="alertdeletemsg == true" class="alert alert-success" role="alert">
+					<button ng-click = "hideloadmessage()" class="close"></button>
+					{{Message}}
+				</div>
+			
+				
+				<div class="col-middle loader-outer" ng-show="autoFetchLoads == true">
+					<!-- START PANEL -->
+					<div class="loader-inner">
+					<div class="full-height">
+						<div class="panel-body text-center">
+							<img class="image-responsive-height demo-mw-50" src="assets/img/demo/progress.svg" alt="Progress">
+						</div>
+					</div>
+					</div>
+					<!-- END PANEL -->
+                </div>
+                
+			  
+			<div class="row">
+				<div class="col-md-12 col-xlg-12">
+					<div class="commen-heading billing-page">
+						<h2 class="oprate-dashbord">{{ languageArray.billingLoadsHeading }}</h2>
+					</div>
+					
+					<div class="label_select_box">
+						<button ng-show = "showReadyForInvoiceLoads == true" ng-click="fetchBillableLoads('invoice')" class="edit-loadDetail edit1Load1 btn btn-info btn-cons m-b-10" type="button"><i class="fa fa-paste"></i> <span class="bold">Show Invoice Ready Loads</span></button>
+						
+						<button ng-show = "showReadyForInvoiceLoads == false" ng-click="fetchBillableLoads('all')" class="edit-loadDetail edit1Load1 btn btn-info btn-cons m-b-10" type="button"><i class="fa fa-paste"></i> <span class="bold">Show All Loads</span></button>
+					</div>
+					<!--div class="label_select_box">
+						<div class="label-select-box-filters" ng-show = "fetchnewsearch == false">
+							<ui-select class="mdrivers" ng-model="search_label" theme="bootstrap" on-select="onSelectVehicleCallback($item, $model);" required>
+								<ui-select-match class="ui-select-match" placeholder="Select Driver">{{selectedDriver}}</ui-select-match>
+								<ui-select-choices class="ui-select-choices" repeat="item in labelArray| filter: $select.search">
+									<div ng-bind-html="trustAsHtml((item.label | highlight: $select.search))"></div>
+								</ui-select-choices>
+							</ui-select>
+						</div>
+					</div-->
+				</div>
+			</div>
+			
+			<div class="row invocie-block-row">
+				<div class="col-md-12 col-xlg-12">
+					<div class="load-new-block-table">
+						<div class="panel-body add-new-data">
+							<div class="load-tabe-auto job-list truckstopJobs map-load-section">	
+							<div class="srpSearchDiv searchinput search-list-fix">
+									<div class="srpSearch1">
+										<label for="search" class="ng-binding">Search</label>
+										<input type="text" class="form-control" ng-model="searchFilter" ng-change="callSearchFilter(searchFilter);" />
+									</div>
+								</div>
+								<div class="table-structure-main-block tb-my">
+									<div class="table-res-1">
+										<div class="table-row-main1 tb-head">
+											
+											<div class="tb-cell ld-id-bill ld-id stype" ng-click="sortCustom('id', idSortType)"> 
+												<span class="lode-arrow {{idSortType}}">{{ languageArray.popupLoadId }}</span>
+											</div>
+
+											<div class="tb-cell Invoice-No-bill stype" ng-click="sortCustom('invoiceNo', invoiceNoSortType)" >
+												<span class="lode-arrow {{invoiceNoSortType}}">{{ languageCommonVariables.invoiceNo }}</span>
+											</div>
+
+											<div class="tb-cell staus-bill stype" ng-click="sortCustom('JobStatus', JobStatusSortType)"> 
+												<span class="lode-arrow {{JobStatusSortType}}">{{ languageCommonVariables.commonTableThStatus }}</span>
+											</div>
+
+											<div class="tb-cell pickup-bill stype" ng-click="sortCustom('PickupDate', PickupDateSortType)"> 
+												<span class="lode-arrow {{PickupDateSortType}}">{{ languageArray.planthpickup }}</span>
+											</div>
+
+											<div class="tb-cell delivery-bill stype" ng-click="sortCustom('DeliveryDate', DeliveryDateSortType)"> 
+												<span class="lode-arrow {{DeliveryDateSortType}}">{{ languageArray.popupdelivery }}</span>
+											</div>
+
+											<div class="tb-cell fl-bill stype" ng-click="sortCustom('LoadType', LoadTypeSortType)"> 
+												<span class="lode-arrow {{LoadTypeSortType}}">{{ languageArray.planthfl }}</span>
+											</div>
+
+											<div class="tb-cell Driver-bill">{{ languageArray.driversHeading }} </div>
+
+											
+											<div class="tb-cell Origin-bill stype" ng-click="sortCustom('OriginCity', OriginCitySortType)"> 
+												<span class="lode-arrow {{OriginCitySortType}}">{{ languageCommonVariables.origin }}</span>
+											</div>
+
+											<div class="tb-cell st-bill stype" ng-click="sortCustom('OriginState', OriginStateSortType)"> 
+												<span class="lode-arrow {{OriginStateSortType}}">{{ languageArray.planthst }}</span>
+											</div>
+
+											<div class="tb-cell Destination-bill stype" ng-click="sortCustom('DestinationCity', DestinationCitySortType)">
+												<span class="lode-arrow {{DestinationCitySortType}}">{{ languageCommonVariables.destination }}</span>
+											</div>
+
+											<div class="tb-cell st1-bill	stype" ng-click="sortCustom('DestinationState', DestinationStateSortType)">
+												<span class="lode-arrow {{DestinationStateSortType}}">{{ languageArray.planthst }}</span>
+											</div>
+
+											<div class="tb-cell miles-bill stype" ng-click="sortCustom('Mileage', MileageSortType)"> 
+												<span class="lode-arrow {{MileageSortType}}">{{ languageArray.planthmiles }}</span>
+											</div>
+
+											<div class="tb-cell d-miles-bill stype" ng-click="sortCustom('deadmiles', deadmilesSortType)"> 
+												<span class="lode-arrow {{deadmilesSortType}}">{{ languageArray.planthdeadmiles }}</span>
+											</div>
+
+											<div class="tb-cell ppm-bill	"> 
+												{{ languageArray.planthrpm }}
+											</div>
+
+											<div class="tb-cell payment-bill	stype" ng-click="sortCustom('PaymentAmount', PaymentAmountSortType)"> 
+												<span class="lode-arrow {{PaymentAmountSortType}}">{{ languageArray.planthpayment }}</span>
+											</div>
+											
+											<div class="tb-cell company-bill ">  {{ languageArray.planthcompany }} </div>
+											
+											<div class="tb-cell source-bill" ng-click="sortCustom('load_source', load_sourceSortType)">  
+												<span class="lode-arrow {{load_sourceSortType}}"> Source</span>	
+											</div>
+											
+											<div class="tb-cell action">
+												<span class="wid">{{ languageCommonVariables.commonTableThAction }}</span>
+											</div>
+										</div>
+										<div class="table-row-main1 tb-body" dir-paginate="value in billingLoads | itemsPerPage: itemsPerPage track by value.id"  total-items="total" current-page="currentPage" pagination-id="billingPage" ng-click="clickMatchLoadDetail(value.truckstopID, value.id, value.deadmiles, value.PaymentAmount, value.totalCost, value.pickDate,value.vehicleID, $index )" ng-class="value.ready_for_invoice == 1 ? 'readyForInovice' : ''" >
+											
+											<div class="tb-cell ld-id-bill ld-id"> 
+												<span>
+													<div class="plus-1" ng-click="$event.stopPropagation();toggleRow($event,$index);"></div>
+													{{ value.id }}
+												</span>
+											</div>
+											
+											<div class="tb-cell Invoice-No-bill	"> 
+												<span>{{ (value.invoiceNo != '' && value.invoiceNo != 0) ? value.invoiceNo : ''}} </span>
+											</div>
+
+											<div class="tb-cell staus-bill">
+												<span>{{ value.JobStatus }}</span>
+											</div>
+
+											<div class="tb-cell pickup-bill">
+												<span>{{ (value.PickupDate != '0000-00-00' && value.PickupDate != '' ) ? value.PickupDate : ''}}</span>
+											</div>
+
+											<div class="tb-cell delivery-bill">
+												<span>{{ (value.DeliveryDate != '0000-00-00' && value.DeliveryDate != '' ) ? value.DeliveryDate : ''}}</span>
+											</div>
+
+											<div class="tb-cell fl-bill"> 
+												<span>{{ value.LoadType }} </span>
+											</div>
+
+											<div class="tb-cell Driver-bill	">
+												<span>{{value.driverName}}</span>
+											</div>
+
+											<div class="tb-cell Origin-bill">
+												<span>{{ value.OriginCity|capitalize}}</span>
+											</div>
+											
+											<div class="tb-cell st-bill">
+												<span>{{ value.OriginState }}</span>
+											</div>
+
+											<div class="tb-cell Destination-bill	">
+												<span>{{ value.DestinationCity|capitalize}}</span>
+											</div>
+											
+											<div class="tb-cell st1-bill	">
+												<span>{{ value.DestinationState }}</span>
+											</div>
+
+											<div class="tb-cell miles-bill	">
+												<span>{{ value.Mileage }}</span>
+											</div>
+
+											<div class="tb-cell d-miles-bill	">
+												<span>{{ value.deadmiles }}</span>
+											</div>
+
+											<div class="tb-cell ppm-bill	"> 
+												<span>{{ value.Mileage != 0 ? (value.PaymentAmount / value.Mileage | currency:"$":2) : '' }}</span>
+											</div>
+
+											<div class="tb-cell payment-bill	">
+												<span>{{ value.PaymentAmount | currency:"$":2 }}</span>
+											</div>
+
+											<div class="tb-cell company-bill">
+												<span class="text-comp-name">{{ value.TruckCompanyName|capitalize }}</span>
+											</div>
+											<div class="tb-cell source-bill"> 
+												<span>{{ value.load_source }}</span>
+											</div>
+											
+											<div class="tb-cell action" ng-click="$event.stopPropagation()">
+												<span class="wid">
+													<a class="btn btn-default DTTT_button_copy" data-original-title="{{languageCommonVariables.specialInfo}}" ui-jq="tooltip" ng-click="fetchSpecialNote(value.truckstopID,value.id)" ><span><i class="fa fa-info" aria-hidden="true"></i></span></a>
+													<a class="btn btn-default DTTT_button_csv" data-original-title="{{languageCommonVariables.exportCSV}}" ui-jq="tooltip" ng-click="exportCsv($event,'loads',value.id)">
+														<span><i class="pg-grid"></i></span>
+													</a>
+												</span>
+											</div>
+											<!--open-block-->
+											<div class="open-block" id="hblock{{$index}}" style="display:none"> 
+													<div class="tb-cell ld-id-bill ld-id text-center">
+														<span> 
+															<div class="heading"> {{ languageArray.popupLoadId }} <b>:</b></div>
+															<div class="value">{{ value.id }} </div>
+														</span>
+													</div>
+
+													<div class="tb-cell Invoice-No-bill	">
+														<span>
+															<div class="heading">{{ languageCommonVariables.invoiceNo }} <b>:</b></div>
+															<div class="value">{{ (value.invoiceNo != '' && value.invoiceNo != 0) ? value.invoiceNo : ''}}</div> 
+														</span>
+													</div>
+
+													<div class="tb-cell staus-bill">
+														<span>
+															<div class="heading">{{ languageCommonVariables.commonTableThStatus }} <b>:</b></div>
+															<div class="value">{{ value.JobStatus }}</div>
+														</span>
+													</div>
+
+													<div class="tb-cell pickup-bill">
+														<span>
+															<div class="heading">{{ languageArray.planthpickup }}<b>:</b></div>
+															<div class="value">{{ (value.PickupDate != '0000-00-00' && value.PickupDate != '' ) ? value.PickupDate : ''}}</div>
+														</span>
+													</div>
+
+													<div class="tb-cell delivery-bill">
+														<span>
+															<div class="heading">{{ languageArray.popupdelivery }} <b>:</b></div>
+															<div class="value">{{ (value.DeliveryDate != '0000-00-00' && value.DeliveryDate != '' ) ? value.DeliveryDate : ''}}</div>
+														</span>
+													</div>
+
+													<div class="tb-cell  fl-bill">
+														<span>
+															<div class="heading">{{ languageArray.planthfl }} <b>:</b></div>
+															<div class="value">{{ value.LoadType }}</div>
+														</span>
+													</div>
+
+													<div class="tb-cell Driver-bill">
+														<span>
+															<div class="heading">{{ languageArray.driversHeading }} <b>:</b></div>
+															<div class="value">{{value.driverName}}</div>
+														</span>
+													</div>
+
+													<div class="tb-cell  Origin-bill">
+														<span>
+															<div class="heading"> {{ languageCommonVariables.origin }}  <b>:</b></div>
+															<div class="value">{{ value.OriginCity|capitalize}}</div>
+														</span>
+													</div>
+
+													<div class="tb-cell st1-bill	">
+														<span>
+															<div class="heading"> {{ languageArray.planthst }}  <b>:</b></div>
+															<div class="value">{{ value.OriginState }}</div>
+														</span>
+													</div>
+
+													<div class="tb-cell Destination-bill">
+														<span>
+															<div class="heading">{{ languageCommonVariables.destination }}<b>:</b></div>
+															<div class="value">{{ value.DestinationCity|capitalize}}</div>
+														</span>
+													</div>
+
+													<div class="tb-cell st1-bill	">
+														<span>
+															<div class="heading"> {{ languageArray.planthst }}  <b>:</b></div>
+															<div class="value">{{ value.DestinationState }}</div>
+														</span>
+													</div>
+
+													<div class="tb-cell miles-bill	">
+														<span>
+															<div class="heading"> {{ languageArray.planthmiles }}  <b>:</b></div>
+															<div class="value">{{ value.Mileage }}</div>
+														</span>
+													</div>
+
+													<div class="tb-cell d-miles-bill	">
+														<span>
+															<div class="heading"> {{ languageArray.planthdeadmiles }}  <b>:</b></div>
+															<div class="value">{{ value.deadmiles }}</div>
+														</span>
+													</div>
+
+													<div class="tb-cell ppm-bill	">
+														<span>
+															<div class="heading">{{ languageArray.planthrpm }} <b>:</b></div>
+															<div class="value">{{ value.Mileage != 0 ? (value.PaymentAmount / value.Mileage | currency:"$":2) : '' }}</div>
+														</span>
+													</div>
+
+													<div class="tb-cell payment-bill	">
+														<span>
+															<div class="heading">{{ languageArray.planthpayment }}<b>:</b></div>
+															<div class="value">{{ value.PaymentAmount | currency:"$":2 }}</div>
+														</span>
+													</div>
+													
+													<div class="tb-cell company-bill">
+														<span>
+															<div class="heading">  {{ languageArray.planthcompany }} <b>:</b></div>
+															<div class="value">{{ value.TruckCompanyName|capitalize }}</div>
+														</span>
+													</div>
+
+													<div class="tb-cell source-bill">
+														<span>
+															<div class="heading">Source <b>:</b></div>
+															<div class="value">{{ value.load_source }}</div>
+														</span>
+													</div>
+													
+													<div class="tb-cell action">
+														<span >
+															<div class="heading">{{ languageCommonVariables.commonTableThAction }} <b>:</b></div><div class="value">
+																<a class="btn btn-default DTTT_button_copy" data-original-title="{{languageCommonVariables.specialInfo}}" ui-jq="tooltip" ng-click="fetchSpecialNote(value.truckstopID,value.id)" >
+																	<span><i class="fa fa-info" aria-hidden="true"></i></span>
+																</a>
+																<a class="btn btn-default DTTT_button_csv" data-original-title="{{languageCommonVariables.exportCSV}}" ui-jq="tooltip" ng-click="exportCsv($event,'loads',value.id)">
+																	<span><i class="pg-grid"></i></span>
+																</a>
+															</div>
+														</span>
+													</div>
+											</div>
+											<!--open-block-->
+										</div>
+									</div>
+								</div><!-- table-structure-main-block -->
+								<div class="dataTables_wrapper">
+								    <div class="dataTables_paginate">
+								        <dir-pagination-controls pagination-id="billingPage" template-url="./assets/templates/dirPagination.html" on-page-change="pageChanged(newPageNumber)" direction-links="true" undary-links="true"></dir-pagination-controls>
+								    </div>
+								</div>
+<!-- 							<div class="dataTables_wrapper no-footer"> 
+								<table id="data" datatable="ng" dt-options="dtOptions" width="100%" class="fixed-thead table-hover row-click table table-striped" cell-padding="0" cell-spacing="0" >
+									<thead>
+										<tr>
+											<th>{{ languageArray.popupLoadId }}</th>	
+											<th>{{ languageCommonVariables.invoiceNo }}</th>	
+											<th>{{ languageCommonVariables.commonTableThStatus }}</th>	
+											<th>{{ languageArray.planthpickup }}</th> 	
+											<th>{{ languageArray.popupdelivery }}</th>											
+											<th>{{ languageArray.planthfl }}</th>
+											<th>{{ languageArray.driversHeading }}</th> 
+											<th class = "billing-origin">{{ languageCommonVariables.origin }}</th>
+											<th>{{ languageArray.planthst }}</th>
+											<th>{{ languageCommonVariables.destination }}</th>
+											<th>{{ languageArray.planthst }}</th>
+											<th>{{ languageArray.planthmiles }}</th>
+											<th>{{ languageArray.planthdeadmiles }}</th>
+											<th>{{ languageArray.planthrpm }}</th>
+											<th>{{ languageArray.planthpayment }}</th>
+											<th>{{ languageArray.planthcompany }}</th>
+											<th>Source</th>
+											<th class="text-center">{{ languageCommonVariables.commonTableThAction }}</th>
+										</tr>
+									</thead>
+									<tbody>
+									
+										<tr ng-repeat="value in billingLoads track by value.id" ng-click="clickMatchLoadDetail(value.truckstopID, value.id, value.deadmiles, value.PaymentAmount, value.totalCost, value.pickDate,value.vehicleID, $index )" ng-class="value.ready_for_invoice == 1 ? 'readyForInovice' : ''" >
+											<td>{{ value.id }}</td>	
+											<td>{{ (value.invoiceNo != '' && value.invoiceNo != 0) ? value.invoiceNo : ''}}</td>
+											<td>{{ value.JobStatus }}</td>
+											<td>{{ (value.PickupDate != '0000-00-00' && value.PickupDate != '' ) ? value.PickupDate : ''}}</td>
+											<td>{{ (value.DeliveryDate != '0000-00-00' && value.DeliveryDate != '' ) ? value.DeliveryDate : ''}}</td>											
+											<td>{{ value.LoadType }} </td>
+											<td>{{value.driverName}}</td>
+											<td class="text-same-lower">{{ value.OriginCity|capitalize}}</td>
+											<td class="state-capital">{{ value.OriginState }}</td>
+											<td class="text-same-lower" >{{ value.DestinationCity|capitalize}}</td>
+											<td class="state-capital">{{ value.DestinationState }}</td>
+											<td class="">{{ value.Mileage }}</td>
+											<td class="">{{ value.deadmiles }}</td>
+											<td class="">{{ value.PaymentAmount / value.Mileage | currency:"$":2}}</td>
+											<td class="">{{ value.PaymentAmount | currency:"$":2 }}</td>
+											<td class="company_name"><span class="text-comp-name">{{ value.TruckCompanyName|capitalize }}</span></td>
+											<td>{{ value.load_source }}</td>
+											<td class="text-center action-btn-ryt"> 
+												<div class="export-options-container">
+													<div class="exportOptions">
+														<div class="DTTT btn-group">
+															<a class="btn btn-default DTTT_button_copy" data-original-title="{{languageCommonVariables.specialInfo}}" ui-jq="tooltip" ng-click="fetchSpecialNote(value.truckstopID,value.id)" >
+																<span><i class="fa fa-info" aria-hidden="true"></i></span>
+															</a>
+															<a class="btn btn-default DTTT_button_csv" data-original-title="{{languageCommonVariables.exportCSV}}" ui-jq="tooltip" ng-click="exportCsv($event,'loads',value.id)">
+																<span><i class="pg-grid"></i></span>
+															</a>
+														</div>
+													</div>
+												</div>
+												
+											</td>
+										</tr>
+									</tbody>
+								</table>
+								</div>
+							</div> -->
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+			
+	</div>
+</div>
+ 
+<ng-include src="'./assets/templates/truckstop/modals.html'"></ng-include>
+

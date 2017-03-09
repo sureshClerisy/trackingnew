@@ -1,0 +1,83 @@
+      <!-- START HEADER -->
+     <ng-include src="'./assets/templates/googleMap.html'"></ng-include>
+      <!-- START PAGE CONTENT WRAPPER -->
+      <div class="page-content-wrapper ">
+        <!-- START PAGE CONTENT -->
+        <div class="content sm-gutter">
+          <!-- START CONTAINER FLUID -->
+          <div class="container-fluid padding-25 sm-padding-10">
+			<div class="row">
+				<div class="col-md-12 col-xlg-12">
+					<h2 class="oprate-dashbord">Departments</h2>
+					
+				</div>
+			</div>
+			
+			<div class="row">
+				<div class="col-lg-12 col-md-12">
+					
+						<div class="panel panel-transparent">
+							 <div class="panel-body">
+							<form id="form-project" name="editDepartment" role="form" autocomplete="off" ng-submit="saveDept()">
+								<p class="Summary-heading">Summary</p>
+							
+									<!--row-->
+									<div class="row clearfix">
+										<div class="col-sm-5">
+											<div pg-form-group class="form-group form-group-default required" ng-class="{ 'has-error' : personal.firstName.$invalid && !personal.firstName.$pristine }">
+												<label> Department Name</label>
+												<input type="text" class="form-control" name="firstName" ng-model="departmentData.label" required>
+											</div>
+											<label class="error" for="firstName" ng-show="personal.firstName.$invalid && !personal.firstName.$pristine">This field is required.</label>
+										
+											<div pg-form-group class="form-group form-group-default" ng-class="{ 'has-error' : personal.lastName.$invalid && !personal.lastName.$pristine }">
+												 <label>Address</label>
+												<input type="text" class="form-control" name="lastName" ng-model="departmentData.address" id = 'pac-input'>
+											</div>
+											<label class="error" for="lastName" ng-show="personal.lastName.$invalid && !personal.lastName.$pristine">This field is required.</label>
+										
+									
+											<div class="form-group form-group-default">
+											<label>Radius</label>
+												<select class="full-width" ng-model="departmentData.radius" data-placeholder="Select Country" data-init-plugin="select2">
+											  
+												<option value="150">150 m</option>
+												<option value="300">300 m</option>
+												<option value="500">500 m</option>
+												<option value="1000">1000 m</option>
+											 
+												</select>
+											</div>
+											
+											
+										 
+										
+										<div class="update-truck-block-btn">
+											 <button class="btn p-color" ng-disabled="editDepartment.$invalid" type="submit">UPDATE</button>
+											<button class="btn gray-color">CLOSE</button>
+										</div>
+								
+									  </div>
+									  
+										<div class="col-sm-7">
+											<div class="row">
+												<div id="map" style="height:550px;"></div>
+											</div>
+										</div>
+									</div> 
+									<!--row clearfix-->
+									<!--row-->
+								
+								
+							</form>
+						</div>
+						<!---->
+					</div>
+              
+				</div>
+			</div>
+		
+		</div>
+		</div>
+	</div>
+

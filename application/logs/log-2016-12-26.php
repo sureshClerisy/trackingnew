@@ -1,0 +1,98 @@
+<?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
+
+ERROR - 2016-12-26 14:43:42 --> 404 Page Not Found: Faviconico/index
+ERROR - 2016-12-26 16:15:11 --> 404 Page Not Found: Faviconico/index
+ERROR - 2016-12-26 16:20:08 --> Severity: Notice --> Undefined index: PaymentAmount /var/www/html/trackingnew/application/controllers/Truckstop.php 1184
+ERROR - 2016-12-26 16:20:08 --> Severity: Notice --> Undefined index: PaymentAmount /var/www/html/trackingnew/application/controllers/Truckstop.php 1186
+ERROR - 2016-12-26 16:20:08 --> Severity: Notice --> Undefined index: PaymentAmount /var/www/html/trackingnew/application/controllers/Truckstop.php 1190
+ERROR - 2016-12-26 16:20:08 --> Severity: Notice --> Undefined index: originalDistance /var/www/html/trackingnew/application/controllers/Truckstop.php 1149
+ERROR - 2016-12-26 16:20:48 --> Severity: Notice --> Undefined index: PaymentAmount /var/www/html/trackingnew/application/controllers/Truckstop.php 1184
+ERROR - 2016-12-26 16:20:48 --> Severity: Notice --> Undefined index: PaymentAmount /var/www/html/trackingnew/application/controllers/Truckstop.php 1186
+ERROR - 2016-12-26 16:20:48 --> Severity: Notice --> Undefined index: PaymentAmount /var/www/html/trackingnew/application/controllers/Truckstop.php 1190
+ERROR - 2016-12-26 16:20:48 --> Severity: Notice --> Undefined index: originalDistance /var/www/html/trackingnew/application/controllers/Truckstop.php 1149
+ERROR - 2016-12-26 16:42:15 --> Severity: Notice --> Undefined index: originalDistance /var/www/html/trackingnew/application/controllers/Truckstop.php 1149
+ERROR - 2016-12-26 16:54:07 --> Severity: Notice --> Undefined index: originalDistance /var/www/html/trackingnew/application/controllers/Truckstop.php 1215
+ERROR - 2016-12-26 16:54:07 --> Severity: Notice --> Undefined variable: newDistance /var/www/html/trackingnew/application/controllers/Truckstop.php 1230
+ERROR - 2016-12-26 17:11:32 --> Severity: Warning --> Division by zero /var/www/html/trackingnew/application/controllers/Truckstop.php 1190
+ERROR - 2016-12-26 17:12:44 --> Severity: Notice --> Undefined index: paymentAmount /var/www/html/trackingnew/application/controllers/Truckstop.php 1183
+ERROR - 2016-12-26 17:18:27 --> Severity: Parsing Error --> syntax error, unexpected ';' /var/www/html/trackingnew/application/controllers/Truckstop.php 1184
+ERROR - 2016-12-26 17:33:06 --> Query error: Column 'totalCost' cannot be null - Invalid query: INSERT INTO `loads` (`PickupAddress`, `DestinationAddress`, `totalCost`, `overallTotalProfit`, `overallTotalProfitPercent`, `PickupDate`, `originalDistance`, `Mileage`, `deadmiles`, `Stops`, `equipment`, `equipment_options`, `LoadType`, `Weight`, `Length`, `commodity`, `PaymentAmount`, `Rate`, `SpecInfo`, `driver_id`, `vehicle_id`, `pickDate`, `user_id`, `load_source`, `Entered`) VALUES ('Washington, DC, United States', 'Alaska, United States', NULL, NULL, NULL, '2016-12-26', '4244', '4244', NULL, 1, 'Flatbed', 'F', 'full', '45,000.00', '45.00', 'bees', 5400, '1', 'No special info available', '109', '127', '12/26/16', NULL, 'Vika Dispatch', '2016-12-26')
+ERROR - 2016-12-26 17:40:26 --> Query error: Column 'totalCost' cannot be null - Invalid query: INSERT INTO `loads` (`PickupAddress`, `DestinationAddress`, `totalCost`, `overallTotalProfit`, `overallTotalProfitPercent`, `PickupDate`, `originalDistance`, `Mileage`, `deadmiles`, `Stops`, `equipment`, `equipment_options`, `LoadType`, `Weight`, `Length`, `PaymentAmount`, `Rate`, `Quantity`, `SpecInfo`, `driver_id`, `vehicle_id`, `pickDate`, `user_id`, `load_source`, `Entered`) VALUES ('Washington, DC, United States', 'Alaska, United States', NULL, NULL, NULL, '2016-12-26', '4244', '4244', NULL, 1, 'Flatbed', 'F', 'full', '45,000.00', '45.00', 5500, '1', '1', 'no special note available', '109', '127', '12/26/16', NULL, 'Vika Dispatch', '2016-12-26')
+ERROR - 2016-12-26 18:05:43 --> Query error: Unknown column 'CarrierMC' in 'field list' - Invalid query: UPDATE `loads` SET `id` = '70', `user_id` = '15', `vehicle_id` = '127', `driver_id` = '109', `truckstopID` = '0', `PickupDate` = '2016-12-26', `pickDate` = '12/26/16', `PickupTime` = '', `PickupAddress` = 'California, United States', `OriginCity` = '', `OriginState` = '', `OriginCountry` = '', `OriginZip` = NULL, `DeliveryDate` = '', `DeliveryTime` = '', `DestinationAddress` = 'Washington, DC, United States', `DestinationCity` = '', `DestinationState` = '', `DestinationCountry` = '', `DestinationZip` = NULL, `equipment` = 'Flatbed', `equipment_options` = 'F', `LoadType` = 'Full', `Weight` = '45,000.00', `Length` = '45.00', `Width` = '', `Mileage` = '7426', `originalDistance` = '2792', `estimated_time` = '', `Bond` = NULL, `BondTypeID` = NULL, `Credit` = '', `PaymentAmount` = 9500, `Quantity` = '1', `FuelCost` = NULL, `Stops` = '1', `commodity` = '', `broker_id` = '16', `Rate` = NULL, `flag` = '0', `sent_for_payment` = '0', `TruckCompanyName` = 'NOLAN TRANSPORTATION GROUP INC', `PointOfContact` = 'Team Jacobsen', `PointOfContactPhone` = '704-954-0947', `TruckCompanyEmail` = 'Freightforit@ntgfreight.com', `TruckCompanyPhone` = '704-954-0947', `TruckCompanyFax` = '', `TruckCompanyCity` = 'CHARLOTTE', `TruckCompanyState` = 'NC', `SpecInfo` = 'No special info availabel', `deadmiles` = '343', `deadmilesEstimatetime` = '', `brokerStatus` = NULL, `MCNumber` = '567093', `DOTNumber` = '2236769', `JobStatus` = 'inprogress', `assigned_truck_id` = '0', `assigned_truck` = '0', `updated_record` = '0', `invoiceNo` = '10024', `invoicedDate` = '0000-00-00', `load_source` = 'Vika Dispatch', `HandleName` = '', `Entered` = '2016-12-26', `totalCost` = 7818.52, `overallTotalProfit` = 1681.48, `overallTotalProfitPercent` = 17.7, `delete_status` = '0', `woRefno` = NULL, `created` = '0000-00-00 00:00:00', `updated` = '0000-00-00 00:00:00', `CarrierMC` = '0'
+WHERE `loads`.`id` = '70'
+ERROR - 2016-12-26 18:15:56 --> Severity: Warning --> unlink(assets/uploads/documents/thumb_rateSheet/thumb_rateSheet_1482756309.jpg): No such file or directory /var/www/html/trackingnew/application/controllers/Truckstop.php 1726
+ERROR - 2016-12-26 18:16:08 --> Severity: Warning --> unlink(assets/uploads/documents/thumb_rateSheet/thumb_rateSheet_1482756356.jpg): No such file or directory /var/www/html/trackingnew/application/controllers/Truckstop.php 1726
+ERROR - 2016-12-26 18:18:23 --> Severity: Warning --> unlink(assets/uploads/documents/thumb_rateSheet/thumb_rateSheet_1482756368.jpg): No such file or directory /var/www/html/trackingnew/application/controllers/Truckstop.php 1727
+ERROR - 2016-12-26 18:19:47 --> Severity: Warning --> unlink(assets/uploads/documents/thumb_rateSheet/thumb_rateSheet_1482756503.jpg): No such file or directory /var/www/html/trackingnew/application/controllers/Truckstop.php 1727
+ERROR - 2016-12-26 18:20:25 --> Severity: Warning --> unlink(assets/uploads/documents/thumb_rateSheet/thumb_rateSheet_1482756587.jpg): No such file or directory /var/www/html/trackingnew/application/controllers/Truckstop.php 1727
+ERROR - 2016-12-26 18:21:50 --> Severity: Warning --> unlink(assets/uploads/documents/thumb_rateSheet/thumb_rateSheet_1482756625.jpg): No such file or directory /var/www/html/trackingnew/application/controllers/Truckstop.php 1727
+ERROR - 2016-12-26 18:22:51 --> Severity: Warning --> unlink(assets/uploads/documents/thumb_rateSheet/thumb_rateSheet_1482756710.jpg): No such file or directory /var/www/html/trackingnew/application/controllers/Truckstop.php 1725
+ERROR - 2016-12-26 18:22:55 --> Severity: Warning --> unlink(assets/uploads/documents/thumb_rateSheet/thumb_rateSheet_1482756771.jpg): No such file or directory /var/www/html/trackingnew/application/controllers/Truckstop.php 1725
+ERROR - 2016-12-26 18:25:23 --> Severity: Warning --> unlink(assets/uploads/documents/thumb_rateSheet/thumb_rateSheet_1482756775.jpg): No such file or directory /var/www/html/trackingnew/application/controllers/Truckstop.php 1725
+ERROR - 2016-12-26 18:30:15 --> Severity: Warning --> unlink(assets/uploads/documents/thumb_rateSheet/thumb_rateSheet_1482756923.jpg): No such file or directory /var/www/html/trackingnew/application/controllers/Truckstop.php 1725
+ERROR - 2016-12-26 18:35:27 --> Severity: Notice --> Undefined index: equipment_options /var/www/html/trackingnew/application/models/Job.php 612
+ERROR - 2016-12-26 18:35:27 --> Severity: Notice --> Trying to get property of non-object /var/www/html/trackingnew/application/models/Job.php 850
+ERROR - 2016-12-26 18:35:27 --> Severity: Notice --> Array to string conversion /var/www/html/trackingnew/system/database/DB_driver.php 1476
+ERROR - 2016-12-26 18:35:27 --> Query error: Unknown column 'Array' in 'field list' - Invalid query: INSERT INTO `loads` (`Bond`, `BondTypeID`, `Credit`, `DOTNumber`, `DeletedId`, `DeliveryDate`, `DeliveryTime`, `DestinationCity`, `DestinationCountry`, `DestinationState`, `DestinationZip`, `Distance`, `Entered`, `EquipmentOptions`, `FuelCost`, `HandleName`, `HasBonding`, `IsDeleted`, `Length`, `LoadType`, `MCNumber`, `Mileage`, `OriginCity`, `OriginCountry`, `OriginState`, `OriginZip`, `PaymentAmount`, `PickupDate`, `PickupTime`, `PointOfContact`, `PointOfContactPhone`, `Quantity`, `SpecInfo`, `Stops`, `TMCNumber`, `TruckCompanyCity`, `TruckCompanyEmail`, `TruckCompanyFax`, `TruckCompanyName`, `TruckCompanyPhone`, `TruckCompanyState`, `Weight`, `Width`, `PostedOn`, `JobStatus`, `commodity`, `totalCost`, `deadmiles`, `pickDate`, `originalDistance`, `driver_id`, `overallTotalProfit`, `overallTotalProfitPercent`, `vehicle_id`, `PickupAddress`, `DestinationAddress`, `brokerStatus`, `user_id`, `load_source`, `equipment`, `invoiceNo`) VALUES (75, 1003, '27*', '2236080', 0, '2016-12-30', '0800-1200', 'wellington', 'USA', 'ut', '', '0', '2016-12-26', Array, '$423.00', 'Drew', 1, 0, '0', 'Full', '555609', '852', 'oakland', 'USA', 'ca', '', 1740, '2016-12-28', '0900', 'Drew Donner', '845-323-8846', '1', '174x110x75 @ 34,391 lbs 8\' drop tarp- Can also drop Monday', '0', '', 'MORENO VALLEY', 'ddonner@armstrongtransport.com', '', 'ARMSTRONG TRANSPORT GROUP INC', '(877) 240-1181', 'CA', '34391', '0', '2016-12-23', 'inprogress', '', 3756.4, '3103', '12/28/16', '852', '79', -2016.4, -115.89, '65', 'oakland ca, USA', 'wellington ut, USA', 'Approved', '15', 'Vika Dispatch', NULL, 10025)
+ERROR - 2016-12-26 18:37:08 --> Severity: Parsing Error --> syntax error, unexpected 'if' (T_IF) /var/www/html/trackingnew/application/controllers/Truckstop.php 1955
+ERROR - 2016-12-26 18:42:19 --> Severity: Warning --> mysqli::real_connect(): (HY000/2003): Can't connect to MySQL server on '192.168.1.35' (4) /var/www/html/trackingnew/system/database/drivers/mysqli/mysqli_driver.php 202
+ERROR - 2016-12-26 18:42:19 --> Unable to connect to the database
+ERROR - 2016-12-26 18:42:38 --> Severity: Warning --> mysqli::real_connect(): (HY000/2003): Can't connect to MySQL server on '192.168.1.35' (4) /var/www/html/trackingnew/system/database/drivers/mysqli/mysqli_driver.php 202
+ERROR - 2016-12-26 18:42:38 --> Unable to connect to the database
+ERROR - 2016-12-26 18:42:54 --> Severity: Warning --> mysqli::real_connect(): (HY000/2003): Can't connect to MySQL server on '192.168.1.35' (4) /var/www/html/trackingnew/system/database/drivers/mysqli/mysqli_driver.php 202
+ERROR - 2016-12-26 18:42:54 --> Unable to connect to the database
+ERROR - 2016-12-26 18:43:01 --> Severity: Warning --> mysqli::real_connect(): (HY000/2003): Can't connect to MySQL server on '192.168.1.35' (113) /var/www/html/trackingnew/system/database/drivers/mysqli/mysqli_driver.php 202
+ERROR - 2016-12-26 18:43:01 --> Unable to connect to the database
+ERROR - 2016-12-26 18:43:56 --> Severity: Warning --> mysqli::real_connect(): (HY000/2003): Can't connect to MySQL server on '192.168.1.35' (4) /var/www/html/trackingnew/system/database/drivers/mysqli/mysqli_driver.php 202
+ERROR - 2016-12-26 18:43:56 --> Unable to connect to the database
+ERROR - 2016-12-26 18:44:20 --> Severity: Warning --> mysqli::real_connect(): (HY000/2003): Can't connect to MySQL server on '192.168.1.35' (113) /var/www/html/trackingnew/system/database/drivers/mysqli/mysqli_driver.php 202
+ERROR - 2016-12-26 18:44:20 --> Unable to connect to the database
+ERROR - 2016-12-26 18:44:23 --> Severity: Warning --> mysqli::real_connect(): (HY000/2003): Can't connect to MySQL server on '192.168.1.35' (113) /var/www/html/trackingnew/system/database/drivers/mysqli/mysqli_driver.php 202
+ERROR - 2016-12-26 18:44:23 --> Unable to connect to the database
+ERROR - 2016-12-26 18:44:29 --> Severity: Warning --> mysqli::real_connect(): (HY000/2003): Can't connect to MySQL server on '192.168.1.35' (113) /var/www/html/trackingnew/system/database/drivers/mysqli/mysqli_driver.php 202
+ERROR - 2016-12-26 18:44:29 --> Unable to connect to the database
+ERROR - 2016-12-26 18:45:08 --> Severity: Warning --> mysqli::real_connect(): (HY000/2003): Can't connect to MySQL server on '192.168.1.35' (113) /var/www/html/trackingnew/system/database/drivers/mysqli/mysqli_driver.php 202
+ERROR - 2016-12-26 18:45:08 --> Unable to connect to the database
+ERROR - 2016-12-26 18:45:16 --> Severity: Warning --> mysqli::real_connect(): (HY000/2003): Can't connect to MySQL server on '192.168.1.35' (113) /var/www/html/trackingnew/system/database/drivers/mysqli/mysqli_driver.php 202
+ERROR - 2016-12-26 18:45:16 --> Severity: Warning --> mysqli::real_connect(): (HY000/2003): Can't connect to MySQL server on '192.168.1.35' (113) /var/www/html/trackingnew/system/database/drivers/mysqli/mysqli_driver.php 202
+ERROR - 2016-12-26 18:45:16 --> Unable to connect to the database
+ERROR - 2016-12-26 18:45:16 --> Unable to connect to the database
+ERROR - 2016-12-26 18:45:16 --> Severity: Warning --> mysqli::real_connect(): (HY000/2003): Can't connect to MySQL server on '192.168.1.35' (113) /var/www/html/trackingnew/system/database/drivers/mysqli/mysqli_driver.php 202
+ERROR - 2016-12-26 18:45:16 --> Severity: Warning --> mysqli::real_connect(): (HY000/2003): Can't connect to MySQL server on '192.168.1.35' (113) /var/www/html/trackingnew/system/database/drivers/mysqli/mysqli_driver.php 202
+ERROR - 2016-12-26 18:45:16 --> Unable to connect to the database
+ERROR - 2016-12-26 18:45:16 --> Unable to connect to the database
+ERROR - 2016-12-26 18:45:19 --> Severity: Warning --> mysqli::real_connect(): (HY000/2003): Can't connect to MySQL server on '192.168.1.35' (113) /var/www/html/trackingnew/system/database/drivers/mysqli/mysqli_driver.php 202
+ERROR - 2016-12-26 18:45:19 --> Severity: Warning --> mysqli::real_connect(): (HY000/2003): Can't connect to MySQL server on '192.168.1.35' (113) /var/www/html/trackingnew/system/database/drivers/mysqli/mysqli_driver.php 202
+ERROR - 2016-12-26 18:45:19 --> Unable to connect to the database
+ERROR - 2016-12-26 18:45:19 --> Unable to connect to the database
+ERROR - 2016-12-26 18:45:48 --> Severity: Warning --> mysqli::real_connect(): (HY000/2003): Can't connect to MySQL server on '192.168.1.35' (113) /var/www/html/trackingnew/system/database/drivers/mysqli/mysqli_driver.php 202
+ERROR - 2016-12-26 18:45:48 --> Unable to connect to the database
+ERROR - 2016-12-26 18:46:53 --> Severity: Warning --> mysqli::real_connect(): (HY000/2003): Can't connect to MySQL server on '192.168.1.35' (113) /var/www/html/trackingnew/system/database/drivers/mysqli/mysqli_driver.php 202
+ERROR - 2016-12-26 18:46:53 --> Unable to connect to the database
+ERROR - 2016-12-26 19:03:36 --> Severity: Notice --> Trying to get property of non-object /var/www/html/trackingnew/application/controllers/Triumph.php 84
+ERROR - 2016-12-26 19:30:33 --> Severity: Notice --> Undefined index: loadsource /var/www/html/trackingnew/application/controllers/Truckstop.php 1985
+ERROR - 2016-12-26 19:35:23 --> Severity: Warning --> Division by zero /var/www/html/trackingnew/application/controllers/Truckstop.php 1174
+ERROR - 2016-12-26 19:35:23 --> Severity: Warning --> Division by zero /var/www/html/trackingnew/application/controllers/Truckstop.php 2034
+ERROR - 2016-12-26 19:35:23 --> Severity: Warning --> Division by zero /var/www/html/trackingnew/application/controllers/Truckstop.php 2034
+ERROR - 2016-12-26 20:21:34 --> Severity: Notice --> Undefined index: ID /var/www/html/trackingnew/application/models/Job.php 384
+ERROR - 2016-12-26 20:21:34 --> Severity: Notice --> Undefined index: EquipmentTypes /var/www/html/trackingnew/application/models/Job.php 387
+ERROR - 2016-12-26 20:21:34 --> Severity: Notice --> Trying to get property of non-object /var/www/html/trackingnew/application/models/Job.php 850
+ERROR - 2016-12-26 20:21:34 --> Severity: Notice --> Undefined index: EquipmentTypes /var/www/html/trackingnew/application/models/Job.php 392
+ERROR - 2016-12-26 20:21:34 --> Severity: Notice --> Undefined index: postingAddress /var/www/html/trackingnew/application/models/Job.php 393
+ERROR - 2016-12-26 20:21:34 --> Severity: Notice --> Undefined offset: 1 /var/www/html/trackingnew/application/models/Job.php 396
+ERROR - 2016-12-26 20:21:34 --> Severity: Notice --> Undefined index: TruckCompanyName /var/www/html/trackingnew/application/models/Job.php 406
+ERROR - 2016-12-26 20:21:34 --> Severity: Notice --> Undefined index: PointOfContact /var/www/html/trackingnew/application/models/Job.php 407
+ERROR - 2016-12-26 20:21:34 --> Severity: Notice --> Undefined index: PointOfContactPhone /var/www/html/trackingnew/application/models/Job.php 408
+ERROR - 2016-12-26 20:21:34 --> Severity: Notice --> Undefined index: TruckCompanyEmail /var/www/html/trackingnew/application/models/Job.php 409
+ERROR - 2016-12-26 20:21:34 --> Severity: Notice --> Undefined index: TruckCompanyPhone /var/www/html/trackingnew/application/models/Job.php 410
+ERROR - 2016-12-26 20:21:34 --> Severity: Notice --> Undefined index: TruckCompanyFax /var/www/html/trackingnew/application/models/Job.php 411
+ERROR - 2016-12-26 20:21:34 --> Severity: Notice --> Undefined index: postingAddress /var/www/html/trackingnew/application/models/Job.php 412
+ERROR - 2016-12-26 20:21:34 --> Severity: Notice --> Undefined index: MCNumber /var/www/html/trackingnew/application/models/Job.php 413
+ERROR - 2016-12-26 20:21:34 --> Severity: Notice --> Undefined index: DOTNumber /var/www/html/trackingnew/application/models/Job.php 415
+ERROR - 2016-12-26 20:21:34 --> Severity: Notice --> Undefined index: MCNumber /var/www/html/trackingnew/application/models/Job.php 420
+ERROR - 2016-12-26 20:21:34 --> Query error: Column 'TruckCompanyName' cannot be null - Invalid query: INSERT INTO `broker_info` (`TruckCompanyName`, `PointOfContact`, `PointOfContactPhone`, `TruckCompanyEmail`, `TruckCompanyPhone`, `TruckCompanyFax`, `postingAddress`, `MCNumber`, `CarrierMC`, `DOTNumber`, `brokerStatus`) VALUES (NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', NULL, NULL)
+ERROR - 2016-12-26 20:21:34 --> Severity: Warning --> Cannot modify header information - headers already sent by (output started at /var/www/html/trackingnew/system/core/Exceptions.php:272) /var/www/html/trackingnew/system/core/Common.php 573
+ERROR - 2016-12-26 20:24:12 --> Severity: Warning --> mysqli::real_connect(): (HY000/2003): Can't connect to MySQL server on '192.168.1.35' (113) /var/www/html/trackingnew/system/database/drivers/mysqli/mysqli_driver.php 202
+ERROR - 2016-12-26 20:24:12 --> Unable to connect to the database
+ERROR - 2016-12-26 20:24:53 --> Severity: Warning --> mysqli::real_connect(): (HY000/2003): Can't connect to MySQL server on '192.168.1.35' (113) /var/www/html/trackingnew/system/database/drivers/mysqli/mysqli_driver.php 202
+ERROR - 2016-12-26 20:24:53 --> Unable to connect to the database

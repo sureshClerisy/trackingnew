@@ -1,0 +1,45 @@
+Below is the request and response of methods we are using for Triumph API:
+____________________________________________________________________________________________________________________________________
+
+Driver - Robert Carbonell-25
+Origin - Washington,DC, USA
+DESTINATION - Chicago, IL, USA
+
+Step 1: Used '/v1/Login' method to login and after successfull login we moved to next step.
+
+Step 2: We are submitting the load details in array to create multiples inputs using '/v1Submit/CreateInputsFromArray' method
+	
+Request => 'referenceKey' => '',
+	'invoiceNumber' => 10019
+	'invoiceDate' => 2017-01-06
+	'referenceNumber' => 458525
+	'grossAmount' => 3500
+	'isMiscInvoice' => true
+	'customerName' => GREAT WESTERN ENTERPRISES
+	'customerId' => 163014
+	'originCity' => Washington
+	'originState' => DC
+	'originZip' => 0
+	'originPickupDate' => 2017-01-05
+	'destinationCity' => Chicago
+	'destinationState' => IL
+	'destinationZip' => 0
+	'deliveryDate' => 
+	
+
+Response => '{"InputId":[560449],"Error":false,"ErrorMessage":""}'
+	
+Step 3: After getting InputId(s) from 'Step 2', we are submitting request for creating document for each 'InputId' seperately
+
+Request => 'inputId' => 560449
+	&'filename' => bundle_1484029626.pdf
+	&'fileData' => 'JVBERi0xLjQKJeLjz9MKMyAwIG9iago8PC9UeXBlIC9QYWdlCi9QYXJlbnQgMSAwIFIKL01lZGlhQm94IFswIDAgNTk1LjI4MCA4NDEuODkwXQovVHJpbUJveCBbMC4wMDAgMC4wMDAgNTk1LjI4MCA4NDEuODkwXQovUmVzb3VyY2VzIDIgMCBSCi9Hcm91cCA8PCAvVHlwZSAvR3JvdXAgL1MgL1RyYW5zcGFyZW5jeSAvQ1MgL0RldmljZVJHQiA%2BPiAKL0NvbnRlbnRzIDQgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvRmlsdGVyIC9GbGF0ZURlY29kZSAvTGVuZ3RoIDk5Pj4Kc3RyZWFtCnicK1QwUPBSMFQoB9JZQOzOVahgqGcABAogCGPqwYjkXC79kAAfQwWXfIVArkAFIwUvLgM9UzNzhXIupxAF1xAukDKQOWCtCulc%2Bu7BhgrpxXBVBgohRVzRsUDDU7gAT5EZ1wplbmRzdHJlYW0KZW5kb2JqCjUgMCBvYmoKPDwvVHlwZSAvUGFnZQovUGFyZW50IDEgMCBSCi9NZWRpYUJveCBbMCAwIDU5NS4yODAgODQxLjg5MF0KL1RyaW1Cb3ggWzAuMDAwIDAuMDAwIDU5NS4yODAgODQxLjg5MF0KL1Jlc291cmNlcyAyIDAgUgovR3JvdXAgPDwgL1R5cGUgL0dyb3VwIC9TIC9UcmFuc3BhcmVuY3kgL0NTIC9EZXZpY2VSR0IgPj4gCi9Db250ZW50cyA2IDAgUj4%2BCmVuZG9iago2IDAgb2JqCjw8L0ZpbHRlciAvRmxhdGVEZWNvZGUgL0xlbmd0aCAxMDU%2BPgpzdHJlYW0KeJwrVDBQ8FIwVCgH0llA7M5VqGCoZwAECiAIYwIpBRNLPQtLheRcLv2QAB8jBZd8hUCuQAUjBS8uAz1TM3OFci6nEAXXEC6QYpBBYL0K6Vz67sGGCunFcFUGCiFFXNGxQNNTuABxZxomCmVuZHN0cmVhbQplbmRvYmoKNyAwIG9iago8PC9UeXBlIC9QYWdlCi9QYXJlbnQgMSAwIFIKL01lZGlhQm94IFswIDAgNTk1LjI4MCA4NDEuODkwXQovVHJpbUJveCBbMC4wMDAgMC4wMDAgNTk1LjI4MCA4NDEuODkwXQovUmVzb3VyY2VzIDIgMCBSCi9Hcm91cCA8PCAvVHlwZSAvR3JvdXAgL1MgL1RyYW5zcGFyZW5jeSAvQ1MgL0RldmljZV..'
+	&docType[0]=1&docType[1]=2&docType[2]=3
+	
+Respone => '{"documentId":[2127154],"Error":false,"ErrorMessage":""}}'
+
+Step 4: At last we are using '/v1Submit/FinalizePendingInputArray' method to finally send it for payment
+Request => "inputIds[0]=560449&fundingInstructions=Fund using WIRE *9995";
+
+Response => '{"ConfirmationCode":"15D4B080","Error":false,"ErrorMessage":""}'
+

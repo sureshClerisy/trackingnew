@@ -1,0 +1,12 @@
+<?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
+
+ERROR - 2017-02-01 09:54:02 --> Severity: Warning --> mysqli::real_connect(): (HY000/2003): Can't connect to MySQL server on '192.168.1.135' (113) /var/www/html/trackingnew/system/database/drivers/mysqli/mysqli_driver.php 202
+ERROR - 2017-02-01 09:54:02 --> Unable to connect to the database
+ERROR - 2017-02-01 10:08:01 --> 404 Page Not Found: Faviconico/index
+ERROR - 2017-02-01 11:20:52 --> Severity: Warning --> file_get_contents(https://maps.googleapis.com/maps/api/geocode/json?address=Miami,FL,USA&amp;key=AIzaSyAwF0iqNCvpZgXwOs6MFiklA6YkhVMOnV8): failed to open stream: HTTP request failed! HTTP/1.0 500 Internal Server Error
+ /var/www/html/trackingnew/application/views/welcome_message.php 5
+ERROR - 2017-02-01 13:42:20 --> Query error: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'AND (`cargo_bay_l` >=0) AND (`cargo_bay_w` <= 8.5) AND (`vehicles`.`id` = 119)' at line 4 - Invalid query: SELECT `vehicles`.`id`, `fuel_consumption`, `destination_address`
+FROM `vehicles`
+LEFT JOIN `drivers` ON `drivers`.`id` = `vehicles`.`driver_id`
+WHERE  AND (`cargo_bay_l` >=0) AND (`cargo_bay_w` <= 8.5) AND (`vehicles`.`id` = 119)
+ERROR - 2017-02-01 17:13:05 --> Query error: Column 'PickupTime' cannot be null - Invalid query: INSERT INTO `loads` (`PickupAddress`, `DestinationAddress`, `totalCost`, `overallTotalProfit`, `overallTotalProfitPercent`, `shipper_entity`, `shipper_name`, `shipper_phone`, `PickupDate`, `OriginZip`, `consignee_entity`, `consignee_name`, `consignee_phone`, `DeliveryDate`, `DestinationZip`, `originalDistance`, `Mileage`, `deadmiles`, `equipment`, `equipment_options`, `PaymentAmount`, `driver_id`, `vehicle_id`, `trailer_id`, `PickupTime`, `DeliveryTime`, `PickupTimeRangeEnd`, `DeliveryTimeRangeEnd`, `OriginCountry`, `OriginState`, `OriginCity`, `OriginStreet`, `DestinationCountry`, `DestinationState`, `DestinationCity`, `DestinationStreet`, `pickDate`, `load_source`, `loadId`, `user_id`, `Entered`, `created`) VALUES ('El Paso, TX, United States', 'Eugene, OR, United States', 2015.15, 1484.85, 42.42, 'shipper', 'teds', '12312323', '2017-02-21', '', 'consignee', 'sd', 'sdf', '2017-02-21', '', '1657', '1657', 610, 'Two 24,28 foot flats', '2F', 3500, '108', '124', NULL, NULL, '12:00 PM', '', '', 'United States', 'TX', 'El Paso', '', 'United States', 'OR', 'Eugene', '', '02/21/17', 'Vika Dispatch', 0, '5', '2017-02-01', '17-02-01 17:13:05')

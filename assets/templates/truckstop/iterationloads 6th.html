@@ -1,0 +1,204 @@
+ 
+ <script>
+jQuery(function(){
+if(!window.google||!window.google.maps){
+	
+  var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = 'http://maps.google.com/maps/api/js?key=AIzaSyAzqFSjwfCSB_x9jNIfBwOI2k-BqV2NT9c&libraries=places';
+    document.body.appendChild(script);
+}
+else{
+
+ //initialize();
+}});
+</script>
+
+ <!-- START PAGE CONTENT WRAPPER -->
+      <div class="page-content-wrapper ">
+        <!-- START PAGE CONTENT -->
+        <div class="content sm-gutter">
+          <!-- START CONTAINER FLUID -->
+          <div class="container-fluid padding-25 sm-padding-10">
+			<div class="row">
+				
+				<div class="col-md-12 col-xlg-12">
+					<h2 class="oprate-dashbord">Itinerary Loads</h2>
+				</div>
+				
+				<button ng-if="showFirstLi == true" data-toggle="modal" class="btn btn-primary fetch fetch-toggle" ng-click="showRightSideBar()" href="#modalSlideLeft" ><img src="./pages/img/map-p.png" ></button>
+			</div>
+	
+			<div class="row invocie-block-row">
+				<div class="col-md-12 col-xlg-12">
+					<div class="load-new-block-table">
+						
+						<div class="loadtable">
+						
+						<div class="panel-body">
+							
+							<h2>{{tableTitle[0]}}</h2>
+							
+							<div class="load-tabe-auto job-list truckstopJobs" ng-class="showRouteOnMap == true ? 'change-table-height' : ''" >
+														
+									<table id="data" datatable="ng" dt-options="dtOptions" width="100%" class="fixed-thead table table-striped" cell-padding="0" cell-spacing="0">
+									<thead>
+										<tr>
+											<th>Bond</th> 
+											<th>Phone</th> 
+											<th>TRLR</th>
+											<th>AGE</th>  
+											<th>F/L</th> 
+											<th>PICKUP</th> 
+											<th>ORIGIN CITY</th>
+											<th>ST</th>
+											<th>DIST</th>
+											<th>Destination City</th>
+											<th>ST</th>											
+											<th>DIST</th>	
+											<th>PAYMENT</th> 										
+											<th>RPM</th> 										
+											<th>MILES</th> 
+											<th>LENGTH</th> 										
+											<th>Weight</th>  
+											<th>EXP</th>
+											<th>COMPANY</th>
+											<th>FUEl</th> 
+											<th>DEAD MI</th>  
+											<th>ACTION</th>  
+										</tr>
+									</thead>
+									<tbody>
+										
+										<tr data-uinfo="{{value.ID}}" ng-repeat="(key3,value) in loadsData">
+									
+											<td class="text-center dark-color">{{value.Bond}}</td>
+											<td class="text-center">{{value.PointOfContactPhone}}</td>
+											<td class="short-width">{{value.Equipment}}</td>
+											<td class="text-center">{{value.Age}}</td>
+											<td class="">{{value.LoadType}}</td>
+											<td class="">{{value.PickUpDate}}</td>
+											<td class="text-same-lower"><span>{{value.OriginCity}}</span></td>
+											<td class="state-capital">{{value.OriginState}}</td>
+											<td class="text-center">{{value.OriginDistance}}</td>											
+											<td class="text-same-lower ex-large-width"><span>{{value.DestinationCity}}</span></td>
+											<td class="state-capital">{{value.DestinationState}}</td>
+											<td class="text-center ">{{value.DestinationDistance}}</td>											
+											<td class="text-center">{{value.Payment}}</td>	
+											<td class="text-center">{{ value.RPM }}</td>	
+											<td class="text-center">{{value.Miles}}</td>
+											<td class="text-center">{{value.Length}}</td>
+											<td class="text-center">{{value.Weight}}</td>
+											<td class="text-center">{{value.ExperienceFactor}}</td>
+											<td class="text-same-lower"><span>{{value.CompanyName}}</span></td>
+											<td class="text-same-lower">{{value.FuelCost}}</td>					
+											<td class="text-center" >{{value.deadmiles}}</td>
+											<!--td class="text-center" ng-show="showtdvalue == true ">{{value}}</td-->
+											<td class="text-center short-width"> 
+												<a title="Load Detail" class="icon-action search" ng-click="editSaveLoad(value.ID)" >
+													<i class="fa fa-search"></i>
+												</a>
+												<a title="Special Information" class="icon-action edit" ng-click="fetchSpecialNote(value.ID)" >
+													<i class="fa fa-info"></i>
+												</a>
+												<a title="Not Interested" class="icon-action del" ng-click="removeItenaryLoad(value.ID,$event)" >
+													<i class="fa fa-close"></i>
+												</a>
+												
+												<a class="icon-action iteration" title="Add To Iternary" ng-click="getRepitionData(value,tableTitle[0],$event)" ><img src="./pages/img/map-p.png" ></a>
+												
+											</td>
+										</tr>
+									</tbody>
+								</table>
+								</div>
+								
+								<div class="show-google-map-route" ng-show="showRouteOnMap == true">
+									<div id="map_canvas"></div>
+								</div>
+								<div class="gantt-chart" ng-show="showGantt == true">
+									<div gantt
+                                         data="data"
+                                        timespans="timespans"
+                                        show-side="options.labelsEnabled"
+                                        daily="options.daily"
+                                        filter-task="{'name': options.filterTask}"
+                                        filter-row="{'name': options.filterRow}"
+                                        sort-mode="options.sortMode"
+                                        view-scale="options.scale"
+                                        column-width="getColumnWidth(options.width, options.scale, options.zoom)"
+                                        auto-expand="options.autoExpand"
+                                        task-out-of-range="options.taskOutOfRange"
+                                        from-date = "options.fromDate"
+                                        to-date = "options.toDate"
+                                        allow-side-resizing = "options.allowSideResizing"
+                                        task-content = "options.taskContentEnabled ? options.taskContent : undefined"
+                                        row-content = "options.rowContentEnabled ? options.rowContent : undefined"
+                                        current-date="options.currentDate"
+                                        current-date-value="options.currentDateValue"
+                                        headers="options.width && options.shortHeaders || options.longHeaders"
+                                        max-height="options.maxHeight && 300 || 0"
+                                        time-frames="options.timeFrames"
+                                        date-frames="options.dateFrames"
+                                        time-frames-non-working-mode="options.timeFramesNonWorkingMode"
+                                        time-frames-magnet="options.timeFramesMagnet"
+                                        api="options.api"
+                                        column-magnet="options.columnMagnet">
+                                        <gantt-tree enabled="options.sideMode === 'Tree' || options.sideMode === 'TreeTable'"
+                                                    header-content="options.treeHeaderContent"
+                                                    keep-ancestor-on-filter-row="true">
+                                        </gantt-tree>
+                                        <gantt-table enabled="options.sideMode === 'Table' || options.sideMode === 'TreeTable'"
+                                                     columns="options.sideMode === 'TreeTable' ? options.treeTableColumns : options.columns"
+                                                     headers="options.columnsHeaders"
+                                                     classes="options.columnsClasses"
+                                                     formatters="options.columnsFormatters"
+                                                     contents="options.columnsContents"
+                                                     header-contents="options.columnsHeaderContents">
+                                        </gantt-table>
+                                        <gantt-groups enabled="options.groupDisplayMode === 'group' || options.groupDisplayMode === 'overview' || options.groupDisplayMode === 'promote'" display="options.groupDisplayMode"></gantt-groups>
+                                        <gantt-tooltips template-url="assets/plugins/angular-gantt/angular-tooltip/tooltip.tmpl.html" ></gantt-tooltips>
+                                        <gantt-bounds></gantt-bounds>
+                                        <gantt-progress></gantt-progress>
+                                        <gantt-sortable></gantt-sortable>
+                                        <gantt-movable enabled="!options.readOnly"></gantt-movable>
+                                        <gantt-draw-task
+                                            enabled="options.canDraw"
+                                            move-threshold="2"
+                                            task-factory="options.drawTaskFactory">
+                                        </gantt-draw-task>
+                                        <gantt-overlap></gantt-overlap>
+                                        <gantt-resize-sensor></gantt-resize-sensor>
+                                    </div>
+								</div>
+						
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<ng-include src="'./assets/templates/truckstop/iteration_modal.html'"></ng-include>
+<ng-include src="'./assets/templates/truckstop/modals.html'"></ng-include>
+
+
+
+<style>
+.show-google-map-route {
+  float: left;
+
+  width: 100%;
+  margin-top:20px;
+  border: 4px solid #34d6c7;
+}
+
+.change-table-height {
+	height: 300px;
+}
+#map_canvas {
+
+}
+</style>
+

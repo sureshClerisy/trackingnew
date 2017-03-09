@@ -1,0 +1,36 @@
+<!-- START EMAIL SIDEBAR MENU-->
+    <nav class="secondary-sidebar padding-30">
+        <!--button class="btn-style btn btn-primary" type="button" ng-click="sendDocsForPayment()"> <i class="fa fa-paper-plane" aria-hidden="true"></i>Send For Payment</button-->
+        <a class="btn btn-complete btn-block btn-compose m-b-30" ng-disabled="flaggedPaymentCount == 0" ng-click="sendDocsForPayment()"> <i class="fa fa-paper-plane" aria-hidden="true"></i> {{ languageCommonVariables.sendForPayment }}</a>
+        <p class="menu-title">{{ languageCommonVariables.browse }}</p>
+        <ul class="main-menu">
+            <li ng-class="showPaymentSidebarLiSelected == 'inbox' ? 'active' : ''">
+                <a ng-click="showSendPaymentsLoads()">
+                    <span class="title"><i class="pg-inbox"></i> {{ languageCommonVariables.inbox }}</span>
+                    <span class="badge pull-right">{{ readyToSendPaymentCount }}</span>
+                </a>
+            </li>
+            <li ng-class="showPaymentSidebarLiSelected == 'sent' ? 'active' : ''">
+                <a href="javascript:void(0)" ng-click="showAlreadySentPaymentRecords()">
+                    <span class="title"><i class="pg-sent"></i>{{ languageCommonVariables.sent }}</span>
+                    <span class="badge pull-right">{{ sentPaymentCount }}</span>
+                </a>
+            </li>
+            <li ng-class="showPaymentSidebarLiSelected == 'flagged' ? 'active' : ''">
+                <a href="javascript:void(0)" ng-click="showFlaggedPaymentRecords()">
+                    <span class="title"><i class="fa fa-flag"></i>{{ languageCommonVariables.flagged }}</span>
+                    <span class="badge pull-right">{{ flaggedPaymentCount }}</span>
+                </a>
+            </li>
+        </ul>
+        <!--p class="menu-title m-t-20 all-caps">Quick view</p>
+        <ul class="sub-menu no-padding">
+            <li ng-class="showPaymentSidebarLiSelected == 'flag' ? 'active' : ''">
+                <a href="javascript:void(0)" ng-click="showFlaggedPaymentRecords()">
+                    <span class="title">Flagged</span>
+                    <span class="badge pull-right">{{ flaggedPaymentCount }}</span>
+                </a>
+            </li>
+        </ul-->
+    </nav>
+    <!-- END EMAL SIDEBAR MENU -->

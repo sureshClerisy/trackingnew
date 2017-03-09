@@ -1,0 +1,765 @@
+.table-structure-main-block{width:100%;float:left;background:#FAFAFA;}
+.tb-my .table-res-1{display:block;float:left;width:100%}
+.tb-my .table-row-main1{width:100%;display:block;border-bottom:1px solid rgba(230, 230, 230, 0.7);float:left;}
+.tb-my .table-row-main1:nth-child(2n+1){background:#fff;}
+.tb-my .tb-cell{word-wrap: break-word;word-break: break-all;display:inline-block;padding:10px 10px;vertical-align: middle;}
+.tb-my .tb-head {background:#FAFAFA;}
+.tb-my .tb-head .tb-cell {font-size: 15px ; white-space: nowrap;font-family: 'Montserrat';color:#000;text-transform: uppercase;vertical-align: top;}
+.tb-my .lode-arrow, .tb-head .tb-cell {
+  display: inline-block;
+  float: none;
+  font-family: "Montserrat";
+  font-size: 15px;
+  font-weight: 600;
+  padding-right: 0;
+  position: relative;
+  width: 100%;
+}
+.tb-my .lode-arrow{
+	width:auto;
+}
+.tb-body .tb-cell.action {
+  padding-bottom: 6px;
+  padding-top: 6px;
+}
+.tb-my .lode-arrow:after{background: url(../img/arr-short.png)no-repeat left top;position: absolute;right: -21px;top: 0;bottom: 0;width: 20px;height: 16px;content: "";margin: auto;}
+.tb-my .tb-body{font-size: 15px;}
+.tb-my .tb-cell.action span.wid{ min-width: 91px;display: inline-block;}
+.tb-my .tb-cell.action a {float: left;width: 30px;height: 30px;    text-align: center;padding: 5px 7px;}
+.tb-my .tb-cell .text-comp-name {display: inline-block;    overflow: hidden;text-overflow: ellipsis;white-space: nowrap;width:125px;}
+.plus-1{background: url(../img/plus1.png)no-repeat left top;width:20px; height:20px;background-size:100%;}
+.tb-cell.ld-id {
+    width: 116px;
+}
+.tb-cell.ph {
+    width: 141px;
+}
+.tb-cell.trlr {
+    width: 66px;
+}
+.tb-cell.fl {
+    width: 57px;
+}
+.tb-cell.pickup {
+    width: 99px;
+}
+.tb-cell.delivery {
+    width: 101px;
+}
+.tb-cell.Origin {
+    width: 99px;
+}
+.tb-cell.st {
+    width: 51px;
+}
+.tb-cell.Destination {
+    width: 135px;
+}
+.tb-cell.st1 {
+    width: 50px;
+}
+.tb-cell.Driver {
+  width: 82px;
+  padding-right: 0px;
+}
+.tb-cell.Invoice-No {
+    width: 124px;
+}
+.tb-cell.payment {
+    width: 107px;
+}
+.tb-cell.ppm {
+    width: 65px;
+}
+.tb-cell.miles {
+    width: 75px;
+}
+.tb-cell.d-miles {
+    width: 134px;
+}
+.tb-cell.length {
+    width: 100px;
+}
+.tb-cell.weight {
+    width: 93px;
+}
+.tb-cell.company {
+    width: 126px;
+}
+.tb-cell.source {
+    width: 100px;
+}
+.tb-cell.staus {
+    width: 100px;
+}
+.tb-cell.action {
+    width: 100px;
+}
+.open-block{width:100%; float:left;padding:10px 50px;background:#f9f9f9 none repeat scroll 0 0;display:block;}
+.tb-my .open-block .tb-cell {width: 100%; float: left;padding:10px 0px;border-bottom:1px solid #f1f1f1;}
+.open-block .tb-cell:last-child{border-bottom:none;}
+.open-block .tb-cell span{width: 100%; float: left;}
+.tb-my .open-block .tb-cell span .heading {
+  color: #626262;
+  float: left;
+  font-size: 15px;
+  font-weight: bold;
+  width: 20%;
+}
+.tb-my .open-block .tb-cell span .value{width: 80%; float: left;}
+.tb-my .open-block .tb-cell span .heading b { float: right; padding-right: 40px;}
+
+.open-block .tb-cell.ld-id,
+.open-block .tb-cell.ph,
+.open-block .tb-cell.trlr ,
+.open-block .tb-cell.fl ,
+.open-block .tb-cell.pickup ,
+.open-block .tb-cell.pickup ,
+.open-block .tb-cell.delivery,
+.open-block .tb-cell.Origin,
+.open-block .tb-cell.st,
+.open-block .tb-cell.Destination,
+.open-block .tb-cell.st1,
+.open-block .tb-cell.Driver,
+.open-block .tb-cell.Invoice-No,
+.open-block  .tb-cell.Invoice-No,
+.open-block .tb-cell.payment,
+.open-block .tb-cell.ppm,
+.open-block .tb-cell.miles ,
+.open-block .tb-cell.d-miles,
+.open-block .tb-cell.length,
+.open-block .tb-cell.weight,
+.open-block .tb-cell.company,
+.open-block .tb-cell.source,
+.open-block .tb-cell.staus,
+.open-block .tb-cell.action {display:none;}
+.ld-id span {
+  display: inline-block;
+  padding-left: 22px;
+  position: relative;
+  vertical-align: middle;
+}
+.open-block .ld-id span {padding-left: 0px;}
+.plus-1 {
+  background-attachment: scroll;
+  background-clip: border-box;
+  background-color: rgba(0, 0, 0, 0);
+  background-image: url("../img/plus1.png");
+  background-origin: padding-box;
+  background-position: left top;
+  background-repeat: no-repeat;
+  background-size: 100% auto !important;
+  border: 2px solid white;
+  border-radius: 50%;
+  bottom: 0;
+  box-shadow: 0 0 3px #444;
+  cursor: pointer;
+  height: 18px;
+  left: 0;
+  margin: auto;
+  position: absolute;
+  top: 0;
+  width: 18px;
+}
+.plus-1.minus-1 {background: url(../img/minus1.png)no-repeat left top;cursor: pointer;
+}
+.tb-my .tb-head .tb-cell.stype {
+    cursor: pointer;
+}
+
+
+/********************bill (24-2-2017)********************************/
+.tb-cell.action {
+  float: right;
+}
+.tb-cell.ld-id-bill {
+  width: 116px;  position: relative;
+}
+.tb-cell.Invoice-No-bill {
+  width: 121px;
+}
+.tb-cell.staus-bill {
+  width: 99px;
+}
+.tb-cell.pickup-bill {
+  width: 103px;
+}
+.tb-cell.delivery-bill {
+  width: 118px;
+}
+.tb-cell.fl-bill {
+  width: 62px;
+}
+.tb-cell.Driver-bill {
+  width: 168px;
+}
+.tb-cell.Origin-bill {
+  width: 100px;
+}
+.tb-cell.st-bill {
+  width: 60px;
+}
+.tb-cell.Destination-bill {
+  width: 170px;
+}
+.tb-cell.st1-bill {
+  width: 60px;
+}
+.tb-cell.miles-bill {
+  width: 88px;
+}
+.tb-cell.d-miles-bill {
+  width: 138px;
+}
+.tb-cell.ppm-bill {
+  width: 90px;
+}
+.tb-cell.payment-bill {
+  width: 138px;
+}
+.tb-cell.company-bill {
+  width: 230px;
+}
+.tb-cell.source-bill {
+  width: 161px;
+}
+.tb-my .tb-cell.company-bill .text-comp-name{width:100%;}
+
+.open-block .tb-cell.ld-id-bill,
+.open-block .tb-cell.Invoice-No-bill ,
+.open-block .tb-cell.staus-bill ,
+.open-block .tb-cell.pickup-bill,
+.open-block .tb-cell.delivery-bill ,
+.open-block .tb-cell.fl-bill ,
+.open-block .tb-cell.Driver-bill ,
+.open-block .tb-cell.Origin-bill ,
+.open-block .tb-cell.st-bill ,
+.open-block .tb-cell.Destination-bill,
+.open-block .tb-cell.st1-bill,
+.open-block .tb-cell.miles-bill,
+.open-block .tb-cell.d-miles-bill,
+.open-block .tb-cell.ppm-bill,
+.open-block .tb-cell.payment-bill,
+.open-block .tb-cell.company-bill,
+.open-block .tb-cell.source-bill{display:none;}
+
+.table-row-main1.tb-body:hover {
+  background: rgb(218, 239, 253) none repeat scroll 0 0;cursor:pointer;
+}
+/********************bill********************************/
+/********************plan********************************/
+
+.tb-cell.ph-plan {
+  width: 152px;
+}
+.tb-cell.company-plan {
+  width: 153px;
+}
+.tb-cell.p-age-plan {
+  width: 80px;
+}
+.tb-cell.fl-plan {
+  width: 60px;
+}
+.tb-cell.pickup-plan {
+  width: 103px;
+}
+.tb-cell.Origin-plan {
+  width: 100px;
+}
+.tb-cell.st-plan {
+  width: 53px;
+}
+.tb-cell.Destination-plan {
+  width: 137px;
+}
+.tb-cell.st1-plan {
+  width: 60px;
+}
+.tb-cell.miles-plan {
+  width: 90px;
+}
+.tb-cell.d-miles-plan {
+  width: 131px;
+}
+.tb-cell.trlr-plan {
+  width: 80px;
+}
+.tb-cell.length-plan {
+  width: 98px;
+}
+.tb-cell.weight-plan {
+  width: 100px;
+}
+.tb-cell.ppm-plan {
+  width: 75px;
+}
+.tb-cell.payment-plan {
+  width: 120px;
+}
+.tb-cell.fuel-cost-plan {
+  width: 100px;
+}
+.tb-cell.profit-amount-plan {
+  width: 100px;
+}
+.tb-cell.profit-prct-plan {
+  width: 143px;
+}
+.tb-cell.action-plan.action {
+  float: right;
+  width: 140px;
+}
+
+.open-block .tb-cell.ph-plan ,
+.open-block .tb-cell.company-plan ,
+.open-block .tb-cell.p-age-plan ,
+.open-block .tb-cell.fl-plan  ,
+.open-block .tb-cell.pickup-plan ,
+.open-block .tb-cell.Origin-plan,
+.open-block .tb-cell.st-plan ,
+.open-block .tb-cell.Destination-plan ,
+.open-block .tb-cell.st1-plan,
+.open-block .tb-cell.miles-plan ,
+.open-block .tb-cell.d-miles-plan ,
+.open-block .tb-cell.trlr-plan ,
+.open-block .tb-cell.length-plan ,
+.open-block .tb-cell.weight-plan ,
+.open-block .tb-cell.ppm-plan ,
+.open-block .tb-cell.payment-plan ,
+.open-block .tb-cell.fuel-cost-plan ,
+.open-block .tb-cell.profit-amount-plan ,
+.open-block .tb-cell.profit-prct-plan ,
+.open-block .tb-cell.action-plan.action{display:none;}
+
+.add-new-data {  margin: auto;  max-width: 2429px;  position: relative;  width: 100%;}
+
+
+.table-structure-main-block.tb-my .table-row-main1.tb-head .tb-cell{
+    font-family: "Montserrat";
+    color: #000;
+    font-weight: 600;
+}
+.table-row-main1.tb-body.visited .tb-cell span {
+  color: red;
+}
+.table-row-main1.tb-body.visited .tb-cell span i{
+ color:#5e5e5e;
+}
+body .dataTables_paginate ul li a {
+  color: #333!important;
+  display: inline-block!important;
+  font-size: 13px!important;
+  min-width: 1.5em!important;
+  padding: 0!important;
+}
+body .dataTables_paginate ul li.active a,body .dataTables_paginate ul li:hover a {
+  color: #333!important;
+  font-weight: normal!important;
+  opacity: 1!important;
+}
+body .dataTables_wrapper .dataTables_paginate {
+  margin-top: 12px !important;
+}
+body .dataTables_paginate ul {
+  margin-bottom: 0px!important;
+}
+
+/********************plan end********************************/
+
+@media (min-width:2500px){
+.tb-my .tb-cell {
+  display: table-cell;
+    float: none !important;
+    width: auto !important;
+}
+.tb-my .table-row-main1 {
+  display: table-row;
+  float: none;
+}
+.tb-my .table-res-1 {
+  display: table;
+  width: 100%;
+}
+.add-new-data{width:100%;max-width:100%;}
+}
+
+/*
+@media (min-width:2530px){
+.tb-cell.Driver { width: 130px;}
+.tb-cell.source {width: 128px;}
+.tb-cell.company { width: 147px;}
+.tb-cell.st { width: 58px;}
+.tb-cell.st1 { width: 58px;}
+.tb-cell.Origin { width: 127px;}
+.tb-cell.trlr { width: 71px;}
+.tb-cell.delivery { width: 113px;}
+}
+
+
+@media (min-width:2519px){
+.tb-cell.Driver {width: 126px;}
+.tb-cell.trlr { width: 67px;}
+.tb-cell.source { width: 121px;}
+.tb-cell.Driver { width: 132px;}
+}
+*/
+
+
+@media (min-width:2400px){
+.plus-1{display:none;}
+.ld-id span {padding-left: 0;}
+}
+
+@media (min-width:2299px){
+
+/******************billing page *************/
+.tb-cell.pickup {width: 113px;}
+
+.tb-my .tb-body {font-size: 16px;}
+	
+.tb-cell.Origin { width: 116px;}
+.tb-cell.pickup-bill { width: 107px;}
+.tb-cell.pickup-bill {  width: 135px;}
+.tb-cell.Driver-bill { width: 210px;}
+.tb-cell.Origin-bill { width: 109px;}
+.tb-cell.st-bill { width: 70px;}
+.tb-cell.miles-bill {width: 96px;}
+.tb-cell.staus-bill {width: 112px;}
+.tb-cell.delivery-bill {width: 135px;}
+.tb-cell.fl-bill { width: 70px;}
+.tb-cell.st1-bill {  width: 70px;}
+
+/***********plan page***************/
+.tb-cell.pickup-plan { width: 140px;}
+.tb-cell.Origin-plan {width: 140px;}
+.tb-cell.Destination-plan { width: 160px;}
+.tb-cell.ppm-plan { width: 90px;}
+.tb-cell.profit-amount-plan { width: 110px;}
+.tb-cell.fuel-cost-plan { width: 108px;}
+.tb-cell.payment-plan { width: 127px;}
+.tb-cell.st1-plan {  width: 71px;}
+.tb-cell.ph { width: 135px;}
+.tb-cell.st-plan {width: 73px;}
+.tb-cell.fl-plan {width: 73px;}
+.tb-cell.length-plan {width: 107px;}
+/***********plan page***************/
+
+
+/****************my load ***********/
+.tb-cell.ppm { width: 63px;}
+.tb-cell.source {
+	width: 101px;
+	word-wrap: break-word;
+	word-break: break-all;
+}
+.tb-cell.delivery { width: 105px;}
+}
+@media (max-width:2460px){
+.tb-cell.source-bill{display:none;}
+.open-block .tb-cell.source-bill{display:block;}
+
+}
+@media (max-width:2400px){
+.tb-cell.staus{display:none;}
+.open-block .tb-cell.staus{display:block;}
+
+}
+
+
+
+
+
+@media (max-width:2297px){
+.tb-cell.staus ,.tb-cell.profit-prct-plan{display:none;}
+.open-block .tb-cell.staus  ,.open-block .tb-cell.profit-prct-plan{display:block;}
+.tb-cell.action {float: right;margin-right: 9px;}
+
+.tb-cell.source{display:none;}
+.open-block .tb-cell.source{display:block;}
+}
+
+
+
+@media (min-width:1600px){
+.tb-cell.Driver-bill {
+    width: 163px;
+}
+ .tb-cell.Invoice-No-bill {
+    width: 109px;
+}
+}
+
+
+@media (min-width:1360px) and (max-width:1370px){
+.tb-cell.Origin { width: 118px;}
+.tb-cell.st {  width: 62px;}
+.tb-cell.pickup { width: 116px;}
+.tb-cell.delivery { width: 120px;}
+.tb-cell.st {width: 72px;}
+}
+
+
+@media (max-width:2215px){
+.tb-cell.source{display:none;}
+.open-block .tb-cell.source{display:block;}
+}
+@media (max-width:2200px){
+.tb-cell.company-bill{display:none;}
+.open-block .tb-cell.company-bill{display:block;}
+
+}
+
+@media (max-width:2170px){
+.tb-cell.profit-amount-plan{display:none;}
+.open-block .tb-cell.profit-amount-plan{display:block;}
+.tb-cell.company{display:none;}
+.open-block .tb-cell.company{display:block;}
+}
+
+@media (max-width:1965px){
+.tb-cell.payment-bill{display:none;}
+.open-block .tb-cell.payment-bill{display:block;}
+
+}
+@media (max-width:2060px){
+
+.tb-cell.fuel-cost-plan{display:none;}
+.open-block .tb-cell.fuel-cost-plan{display:block;}
+.tb-cell.weight{display:none;}
+.open-block .tb-cell.weight{display:block;}
+
+
+}
+@media (max-width:1960px){
+
+.tb-cell.payment-plan{display:none;}
+.open-block .tb-cell.payment-plan{display:block;}
+
+
+}
+@media (max-width:1940px){
+
+.tb-cell.length{display:none;}
+.open-block .tb-cell.length{display:block;}
+
+}
+@media (max-width:1840px){
+
+.tb-cell.d-miles,.tb-cell.ppm-plan{display:none;}
+.open-block .tb-cell.d-miles,.open-block .tb-cell.ppm-plan{display:block;}
+}
+
+@media (max-width:1790px){
+
+.tb-cell.ppm-bill{display:none;}
+.open-block .tb-cell.ppm-bill{display:block;}
+
+}
+@media (max-width:1765px){
+
+.tb-cell.weight-plan    {display:none;}
+.open-block .tb-cell.weight-plan    {display:block;}
+
+}
+@media (max-width:1700px){
+
+.tb-cell.miles,.tb-cell.d-miles-bill    {display:none;}
+.open-block .tb-cell.miles ,.open-block .tb-cell.d-miles-bill    {display:block;}
+
+}
+@media (max-width:1660px){
+
+.tb-cell.length-plan    {display:none;}
+.open-block .tb-cell.length-plan    {display:block;}
+
+}
+@media (max-width:1646px){
+
+ .tb-cell.ppm   {display:none;}
+ .open-block .tb-cell.ppm   {display:block;}
+
+}
+@media (max-width:1570px){
+
+.tb-cell.miles-bill{display:none;}
+.open-block .tb-cell.miles-bill{display:block;}
+
+}
+@media (max-width:1560px){
+
+.tb-cell.ppm ,.tb-cell.miles-bill,.tb-cell.trlr-plan, .tb-cell.payment    {display:none;}
+.open-block .tb-cell.ppm ,.open-block .tb-cell.miles-bill,.open-block .tb-cell.trlr-plan, .open-block .tb-cell.payment    {display:block;}
+
+}
+@media (max-width:1551px){
+
+.tb-cell.payment    {display:none;}
+.open-block .tb-cell.payment   {display:block;}
+
+}
+@media (max-width:1500px){
+
+.tb-cell.st1-bill {display:none;}
+.open-block .tb-cell.st1-bill{display:block;}
+
+}
+@media (max-width:1470px){
+
+.tb-cell.st1-bill,.tb-cell.d-miles-plan    {display:none;}
+.open-block .tb-cell.st1-bill,.open-block .tb-cell.d-miles-plan{display:block;}
+
+}
+@media (max-width:1440px){
+
+.tb-cell.Invoice-No    {display:none;}
+.open-block .tb-cell.Invoice-No   {display:block;}
+
+}
+@media (max-width:1420px){
+
+.tb-cell.Destination-bill    {display:none;}
+.open-block .tb-cell.Destination-bill{display:block;}
+
+
+}
+@media (max-width:1370px){
+
+.tb-cell.Driver    {display:none;}
+.open-block .tb-cell.Driver   {display:block;}
+}
+@media (max-width:1355px){
+
+.tb-cell.miles-plan    {display:none;}
+.open-block .tb-cell.miles-plan    {display:block;}
+}
+@media (max-width:1286px){
+
+.tb-cell.Driver,.tb-cell.st-bill,.tb-cell.st1-plan    {display:none;}
+.open-block .tb-cell.Driver    ,.open-block .tb-cell.st-bill,.open-block .tb-cell.st1-plan    {display:block;}
+
+}
+@media (max-width:1225px){
+.tb-cell.st1    {display:none;}
+.open-block .tb-cell.st1    {display:block;}
+}
+
+@media (max-width:1200px){
+
+.tb-cell.Destination-plan    {display:none;}
+.open-block .tb-cell.Destination-plan    {display:block;}
+.tb-cell.Origin-bill    {display:none;}
+.open-block .tb-cell.Origin-bill    {display:block;}
+
+
+
+.tb-my .open-block .tb-cell span .heading { width: 40%;}
+.tb-my .open-block .tb-cell span .value { width: 60%;}
+
+}
+@media (max-width:1170px){
+
+.tb-cell.Destination    {display:none;}
+.open-block .tb-cell.Destination    {display:block;}
+
+}
+@media (max-width:1090px){
+
+.tb-cell.Driver-bill    {display:none;}
+.open-block .tb-cell.Driver-bill    {display:block;}
+
+}
+@media (max-width:1060px){
+
+.tb-cell.st-plan    {display:none;}
+.open-block .tb-cell.st-plan    {display:block;}
+
+}
+@media (max-width:1040px){
+
+.tb-cell.st    {display:none;}
+.open-block .tb-cell.st    {display:block;}
+
+}
+@media (max-width:1000px){
+
+.tb-cell.Origin-plan    {display:none;}
+.open-block .tb-cell.Origin-plan    {display:block;}
+
+}
+
+@media (max-width:900px){
+
+.tb-cell.Origin   {display:none;}
+.open-block .tb-cell.Origin   {display:block;}
+
+}
+@media (max-width:880px){
+
+.tb-cell.Origin,.tb-cell.pickup-plan    {display:none;}
+.open-block .tb-cell.Origin,.open-block .tb-cell.pickup-plan    {display:block;}
+
+}
+@media (max-width:835px){
+
+.tb-cell.fl-bill    {display:none;}
+.open-block .tb-cell.fl-bill    {display:block;}
+
+}
+@media (max-width:800px){
+.tb-cell.delivery  {display:none;}
+.open-block .tb-cell.delivery {display:block;}
+}
+@media (max-width:770px){
+
+.tb-cell.delivery-bill,.tb-cell.fl-plan    {display:none;}
+.open-block .tb-cell.delivery-bill,.open-block .tb-cell.fl-plan    {display:block;}
+
+.tb-my .open-block .tb-cell span .heading { width: 50%;}
+.tb-my .open-block .tb-cell span .value { width: 50%;}
+
+}
+@media (max-width:660px){
+
+.tb-cell.pickup,.tb-cell.pickup-bill,.tb-cell.p-age-plan    {display:none;}
+.open-block .tb-cell.pickup,.open-block .tb-cell.pickup-bill,.open-block .tb-cell.p-age-plan    {display:block;}
+
+}
+@media (max-width:574px){
+
+.tb-cell.company-plan    {display:none;}
+.open-block .tb-cell.company-plan    {display:block;}
+
+}
+@media (max-width:560px){
+
+.tb-cell.fl    {display:none;}
+.open-block .tb-cell.fl    {display:block;}
+
+}
+@media (max-width:510px){
+.tb-cell.staus-bill    {display:none;}
+.open-block .tb-cell.staus-bill    {display:block;}
+
+}
+@media (max-width:495px){
+
+.tb-cell.trlr  {display:none;}
+.open-block .tb-cell.trlr{display:block;}
+.tb-my .open-block .tb-cell span .heading { width: 100%;}
+.tb-my .open-block .tb-cell span .value { width: 100%;}
+.tb-my .open-block .tb-cell span .heading b{display:none;}
+
+}
+@media (max-width:440px){
+
+.tb-cell.ph {display:none;}
+.open-block .tb-cell.ph {display:block;}
+
+}
+@media (max-width:420px){
+
+.tb-cell.Invoice-No-bill,.tb-cell.action-plan    {display:none;}
+.open-block .tb-cell.Invoice-No-bill,.open-block .tb-cell.action-plan    {display:block;}
+
+}

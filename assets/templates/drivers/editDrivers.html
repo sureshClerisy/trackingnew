@@ -1,0 +1,167 @@
+<div class="page-content-wrapper ">
+	 <!--ng-include src="'./assets/templates/googleMap.html'"></ng-include-->
+        <!-- START PAGE CONTENT -->
+        <div class="content sm-gutter">
+          <!-- START CONTAINER FLUID -->
+          <div class="container-fluid padding-25 sm-padding-10 bg-color">
+            <div class="row">
+                <div class="col-md-12 col-xlg-12">
+                    
+                    <div class="commen-heading driver-page">
+						<h2 class="oprate-dashbord">{{ title }}</h2>
+					</div>
+                </div>
+            </div>
+           
+            <div class="row new-block-padding">
+                <div class="col-lg-12 col-md-12 edit-text">
+                   
+                        <div class="panel panel-transparent">
+                             <div class="panel-body">
+                            
+							<form id="form-project" name="editDrivers" role="form" autocomplete="off" ng-submit="editDrivers.$valid && saveDriver()" enctype="multipart/formdata" novalidate >
+                                
+                           
+                                    <!--row-->
+                                    <div class="row clearfix">
+                                        <div class="col-sm-6 col-sx-12">
+                                            <p class="Summary-heading  no-marign-top">{{ languageCommonVariables.commonSummaryHeading }}</p>
+											<!--div pg-form-group class="form-group form-group-default required th-select" ng-class="{'has-error':editDrivers.dispatchersList.$invalid && !editDrivers.dispatchersList.$pristine || editDrivers.$submitted && editDrivers.dispatchersList.$invalid}"-->
+											<div pg-form-group class="form-group form-group-default th-select">
+                                                <label>Select Dispatcher</label>
+                                                <ui-select class="mdrivers" name="dispatchersList" ng-model="dispatcher.selected" theme="bootstrap" on-select="onSelectDispatcherCallback($item, $model);" >
+													<ui-select-match class="ui-select-match" placeholder="Select Dispatcher">{{$select.selected.username}}</ui-select-match>
+													<ui-select-choices class="ui-select-choices" group-by="groupFind" repeat="item in dispatcherList | filter: $select.search | orderBy:'username'">
+														<span ng-bind-html="trustAsHtml((item.username | highlight: $select.search))"></span>
+													</ui-select-choices>
+												</ui-select>
+                                            </div>
+                                            <!--label class="error" for="dispatcherList" ng-show="editDrivers.dispatchersList.$invalid && !editDrivers.dispatchersList.$pristine || editDrivers.$submitted && editDrivers.dispatchersList.$invalid">Please select dispatcher list.</label-->
+                                            
+                                            <div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':editDrivers.last_name.$invalid && !editDrivers.last_name.$pristine || editDrivers.$submitted && editDrivers.last_name.$invalid}">
+                                                <label> {{ languageArray.driverlname }}</label>
+                                                <input type="text" class="form-control" name="last_name" ng-model="driversData.last_name" required>
+                                            </div>
+                                            <label class="error" for="lastName" ng-show="editDrivers.last_name.$invalid && !editDrivers.last_name.$pristine || editDrivers.$submitted && editDrivers.last_name.$invalid">Please enter last name.</label>
+                                            
+                                            <div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':editDrivers.first_name.$invalid && !editDrivers.first_name.$pristine || editDrivers.$submitted && editDrivers.first_name.$invalid}">
+                                                <label> {{ languageArray.driverfname }}</label>
+                                                <input type="text" class="form-control" name="first_name" ng-model="driversData.first_name" required>
+                                            </div>
+                                            <label class="error" for="firstName" ng-show="editDrivers.first_name.$invalid && !editDrivers.first_name.$pristine || editDrivers.$submitted && editDrivers.first_name.$invalid">Please enter first name.</label>
+                                            
+                                            <div pg-form-group class="form-group form-group-default">
+                                                <label>{{ languageArray.drivermname }}</label>
+                                                <input type="text" class="form-control" name="middleName" ng-model="driversData.middle_name"  >
+                                            </div>
+                                             <div pg-form-group class="form-group form-group-default">
+                                                <label>{{ languageArray.driverdob }}</label>
+                                                <div class="input-group date" ui-jq="datepicker" ui-options='{format: "yyyy-mm-dd",autoclose: true}'>
+													<input type="text" ng-click="refreshDatepicker($event)"  value="{{driversData.date_of_birth}}" ng-model="driversData.date_of_birth"  class="form-control"><span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+												</div>
+                                            </div>
+                                            <div pg-form-group class="form-group form-group-default  "  >
+                                                <label> {{ languageArray.drivertracker }}</label>
+                                                <input type="text" class="form-control" name="tracker" ng-model="driversData.tracker"  >
+                                            </div>
+                                            <div pg-form-group class="form-group form-group-default  "  >
+                                                <label> {{ languageArray.driverhardwarekey }}</label>
+                                                <input type="text" class="form-control" name="hardware Key" ng-model="driversData.hardware_key"  >
+                                            </div>
+                                            <!--div pg-form-group class="form-group form-group-default  "  >
+                                                <label> Tags</label>
+                                                <input type="text" class="form-control" name="tags" ng-model="driversData.tags"  >
+                                            </div-->
+                                             
+                                           
+                                                                                        
+                                            <p class="Summary-heading margin-top">{{ languageArray.driverdl }}</p>
+                                            <div pg-form-group class="form-group form-group-default  "  >
+                                                <label>{{ languageArray.driverdlnum }}</label>
+                                                <input type="text" class="form-control" name="driverlicencenumber" ng-model="driversData.driver_license_number"  >
+                                            </div>
+                                            <div pg-form-group class="form-group form-group-default  "  >
+                                                <label> {{ languageArray.driverdlclass }}</label>
+                                                <input type="text" class="form-control" name="driverlicenceclass" ng-model="driversData.driver_license_cats"  >
+                                            </div>
+                                            <div pg-form-group class="form-group form-group-default  "  >
+                                                <label> {{ languageArray.driverdlexpdate }}</label>
+                                                <div class="input-group date" ui-jq="datepicker" ui-options='{format: "yyyy-mm-dd",autoclose: true}'>
+													<input type="text" class="form-control" name="driverlicenceexpirationdate" ng-model="driversData.driver_license_valid_till"  ><span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                </div>
+                                            </div>
+                                            
+
+                                        
+                               
+                                      </div>
+                                     
+                                        <div class="col-sm-6 col-xs-12">
+                                            <div class="row1">
+                                                <!-- <div id="map" style="height:550px;"></div> -->
+                                                 <p class="Summary-heading no-marign-top">{{ languageArray.drivercontinfo }}</p>
+                                                <div pg-form-group class="form-group form-group-default  "  >
+                                                    <label>{{ languageCommonVariables.commonTableThPhone }}</label>
+                                                    <input type="text" class="form-control" ui-jq="mask" ui-options="'(999) 999-9999'" name="phone" ng-model="driversData.phone"  >
+                                                </div>
+                                                <div pg-form-group class="form-group form-group-default" ng-class="{ 'has-error' : editDrivers.email.$invalid && !editDrivers.email.$pristine }" >
+                                                    <label>{{ languageCommonVariables.commonTableThEmail }}</label>
+                                                    <input type="email" class="form-control" name="email" ng-model="driversData.email"  >
+                                                </div>
+                                                <label class="error" for="email" ng-show="editDrivers.email.$invalid && !editDrivers.email.$pristine">Please enter valid email address.</label>
+                                                <p class="Summary-heading margin-top">{{ languageArray.driverlocation }}</p>
+                                                <div pg-form-group class="form-group form-group-default  "  >
+                                                    <div class="col-sm-8">
+                                                        <label>{{ languageArray.driverprofileimg }}</label>
+                                                        <div class="input-file-browse">
+                                                        <input type = "file" file-model = "myFile"/>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-4 img-cont">
+                                                        <img class="center-me" on-error-src="pages/img/user.png" ng-src="./assets/uploads/drivers/thumbnail/{{driversData.profile_image}}" width="70" height="50">
+                                                    </div>
+                                                </div>
+                                                <div pg-form-group class="form-group form-group-default  "  >
+                                                    <label>{{ languageArray.driveraddress }}</label>
+                                                    <input type="text" class="form-control" name="address" placeholder="{{ languageArray.driveraddressPlaceholder }}" ng-model="driversData.address" id = 'pac-input' >
+                                                </div>
+                                                <div class="dropzone" ng-dropzone dropzone="dropzone" dropzone-config="dropzoneConfigDriverEdit" ></div>
+
+                                                <section class="truck-load-pdf" >
+                                                    
+                                                    <div class="truck-load-pdf-left" ng-repeat="docs in driverDocs">
+                                                        <div class="row1">
+                                                            <button class="btn btn-danger" type="button" ng-click="deleteDoc(docs.id,docs.document_name, $index);">X</button>
+                                                            <div class="pdf-cover" data-url="assets/uploads/documents/driver/{{docs.document_name}}" ng-click="perviewDoc($event)">
+																<img ng-src="assets/uploads/documents/thumb_driver/thumb_{{docs.document_name | filetoimg}} " on-error-src="pages/img/pdf.png" />
+															</div>
+                                                        </div>
+                                                    </div>
+                                                </section>
+                                            </div>
+                                        </div><div class="col-sm-12 col-xs-12">
+                                            <div class="row">
+                                                <div class="update-truck-block-btn" style="margin-top:10px">
+                                                    <button ng-click="submitted=true" class="btn btn-primary btn-cons m-b-10" type="submit"><i class="fa fa-pencil-square-o"></i><span class="bold"> {{ languageCommonVariables.updatebutton|capitalize }} </span>
+                                                    </button>
+                                                    <a href="#/drivers"><button class="btn btn-danger btn-cons m-b-10" type="button"><i class="fa fa-ban"></i><span class="bold"> {{ languageCommonVariables.cancelbutton|capitalize }} </span></button></a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--row clearfix-->
+                                    <!--row-->
+                               
+                               
+                            </form>
+                        </div>
+                        <!---->
+                    </div>
+             
+                </div>
+            </div>
+       
+        </div>
+        </div>
+    </div>
+    

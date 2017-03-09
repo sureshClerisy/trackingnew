@@ -1,0 +1,73 @@
+54 server phpmyadmin details:
+username: root
+password: DGxDeH5qgR3sG
+
+
+vika.io server phpmyadmin details:
+username: root
+password: DGxDeH5qgR3sG
+
+Google Key used for google maps:
+
+emailId = gsm.jatt@gmail.com
+projectName = 'tracking'
+key = 'AIzaSyBq1PClmdDqr7LsWoasmkTNM73-PCfJfZo'
+
+
+Google Key used for matched jobs maps:
+
+emailId = clerisysolution123@gmail.com
+projectName = 'navixy routes'
+key = 'AIzaSyAzqFSjwfCSB_x9jNIfBwOI2k-BqV2NT9c'
+
+Google Key used for Fuel stops maps:
+
+emailId = clerisysolution123@gmail.com
+projectName = 'Fuel stops Tracking'
+Api key = 'AIzaSyCJxKWkyvOhA6pAl0mXuGe0phOPWbkCebM' -> iterationLoad
+Server key = 'AIzaSyB62sujBjnYX2EIlvE0fSc_6RJ5d3h_KGs'
+
+
+emailId = "clerisysolution123@gmail.com"
+Password = "clerisy##212"
+projectName = 'Tracking Iterations'
+Api Key = 'AIzaSyDiojAPmOWusjvasUhm5wKswtCRtkEKyi8'  -> used in  truckstop controller to find distance b/w two locations
+
+
+emailId = "clerisysolution123@gmail.com"
+projectName = 'Iterations new'
+Api Key = 'AIzaSyBSPVGmxdOqe2yrxzla4iezs00zWe_p6j4'  -> loads-index, Dashboard Weather(get lat long from location)
+
+fuelstopkey = 'LjagRYIsTqr14TgfZD9u8a1F2fdglWmOj4268cHs' -> savedLoad
+
+AIzaSyCJ04xh3kIVPFSO-MICsJELeab0AMoYWdM 		// live key created for mycontroller and zipcodes(truckstop.php) on 34 server
+
+
+Api Used :
+1. Fuel stop Test api
+	Truck Stop credentials:
+	username 	= 'VIKALOGSTWS';
+	password 	= 'b3Qp23Ng';
+	Account 	= 'T291457VL';
+	Integration ID = 271425;
+
+2. Triumph Api:
+	Triumph Api credentials:
+	username   = 'jpbruzual@vikalogisticscorp.com';
+	password   = 'jpbruzual@vikalogisticscorp.com';
+	Apikey	   = '133e47a2-4f93-416a-a83c-a45c5cdc3cf5';
+	
+3. Navaxy APi
+	Navaxy Api credentials:
+	login 		= 'vika@lodgeos.com';
+	password 	= 'vika@123';
+	navixy_auth_url 	= 'https://api.navixy.com/v2/user/auth';
+	navixy_api_url 	= 'https://api.navixy.com/v2/';
+	
+	
+http://nttsbreakdown.com/ntts/programs/main/main.php
+
+https://truckerpath.com/
+http://www.findfuelstops.com.webstatsdomain.org/
+
+-- https://pilotflyingj.com/mypilot

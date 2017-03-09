@@ -1,0 +1,94 @@
+      <!-- START PAGE CONTENT WRAPPER -->
+      <div class="page-content-wrapper">
+        <!-- START PAGE CONTENT -->
+        <div class="content sm-gutter">
+          <!-- START CONTAINER FLUID -->
+          <div class="container-fluid padding-25 sm-padding-10">
+			<div class="row">
+				<div class="col-md-12 col-xlg-12">
+					<div ng-show="alertmsg == true&&alertdeletemsg !=true" class="alert alert-success" role="alert">
+						<button class="close" data-dismiss="alert"></button>						
+						{{Message}}
+						</div>
+						<div ng-show="alertdeletemsg == true" class="alert alert-success" role="alert">
+						<button ng-click = "hidedeletemessage()" class="close"></button>
+						{{brokerdeleteMessage}}
+						</div>
+						<div class="commen-heading">
+							<h2 class="oprate-dashbord"> {{ languageArray.brokerListingHeading }}</h2>
+						</div>
+					</div>
+			</div>
+			<div class="row invocie-block-row ">
+				<div class="col-md-12 col-xlg-12">
+					<div class="load-new-block-table">
+						<div class="panel-body add-new-data fix-page">
+							<div class="load-tabe-auto map-load-section">
+								<a href="#/addbroker" class="add-new-data-button"><button class="btn btn-primary"><i class="fa fa-plus" style="margin-right:3px"></i><span class="bold">{{ languageArray.brokerListingAddButton }}</span></button></a>
+								<table datatable="ng" dt-options="dtOptions" class="table tr-hover table-hover table-striped driver-table" id="tableWithExportOptions">
+									<thead>
+										<tr>
+											<th>{{ languageArray.brokerListingTableThName }}</th>
+											<th class="rating-alignment">{{ languageArray.brokerListingTableRatings }}</th>
+											<th>{{ languageArray.brokerListingTableThStreetAddress }}</th>
+											<th>{{ languageArray.brokerListingTableThCity }}</th>
+											<th>{{ languageArray.brokerListingTableThState }}</th>
+											<th>{{ languageArray.brokerListingTableThZipCode }}</th>
+											<th>{{ languageArray.brokerListingTableThBrokerMc }}</th>
+											<th>{{ languageArray.brokerListingTableThCarrierMc }}</th>
+											<th>{{ languageArray.brokerListingTableThUsDot }}</th>
+											<th>{{ languageCommonVariables.commonTableThStatus }}</th>
+											<th class="text-center">{{ languageCommonVariables.commonTableThAction }}</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr ng-repeat="value in data track by value.id">
+											<td>{{ value.TruckCompanyName }}</td>
+											<td class="rating-alignment">
+												<div ng-init="rating = value.rating "></div>
+												<div class="star-rating show-rating" star-rating rating-value="rating" data-max="5"></div>
+											</td>
+											<td>{{ value.postingAddress }}</td>
+											<td>{{ value.city }}</td>
+											<td>{{ value.state }}</td>
+											<td>{{ value.zipcode }}</td>
+											<td>{{ value.MCNumber }} </td>
+											<td>{{ value.CarrierMC }}</td>
+											<td>{{ value.DOTNumber }}</td>
+											<td>{{ value.brokerStatus }}</td>
+											<td class="text-center action-btn-ryt"> 
+												<div class="export-options-container">
+													<div class="exportOptions">
+														<div class="DTTT btn-group">
+															<a href="#/editbroker/{{value.id}}" class="btn btn-default DTTT_button_pdf" data-original-title="{{languageCommonVariables.editBroker}}" ui-jq="tooltip" >
+																<span><i class="fa fa-edit" aria-hidden="true"></i></span>
+															</a>
+															<a class="btn btn-default DTTT_button_copy" title="{{languageCommonVariables.deleteBroker}}" ui-jq="tooltip" ng-click='removeBroker(value.id,$index)' >
+																<span><i class="fa fa-trash" aria-hidden="true"></i></span>
+															</a>
+															<a class="btn btn-default DTTT_button_csv" title="{{languageCommonVariables.blackListBroker}}" ui-jq="tooltip" ng-click="blackListBroker(value.id,value.black_list,$index)" ng-if="value.black_list == 0 || value.black_list == ''">
+																<span><i class="fa fa-thumbs-o-up"></i></span>
+															</a>
+															<a class="btn btn-default DTTT_button_csv" title="{{languageCommonVariables.acceptBroker}}" ui-jq="tooltip" ng-click="blackListBroker(value.id,value.black_list,$index)" ng-if="value.black_list == 1">
+																<span><i class="fa fa-thumbs-down"></i></span>
+															</a>
+															<a class="btn btn-default DTTT_button_csv" data-original-title="{{languageCommonVariables.exportCSV}}" ui-jq="tooltip" ng-click="exportCsv($event,'broker_info',value.id)">
+																<span><i class="pg-grid"></i></span>
+															</a>
+														</div>
+													</div>
+												</div>
+												
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<ng-include src="'./assets/templates/common_modals.html'"></ng-include>

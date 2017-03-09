@@ -1,0 +1,203 @@
+
+      <!-- START PAGE CONTENT WRAPPER -->
+      <div class="page-content-wrapper ">
+        <!-- START PAGE CONTENT -->
+        <div class="content sm-gutter">
+          <!-- START CONTAINER FLUID -->
+          <div class="container-fluid padding-25 sm-padding-10">
+			  
+					
+			  <div class="col-middle loader-outer" ng-show="autoFetchLoads == true">
+					<!-- START PANEL -->
+					<div class="loader-inner">
+					<div class="full-height">
+						<div class="panel-body text-center">
+							<img class="image-responsive-height demo-mw-50" src="assets/img/demo/progress.svg" alt="Progress">
+						</div>
+					</div>
+					</div>
+					<!-- END PANEL -->
+                </div>
+           
+	
+			<div class="row invocie-block-row">
+				<div class="col-md-12 col-xlg-12">
+				<div class="commen-heading search-result-page">
+					<h2 class="oprate-dashbord ">{{languageArray.searchResultPageHeading}}</h2>
+				</div>
+				
+					<div class="load-new-block-table">
+						<div class="panel-body search-position start-over search-change-right fix-page srp-search">
+							<div class="load-tabe-auto job-list truckstopJobs map-load-section textCenter" ng-show ="notShowDataTable == false">
+								<span class="textCenter-span">{{languageArray.noSearchParameter}}</span>
+							</div>
+							
+							<div class="load-tabe-auto job-list truckstopJobs map-load-section" ng-show = "notShowDataTable == true">
+								
+								<h2 class="edit-search-btnC itenary-truck-heading small-heading-h2">{{tableTitle[0]}}<button ng-click="editSearch()"  title="{{ languageArray.editSearch }}" class="btn btn-info btn-cons m-b-10" type="button"><i class="fa fa-paste"></i> <span class="bold">{{ languageArray.editSearch }}</span>
+								</button></h2>
+								<div class="col-xs-4">
+										<label for="search">{{ languageArray.searchButton }}</label>
+										<input type="text" class="form-control" ng-model="searchLoad">
+								</div>	 
+								<div class="loadtable">
+									<div class="dataTables_wrapper no-footer"> 
+									
+									<div id="Scroller:fx:OuterDiv" style="position: relative; width: 100%; overflow: hidden; padding: 0px; margin: 0px; height: 20px;">
+										<div id="Scroller:fx" style="position: relative; padding: 0px; margin-left: 0px; left: 0px; width: 9999px;">
+											<table id="Scroller:content" class="mt" style="width: 1825px; margin-top: 0px;" width="100%">
+												<tbody>
+													<tr>
+														<th>Column 1</th>
+														<th>Column 2</th>
+														<th>Column 3</th>
+														<th>Column 4</th>
+														<th>Column 5</th>
+														<th>Column 6</th>
+														<th>Column 7</th>
+														<th>Column 8</th>
+														<th>Column 9</th>
+														<th>Column 10</th>
+													</tr>
+													<tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+													<tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+													<tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+              <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+							</tbody>
+							</table>
+										</div>
+									</div>
+							
+								<div style="height: 500px; overflow: auto; width: 100%;" id="dataTable:scroller">
+									<table id="dataTable" class="mt" style="width: 1825px; margin-top: -20px;" width="100%">
+				  <tbody><tr><th>Column 1</th><th>Column 2</th><th>Column 3</th><th>Column 4</th><th>Column 5</th><th>Column 6</th><th>Column 7</th><th>Column 8</th><th>Column 9</th><th>Column 10</th></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+				  <tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td><td>Cell 4</td><td>Cell5WithSomeLongContent</td><td>Cell 6</td><td>Cell 7</td><td>Cell 8</td><td>Cell 9</td><td>Cell 10</td></tr>
+			  </tbody></table>
+								</div>
+								
+								<div class="dataTables_wrapper">
+        							<div class="dataTables_paginate">
+										<dir-pagination-controls template-url="./assets/templates/dirPagination.html" on-page-change="pageChanged(newPageNumber,itemsOnPage)" direction-links="true" undary-links="true"></dir-pagination-controls>
+									</div>
+								</div>
+								</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+          fxheaderInit('dataTable',300);
+      </script>
+
+<ng-include src="'./assets/templates/truckstop/modals.html'"></ng-include>

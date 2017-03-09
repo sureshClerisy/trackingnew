@@ -1,0 +1,62 @@
+   <!-- START PAGE CONTENT WRAPPER -->
+      <div class="page-content-wrapper ">
+        <!-- START PAGE CONTENT -->
+        <div class="content sm-gutter">
+          <!-- START CONTAINER FLUID -->
+          <div class="container-fluid padding-25 sm-padding-10">
+			<div class="row">
+				<div class="col-md-12 col-xlg-12">
+					<div ng-show="alertmsg == true" class="alert alert-success" role="alert">
+						<button class="close" data-dismiss="alert"></button>
+						{{Message}}
+						</div>
+						<div ng-show="alertdeletemsg == true" class="alert alert-success" role="alert">
+						<button ng-click = "hidedeletemessage()" class="close"></button>
+						{{deptdeleteMessage}}
+						</div>
+					<h2 class="oprate-dashbord">Departments</h2>
+					<div class="search-block-listing">
+                        <input type="search"  placeholder="Search name" ng-change="searchDepartmentDB()" ng-model="searchText" name="table_search" value=""/>
+                        <i href="#" class="fa fa-search"></i>
+                    </div>
+				</div>
+			</div>
+			
+			<div class="row invocie-block-row">
+				<div class="col-md-12 col-xlg-12">
+					<div class="load-new-block-table">
+						<div class="panel-body">
+							<div class="load-tabe-auto">
+								<table class="table table-striped" id="tableWithExportOptions">
+									<thead>
+										<tr>
+											<th>S.No</th>
+											<th><a ng-click="sortType = 'label'; sortReverse = !sortReverse; sortPage()" style='color: #fff;'>
+												<span ng-show="sortType == 'label' && !sortReverse" class="fa fa-caret-down"></span>
+												<span ng-show="sortType == 'label' && sortReverse" class="fa fa-caret-up"></span>Name</a></th>
+											<th>Address</th>
+											<th>ACTION</th>
+										</tr>
+									  </thead>
+									  <tbody>
+											<tr dir-paginate="value in data | itemsPerPage:10" total-items="totalItems">
+										
+											<td class="text-center">{{ ((pageNumber- 1) * 10) + ($index + 1) }}</td>
+											<td class="dark-color">{{ value.label }} </td>
+											<td >{{ value.address }}</td>
+											<td class="text-center"> 
+												<a href="#/editdepartment/{{ value.id}}"  class="icon-action edit"><i class="fa fa-edit"></i></a> 
+												 
+												<a ng-click='removeDept(value.id,$index)' class="icon-action del" title="Delete Department"><i class="fa fa-trash"></i></a> 
+											</td>
+										</tr>
+										
+										 </tr>
+									</tbody>
+								</table>
+<dir-pagination-controls class="pull-right" on-page-change="pageChanged(newPageNumber)" template-url="assets/templates/dirPagination.html" ></dir-pagination-controls>
+							</div>
+						</div>
+					</div>
+				</div>
+			

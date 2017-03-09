@@ -1,0 +1,104 @@
+<!-- START PAGE CONTENT WRAPPER -->
+      <div class="page-content-wrapper ">
+        <!-- START PAGE CONTENT -->
+        <div class="content sm-gutter">
+          <!-- START CONTAINER FLUID -->
+			<div class="container-fluid padding-25 sm-padding-10">
+				<canvas id="viewport" style="display: none;"></canvas>
+			   <div ng-show="showMessage == true" class="alert alert-success" role="alert">
+					<button ng-click = "hideloadmessage()" class="close"></button>
+					{{SuccMessage}}
+				</div>
+			
+				
+				<div class="col-middle loader-outer" ng-show="autoFetchLoads == true">
+					<!-- START PANEL -->
+					<div class="loader-inner">
+					<div class="full-height">
+						<div class="panel-body text-center">
+							<img class="image-responsive-height demo-mw-50" src="assets/img/demo/progress.svg" alt="Progress">
+						</div>
+					</div>
+					</div>
+					<!-- END PANEL -->
+                </div>
+                
+			  
+			<div class="row">
+				<div class="col-md-12 col-xlg-12">
+					<div class="commen-heading billing-page">
+						<h2 class="oprate-dashbord">Confirm Payment</h2>
+					</div>
+				</div>
+			</div>
+			
+			<div class="row invocie-block-row">
+				<div class="col-md-12 col-xlg-12">
+					<div class="load-new-block-table">
+						<div class="panel-body add-new-data">
+							<div class="load-tabe-auto job-list truckstopJobs map-load-section">	
+								<div class="dataTables_wrapper no-footer"> 
+								
+								<!--a class="btn btn-primary" ng-click="addMoreLoadForPayment()"><i class="fa fa-plus"></i></a-->
+								
+								<a target="_blank" class="btn-style btn btn-primary" href="assets/uploads/documents/schedule/{{uploadedSchedule}}" class="gray"><i class="fa fa-paper-plane"></i>View Schedule sheet</a>
+							 
+								<table id="data" datatable="ng" dt-options="dtOptions" width="100%" class="fixed-thead table table-striped" cell-padding="0" cell-spacing="0" >
+									<thead>
+										<tr>
+											<th>{{ languageCommonVariables.commonTableThPhone }}</th>
+											<th>{{ languageArray.planthpickup }}</th> 
+											<th>{{ languageArray.driversHeading }}</th> 
+											<th>{{ languageCommonVariables.origin }}</th>
+											<th>{{ languageCommonVariables.destination }}</th>
+											<th>{{ languageArray.planthpayment }}</th>
+											<th>{{ languageArray.planthcompany }}</th>
+											<th>Bundle</th>
+											<th class="text-center">{{ languageCommonVariables.commonTableThAction }}</th>
+										</tr>
+									</thead>
+									<tbody>
+										
+										<!--tr data-uinfo="{{value.truckstopID}}" ng-class="{'visited' : value.visited}" data-pickdate="{{value.pickDate}}" ng-repeat="value in billingLoads track by value.id" ng-show="search_label == value.vehicleID || search_label == 'all'"-->
+										<tr data-uinfo="{{value.truckstopID}}" ng-class="{'visited' : value.visited}" data-pickdate="{{value.pickDate}}" ng-repeat="value in billingLoads track by value.id" >
+												
+											<td>{{ value.PointOfContactPhone }}</td>	
+											<td>{{value.PickupDate}}</td>
+											<td>{{value.driverName}}</td>
+											<td class="text-same-lower">{{ value.PickupAddress | capitalize }}</td>
+											<td class="text-same-lower" >{{ value.DestinationAddress | capitalize }}</td>
+											<td class="">{{ value.PaymentAmount | currency:"$":2 }}</td>
+											<td class="company_name"><span class="text-comp-name">{{ value.TruckCompanyName|capitalize }}</span></td>
+							 		
+											<td class="upload-page"><a href="javascript:void(0)" class="pdf-cover" data-id="{{docs.id}}" data-loadid="{{docs.id}}"  data-url="assets/uploads/documents/{{value.doc_type}}/{{value.doc_name}}" ng-click="perviewDoc($event,'confPayment')" title="View Bundle"><img src="./pages/img/invoice.png"></a></td>
+											<td class="text-center action-btn-ryt"> 
+												<div class="export-options-container">
+													<div class="exportOptions">
+														<div class="DTTT btn-group">
+															<a class="btn btn-default DTTT_button_pdf" title="Remove from payment" ui-jq="tooltip" ng-click="removeLoadFromSchedule(value.id,$index)">
+																<span><i class="fa fa-trash" aria-hidden="true"></i>
+															</a>
+														</div>
+													</div>
+												</div>
+												
+											</td>
+										</tr>
+									</tbody>
+								</table>
+								</div>
+								
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+			
+	</div>
+</div>
+ 
+<ng-include src="'./assets/templates/truckstop/modals.html'"></ng-include>
+

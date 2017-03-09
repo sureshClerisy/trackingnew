@@ -1,0 +1,143 @@
+
+<!-- START PAGE CONTENT WRAPPER -->
+<div class="page-content-wrapper ">
+	<!-- START PAGE CONTENT -->
+	<div class="content sm-gutter">
+	<!-- START CONTAINER FLUID -->
+		<div class="container-fluid padding-25 sm-padding-10">
+			<div class="row">
+				<div class="col-md-12 col-xlg-12">
+				<div class="commen-heading">
+					<h2 class="oprate-dashbord"> {{ languageArray.brokerListingeditButton }}</h2>
+				</div>
+				</div>
+			</div>
+			<div class="row new-block-padding">
+				<div class="col-lg-12 col-md-12">
+					<div class="panel panel-transparent">
+						<div class="panel-body">
+							<form id="form-project" name="newbroker" role="form" autocomplete="off" ng-submit="newbroker.$valid && saveBroker()" enctype="multipart/formdata" novalidate >
+								<!--row-->
+								<div class="row clearfix">
+									<div class="col-sm-6">
+										<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':newbroker.brokermc.$invalid && !newbroker.brokermc.$pristine || newbroker.$submitted && newbroker.brokermc.$invalid}">
+											<label>{{ languageArray.brokerListingTableThBrokerMc }}</label>
+											<input type="text" class="form-control" name="brokermc" ng-model="brokersData.MCNumber" required />
+										</div>
+										<label class="error" for="brokerMc" ng-show="newbroker.brokermc.$invalid && !newbroker.brokermc.$pristine || newbroker.$submitted && newbroker.brokermc.$invalid">Please enter broker mc number.</label>
+									</div>
+									<div class="col-sm-6">
+										<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':newbroker.companyname.$invalid && !newbroker.companyname.$pristine || newbroker.$submitted && newbroker.companyname.$invalid}">
+											<label>{{ languageArray.brokerListingTableThName }}</label>
+											<input type="text" class="form-control" name="companyname" ng-model="brokersData.TruckCompanyName" required>
+										</div>
+										<label class="error" for="companyname" ng-show="newbroker.companyname.$invalid && !newbroker.companyname.$pristine || newbroker.$submitted && newbroker.companyname.$invalid">Please enter broker name.</label>
+									</div>
+								</div>
+								<!--row-end-->
+								
+								<!--row-->
+								<div class="row clearfix">
+									<div class="col-sm-6">
+										<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':newbroker.street_address.$invalid && !newbroker.street_address.$pristine || newbroker.$submitted && newbroker.street_address.$invalid}">
+											<label>{{languageArray.brokerListingTableThStreetAddress}}</label>
+											<input type="text" class="form-control" name="street_address" ng-model="brokersData.postingAddress" required />
+										</div>
+										<label class="error" for="street_address" ng-show="newbroker.street_address.$invalid && !newbroker.street_address.$pristine || newbroker.$submitted && newbroker.street_address.$invalid">Please enter street address.</label>
+									</div>
+									<div class="col-sm-6">
+										<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':newbroker.city.$invalid && !newbroker.city.$pristine || newbroker.$submitted && newbroker.city.$invalid}">
+											<label>{{languageArray.brokerListingTableThCity}}</label>
+											<input type="text" class="form-control" name="city" ng-model="brokersData.city" required />
+										</div>
+										<label class="error" for="city" ng-show="newbroker.city.$invalid && !newbroker.city.$pristine || newbroker.$submitted && newbroker.city.$invalid">Please enter city.</label>
+									</div>				
+								</div>
+								<!--row-end-->
+								
+								<!--row-->
+								<div class="row clearfix">
+									<div class="col-sm-6">
+										<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':newbroker.state.$invalid && !newbroker.state.$pristine || newbroker.$submitted && newbroker.state.$invalid}">
+											<label>{{languageArray.brokerListingTableThState}}</label>
+											<input type="text" class="form-control" name="state" ng-model="brokersData.state" required />
+										</div>
+										<label class="error" for="state" ng-show="newbroker.state.$invalid && !newbroker.state.$pristine || newbroker.$submitted && newbroker.state.$invalid">Please enter state.</label>
+									</div>
+									<div class="col-sm-6">
+										<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':newbroker.zipcode.$invalid && !newbroker.zipcode.$pristine || newbroker.$submitted && newbroker.zipcode.$invalid}">
+											<label>{{languageArray.brokerListingTableThZipCode}}</label>
+											<input type="text" class="form-control" name="zipcode" ng-model="brokersData.zipcode" required />
+										</div>
+										<label class="error" for="zipcode" ng-show="newbroker.zipcode.$invalid && !newbroker.zipcode.$pristine || newbroker.$submitted && newbroker.zipcode.$invalid">Please enter zip code.</label>
+									</div>
+								</div>
+								<!--row-end-->
+								<!--row-->
+								<div class="row clearfix">
+									<div class="col-sm-6">
+										<div pg-form-group class="form-group form-group-default">
+											<label>{{ languageArray.brokerListingTableThCarrierMc }}</label>
+											<input type="number" class="form-control" name="carriermc" ng-model="brokersData.CarrierMC">
+										</div>
+									</div>
+									<div class="col-sm-6">
+										<div pg-form-group class="form-group form-group-default">
+											<label>{{ languageArray.brokerListingTableThUsDot }}</label>
+											<input type="number" class="form-control" name="usdot" ng-model="brokersData.DOTNumber">
+										</div>
+									</div>
+								</div>
+								<!--row-end-->
+								<!--row-->
+								<div class="row clearfix">
+									<div class="col-sm-6">
+										<div pg-form-group class="form-group form-group-default">
+											<label>{{ languageArray.brokerListingTableThstatus }}</label>
+											<input type="text" class="form-control" name="status" ng-model="brokersData.brokerStatus">
+										</div>
+									</div>
+									<div class="col-sm-6">
+										<div pg-form-group class="form-group form-group-default">
+											<label>{{ languageArray.brokerListingTableThrating }}</label>
+											<div ng-init="rating = changedRating "></div>
+											<div class="star-rating"  star-rating rating-value="rating" data-max="5" on-rating-selected="rateFunction(rating)"></div>
+										</div>
+									</div>
+								</div>
+								<!--row-end-->
+								
+								<div class="row clearfix">
+									<div class="col-sm-6">
+										<div class="dropzone" ng-dropzone dropzone="dropzone" dropzone-config="dropzoneConfigBrokerEdit" ></div>
+									</div>
+									<div class="col-sm-6">
+										<section class="truck-load-pdf" >
+                                            <div class="truck-load-pdf-left" ng-repeat="docs in brokerDocs">
+												<div class="row1">
+													<button class="btn btn-danger" type="button" ng-click="deleteDocument(docs.id,docs.document_name, $index);">X</button>
+													<div class="pdf-cover" data-url="assets/uploads/documents/broker/{{docs.document_name}}" ng-click="perviewDoc($event)">
+														<img ng-src="assets/uploads/documents/thumb_broker/thumb_{{docs.document_name | filetoimg}} " on-error-src="pages/img/pdf.png" />
+													</div>
+												</div>
+												
+												
+											</div>
+										</section>
+									</div>
+								</div>
+																
+								<div class="update-truck-block-btn">
+									<button ng-click="submitted=true" class="btn btn-primary btn-cons m-b-10" type="submit"><i class="fa fa-pencil-square-o"></i><span class="bold"> {{ languageArray.brokerListingTableupdatebutton|capitalize }} </span>
+									</button>
+									<a href="#/broker"><button class="btn btn-danger btn-cons m-b-10" type="button"><i class="fa fa-ban"></i><span class="bold"> {{ languageCommonVariables.cancelbutton|capitalize }} </span></button></a>
+								</div>
+							</form>
+						</div>
+					<!---->
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

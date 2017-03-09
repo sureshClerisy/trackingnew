@@ -1,0 +1,63 @@
+<!-- START PAGE CONTENT WRAPPER -->
+      <div class="page-content-wrapper ">
+        <!-- START PAGE CONTENT -->
+        <div class="content sm-gutter">
+          <!-- START CONTAINER FLUID -->
+          <div class="container-fluid padding-25 sm-padding-10">
+			<div class="row">
+				<div class="col-md-12 col-xlg-12">
+					<div ng-show="alertmsg == true&&alertdeletemsg != true" class="alert alert-success" role="alert">
+						<button class="close" data-dismiss="alert"></button>
+						{{Message}}
+						</div>
+						<div ng-show="alertdeletemsg == true" class="alert alert-success" role="alert">
+						<button ng-click = "hidedeletemessage()" class="close"></button>
+						{{garagedeleteMessage}}
+						</div>
+					<h2 class="oprate-dashbord">Garages</h2>
+				</div>
+			</div>
+			<div class="row invocie-block-row">
+				<div class="col-md-12 col-xlg-12">
+					<div class="load-new-block-table">
+						<div class="panel-body add-new-data">
+							<div class="load-tabe-auto">
+								<a href="#/addGarage" class="add-new-data-button"><button class="btn btn-primary "><i class="fa fa-plus" style="margin-right:3px"></i>Add Garage</button></a>
+								<table datatable="ng" dt-options="dtOptions" class="table table-striped" id="tableWithExportOptions">
+									<thead>
+										
+										<tr>
+											<th>S.No</th>
+											<th>Organization</th>
+											<th>Mechanic Name</th>
+											<th>Address</th>
+											<th>ACTION</th>
+										</tr>
+									</thead>
+									
+									<tbody>
+										<tr dir-paginate="value in data | itemsPerPage:10 " total-items="totalItems">
+										
+											<td class="text-center">{{ ((pageNumber- 1) * 10) + ($index + 1) }}</td>
+											<td class="left-space">{{ value.organization_name }} </td>
+											<td class="left-space">{{ value.mechanic_name }}</td>
+											<td class="left-space">{{ value.address }}</td>
+																	 
+											<td class="text-center"> 
+												<a href="#/editgarages/{{value.id}}" class="icon-action edit round-shape"><i class="fa fa-edit"></i></a> 
+												<!--a href="#/editdepartment/{{ value.id}}" class="icon-action edit"><i class="fa fa-edit"></i></a--> 
+												
+												<a ng-click='removeGarage(value.id,$index)' class="icon-action del round-shape" title="Delete Garage"><i class="fa fa-trash"></i></a> 
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+ 

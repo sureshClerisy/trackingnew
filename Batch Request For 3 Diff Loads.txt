@@ -1,0 +1,44 @@
+Below are the request and response of methods we are using for Triumph API:
+
+TEST PDF FILE GIVEN
+
+Step 1: Used '/v1/Login' method to login and after successfull login we moved to next step.
+
+Step 2: We are submitting the load details in array to create multiples inputs using '/v1Submit/CreateInputsFromArray' method
+
+Request => 
+	[0].referenceKey=''&[0].invoiceNumber=10047&[0].invoiceDate=2017-01-27&[0].referenceNumber=99998&[0].grossAmount=5300&[0].isMiscInvoice=true&[0].customerName=PITTSBURGH LOGISTICS SYSTEMS, INC.-Test&[0].customerId=247621&[0].originCity=25 grant&[0].originState=FL&[0].originZip=32907&[0].originPickupDate=2017-01-28&[0].destinationCity=five points&[0].destinationState=CA&[0].destinationZip=93624&[0].deliveryDate=&[1].referenceKey=''&[1].invoiceNumber=10048&[1].invoiceDate=2017-01-27&[1].referenceNumber=99997&[1].grossAmount=5300&[1].isMiscInvoice=true&[1].customerName=LOOP LOGISTICS CORP-Test&[1].customerId=980440&[1].originCity=la belle&[1].originState=FL&[1].originZip=33935&[1].originPickupDate=2017-02-01&[1].destinationCity=Fresno&[1].destinationState=ca&[1].destinationZip=93702&[1].deliveryDate=&[2].referenceKey=''&[2].invoiceNumber=10049&[2].invoiceDate=2017-01-27&[2].referenceNumber=99996&[2].grossAmount=5300&[2].isMiscInvoice=true&[2].customerName=TIFFANIE'S APIARIES & LOGISTICS, LLC-Test&[2].customerId=798634&[2].originCity=NEWBERRY&[2].originState=FL&[2].originZip=32669&[2].originPickupDate=2017-01-31&[2].destinationCity=MADERA&[2].destinationState=CA&[2].destinationZip=93637&[2].deliveryDate=
+	
+Response : '{"InputId":[3117567,3117568,3117569],"Error":false,"ErrorMessage":""}'
+	
+Step 3. After getting inputs ids from second step we send them for creating doucment using '/v1Submit/CreateDocument' method :
+Request1 => 
+		'inputId' => 3117567
+		'filename' => bundle_1485502093.pdf
+		'fileData' => 'JVBERi0xLjQKJeLjz9MKMyAwIG9iago8PC9UeXBlIC9QYWdlCi9QYXJlbnQgMSAwIFIKL01lZGlhQm94IFswIDAgNTk1LjI4MCA4NDEuODkwXQovVHJpbUJveCBbMC4wMDAgMC4wMDAgNTk1LjI4MCA4NDEuODkwXQovUmVzb3VyY2VzIDIgMCBSCi9Hcm91cCA8PCAvVHlwZSAvR3JvdXAgL1MgL1RyYW5zcGFyZW5jeSAvQ1MgL0RldmljZVJHQiA%2BPiAKL0NvbnRlbnRzIDQgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvRmlsdGVyIC9GbGF0ZURlY29kZSAvTGVuZ3RoIDk5Pj4Kc3RyZWFtCnicK1QwUPBSMFQoB9JZQOzOVahgqGcABAogCGPqwYjkXC79kAAfQwWXfIVArkAFIwUvLgM9UzNzhXIupxAF1xAukDKQOWCtCulc%2Bu7BhgrpxXBVBgohRVzRsUDDU7gAT5EZ1wplbmRzdHJlYW0KZW5kb2JqCjUgMCBvYmoKPDwvVHlwZSAvUGFnZQovUGFyZW50IDEgMCBSCi9NZWRpYUJveCBbMCAwIDU5NS4yODAgODQxLjg5MF0KL1RyaW1Cb3ggWzAuMDAwIDAuMDAwIDU5NS4yODAgODQxLjg5MF0KL1Jlc291cmNlcyAyIDAgUgovR3JvdXAgPDwgL1R5cGUgL0dyb3VwIC9TIC9UcmFuc3BhcmVuY3kgL0NTIC9EZXZpY2VSR0IgPj4gCi9Db250ZW50cyA2IDAgUj4%2BCmVuZG9iago2IDAgb2JqCjw8L0ZpbHRlciAvRmxhdGVEZWNvZGUgL0xlbmd0aCAxMDU%2BPgpzdHJlYW0KeJwrVDBQ8FIwVCgH0llA7M5VqGCoZwAECiAIYwIpBRNLPQtLheRcLv2QAB8jBZd8hUCuQAUjBS8uAz1TM3OFci6nEAXXEC6QYpBBYL0K6Vz67sGGCunFcFUGCiFFXNGxQNNTuABxZxomCmVuZHN0cmVhbQplbmRvYmoKNyAwIG9iago8PC9UeXBlIC9QYWdlCi9QYXJlbnQgMSAwIFIKL01lZGlhQm94IFswIDAgNTk1LjI4MCA4NDEuODkwXQovVHJpbUJveCBbMC4wMDAgMC4wMDAgNTk1LjI4MCA4NDEuODkwXQovUmVzb3VyY2VzIDIgMCBSCi9Hcm91cCA8PCAvVHlwZSAvR3JvdXAgL1MgL1RyYW5zcGFyZW5jeSAvQ1MgL0RldmljZVJHQiA%2BPiAKL0NvbnRlbnRzIDggMCBSPj4KZW5kb2JqCjggMCBvYmoKPDwvRmlsdGVyIC9GbGF0ZURlY29kZSAvTGVuZ3RoIDEwNT4%2BCnN0cmVhbQp4nCtUMFDwUjBUKAfSWUDszlWoYKhnAAQKIAhjAikFE0s9C0uF5Fwu%2FZAAH2MFl3yFQK5ABSMFLy4DPVMzc4VyLqcQBdcQLpBikEFgvQrpXPruwYYK6cVwVQYKIUVc0bFA01O4AHGuGicKZW5kc3RyZWFtCmVuZG9iago5IDAgb2JqCjw8L1R5cGUgL1BhZ2UKL1BhcmVudCAxIDAgUgovTWVkaWFCb3ggWzAgMCA1OTUuMjgwIDg0MS44OTBdCi9UcmltQm94IFswLjAwMCAwLjAwMCA1OTUuMjg..'
+		&docType[0]=1&docType[1]=2&docType[2]=3
+		
+Response1 : '{"documentId":[12092599],"Error":false,"ErrorMessage":""}'
+	
+Request2 =>		
+		'inputId' => 3117568
+		'filename' => bundle_1485502251.pdf
+		'fileData' => 'JVBERi0xLjQKJeLjz9MKMyAwIG9iago8PC9UeXBlIC9QYWdlCi9QYXJlbnQgMSAwIFIKL01lZGlhQm94IFswIDAgNTk1LjI4MCA4NDEuODkwXQovVHJpbUJveCBbMC4wMDAgMC4wMDAgNTk1LjI4MCA4NDEuODkwXQovUmVzb3VyY2VzIDIgMCBSCi9Hcm91cCA8PCAvVHlwZSAvR3JvdXAgL1MgL1RyYW5zcGFyZW5jeSAvQ1MgL0RldmljZVJHQiA%2BPiAKL0NvbnRlbnRzIDQgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvRmlsdGVyIC9GbGF0ZURlY29kZSAvTGVuZ3RoIDk5Pj4Kc3RyZWFtCnicK1QwUPBSMFQoB9JZQOzOVahgqGcABAogCGPqwYjkXC79kAAfQwWXfIVArkAFIwUvLgM9UzNzhXIupxAF1xAukDKQOWCtCulc%2Bu7BhgrpxXBVBgohRVzRsUDDU7gAT5EZ1wplbmRzdHJlYW0KZW5kb2JqCjUgMCBvYmoKPDwvVHlwZSAvUGFnZQovUGFyZW50IDEgMCBSCi9NZWRpYUJveCBbMCAwIDU5NS4yODAgODQxLjg5MF0KL1RyaW1Cb3ggWzAuMDAwIDAuMDAwIDU5NS4yODAgODQxLjg5MF0KL1Jlc291cmNlcyAyIDAgUgovR3JvdXAgPDwgL1R5cGUgL0dyb3VwIC9TIC9UcmFuc3BhcmVuY3kgL0NTIC9EZXZpY2VSR0IgPj4gCi9Db250ZW50cyA2IDAgUj4%2BCmVuZG9iago2IDAgb2JqCjw8L0ZpbHRlciAvRmxhdGVEZWNvZGUgL0xlbmd0aCAxMDU%2BPgpzdHJlYW0KeJwrVDBQ8FIwVCgH0llA7M5VqGCoZwAECiAIYwIpBRNLPQtLheRcLv2QAB8jBZd8hUCuQAUjBS8uAz1TM3OFci6nEAXXEC6QYpBBYL0K6Vz67sGGCunFcFUGCiFFXNGxQNNTuABxZxomCmVuZHN0cmVhbQplbmRvYmoKNyAwIG9iago8PC9UeXBlIC9QYWdlCi9QYXJlbnQgMSAwIFIKL01lZGlhQm94IFswIDAgNTk1LjI4MCA4NDEuODkwXQovVHJpbUJveCBbMC4wMDAgMC4wMDAgNTk1LjI4MCA4NDEuODkwXQovUmVzb3VyY2VzIDIgMCBSCi9Hcm91cCA8PCAvVHlwZSAvR3JvdXAgL1MgL1RyYW5zcGFyZW5jeSAvQ1MgL0RldmljZVJHQiA%2BPiAKL0NvbnRlbnRzIDggMCBSPj4KZW5kb2JqCjggMCBvYmoKPDwvRmlsdGVyIC9GbGF0ZURlY29kZSAvTGVuZ3RoIDEwNT4%2BCnN0cmVhbQp4nCtUMFDwUjBUKAfSWUDszlWoYKhnAAQKIAhjAikFE0s9C0uF5Fwu%2FZAAH2MFl3yFQK5ABSMFLy4DPVMzc4VyLqcQBdcQLpBikEFgvQrpXPruwYYK6cVwVQYKIUVc0bFA01O4AHGuGicKZW5kc3RyZWFtCmVuZG9iago5IDAgb2JqCjw8L1R5cGUgL1BhZ2UKL1BhcmVudCAxIDAgUgovTWVkaWFCb3ggWzAgMCA1OTUuMjgwIDg0MS44OTBdCi9UcmltQm94IFswLjAwMCAwLz..'
+		&docType[0]=1&docType[1]=2&docType[2]=3
+		
+Response2 : '{"documentId":[12092600],"Error":false,"ErrorMessage":""}'
+	
+Request3 => 	
+		'inputId' => 3117569
+		'filename' => bundle_1485502578.pdf
+		'fileData' => 'JVBERi0xLjQKJeLjz9MKMyAwIG9iago8PC9UeXBlIC9QYWdlCi9QYXJlbnQgMSAwIFIKL01lZGlhQm94IFswIDAgNTk1LjI4MCA4NDEuODkwXQovVHJpbUJveCBbMC4wMDAgMC4wMDAgNTk1LjI4MCA4NDEuODkwXQovUmVzb3VyY2VzIDIgMCBSCi9Hcm91cCA8PCAvVHlwZSAvR3JvdXAgL1MgL1RyYW5zcGFyZW5jeSAvQ1MgL0RldmljZVJHQiA%2BPiAKL0NvbnRlbnRzIDQgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvRmlsdGVyIC9GbGF0ZURlY29kZSAvTGVuZ3RoIDk5Pj4Kc3RyZWFtCnicK1QwUPBSMFQoB9JZQOzOVahgqGcABAogCGPqwYjkXC79kAAfQwWXfIVArkAFIwUvLgM9UzNzhXIupxAF1xAukDKQOWCtCulc%2Bu7BhgrpxXBVBgohRVzRsUDDU7gAT5EZ1wplbmRzdHJlYW0KZW5kb2JqCjUgMCBvYmoKPDwvVHlwZSAvUGFnZQovUGFyZW50IDEgMCBSCi9NZWRpYUJveCBbMCAwIDU5NS4yODAgODQxLjg5MF0KL1RyaW1Cb3ggWzAuMDAwIDAuMDAwIDU5NS4yODAgODQxLjg5MF0KL1Jlc291cmNlcyAyIDAgUgovR3JvdXAgPDwgL1R5cGUgL0dyb3VwIC9TIC9UcmFuc3BhcmVuY3kgL0NTIC9EZXZpY2VSR0IgPj4gCi9Db250ZW50cyA2IDAgUj4%2BCmVuZG9iago2IDAgb2JqCjw8L0ZpbHRlciAvRmxhdGVEZWNvZGUgL0xlbmd0aCAxMDU%2BPgpzdHJlYW0KeJwrVDBQ8FIwVCgH0llA7M5VqGCoZwAECiAIYwIpBRNLPQtLheRcLv2QAB8jBZd8hUCuQAUjBS8uAz1TM3OFci6nEAXXEC6QYpBBYL0K6Vz67sGGCunFcFUGCiFFXNGxQNNTuABxZxomCmVuZHN0cmVhbQplbmRvYmoKNyAwIG9iago8PC9UeXBlIC9QYWdlCi9QYXJlbnQgMSAwIFIKL01lZGlhQm94IFswIDAgNTk1LjI4MCA4NDEuODkwXQovVHJpbUJveCBbMC4wMDAgMC4wMDAgNTk1LjI4MCA4NDEuODkwXQovUmVzb3VyY2VzIDIgMCBSCi9Hcm91cCA8PCAvVHlwZSAvR3JvdXAgL1MgL1RyYW5zcGFyZW5jeSAvQ1MgL0RldmljZV..'
+		&docType[0]=1&docType[1]=2&docType[2]=3
+		
+Response3 : '{"documentId":[12092601],"Error":false,"ErrorMessage":""}'
+	
+Step 4. In the last we are using '/v1Submit/FinalizePendingInputArray' method to send it for payment:
+	
+Request => "inputIds[0]=3117567&inputIds[1]=3117568&inputIds[2]=3117569&fundingInstructions=Fund using WIRE *9995"
+
+Response : '{"ConfirmationCode":"CE96C8B5","Error":false,"ErrorMessage":""}'
+

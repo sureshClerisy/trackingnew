@@ -1,0 +1,394 @@
+ <!-- START OVERLAY -->
+    <div ng-controller="SearchCtrl" id="mainSearchOverlay" class="overlay" style="display: none" pg-search> 
+      <!-- BEGIN Overlay Content !-->
+      <div class="overlay-content has-results m-t-20">
+        <!-- BEGIN Overlay Header !-->
+        <div class="container-fluid">
+          <!-- BEGIN Overlay Logo !-->
+          <img class="overlay-brand" src="assets/img/vikalogo.png" alt="logo" data-src="assets/img/vikalogo.png" ui-jq="unveil" data-src-retina="assets/img/vikalogo.png">
+          <!-- END Overlay Logo !-->
+          <!-- BEGIN Overlay Close !-->
+          <a href="" class="close-icon-light overlay-close text-black fs-16" data-search="closeButton">
+            <i class="pg-close"></i>
+          </a>
+          <!-- END Overlay Close !-->
+        </div>
+        <!-- END Overlay Header !-->
+        <div class="container-fluid">
+			<!-- BEGIN Overlay Controls !-->
+			<input data-search="searchField" id="overlay-search" class="no-border overlay-search bg-transparent" placeholder="Search..." autocomplete="off" spellcheck="false" ng-model="search.query" ng-change="liveSearch()" ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }">
+			<br>
+			<div class="inline-block">
+				<div class="right">
+					<!-- <input id="checkboxn" type="checkbox" value="1" checked="checked"> -->
+					<label ><i class="fa fa-search"></i>{{ languageCommonVariables.qsearchWithinWebsite}}</label>
+				</div>
+			</div>
+			<!--div class="inline-block m-l-10">
+				<p class="fs-13"><i class="fa fa-level-down"></i>{{ languageCommonVariables.qsearchpressenter }}</p>
+			</div-->
+			<div class="inline-block m-l-10">
+				<p class="fs-13"><i class="fa fa-cog"></i> <a ng-click="openNewSearchPopUp()" >{{toggleSearchTitle}}</a></p>
+			</div>
+			<!-- END Overlay Controls !-->
+        </div>
+        
+        <!-- BEGIN Overlay Search Results, This part is for demo purpose, you can add anything you like !-->
+        <div class="container-fluid">
+          <!--span>
+                <strong>suggestions :</strong>
+            </span>
+          <span id="overlay-suggestions">{{search.query}}</span>
+          <br-->
+			<div class="search-results m-t-40">
+            <!-- <p class="bold">Pages Search Results</p> -->
+				<div class="row" >
+					<div class="col-md-6" ng-repeat="result in searchResults">
+						<!-- BEGIN Search Result Item !-->
+						<div class="">
+							<!-- BEGIN Search Result Item Thumbnail !-->
+							<div class="thumbnail-wrapper d48 circular bg-success text-white inline m-t-10">
+								<div class="search-custom-thumb">
+									<span class="icon-thumbnail">{{ result.thumbnail }}</span>
+								</div>
+							</div>
+							<!-- END Search Result Item Thumbnail !-->
+							<div class="p-l-10 inline p-t-5">
+								<h5 class="m-b-5"><a class="semi-bold result-name" href="#{{ result.link }}">{{ result.name }}</a></h5>
+								<p class="hint-text">{{ result.name }}</p>
+							</div>
+						</div>
+						<!-- END Search Result Item !-->
+					</div>
+					
+					
+					<!------------------------____New Search Tab--------------------->
+
+					<!--div class="modal form-cls fade slide-up" ng-show="shownewSearch == true" id="globalSearchId" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"-->
+					<div ng-show="shownewSearch == true">
+
+						<div class="modal-dialogd" role="document">
+							<div class="modal-content-wrapper">
+								<div class="modal-content-load">
+								 <form method="POST" name="newSearch" role="form" ng-submit="fetchSearchResults()">
+									<!-- <div class="modal-header model-heading-main">
+										<div class="model-heading-inner">
+											<h4 class="modal-title" id="myModalLabel">ADD A SEARCH</h4>
+										</div>
+									</div> -->
+									<div class="modal-body main-pop-body ">
+										<div class="popup-body-bg inner-high">
+											<div class="form-group-attached">
+												<div class="row clearfix">
+														<div class='col-lg-6 mainsearch-col6'> 
+															<div class='col-lg-6 right-padding'>
+																<div pg-form-group class="form-group form-group-default required th-select">
+															  		<label>{{ languageCommonVariables.country }}</label>
+																	<ui-select ng-model="form.origin_country" theme="bootstrap" on-select="onSelectOriginCountryCallback($item, $model)">
+																		<ui-select-match class="ui-select-match" placeholder="{{languageCommonVariables.selectCountry}}">{{ocountryname}}</ui-select-match>
+																			<ui-select-choices class="ui-select-choices" repeat="country in allCountries | filter: $select.search">
+																				<div ng-bind-html="trustAsHtml((country.name | highlight: $select.search))"></div>
+																				
+																			</ui-select-choices>
+																	</ui-select>
+																</div>
+															</div>
+															<div class="col-lg-6 right-padding">
+																<div class="checkbox check1 check-success mainsearch-checkbox">
+																	<input class="multicheck" type="checkbox" ng-click="checkmultiOriginstate(); ShowMultiOriginState()" ng-checked="popcheckOrigin" id="checkboxMultiOrigin"/>
+																	<label class="right-check" for="checkboxMultiOrigin">{{originMultiState}}</label>
+																</div>
+															</div>
+
+															
+															<div class='col-lg-12 right-r'>
+																<div pg-form-group class="form-group form-group-default required th-select">
+																  <label>{{ languageCommonVariables.origin }}</label>
+																  	
+																	<input type="text" id="originStates" ng-model="form.searchAuto" ng-change="fetchUSCities(form.searchAuto, form.origin_country)" class="ioselect form-control" placeholder="{{languageCommonVariables.pleaseSearchOrigin}}" autocomplete="off" required ng-if="multistateOriginCheck == 0" ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }">
+																	<ul class="list-unstyled" ng-show="mainOriginUL == true">
+																		<li ng-show = "noCity == true" ng-click="fetchNoCities()">{{ languageCommonVariables.norecordfound }}</li>
+																		<li class="show-pointer" ng-repeat="tag in originCities" ng-show ="noCity == false" ng-click="fetchUSCitiesSelect(tag.city,tag.state_code)" shouldFocus>{{tag.city}}, {{ tag.state_code }}</li>
+																	</ul>
+																	<textarea readonly="readonly" ng-model="form.multiOrigins"  class="form-control form-control-txtarea-main wysiwyg demo-form-wysiwyg close-expand" placeholder="Enter text ..." wysihtml5 ng-if="multistateOriginCheck == 1"></textarea>
+																	<input type="hidden" id="select_origin" name="select_origin" />
+																</div>
+															</div>
+															<div class='col-lg-12 row-padding'>
+																<div class="row ">																	
+																	<div pg-form-group class="form-group form-group-default form-group-default-left" ng-if="multistateOriginCheck == 0">
+																		<label>{{ languageCommonVariables.qsearchradius }}</label>
+																		 <span class="help">{{ languageCommonVariables.qsearchradiuseg }}</span>
+																		<input type="text" ng-model="form.origin_range" data-v-min="0" data-v-max="300" class="autonumeric form-control" placeholder='Origin Radius' ui-jq="autoNumeric" ui-options="'init'" />
+																	</div>
+																</div>
+															</div>
+														</div>
+														<input type="hidden" ng-model="form.origin_City"  />
+														<input type="hidden" ng-model="form.origin_State" />
+														<input type="hidden" ng-model="form.abbreviation" />
+														<input type="hidden" ng-model="form.DriverName" />
+														<input type="hidden" ng-model="form.TruckLabel" />
+														<input type="hidden" ng-model="form.VehicleId" />
+														
+														<div class='col-lg-6 mainsearch-col6'>
+															<div class='col-lg-6 right-padding'>
+																<div pg-form-group class="form-group form-group-default th-select ">
+																	<label>{{ languageCommonVariables.country }}</label>
+																	<ui-select ng-model="form.destination_country" theme="bootstrap" on-select="onSelectDestinationCountryCallback($item, $model)">
+																		<ui-select-match class="ui-select-match" placeholder="{{languageCommonVariables.selectCountry}}">{{dcountryname}}</ui-select-match>
+																			<ui-select-choices class="ui-select-choices" repeat="country in allCountries | filter: $select.search">
+																				<div ng-bind-html="trustAsHtml((country.name | highlight: $select.search))"></div>
+																			</ui-select-choices>
+																	</ui-select>
+																</div>
+															</div>
+															<div class='col-lg-6 right-padding'>
+																<div class="checkbox check1 check-success lft-bor-none">
+																	<input class="multicheck" type="checkbox" ng-click="checkmultistate(); ShowMultiState()" ng-checked="popcheck" id="checkboxMulti"/>
+																	<label class="right-check" for="checkboxMulti">{{destMultiState}}</label>
+																</div>
+															</div>
+															<div class='col-lg-12 right-r '>
+																<div pg-form-group class="form-group form-group-default th-select ">
+																	<label>{{ languageCommonVariables.destination }}</label>
+																	<input ng-model="form.destination_state" type="hidden" id="select_state" name="select_state" />
+																	<input type="text" id="destStates" ng-model="form.destSearch" ng-change="fetchUSDestCities(form.destSearch,form.destination_country)" class="ioselect form-control" placeholder="{{languageCommonVariables.pleaseSearchDest}}" autocomplete="off" ng-if="multistateCheck == 0" ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }">
+																	<ul class="list-unstyled-dest" ng-show="mainDestUL == true">
+																		<li ng-show = "noDestCity == true" ng-click="fetchNoCitiesDest()">{{ languageCommonVariables.norecordfound }}</li>
+																		<li class="show-pointer" ng-repeat="dest in destCities" ng-show ="noDestCity == false" ng-click="fetchUSCitiesDest(dest.city,dest.state_code,dest.country,showCountry)">{{dest.city}}, {{ dest.state_code }}<div class="autocom-list" ng-show="showCountry == true">, {{dest.country}}</div></li>
+																	</ul>
+															   
+																	<textarea  id="wysiwyg5" readonly="readonly" ng-model="form.multiDestinations"  class="form-control form-control-txtarea-main  wysiwyg demo-form-wysiwyg close-expand" placeholder="Enter text ..." wysihtml5 ng-if="multistateCheck == 1"></textarea>
+																</div>
+															</div>
+															<div class='col-lg-12 row-padding'>
+																<div class="row">
+																	<div pg-form-group class="form-group form-group-default form-group-default-left" ng-if="multistateCheck == 0">
+																		<label>{{ languageCommonVariables.qsearchradius }}</label>
+																		 <span class="help">{{ languageCommonVariables.qsearchradiuseg }}</span>
+																		<input type="text" ng-model="form.destination_range" data-v-min="0" data-v-max="300" class="form-control" placeholder='Destination Radius' ui-jq="autoNumeric" ui-options="'init'"/>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+												
+											</div>
+										</div>
+									</div>
+									
+												<input type="hidden" ng-model="form.dest_City"  />
+												<input type="hidden" ng-model="form.dest_State" />
+												
+									<div class="modal-body main-pop-body doc-custom-multi">
+										<div class="popup-body-bg inner-high">
+											<div class="form-group-attached">
+												<div class="row clearfix">
+												  <div class="col-sm-6">
+														<div pg-form-group class="form-group form-group-default border-new">
+															<label>{{ languageCommonVariables.date }}</label>
+															<div class="input-group date search-by-date" ui-jq="datepicker" ui-options='{format: "yyyy-mm-dd",multidate : true,multidateSeparator: ", ",startDate: {{ mindate}}}'>
+																<input type="text" ng-click = "refreshDatepicker($event)" ng-model="form.pickup_date"  class="form-control" id="dat"><span class="input-group-addon align-icon"><i class="fa fa-calendar"></i></span>
+															</div>
+														</div>
+													</div>
+													<div class="col-sm-6">
+														<div pg-form-group class="form-group form-group-default th-select">
+														<label>{{ languageCommonVariables.qsearchpostedfrom }}</label>
+															<ui-select ng-model="form.posted_time1" theme="bootstrap" on-select="onSelectpostedTimeCallback($item, $model)">
+																<ui-select-match class="ui-select-match" placeholder="{{languageCommonVariables.selectPostedTime}}">{{$select.selected.val}}</ui-select-match>
+																	<ui-select-choices class="ui-select-choices" repeat="post in postedOn | filter: $select.search">
+																		<div ng-bind-html="trustAsHtml((post.val | highlight: $select.search))"></div>
+																		
+																	</ui-select-choices>
+															</ui-select>
+															<input type="hidden" id="select_postedTime" ng-model="form.posted_time" name="select_postedTime" />
+														</div>
+													</div>
+												</div>
+												
+												<div class="row clearfix">
+													<div class="col-sm-6">
+														<div pg-form-group class="form-group th-select form-group-default" >
+															<label>{{ languageCommonVariables.qsearchloadsize }}</label>
+															<span class="full-div">{{ languageCommonVariables.qsearchloadsizefull }}</span>
+														</div>
+													</div>
+													<div class="col-sm-6"> 
+														<div pg-form-group class="form-group form-group-default th-select">
+														<label>Load Frequency</label>
+															<ui-select ng-model="form.dailyFilter" theme="bootstrap" on-select="onSelectLoadsFilterCallback($item, $model)">
+																<ui-select-match class="ui-select-match" placeholder="Select load frequency">{{searchDailyFilter}}</ui-select-match>
+																	<ui-select-choices class="ui-select-choices" repeat="post in loadsFilter | filter: $select.search">
+																		<div ng-bind-html="trustAsHtml((post.val | highlight: $select.search))"></div>
+																</ui-select-choices>
+															</ui-select>
+														</div>
+													</div>
+												</div>
+												
+												<div class="row clearfix">
+													<div class="col-sm-6">
+														<div pg-form-group class="form-group form-group-default th-select posted-select align-trailer">
+														<label>{{ languageCommonVariables.qsearchtrailertype }}</label>
+															<ui-select multiple ng-model="form.trailerType" class="multiSelect" theme="select2" required>
+																<ui-select-match class="ui-select-match" placeholder="{{languageCommonVariables.selectTrailerType}}">{{$item.abbrevation}}</ui-select-match>
+																	<ui-select-choices class="ui-select-choices" repeat="trailers in trailerTypes | filter: $select.search">
+																		{{trailers.name}}
+																	</ui-select-choices>
+															</ui-select>
+														</div>
+													</div>
+													
+													<div class="col-sm-6">
+														<div pg-form-group class="form-group form-group-default th-select posted-select align-trailer">
+															<div class="checkbox check1 check-success mainsearch-checkbox">
+																<input class="multicheck" type="checkbox" id="showMoreLoads" ng-model="form.moreLoadCheck" ng-click="changeMoreLoadCheck(form.moreLoadCheck)" ng-checked="form.moreLoadCheck" />
+																<label class="right-check" for="showMoreLoads">Show 500 + miles loads</label>
+															</div>
+														</div>
+													</div>
+												</div>
+												
+												<div class="row clearfix">
+													<div class="col-sm-6">
+														<div pg-form-group class="form-group th-select form-group-default" >
+														<label>Max Weight</label>
+															<input type="number" ng-model="form.max_weight" class="form-control" />
+														</div>
+													</div>
+																								
+													<div class="col-sm-6">
+														<div pg-form-group class="form-group th-select form-group-default" >
+														<label>Max Length</label>
+															<input type="number" ng-model="form.max_length" class="form-control" />
+														</div>
+													</div>
+												</div>
+												
+												<div class="row clearfix">
+													<div class="col-sm-6">
+														<div pg-form-group class="form-group form-group-default">
+															<label>{{ languageCommonVariables.qsearchcountryname }} </label>
+															<input type="text" ng-model="form.company_name" class="form-control" />
+														</div>
+													</div>
+													<!--div class="col-sm-6">
+														<div pg-form-group class="form-group form-group-default th-select posted-select align-trailer">
+															<label>Select Driver</label>
+															<ui-select name="driver_assign_name" ng-model="form.selectedSRPDriver" theme="bootstrap" on-select="onSelectDriverFilterCallback($item, $model)">
+																<ui-select-match class="ui-select-match" placeholder="Select Driver">{{searchDriversList}}</ui-select-match>
+																<ui-select-choices class="ui-select-choices" group-by="'username'" repeat="item in vDriversList | filter: $select.search">
+																	<span ng-bind-html="trustAsHtml((item.driverName | highlight: $select.search))"></span>
+																</ui-select-choices>
+															</ui-select>
+														</div>
+													</div-->
+												</div>
+												
+												
+											</div>
+										</div>
+									</div>	
+									 
+									<div class="modal-footer sbtn-modal">
+										<button class="btn btn-primary btn-cons m-b-10"  type="submit" ng-disabled="newSearch.$invalid"><i ng-show="newSearchButtonShow == true" class="glyphicon glyphicon-refresh spinning"></i><i ng-show="newSearchButtonShow != true" class="fa fa-search"></i><span class="bold"> {{ languageCommonVariables.searchbutton }}</span>
+										</button>
+									</div>
+								</form>
+							</div>
+						</div>  
+						</div>  
+
+
+						</div>	
+							<!--new SEarch tab end-->
+
+				</div>
+          </div>
+        </div>
+        <!-- END Overlay Search Results !-->
+        
+      </div>
+      <!-- END Overlay Content !-->
+    </div>
+    <!-- END OVERLAY -->
+    
+    
+     
+    
+<!-- multistates -->
+
+
+<div class="modal fade slide-down" id="multistate" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" >
+	<div class="modal-dialog" role="document">
+		<div class="modal-content-wrapper">
+			<div class="modal-content">
+				<div class="modal-header model-heading-main">
+					<div class="model-heading-inner">
+						<h4 class="modal-title" id="myModalLabel">{{ languageCommonVariables.multiselector }}</h4>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click = "multiStateUnchek(selectDataFor); iterationcheckmultistate()"><span aria-hidden="true">&times;</span></button>
+					</div>
+				</div>
+				<div class="modal-body main-pop-body">
+					<div class="row">
+						<div class='col-lg-4'>
+							<div class="orign-default-main orign-select-custom">
+								<div pg-form-group class="form-group form-group-default">
+									<label>{{ languageCommonVariables.country }}</label>
+									<!-- <select class="form-control" ng-model="country" ng-change="changeCountry(country);"> 
+										<option value="USA">USA</option>
+										<option value="CAN">Canada</option>
+									 </select> -->
+									 <ui-select ng-model="country" theme="bootstrap" on-select="onSelectCountryCallback($item, $model)">
+										<ui-select-match class="ui-select-match" placeholder="Select Country">{{sel_country}}</ui-select-match>
+											<ui-select-choices class="ui-select-choices" repeat="country in allCountries | filter: $select.search">
+												<div ng-bind-html="trustAsHtml((country.name | highlight: $select.search))"></div>
+												
+											</ui-select-choices>
+									</ui-select>
+								</div>
+							</div>
+							<div class="orign-defalut-checkbox">
+								<div class="checkbox {{region.class}}" ng-repeat="region in regions">
+									<input type="checkbox"  ng-model="regions['a_'+region.regions]" id="checkboxm{{$index}}" >
+									<label for="checkboxm{{$index}}">{{region.regions}}</label>
+								</div>
+							</div>
+						</div>
+						<div class='col-lg-8'>
+							<div class="check-all-area">
+								<div class="heading-model-block-pop">
+									{{cDisplay}}
+								</div>
+								<div class="all-input-checkboxes" ng-repeat="area in areas" ng-init="current = $index">
+									<div style="display: none">{{current = $index}}</div>
+									<div class="checkbox {{area.class}} " ng-class="">
+										<input class="{{area.country + $index}}" ng-model="areas['a_' + current]" type="checkbox" id="checkbox{{$index}}" >
+										<label for="checkbox{{$index}}"> {{area.areas}}</label>
+									</div>
+									
+									<div class="internal-checkboxes">
+										<div class="checkbox  {{item.class}}" ng-repeat="item in area.codes">
+											<input value="{{item.state}}" type="checkbox" ng-checked="regions['a_'+item.regions] || areas['a_' + current]"  ng-model="test" class="achekbox"  id="checkboxArea_{{ current+'_'+$index }}"> 
+											<label for="checkboxArea_{{current+'_'+ $index }}"> {{item.state}}</label>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="submit" ng-click="getAllCheckedBoxes()" class="btn btn-primary">
+							{{languageCommonVariables.select}}
+					</button>				
+				</div>
+			</div>
+		</div>  
+	</div>  
+		
+	<!-- table-full-width -->
+</div>	
+

@@ -1,0 +1,345 @@
+     
+		
+      
+      <!-- START PAGE CONTENT WRAPPER -->
+      <div class="page-content-wrapper ">
+        <!-- START PAGE CONTENT -->
+        <div class="content sm-gutter dash-page">
+          <!-- START CONTAINER FLUID -->
+          <div class="container-fluid padding-25 sm-padding-10">
+			<div class="row">
+				<div class="col-md-12 col-xlg-12">
+					<h2 class="oprate-dashbord">Operation dashboard</h2>
+					
+				</div>
+			</div>
+			
+			<div class="row invocie-block-row">
+				<div class="col-md-3 col-xlg-3">
+					<div class="invocie-block">
+						<h2>Invoices</h2>
+						<ul class="print-listing">
+							<li> <P>Print Invoices<span> <b>:</b>{{invoices.printInvoices}}</span></P></li>
+							<li> <P>Waiting Paperwork<span> <b>:</b>{{invoices.waitingPaperwork}}</span></P></li>
+							<li> <P>Payments Not Recieved<span><b>:</b>{{invoices.paymentNotRecieved}}</span></P></li>
+							<li> <P>Payment On Collection <span><b>:</b>{{invoices.paymentOnCollection}}</span></P></li>
+						</ul>
+					</div>
+				</div>
+				<div class="col-md-5 col-xlg-5">
+					<div class="invocie-block">
+						<h2>driver messages - last 7 days</h2>
+						<div class="row drive-msg-block">
+							<div class="col-md-4 col-xlg-4 chart-block skyline-block">
+<!--
+								<img src="assets/img/skyline.png">
+-->							
+							<div jq-sparkline class="sparkline-chart" ng-model="sparkline_line_data" opts="{{ sparkline_line_options }}"></div>
+							</div>
+							<div class="col-md-4 col-xlg-4 chart-block1">
+<!--
+								<img src="assets/img/elli.png">
+-->							<div id="driver_msg" style="min-width:150px; height:150px; max-width: 150px;"></div>
+							</div>
+							<div class="col-md-4 col-xlg-4 last-chart-block">
+								<div class="cart-color">
+									<ul class="print-listing chart-color">
+										<li><span style="background:#626262;"></span> <P>In Emergency</P></li>
+										<li><span style="background:#34d6c7;"></span> <P>High Priority</P></li>
+										<li> <span style="background:#6d5cae;"></span><P>Opened</P></li>
+										<li><span style="background:#077ed0;"></span> <P>Un Opened</P></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-4 col-xlg-4">
+					<div class="invocie-block">
+						<h2>delivery metrics</h2>
+						<div class="row drive-msg-block">
+							<div class="col-md-6 col-xlg-6 chart-block ">
+<!--
+								<img src="assets/img/cart-block.png">
+-->
+							<div jq-sparkline class="sparkline-chart" ng-model="sparkline_pie_data" opts="{{sparkline_pie_options}}"></div>
+							
+							</div>
+							<div class="col-md-6 col-xlg-6 pie-color-block ">
+								<div class="cart-color">
+									<ul class="print-listing chart-color">
+										<li><span style="background:#077ed0;"></span> <P>Late Delivery</P></li>
+										<li> <span style="background:#6d5cae;"></span><P>On - Time</P></li>
+										<li><span style="background:#34d6c7;"></span> <P>On The Road</P></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+          
+			<div class="row invocie-block-row lode-table">
+				<div class="col-md-6 col-xlg-6">
+					<div class="invocie-block">
+						<h2>load on the road</h2>
+						<div class="graph-block-tabel">
+							<div class="load-road-graph text-center">
+								<img src="assets/img/load-graph.png">
+							</div>
+							<div class="table-mainass">
+								<div class="table-responsive">
+								  <table class="table table-hover table-condensed table-detailed" id="detailedTable">
+									<thead>
+									  <tr>
+										<th style="width:20%">Asset</th>
+										<th style="width:20%"> DRIVER </th>
+										<th style="width:20%">SHIPPER </th>
+										<th style="width:20%"> CONS.  </th>
+										<th style="width:20%"> CUST  </th>
+									  </tr>
+									</thead>
+									<tbody>
+									  <tr>
+										<td class="v-align-middle semi-bold">130</td>
+										<td class="v-align-middle">John H.</td>
+										<td class="v-align-middle semi-bold">Col/Oh</td>
+										<td class="v-align-middle">Mpls/Mn</td>
+										<td class="v-align-middle">CH R</td>
+									  </tr>
+									  <tr>
+										<td class="v-align-middle semi-bold">130</td>
+										<td class="v-align-middle">John H.</td>
+										<td class="v-align-middle semi-bold">Col/Oh</td>
+										<td class="v-align-middle">Mpls/Mn</td>
+										<td class="v-align-middle">CH R</td>
+									  </tr>
+									  <tr>
+										<td class="v-align-middle semi-bold">130</td>
+										<td class="v-align-middle">John H.</td>
+										<td class="v-align-middle semi-bold">Col/Oh</td>
+										<td class="v-align-middle">Mpls/Mn</td>
+										<td class="v-align-middle">CH R</td>
+									  </tr>
+									  <tr>
+										<td class="v-align-middle semi-bold">130</td>
+										<td class="v-align-middle">John H.</td>
+										<td class="v-align-middle semi-bold">Col/Oh</td>
+										<td class="v-align-middle">Mpls/Mn</td>
+										<td class="v-align-middle">CH R</td>
+									  </tr>
+									  <tr>
+										<td class="v-align-middle semi-bold">130</td>
+										<td class="v-align-middle">John H.</td>
+										<td class="v-align-middle semi-bold">Col/Oh</td>
+										<td class="v-align-middle">Mpls/Mn</td>
+										<td class="v-align-middle">CH R</td>
+									  </tr>
+									  <tr>
+										<td class="v-align-middle semi-bold">130</td>
+										<td class="v-align-middle">John H.</td>
+										<td class="v-align-middle semi-bold">Col/Oh</td>
+										<td class="v-align-middle">Mpls/Mn</td>
+										<td class="v-align-middle">CH R</td>
+									  </tr>
+									  <tr>
+										<td class="v-align-middle semi-bold">130</td>
+										<td class="v-align-middle">John H.</td>
+										<td class="v-align-middle semi-bold">Col/Oh</td>
+										<td class="v-align-middle">Mpls/Mn</td>
+										<td class="v-align-middle">CH R</td>
+									  </tr>
+									  <tr>
+										<td class="v-align-middle semi-bold">130</td>
+										<td class="v-align-middle">John H.</td>
+										<td class="v-align-middle semi-bold">Col/Oh</td>
+										<td class="v-align-middle">Mpls/Mn</td>
+										<td class="v-align-middle">CH R</td>
+									  </tr>
+									  <tr>
+										<td class="v-align-middle semi-bold">130</td>
+										<td class="v-align-middle">John H.</td>
+										<td class="v-align-middle semi-bold">Col/Oh</td>
+										<td class="v-align-middle">Mpls/Mn</td>
+										<td class="v-align-middle">CH R</td>
+									  </tr>
+									  <tr>
+										<td class="v-align-middle semi-bold">130</td>
+										<td class="v-align-middle">John H.</td>
+										<td class="v-align-middle semi-bold">Col/Oh</td>
+										<td class="v-align-middle">Mpls/Mn</td>
+										<td class="v-align-middle">CH R</td>
+									  </tr>
+									</tbody>
+								  </table>
+								</div>
+							</div>
+						 </div>
+					</div>
+				</div>
+				<div class="col-md-6 col-xlg-6 map-table-block">
+					<div class="map-block-main text-center">
+						<img src="assets/img/map.png" class="col-md-9">
+						 <div class="forecast-day col-md-3 text-center m-t-10 ">
+							<div class="bg-master-lighter p-b-10 p-t-10">
+								<h4 class="p-t-10 no-margin">Tuesday</h4>
+								<p class="small hint-text m-b-20">11th Augest 2014</p>
+								<canvas class="rain" width="64" height="64" skycons></canvas>
+								<h5 class="text-danger">32°</h5>
+								<p>Feels like
+									<span class="bold">sunny</span>
+								</p>
+								<p class="small">Wind
+									<span class="bold p-l-20">11km/h</span>
+								</p>
+								<div class="m-t-20 block">
+									<div class="padding-10">
+										<div class="row">
+											<div class="col-md-6 text-center">
+												<p class="small">Noon</p>
+												<canvas class="sleet" width="25" height="25" skycons></canvas>
+												<p class="text-danger bold">30°C</p>
+											</div>
+											<div class="col-md-6 text-center">
+												<p class="small">Night</p>
+												<canvas class="wind" width="25" height="25" skycons></canvas>
+												<p class="text-danger bold">30°C</p>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-6 col-xlg-6">
+							<div class="invocie-block">
+								
+<!--
+								<img src="assets/img/inservice.png">
+-->
+								<h2>Asset Insights</h2>
+								<div id="assets_insight" style="min-width:200px; height:250px; "></div>	
+								
+								
+								<div class="service-in-block">
+									<div class="service-block1">
+										<p><span style="background:#34d6c7;"></span> In Services</p>
+									</div>
+									<div class="service-block1">
+										<p><span style="background:#077ed0;"></span> Out of Services</p>
+									</div>
+									<div class="service-block1">
+										<p><span style="background:#626262;"></span> Random Services</p>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-6 col-xlg-6 top5">
+							<div class="invocie-block">
+								<h2>TOP 5 COUSTOMERS</h2>
+								<div class="row drive-msg-block">
+<!--
+									<div class="col-md-5 col-xlg-5 chart-block">
+										<img src="assets/img/gp-mp.png">
+									</div>
+-->
+									 <div class="col-xs-7 col-xs-height col-bottom relative widget-5-chart-container">
+                                        <div class="widget-5-chart"></div>
+                                    </div>
+									<div class="col-md-5 col-xlg-5 gp-mp-block">
+										<div class="cart-color">
+											<ul class="print-listing chart-color">
+												<li><span style="background:#077ed0;"></span> <P>Late Delivery</P></li>
+												<li> <span style="background:#6d5cae;"></span><P>On - Time</P></li>
+												<li><span style="background:#34d6c7;"></span> <P>On The Road</P></li>
+												<li><span style="background:#34d6c7;"></span> <P>On The Road</P></li>
+												<li><span style="background:#34d6c7;"></span> <P>On The Road</P></li>
+											</ul>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+          
+			<div class="row invocie-block-row best-sfe-block">
+				<div class="col-md-4 col-xlg-4">
+					<div class="invocie-block">
+						<h2>BEST SAFTY</h2>
+						<div class="audits-block">
+							<p>Audits</p>
+							<div class="one-third-block">
+								<ul class="bext-safty-block">
+									<li> <span style="background:#34d6c7;"> </span>Failed </li>
+									<li> <span style="background:#077ed0;"> </span> Passed </li>
+									<li> <span style="background:#626262;"> </span>Issues</li>
+								</ul>
+							</div>
+							<div class="third-part">
+								<img src="assets/img/graph.jpg">
+							</div>
+						</div>
+					</div>
+				</div>
+				
+				<div class="col-md-4 col-xlg-4">
+					<div class="invocie-block">
+						<h2>DRIVER RENEWALS</h2>
+						<div class="audits-block audits-block-mid">
+							<div class="one-third-block text-center">
+<!--
+								<img src="assets/img/ell1i.png">
+-->
+								<div id="driver_renewals" style="min-width:150px; height:150px; max-width: 150px;"></div>
+							</div>
+							<div class="third-part">
+								<div class="cart-color">
+									<ul class="print-listing chart-color">
+										<li><span style="background:#626262;"></span> <P>Expired</P></li>
+										<li> <span style="background:#6d5cae;"></span><P>Driver Licence</P></li>
+										<li><span style="background:#34d6c7;"></span> <P>Drug Test</P></li>
+										<li><span style="background:#077ed0;"></span> <P>Medical Card</P></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+				<div class="col-md-4 col-xlg-4">
+					<div class="invocie-block">
+						<h2>assetS in EMERGENCY</h2>
+						<div class=" audits-block-last">
+							<div class="row drive-msg-block">
+								<div class="col-md-6 col-xlg-6 chart-block">
+									<!--img src="assets/img/cart-block1.png"-->
+									
+									<div jq-sparkline class="sparkline-chart" ng-model="sparkline_pie_data1" opts="{{sparkline_pie_options1}}"></div>
+								</div>
+								<div class="col-md-6 col-xlg-6 pie-color-block ">
+									<div class="cart-color">
+										<ul class="print-listing chart-color">
+											<li><span style="background:#077ed0;"></span> <P>Late Delivery</P></li>
+											<li> <span style="background:#6d5cae;"></span><P>On - Time</P></li>
+											<li><span style="background:#34d6c7;"></span> <P>On The Road</P></li>
+										</ul>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+		</div>
+	</div>
+</div>
+<script>
+
+</script>
+
+      
+       

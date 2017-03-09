@@ -1,0 +1,362 @@
+
+      <!-- START PAGE CONTENT WRAPPER -->
+      <div class="page-content-wrapper ">
+        <!-- START PAGE CONTENT -->
+        <div class="content sm-gutter">
+          <!-- START CONTAINER FLUID -->
+          <div class="container-fluid padding-25 sm-padding-10">
+			  
+			<div ng-show="showErrorMessage == true" class="alert alert-danger" role="alert">
+				<button ng-click = "hideloadmessage()" class="close"></button>
+				{{errorMessage}}
+			</div>
+			
+			<div class="row">
+				<div class="col-md-12 col-xlg-12">
+					<div class="commen-heading truck-page">
+						<h2 class="oprate-dashbord ng-binding">{{ languageArray.AddTruckButton }}</h2>
+					</div>
+				</div>
+			</div>
+			
+					
+			<div class="row new-block-pad">
+				<div class="col-lg-12 col-md-12">
+					
+						<div class="panel panel-transparent">
+							 <div class="panel-body update-truck-block1">
+							<form id="form-project" name="addtruckDataform" role="form" autocomplete="off" 	ng-submit="addtruckDataform.$valid && addTruck()" enctype="multipart/formdata" novalidate>
+								<p class="Summary-heading">{{ languageCommonVariables.commonSummaryHeading }}</p>
+							
+									<!--row-->
+									<div class="row clearfix">
+										<div class="col-sm-6">
+											<div pg-form-group class="form-group form-group-default required" ng-class="{ true:'has-error'} [(submitted && addtruckDataform.label.$invalid)]">
+												 <label>{{ languageArray.truckNumbetTableTh }}</label>
+												<input type="text" class="form-control" name="label" ng-model="addTruckData.label" ng-change="checkVehicleLabelExist(addTruckData.label)" ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }" required />
+											</div>
+											<label class="error" for="label" ng-show="(submitted && addtruckDataform.label.$invalid)">Please enter truck number.</label>
+										</div>
+										<div class="col-sm-6">
+											<div pg-form-group class="form-group form-group-default" >
+												 <label>{{ languageArray.truckNumbetTableThtracker }}</label>
+												<input type="text" class="form-control" name="tracker" ng-model="addTruckData.tracker_id"  >
+											</div>
+											
+										</div>
+									</div> 
+									<!--row-end-->
+									<!-- Driver Choice button -->
+									<div class="radio radio-success">
+					                    <input type="radio"  checked="checked" ng-change="changeDriverType('single')" ng-model="addTruckData.driverType" value="single" name="driverType" id="single">
+					                    <label for="single">Single</label>
+					                    
+					                    <input type="radio" value="team" ng-change="changeDriverType('team')" ng-model="addTruckData.driverType" name="driverType" id="team" >
+					                    <label for="team">Team</label>
+					                </div>
+									<!-- Driver Choice Button end -->
+									<!--row-->
+									<div class="row clearfix">
+										<div class="col-sm-6">
+											<div class="form-group form-group-default th-select" ng-if="addTruckData.driverType == 'single'" >
+												<label>{{ languageArray.truckNumbetTableThdname }}</label>
+												<ui-select name="driver_name" ng-model="addTruckData.driver_id" theme="bootstrap" on-select="onSelectDriverNameCallback($item, $model)"  >
+					                                <ui-select-match class="ui-select-match" placeholder="{{ languageArray.selectDriverName }}">{{addTruckData.driverName}}</ui-select-match>
+					                                <ui-select-choices class="ui-select-choices" group-by="groupFind" repeat="item in driversList | filter: $select.search | orderBy: groupFind">
+					                                    <div ng-bind-html="trustAsHtml((item.driverName | highlight: $select.search))"></div>
+					                                </ui-select-choices>
+					                            </ui-select>
+					                        </div>
+				                     		<div class="form-group form-group-default posted-select align-trailer th-select required"  ng-if="addTruckData.driverType == 'team'">
+												<div class="row" >
+													<label>{{ languageArray.truckNumbetTableThdname }}</label>
+													<div class="col-sm-6" ng-class="{'has-error':addtruckDataform.team_driver_one.$invalid && !addtruckDataform.team_driver_one.$pristine || addtruckDataform.$submitted && addtruckDataform.team_driver_one.$invalid,'has-success' : addtruckDataform.team_driver_one.$valid }">
+														<ui-select name="team_driver_one" ng-model="addTruckData.team_driver_one" theme="bootstrap" on-select="onSelectTeamDriverCallback($item, $model,'team_driver1')" required>
+															<ui-select-match class="ui-select-match" placeholder="{{ languageArray.selectDriverName }}">{{addTruckData.teamDriverOne}}</ui-select-match>
+															<ui-select-choices class="ui-select-choices" group-by="groupFind" repeat="item in driversListTeam | filter: $select.search | orderBy: groupFind" ui-disable-choice="item.driverName == addTruckData.teamDriverTwo">
+																<div ng-bind-html="trustAsHtml((item.driverName | highlight: $select.search))"></div>
+															</ui-select-choices>
+														</ui-select>
+													</div>
+													<div class="col-sm-6" ng-class="{'has-error':addtruckDataform.team_driver_two.$invalid && !addtruckDataform.team_driver_two.$pristine || addtruckDataform.$submitted && addtruckDataform.team_driver_two.$invalid,'has-success' : addtruckDataform.team_driver_two.$valid }">
+														<ui-select name="team_driver_two" ng-model="addTruckData.team_driver_two" theme="bootstrap" on-select="onSelectTeamDriverCallback($item, $model,'team_driver2')" required>
+															<ui-select-match class="ui-select-match" placeholder="{{ languageArray.selectDriverName }}">{{addTruckData.teamDriverTwo}}</ui-select-match>
+															<ui-select-choices class="ui-select-choices" group-by="groupFind" repeat="item in driversListTeam | filter: $select.search | orderBy: groupFind" ui-disable-choice="item.driverName == addTruckData.teamDriverOne || ( item.username != teamDispatcher  )">
+																<div ng-bind-html="trustAsHtml((item.driverName | highlight: $select.search))"></div>
+															</ui-select-choices>
+														</ui-select>
+													</div>
+												</div>
+											</div><!-- end driver type team -->
+											<label class="error" ng-show="((addtruckDataform.team_driver_one.$invalid && !addtruckDataform.team_driver_one.$pristine || addtruckDataform.$submitted && addtruckDataform.team_driver_one.$invalid) || (addtruckDataform.team_driver_two.$invalid && !addtruckDataform.team_driver_two.$pristine || addtruckDataform.$submitted && addtruckDataform.team_driver_two.$invalid)) && addTruckData.driverType == 'team'">Please select driver Team.</label>
+					                    </div>
+									  
+										<div class="col-sm-6 multiple-vehicleD"> 
+											<div class="form-group form-group-default th-select posted-select align-trailer required" ng-class="{'has-error':addtruckDataform.vehicle_type.$invalid && !addtruckDataform.vehicle_type.$pristine || addtruckDataform.$submitted && addtruckDataform.vehicle_type.$invalid,'has-success' : addtruckDataform.fuel_type.$valid}">
+												<label>{{ languageArray.truckNumbetTableThvhtype }}</label>
+												<ui-select name="vehicle_type" multiple ng-model="addTruckData.vehicle_type" class="multiSelect" theme="select2" required>
+													<ui-select-match class="ui-select-match" placeholder="{{languageArray.selectVehicleType}}">{{$item.abbrevation}}</ui-select-match>
+														<ui-select-choices class="ui-select-choices" repeat="trailers in trailerTypes | filter: $select.search">
+															{{trailers.name}}
+														</ui-select-choices>
+												</ui-select>
+											</div>
+											<label class="error" ng-show="addtruckDataform.vehicle_type.$invalid && !addtruckDataform.vehicle_type.$pristine || addtruckDataform.$submitted && addtruckDataform.vehicle_type.$invalid">Please select vehicle type.</label>
+										</div>
+									</div>
+									<!--row-end-->
+									
+									<!--row-->
+									<div class="row clearfix">
+										<div class="col-sm-6">
+											<div pg-form-group class="form-group form-group-default">
+											  <label>{{ languageArray.truckNumbetTableThmodel }}</label>
+											  <input type="text" class="form-control" name="model" ng-model="addTruckData.model" >
+											</div>
+										</div>
+										<div class="col-sm-6">
+											<div pg-form-group class="form-group form-group-default ">
+												<label>{{ languageArray.truckNumbetTableThvin }}</label>
+												<input type="text" class="form-control" name="vin" ng-model="addTruckData.vin" >
+											</div>
+										</div>
+									</div>
+									<!--row-end-->
+										<!--row-->
+									<div class="row clearfix">
+										<div class="col-sm-6">
+											<div pg-form-group class="form-group form-group-default">
+												<label>{{ languageArray.truckNumbetTableThchnum }}</label>
+												<input type="text" class="form-control" name="chassis Number" ng-model="addTruckData.chassis_number">
+											</div>
+										</div>
+										<div class="col-sm-6">
+											<div pg-form-group class="form-group form-group-default">
+												<label>{{ languageArray.truckNumbetTableThpspeed }}</label>
+												<input type="text" class="form-control" name="permittedspeed" ng-model="addTruckData.permitted_speed">
+											</div>
+										</div>
+									</div>
+									
+									<div class="row clearfix">
+										<div class="col-sm-6">
+											<div pg-form-group class="form-group form-group-default">
+											  <label>{{ languageArray.truckNumbetTableThvehregplate }}</label>
+											  <input type="text" class="form-control" name="vehicleregistrationplate" ng-model="addTruckData.registration_plate">
+											</div>
+										</div>
+										<div class="col-sm-6">
+											<div pg-form-group class="form-group form-group-default" >
+												<label>{{ languageArray.truckNumbetTableThvehadd }}</label>
+												<input type="text" class="form-control" name="vehicleaddress" ng-model="addTruckData.vehicle_address" >
+											</div>
+										</div>
+									</div>
+						
+									
+									<div class="row clearfix">
+										<div class="col-sm-6">
+											<div class="form-group form-group-default th-select" >
+												<label>{{ languageArray.truckNumbetTableThclocstate }}</label>
+												<ui-select name="currentlocation" ng-model="addTruckData.state" theme="bootstrap" on-select="onSelectStateCallback($item, $model)" >
+														<ui-select-match class="ui-select-match" placeholder="{{ languageArray.selectCurrentLocation }}">{{addTruckData.state}}</ui-select-match>
+														<ui-select-choices class="ui-select-choices" repeat="item in states_data | filter: $select.search">
+															<div ng-bind-html="trustAsHtml((item.label | highlight: $select.search))"></div>
+														</ui-select-choices>
+													</ui-select>
+											</div>
+										</div>
+										<div class="col-sm-6">
+											<div pg-form-group class="form-group form-group-default">
+												<label>{{ languageArray.truckNumbetTableThcloccity }}</label>
+												<input type="text" class="form-control" name="city" ng-model="addTruckData.city" >
+											</div>
+										</div>
+									</div>
+									<!--row-end-->
+									<!--row-->
+									<div class="row clearfix">
+										<div class="col-sm-6">
+											<div pg-form-group class="form-group form-group-default">
+												<div class="col-sm-8">
+													<label>{{ languageArray.truckNumbetTableThuploadvehimg }}</label>
+													<div class="input-file-browse">
+													<input type = "file" file-model = "myFile"/>
+													</div>
+												</div>
+												<div class="col-sm-4 img-cont image-size" >
+													<img class="center-me" on-error-src="pages/img/truck-dummy.jpeg" ng-src="./assets/uploads/vehicles/thumbnail/{{truckData.vehicle_image}}" ng-show = "showimage == true" height="40px">
+												</div>
+											</div>
+										</div>
+										<div class="col-sm-6"></div>
+									</div>
+									<!--row-end-->
+													
+								<div class="update-truck-block">
+									<div class="panel panel-transparent">
+										<div class="row clearfix">
+											<div class="col-sm-6">
+												<p class="Summary-heading">{{ languageArray.truckNumbetTableThdimension }}</p>
+												<div pg-form-group class="form-group form-group-default required" ng-class="{ true:'has-error'} [(submitted && addtruckDataform.cargocapacity.$invalid)]">
+													<label>{{ languageArray.truckNumbetTableThcclbs }}</label>
+													<input type="text" class="form-control" name="cargocapacity" ng-model="addTruckData.cargo_capacity" required>
+												</div>
+												<label class="error" for="cargocapacity" ng-show="(submitted && addtruckDataform.cargocapacity.$invalid)">Please enter cargo capacity.</label>
+											</div>
+											<div class="col-sm-6">
+												<p class="Summary-heading">{{ languageArray.truckNumbetTableThwheelbase }} </p>
+												<div class="form-group form-group-default">
+													<label>{{ languageArray.truckNumbetTableThwheelarrang }}</label>
+													<div pg-form-group class="col-sm-6 border-right-sm">
+														<input type="text" class="form-control" name="wheelx" ng-model="addTruckData.wheel_arrangement1">	 
+													</div>
+													<div pg-form-group class="col-sm-6">
+														<input type="text" class="form-control" name="wheely"  ng-model="addTruckData.wheel_arrangement2">
+													</div>													
+												</div>
+											</div>
+										</div>
+										
+										<div class="row clearfix">	
+											<div class="col-sm-6">
+												<div class="form-group form-group-default required">
+													<label>{{ languageArray.truckNumbetTableThcblwh }}</label>
+													<div pg-form-group class="col-sm-4 border-right-sm" ng-class="{ true:'has-error'} [(submitted && addtruckDataform.l.$invalid)]">
+														<input type="text" class="form-control" name="l" placeholder="Cargo Bay L" ng-model="addTruckData.cargo_bay_l" required>
+													</div>
+													<div pg-form-group class="col-sm-4 border-right-sm" ng-class="{ true:'has-error'} [(submitted && addtruckDataform.w.$invalid)]">
+														<input type="text" class="form-control" name="w" placeholder="Cargo Bay W" ng-model="addTruckData.cargo_bay_w" required>
+													</div>
+													<div pg-form-group class="col-sm-4" ng-class="{ 'has-error' : addtruckDataform.h.$invalid && !addtruckDataform.h.$pristine }">
+														<input type="text" class="form-control" name="h" placeholder="Cargo Bay H" ng-model="addTruckData.cargo_bay_h">
+													</div>
+												</div>
+												<label class="error" for="l" ng-show="(submitted && addtruckDataform.l.$invalid) || (submitted && addtruckDataform.w.$invalid)">Please enter cargo bay length and width.</label>
+											</div>
+											<div class="col-sm-6">
+												<div pg-form-group class="form-group form-group-default">
+													<label>{{ languageArray.truckNumbetTableThtiresize }}</label>
+													<input type="text" class="form-control" name="tyreize"  ng-model="addTruckData.tyres_size">
+												</div>
+											</div>										
+										</div>
+											
+										<div class="row clearfix">	
+											<div class="col-sm-6">
+												<div pg-form-group class="form-group form-group-default">
+													<label>{{ languageArray.truckNumbetTableThpessnum }}</label>
+													<input type="text" class="form-control" name="numberofpassengers" ng-model="addTruckData.number_of_passengers">
+												</div>
+											</div>										
+											<div class="col-sm-6">
+												<div pg-form-group class="form-group form-group-default">
+													<label>{{ languageArray.truckNumbetTableThtirenum }}</label>
+													<input type="text" class="form-control" name="tyresnumber"  ng-model="addTruckData.tyres_number" >
+												</div>
+											</div>
+										</div>
+											
+									</div>
+								</div>			<!--update-truck-block end-->
+								
+								<div class="update-truck-block">
+									<div class="panel panel-transparent">
+										<div class="row clearfix">
+											<div class="col-sm-6">
+												<p class="Summary-heading">{{ languageArray.truckNumbetTableThfuel }}</p>
+												<div class="form-group form-group-default th-select required" ng-class="{'has-error':addtruckDataform.fuel_type.$invalid && !addtruckDataform.fuel_type.$pristine || addtruckDataform.$submitted && addtruckDataform.fuel_type.$invalid,'has-success' : addtruckDataform.fuel_type.$valid }" >
+													<label>{{ languageArray.truckNumbetTableThfueltype }}</label>
+													<ui-select ng-model="addTruckData.fuel_type" name="fuel_type" theme="bootstrap" on-select="onSelectFuelTypeCallback($item, $model)" required>
+														<ui-select-match class="ui-select-match" placeholder="{{ languageArray.selectFuelType }}">{{addTruckData.fuel_type}}</ui-select-match>
+														<ui-select-choices class="ui-select-choices" repeat="item in fuelType | filter: $select.search">
+															<div ng-bind-html="trustAsHtml((item.val | highlight: $select.search))"></div>
+														</ui-select-choices>
+													</ui-select>
+												</div>
+												<label class="error" ng-show="addtruckDataform.fuel_type.$invalid && !addtruckDataform.fuel_type.$pristine || addtruckDataform.$submitted && addtruckDataform.fuel_type.$invalid">Please select fuel type.</label>
+											</div>
+											<div class="col-sm-6">
+												<p class="Summary-heading">{{ languageArray.truckInsurance }}</p>
+												<div pg-form-group class="form-group form-group-default">
+													<label>{{ languageArray.truckNumbetTableThinspolnum }}</label>
+													<input type="text" class="form-control" name="insurancepolicynumber" ng-model="addTruckData.free_insurance_policy_number">
+												</div>
+											</div>
+										</div>
+										
+										<div class="row clearfix">
+											<div class="col-sm-6">
+												<div pg-form-group class="form-group form-group-default">
+													<label>{{ languageArray.truckNumbetTableThfuelgrade }}</label>
+													<input type="text" class="form-control" name="fuelgrade" ng-model="addTruckData.fuel_grade" >
+												</div>
+											</div>
+											<div class="col-sm-6">
+												<div pg-form-group class="form-group form-group-default">
+													<label>{{ languageArray.truckNumbetTableThinspolvalid }}</label>
+													<input type="text" class="form-control" name="insurancevalidtill" ng-model="addTruckData.liability_insurance_valid_till" >
+												</div>
+											</div>
+										</div>
+										
+										<div class="row clearfix">
+											<div class="col-sm-6">
+												<div pg-form-group class="form-group form-group-default required" ng-class="{ true:'has-error'} [(submitted && addtruckDataform.fuelconsumption.$invalid)]">
+													<label>{{ languageArray.truckNumbetTableThfuelcons }}</label>
+													<input type="text" class="form-control" name="fuelconsumption" ng-model="addTruckData.fuel_consumption" required>
+												</div>
+												<label class="error" for="drivername" ng-show="(submitted && addtruckDataform.fuelconsumption.$invalid)">Please enter fuel consumption per 100 miles.</label>
+											</div>
+											<div class="col-sm-6">
+												<div pg-form-group class="form-group form-group-default">
+													<label>{{ languageArray.truckNumbetTableThinspolnum2 }}</label>
+													<input type="text" class="form-control" name="insurance2policynumber" ng-model="addTruckData.insurance_policy_number2">
+												</div>
+											</div>
+										</div>
+										
+										<div class="row clearfix">
+											<div class="col-sm-6">
+												<div pg-form-group class="form-group form-group-default">
+													<label>{{ languageArray.truckNumbetTableThtankcap }}</label>
+													<input type="text" class="form-control" name="tankcapacity" ng-model="addTruckData.tank_capactiy">
+												</div>
+											</div>
+											<div class="col-sm-6">
+												<div pg-form-group class="form-group form-group-default">
+													<label>{{ languageArray.truckNumbetTableThinspolvalid }}</label>
+													<input type="text" class="form-control" name="insurancevalidtill" ng-model="addTruckData.insurance_valid_date2">
+												</div>
+											</div>
+										</div>
+										
+										<div class='row clearfix'>
+											<div class="col-sm-6">
+												<div class="dropzone" ng-dropzone dropzone="dropzone" dropzone-config="dropzoneConfigTruckAdd" ></div>
+											</div>
+											<div class="col-sm-6">
+												
+											</div>
+										</div>
+									</div>
+								</div>	<!--update-truck-block end-->
+								
+								<div class="update-truck-block-btn">
+									<button class="btn btn-primary btn-cons m-b-10" ng-click="submitted=true" type="submit"><i class="fa fa-plus"></i><span class="bold"> {{ languageArray.brokerListingTableAddbutton|capitalize }} </span>
+									</button>
+									 <a href="#/trucks"><button class="btn btn-danger btn-cons m-b-10" type="button"><i class="fa fa-ban"></i><span class="bold"> {{ languageCommonVariables.cancelbutton|capitalize }} </span></button></a>
+								</div>
+							</form>
+						</div>
+						<!---->
+					</div>
+              
+				</div>
+			</div>
+		
+		</div>
+		</div>
+	</div>
+
+<ng-include src="'./assets/templates/vehicles/common-modal.html'"></ng-include>

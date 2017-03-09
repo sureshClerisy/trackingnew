@@ -1,0 +1,29 @@
+<div ng-cloak
+     class="gantt-task-info"
+     ng-show="displayed"
+     ng-class="isRightAligned ? 'gantt-task-infoArrowR' : 'gantt-task-infoArrow'"
+     ng-style="{top: taskRect.top + 'px', marginTop: -elementHeight - 8 + 'px'}">
+    <div class="gantt-task-info-content">
+		<div class="route-report">
+        <strong>Route :</strong>
+        <p><i class="fa fa-map-marker"></i> {{task.model.origin}} </p>
+        <p><i class="fa fa-map-marker"></i> {{task.model.destination}}</p>
+        <!--p><b>Miles : </b> {{task.model.miles}}</p-->
+        </div>
+        <div class="status-report">
+			<div class="col-xs-12 col-sm-6 col-md-6 status-inner">
+				<div class="row">
+				<strong>Status </strong> 
+				<p>{{task.model.name}}</p>
+				</div>
+			</div>
+			<div class="col-xs-12 col-sm-6 col-md-6 status-inner">
+				<div class="row">
+				<strong>Hours </strong>
+				<p>{{task.model.hrs}}</p>
+				</div>
+			</div>
+		</div>
+        
+    </div>
+</div>

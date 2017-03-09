@@ -1,0 +1,356 @@
+<!--START PAGE CONTENT -->
+<div class="page-content-wrapper" >
+  <div class="content sm-gutter">
+    <div class="container-fluid no-padding">
+      <div class="">
+        <!-- FORM -->
+        <div class="no-padding col-sm-4 col-lg-3 col-md-4 bright">
+          <div class="cdialog-width">
+            <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true" ng-show="reportListOpen">
+                <div class="panel panel-default" ng-repeat="(reportName, reports) in reportList">
+                    <div class="panel-heading ac-heading" role="tab" id="headingOne">
+                        <h4 class="ac-title panel-title">
+                        <a ng-class="{collapsed:!collapseOne}" ng-click="collapseOne=!collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                         <i class="fa fa-folder-open"></i> {{reportName}}
+                        </a>
+                      </h4>
+                    </div>
+                    <div class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne" ng-class="{in:collapseOne}" ng-repeat="report in reports">
+                        <div class="panel-body no-padding">
+                            <ul class="ac-li">
+                              <li ng-click="toggleReportOpen(report)">
+                                <div class="report-type">
+                                  <i class="fa fa-file-text"></i>
+                                  <h2>{{report.title}}</h2>
+                                  <p>{{report.context}}</p>
+                                </div>
+                              </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Report Filters -->
+            <div class="report-filter-section" ng-show="reportOpen"> 
+              <h2 ng-click="toggleReportOpen('back')"><i class="fa fa-arrow-left"></i> Back to report list</h2>
+              <div class="repf-title">
+                <h2>{{reportTitle}}</h2>
+                <p>{{reportContext}}</p>
+              </div>
+              <!-- Breadcrumb Detail Report Form Start-->
+              <form ng-show="report.name == 'breadcrumb_detail'"> 
+                <div class="report-filter">
+                  <h2>Scope</h2>
+                  <div class="drange-block">
+                    <div class="data-range filter-range">
+                      <span>Select Vehicles: </span>
+                      <div class="date-wrapper">
+                        <button type="button" ng-click="toggleSelectVehicles('none')" class="btn btn-info">Select None</button>
+                        <button type="button" ng-click="toggleSelectVehicles('all')" class="btn btn-info">Select All</button>
+                        <ui-select multiple ng-model="formFilter.vehicles" class="multiSelect multi-select" theme="select2" required>
+                          <ui-select-match class="ui-select-match" placeholder="Select vehicles...">{{$item.truck}}</ui-select-match>
+                            <ui-select-choices class="ui-select-choices" repeat="vehicle in vehicles | filter: $select.search">
+                              {{vehicle.truck}}
+                            </ui-select-choices>
+                        </ui-select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="report-filter">
+                  <h2>Date Range</h2>
+                  <div class="drange-block">
+                    <div class="data-range">
+                      <span>Report On : </span>
+                      <select ng-model="formFilter.forDate" class=" report-for cs-select cs-skin-slide" cs-select ng-change="toggleCustomDate(formFilter.forDate)">
+                          <option value="today">Today</option>
+                          <option value="yesterday">Yesterday</option>
+                          <option value="custom">Custom Date</option>
+                      </select>
+                    </div>
+                    <div class="data-range" ng-show="showCustomDate">
+                      <span>&nbsp; </span>
+                      <div class="date-wrapper">
+                        <div class="input-group date"  ui-jq="datepicker" ui-options='{format: "yyyy-mm-dd"}'>
+                          <input type="text" ng-click = "refreshDatepicker($event)" ng-model="formFilter.customDate"  class="form-control" >
+                          <span class="input-group-addon align-icon"><i class="fa fa-calendar"></i></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+
+                <div class="report-filter">
+                  <h2>Filters and Options</h2>
+                  <div class="drange-block">
+                    <div class="data-range filter-range">
+                      <span>Filters On Status: </span>
+                      <div class="date-wrapper">
+                        <button type="button" ng-click="toggleSelectStatus('none',report.name)" class="btn btn-info">Select None</button>
+                        <button type="button" ng-click="toggleSelectStatus('all', report.name)" class="btn btn-info">Select All</button>
+                        <ui-select multiple ng-model="formFilter.vStatus" class="multiSelect multi-select" theme="select2" required>
+                          <ui-select-match class="ui-select-match" placeholder="Select status...">{{$item.label}}</ui-select-match>
+                            <ui-select-choices class="ui-select-choices" repeat="status in vStatus | filter: $select.search">
+                              {{status.label}}
+                            </ui-select-choices>
+                        </ui-select>
+                      </div>
+                    </div>
+                    <div class="checkbox check-success latlng-check "   >
+                      <input id = "includeLatLng" ng-model="formFilter.includeLatLong" type="checkbox">
+                      <label for="includeLatLng">Include Latitude/Longitude</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="report-filter filter-action">
+                  <h2>Report Actions</h2>
+                  <button ng-click="generateReport(report)" ng-disable="isQueued" class="btn btn-success" type="button"><i class="fa fa-file"></i> <span class="bold">Generate</span>
+                    </button>
+<!--
+                  <button type="button" ng-disable="isQueued" ng-click="generateReport(report)" class="btn btn-success">Generate</button>
+-->
+                  <!-- <button type="button" class="btn btn-danger">Save</button> -->
+                </div>
+              </form>
+              <!-- Breadcrumb Detail Report Form End -->
+              
+              <!-- Loads Performance Report Start -->
+              <form ng-show="report.name == 'loads_performance'"> 
+                <div class="report-filter">
+                  <h2>Scope</h2>
+                  <div class="drange-block">
+                    <div class="data-range filter-range">
+                      <span>Select Scope </span>
+                      <div class="date-wrapper">
+                        <div class="dashbord-select-dropdown">
+                          <ui-select class="mdrivers" ng-model="selectedScope" theme="bootstrap" on-select="onSelectVehicleCallback($item, $model);">
+                            <ui-select-match class="ui-select-match" placeholder="Select Scope">{{$select.selected.label == "_idispatcher" ? "Dispatcher : " + $select.selected.username : $select.selected.driverName}}</ui-select-match>
+                            <ui-select-choices class="ui-select-choices" group-by="groupFind" repeat="item in vDriversList | propsFilter: {driverName: $select.search, username: $select.search}">
+                              <span ng-bind-html="trustAsHtml((item.driverName | highlight: $select.search))"></span>
+                            </ui-select-choices>
+                          </ui-select> <!-- dashboard-select-dropdown -->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="report-filter">
+                  <h2>Filters and Options</h2>
+                  <div class="drange-block">
+                    <div class="data-range filter-range">
+                      <span>Report Type: </span>
+                      <div class="date-wrapper">
+                        <select ng-model="formFilter.reportType" class=" report-for cs-select cs-skin-slide" cs-select >
+                            <option value="individual">Individual</option>
+                            <option value="performance">Performance</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="report-filter filter-action">
+                  <h2>Report Actions</h2>
+                  <button type="button" ng-disable="isQueued" ng-click="generateReport(report)" class="btn btn-success">Generate</button>
+                  <!-- <button type="button" class="btn btn-danger">Save</button> -->
+                </div>
+             </form>
+            <!-- Loads Performance Report End -->
+
+
+
+
+              <!-- Report Filters -->
+            </div>
+            <!-- Report Filters end-->
+          </div>
+        </div>
+        <div class="col-sm-8 col-lg-9 col-md-8 no-padding">
+          <div class="padding-15 report-right" ng-show="noFilterYet">
+          </div>
+          <div class="col-middle loader-outer" ng-show="isQueued">
+            <!-- START PANEL -->
+            <div class="loader-inner">
+              <div class="full-height">
+                <div class="panel-body text-center">
+                  <img class="image-responsive-height demo-mw-50" src="assets/img/demo/progress.svg" alt="Progress">
+                </div>
+              </div>
+            </div>
+            <!-- END PANEL -->
+          </div>
+          <div class="padding-15 report-right remove-bkg" ng-show="filteredResults" >
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse  report-header" id="sub-nav">
+                <div class="row">
+                    <div class="col-sm-12 col-md-6 col-lg-8">
+                        <div class="report-thead">
+                          <h2>{{reportTitle}}</h2>
+                          <p>{{reportContext}}</p>
+                        </div>
+                        <ul class="nav navbar-nav navbar-center">
+                            
+                            <!-- <li><a href="" data-toggle="tooltip" data-placement="bottom" title="Download"><i class="fa fa-download"></i></a>
+                            </li> -->
+                        </ul>
+                    </div>
+                    <div class="col-sm-12 col-md-6 col-lg-4">
+                        <ul class="nav navbar-nav navbar-right">
+                            <li style="margin-right: 40px; border-right: 1px solid #dedede;"><a href=""  ng-click="exportToHTML(report,true)"  ><i class="fa fa-print " ui-jq="tooltip" title="Print"></i></a>
+                            </li>
+                            <li>
+                                <a href=""   ng-click="exportToPDF(report)" class="p-r-10">
+									<img ui-jq="tooltip" title="Export as PDF" alt="" class="icon-pdf" ui-jq="unveil" data-src-retina="assets/img/invoice/pdf2x.png" data-src="assets/img/invoice/pdf.png" src="assets/img/invoice/pdf.png" width="25" height="25">
+                                </a>
+                            </li>
+                            <li>
+                                <a href=""  ng-click="exportToHTML(report,false)"  class="p-r-10">
+									<img ui-jq="tooltip" title="View as HTML" alt="" class="icon-image" ui-jq="unveil" data-src-retina="assets/img/invoice/image2x.png" data-src="assets/img/invoice/image.png" src="assets/img/invoice/image.png" width="25" height="25">
+                                </a>
+                            </li>
+                            <li>
+                                <a href=""  ng-click="exportToCSV(report)" class="p-r-10">
+									<img title="Export as CSV"  alt="" ui-jq="tooltip" class="icon-doc" ui-jq="unveil" data-src-retina="assets/img/invoice/doc2x.png" data-src="assets/img/invoice/doc.png" src="assets/img/invoice/doc.png" width="25" height="25">
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- /.navbar-collapse -->
+            </div>
+            <div class="loadtable rtable" id="report-table">
+              <div class="table-scroll-custom">
+                <table width="100%" class=" report-table fixed-thead table table-striped" cell-padding="0" cell-spacing="0" ng-show="report.name == 'breadcrumb_detail'">
+                  <thead>
+                    <tr>
+                      <th>
+                        <a href="javascript:void(0)" ng-click="sortType = 'label'; sortReverse = !sortReverse"> Vehicle ID </a>
+                        <span ng-show="sortType == 'label' && !sortReverse" class="fa fa-caret-down"></span>
+                        <span ng-show="sortType == 'label' && sortReverse" class="fa fa-caret-up"></span>
+                      </th>
+                      <th>
+                        <a href="javascript:void(0)" ng-click="sortType = 'deviceID'; sortReverse = !sortReverse"> Truck No </a>
+                        <span ng-show="sortType == 'deviceID' && !sortReverse" class="fa fa-caret-down"></span>
+                        <span ng-show="sortType == 'deviceID' && sortReverse" class="fa fa-caret-up"></span>
+                      </th>
+                      <th>
+                        <a href="javascript:void(0)" ng-click="sortType = 'driverName'; sortReverse = !sortReverse"> Driver Name </a>
+                        <span ng-show="sortType == 'driverName' && !sortReverse" class="fa fa-caret-down"></span>
+                        <span ng-show="sortType == 'driverName' && sortReverse" class="fa fa-caret-up"></span>
+                      </th>
+                      <th>
+                        <a href="javascript:void(0)" ng-click="sortType = 'GMTTime'; sortReverse = !sortReverse"> Timestamp </a>
+                        <span ng-show="sortType == 'GMTTime' && !sortReverse" class="fa fa-caret-down"></span>
+                        <span ng-show="sortType == 'GMTTime' && sortReverse" class="fa fa-caret-up"></span>
+                      </th>
+                      <th>
+                        <a href="javascript:void(0)" ng-click="sortType = 'eventType'; sortReverse = !sortReverse"> Event  </a>
+                        <span ng-show="sortType == 'eventType' && !sortReverse" class="fa fa-caret-down"></span>
+                        <span ng-show="sortType == 'eventType' && sortReverse" class="fa fa-caret-up"></span>
+                      </th>
+                      <th ng-show="formFilter.includeLatLong">
+                        <a href="javascript:void(0)" ng-click="sortType = 'latitude'; sortReverse = !sortReverse"> Latitude </a>
+                        <span ng-show="sortType == 'latitude' && !sortReverse" class="fa fa-caret-down"></span>
+                        <span ng-show="sortType == 'latitude' && sortReverse" class="fa fa-caret-up"></span>
+                      </th>
+                      <th ng-show="formFilter.includeLatLong">
+                        <a href="javascript:void(0)" ng-click="sortType = 'longitude'; sortReverse = !sortReverse"> Longitude </a>
+                        <span ng-show="sortType == 'longitude' && !sortReverse" class="fa fa-caret-down"></span>
+                        <span ng-show="sortType == 'longitude' && sortReverse" class="fa fa-caret-up"></span>
+                      </th>
+                      <th>
+                        <a href="javascript:void(0)" ng-click="sortType = 'location'; sortReverse = !sortReverse"> Location </a>
+                        <span ng-show="sortType == 'location' && !sortReverse" class="fa fa-caret-down"></span>
+                        <span ng-show="sortType == 'location' && sortReverse" class="fa fa-caret-up"></span>
+                      </th>
+                      <th>
+                        <a href="javascript:void(0)" ng-click="sortType = 'vehicleSpeed'; sortReverse = !sortReverse"> Speed (MPH) </a>
+                        <span ng-show="sortType == 'vehicleSpeed' && !sortReverse" class="fa fa-caret-down"></span>
+                        <span ng-show="sortType == 'vehicleSpeed' && sortReverse" class="fa fa-caret-up"></span>
+                      </th><th>
+                        <a href="javascript:void(0)" ng-click="sortType = 'odometer'; sortReverse = !sortReverse"> Odometer (Mi) </a>
+                        <span ng-show="sortType == 'odometer' && !sortReverse" class="fa fa-caret-down"></span>
+                        <span ng-show="sortType == 'odometer' && sortReverse" class="fa fa-caret-up"></span>
+                      </th>
+
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr dir-paginate="row in records | orderBy:sortType:sortReverse | itemsPerPage:50">
+                      <td>{{row.deviceID}}</td>
+                      <td>{{row.label}}</td>
+                      <td>{{row.driverName}}</td>
+                      <td>{{row.GMTTime}}</td>
+                      <td>{{row.eventType}}<span ng-show="{{row.eventType == 'MOVING'}}"> {{row.hdirection}}:{{row.vehicleSpeed}}mph</span></td>
+                      <td ng-show="formFilter.includeLatLong">{{row.latitude}}</td>
+                      <td ng-show="formFilter.includeLatLong">{{row.longitude}}</td>
+                      <td>{{row.location}}</td>
+                      <td>{{row.vehicleSpeed}}</td>
+                      <td>{{row.odometer}}</td>
+                    </tr>
+                    <tr ng-show="noRecords">
+                      <td colspan="8">There is no record for seletect filters</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                
+
+                <table width="100%" class=" report-table fixed-thead table table-striped" cell-padding="0" cell-spacing="0" ng-show="report.name == 'loads_performance'">
+                  <thead>
+                    <tr class="{{formFilter.reportType}}">
+                      <th class="{{formFilter.reportType+'_'+$index}}" ng-repeat="(class,heading) in columnMappings">
+                        <a href="javascript:void(0)" > {{heading}} </a>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="{{formFilter.reportType}}" dir-paginate="row in lpRecords | itemsPerPage:50">
+                      <td class="{{formFilter.reportType+'_'+$index}}" ng-repeat= "(k,cols) in row">
+                          <div> {{cols}} {{ k == "overallTotalProfitPercent" ? "%" : ""}}</div>
+                      </td>
+                      <!-- <td colspan="{{tCols}}">
+                        <h2><span>Dispatcher : </span>{{dname}}</h2>
+                        <table>
+                          <tr ng-repeat="(driver, driverList) in dlist">
+                            <td colspan="{{tCols}}">
+                              <h3><span>Driver : </span>{{driver}}</h3>
+                              <table>
+                                  <tr class="{{formFilter.reportType}}" ng-repeat="row in driverList">
+                                    <td class="fixw_{{$index}}" ng-repeat= "cols in row">
+                                        {{cols}}
+                                    </td>
+                                  </tr>
+                              </table>
+                            </td>
+                          </tr>
+                        </table>
+                      </td> -->
+
+                      
+                      
+                    </tr>
+                    <tr ng-show="noRecords">
+                      <td colspan="8">There is no record for seletect filters</td>
+                    </tr>
+                  </tbody>
+                </table>
+                
+              </div>
+              <div class="dataTables_wrapper">
+                <div class="dataTables_paginate">
+                  <dir-pagination-controls template-url="./assets/templates/dirPagination.html" on-page-change="pageChanged(newPageNumber,itemsOnPage)" direction-links="true" undary-links="true"></dir-pagination-controls>  
+                </div>
+                <div id="downloadLink"></div>
+              </div>
+              
+            </div>
+          </div>
+        </div> <!-- col-sm-9 -->
+      </div>
+    </div>
+  </div>
+</div>
+

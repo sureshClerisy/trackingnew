@@ -1,0 +1,281 @@
+ 
+ <script>
+jQuery(function(){
+if(!window.google||!window.google.maps){
+	
+  var script = document.createElement('script');
+    script.type = 'text/javascript';
+    //script.src = 'http://maps.google.com/maps/api/js?key=AIzaSyCJxKWkyvOhA6pAl0mXuGe0phOPWbkCebM&libraries=places';
+    script.src = 'http://maps.google.com/maps/api/js?key=AIzaSyAzqFSjwfCSB_x9jNIfBwOI2k-BqV2NT9c&libraries=places';
+    document.body.appendChild(script);
+}
+else{
+
+ //initialize();
+}});
+</script>
+
+
+                    
+ <!-- START PAGE CONTENT WRAPPER -->
+      <div class="page-content-wrapper ">
+        <!-- START PAGE CONTENT -->
+        <div class="content sm-gutter">
+          <!-- START CONTAINER FLUID -->
+          <div class="container-fluid padding-25 sm-padding-10">
+			  
+			  
+				<div class="col-middle loader-outer" ng-show="autoFetchLoads == true">
+					<!-- START PANEL -->
+					<div class="loader-inner">
+					<div class="full-height">
+						<div class="panel-body text-center">
+							<img class="image-responsive-height demo-mw-50" src="assets/img/demo/progress.svg" alt="Progress">
+						</div>
+					</div>
+					</div>
+					<!-- END PANEL -->
+                </div>
+                
+			<div class="row">
+				
+				<div class="col-md-12 col-xlg-12">
+					<h2 class="oprate-dashbord">Auto Generated Loads</h2>
+					<div class="label_select_box">
+						<!--div class="label-select-box-filters" ng-show = "fetchnewsearch == false">
+							<p>Filter</p>
+							<select name="label_name" class='form-control'  ng-model='search_label' ng-change="changeDriverLoads(search_label);" csSelect>
+								<option value='all'>Select Driver</option>
+								<option value='{{key1}}' ng-repeat='(key1, value1) in labelArray'>{{value1}}</option>
+							</select>
+							<span class="glymphic-span" ng-show="newChangeDriverLoads == true"><i class="glyphicon glyphicon-refresh spinning"></i></span>
+						</div-->
+					</div>
+				</div>
+				<!-- button ng-if="showFirstLi == true" data-toggle="modal" class="btn btn-primary fetch fetch-toggle" ng-click="showRightSideBar()" href="#modalSlideLeft" ><img src="./pages/img/map-p.png" ></button -->
+			</div>
+	
+			<div class="row invocie-block-row">
+				<div class="col-md-12 col-xlg-12">
+					<div class="load-new-block-table">
+						
+						<div class="loadtable">
+						
+						
+						<div class="panel-body start-over no-right-margin">
+							
+							<div class="load-tabe-auto job-list truckstopJobs" ng-class="showRouteOnMap == true ? 'change-table-height start-over' : ''" >
+								<h2 class="itenary-truck-heading">{{tableTitle[0]}}</h2>
+												
+									<table id="data" datatable="ng" dt-options="dtOptions" width="100%" class="fixed-thead table table-striped" cell-padding="0" cell-spacing="0">
+									<thead>
+										<tr>
+											<th>Bond</th> 
+											<th>Phone</th> 
+											<th>TRLR</th>
+											<th>AGE</th>  
+											<th>F/L</th> 
+											<th>PICKUP</th> 
+											<th>ORIGIN CITY</th>
+											<th>ST</th>
+											<th>DIST</th>
+											<th class="dest-left-text">Destination City</th>
+											<th>ST</th>											
+											<!-- <th>DIST</th>	 -->
+											<th>PAYMENT</th> 										
+											<th>RPM</th> 										
+											<th>MILES</th> 
+											<th>LENGTH</th> 										
+											<th>Weight</th>  
+											<!-- <th>EXP</th> -->
+											<th>COMPANY</th>
+											<th>FUEl</th> 
+											<th>DEAD MI</th>  
+											<th>Profit</th>  
+											<th>Profit %</th>  
+											<th class="text-center">ACTION</th>  
+										</tr>
+									</thead>
+									<tbody>
+										
+										<tr data-uinfo="{{value.ID}}" ng-repeat="(key3,value) in loadsData">
+									
+											<td>{{value.Bond}}</td>
+											<td>{{value.PointOfContactPhone}}</td>
+											<td class="short-width">{{value.Equipment}}</td>
+											<td>{{value.Age}}</td>
+											<td>{{value.LoadType}}</td>
+											<td>{{value.PickUpDate}}</td>
+											<td class="text-same-lower"><span>{{value.OriginCity|capitalize}}</span></td>
+											<td class="state-capital">{{value.OriginState}}</td>
+											<td class="">{{value.OriginDistance}}</td>											
+											<td class="text-same-lower ex-large-width"><span>{{value.DestinationCity|capitalize}}</span></td>
+											<td class="state-capital">{{value.DestinationState}}</td>
+											<!-- <td class="text-center ">{{value.DestinationDistance}}</td> -->
+											<td ng-class="value.highlight == 1 ? 'highlight' : ''">{{value.Payment | currency:"$":2}}</td>	
+											<td>{{ value.RPM }}</td>	
+											<td>{{value.Miles}}</td>
+											<td>{{value.Length}}</td>
+											<td>{{value.Weight}}</td>
+											<!-- <td class="text-center">{{value.ExperienceFactor}}</td> -->
+											<td class="text-same-lower"><span>{{value.CompanyName|capitalize}}</span></td>
+											<td class="text-same-lower">{{value.FuelCost}}</td>					
+											<td>{{value.deadmiles}}</td>
+											<td>{{value.profitAmount | currency:"$":2}}</td>
+											<td>{{value.percent}}</td>
+											<!--td class="text-center" ng-show="showtdvalue == true ">{{value}}</td-->
+											<td class="text-center"> 
+												
+												<a title="Load Detail" class="icon-action search-il" ng-click="editSaveLoad(value.ID,'',value.deadmiles,value.Payment)" >
+													<i class="fa fa-search"></i>
+												</a>
+												<a title="Special Information" class="icon-action edit-il" ng-click="fetchSpecialNote(value.ID)" >
+													<i class="fa fa-info"></i>
+												</a>
+												<a title="Not Interested" class="icon-action del-il" ng-click="removeItenaryLoad(value.ID,$event)" >
+													<i class="fa fa-trash"></i>
+												</a>
+												
+												<a class="icon-action iteration round-shape" title="Add To Iternary" ng-click="getRepitionData(value,tableTitle[0],$event)" ><img src="./pages/img/map-p.png" ></a>
+												
+											</td>
+										</tr>
+									</tbody>
+								</table>
+								</div>
+							
+								<div class="show-google-cover" style="margin-top:20px;" ng-show="showRouteOnMap == true">
+								<div class="show-google-map-route" ng-show="showRouteOnMap == true">
+									<div id="map_canvas"></div>
+									<div class="itinery-section" data-jquery-scrollbar="jqueryScrollbarOptions">
+										<div class="itinery-section-inner">
+											<h4>Itinerary
+											
+												<a ng-click = "changeClass()"><i ng-class = "{'fa fa-angle-left' : iClass == false,'fa fa-angle-right' : iClass == true}" aria-hidden="true"></i></a>
+											</h4>
+											<div class="itinery-content-cover">
+												<div class="itinery-content-row"  ng-repeat="rows in newRowsArray">
+													<div class="itinery-content">
+														{{ rows.OriginCity|capitalize }} {{ rows.OriginState|capitalize }}
+													</div>
+													<div class="itinery-content">
+														{{ rows.DestinationCity|capitalize }} {{ rows.DestinationState|capitalize }} 
+													</div>
+													<div class="itinery-content itinery-content-last">												 
+														<a title="Load Detail" class="icon-action search-il" ng-click="editSaveLoad(rows.ID,'',rows.deadmiles,rows.Payment)">
+															<i class="fa fa-search"></i>
+														</a>
+														<a class="icon-action del-il" title="Delete from chain" ng-click="removeItenaryLoadSide(rows.ID,$event,rows.PickUpDate,rows.OriginDistance,$index,rows)">
+															<i class="fa fa-trash"></i>
+														</a>
+														<a class="icon-action iteration round-shape" title="Add To Iternary" ng-click="getRepitionData(rows,tableTitle[0],$event,$index)"><img src="./pages/img/map-p.png"></a>
+													</div>
+													
+												</div>
+																							
+											</div>
+										</div>
+									</div>
+									<div class="itinery-distance-detail">
+										<p>total distance {{ totalMiles }} miles<i class="fa fa-angle-right" aria-hidden="true"></i>dead miles {{ totalDeadMiles }} miles <i class="fa fa-angle-right" aria-hidden="true"></i>
+										time {{ totalWorkingHours }} hours <i class="fa fa-angle-right" aria-hidden="true"></i>profit {{ totalProfitPercent }} %</p>
+									</div>
+								</div>
+								</div>
+								
+								<div class="gantt-chart" ng-show="showGantt == true">
+									<div gantt
+                                         data="data"
+                                        timespans="timespans"
+                                        show-side="options.labelsEnabled"
+                                        daily="options.daily"
+                                        filter-task="{'name': options.filterTask}"
+                                        filter-row="{'name': options.filterRow}"
+                                        sort-mode="options.sortMode"
+                                        view-scale="options.scale"
+                                        column-width="getColumnWidth(options.width, options.scale, options.zoom)"
+                                        auto-expand="options.autoExpand"
+                                        task-out-of-range="options.taskOutOfRange"
+                                        from-date = "options.fromDate"
+                                        to-date = "options.toDate"
+                                        allow-side-resizing = "options.allowSideResizing"
+                                        task-content = "options.taskContentEnabled ? options.taskContent : undefined"
+                                        row-content = "options.rowContentEnabled ? options.rowContent : undefined"
+                                        current-date="options.currentDate"
+                                        current-date-value="options.currentDateValue"
+                                        headers="options.width && options.shortHeaders || options.longHeaders"
+                                        headers-formats="headersFormats"
+                                        max-height="options.maxHeight && 300 || 0"
+                                        time-frames="options.timeFrames"
+                                        date-frames="options.dateFrames"
+                                        time-frames-non-working-mode="options.timeFramesNonWorkingMode"
+                                        time-frames-magnet="options.timeFramesMagnet"
+                                        api="options.api"
+                                        column-magnet="options.columnMagnet">
+                                        <gantt-tree enabled="options.sideMode === 'Tree' || options.sideMode === 'TreeTable'"
+                                                    header-content="options.treeHeaderContent"
+                                                    keep-ancestor-on-filter-row="true">
+                                        </gantt-tree>
+                                        <gantt-table enabled="options.sideMode === 'Table' || options.sideMode === 'TreeTable'"
+                                                     columns="options.sideMode === 'TreeTable' ? options.treeTableColumns : options.columns"
+                                                     headers="options.columnsHeaders"
+                                                     classes="options.columnsClasses"
+                                                     formatters="options.columnsFormatters"
+                                                     contents="options.columnsContents"
+                                                     header-contents="options.columnsHeaderContents">
+                                        </gantt-table>
+                                        <gantt-groups enabled="options.groupDisplayMode === 'group' || options.groupDisplayMode === 'overview' || options.groupDisplayMode === 'promote'" display="options.groupDisplayMode"></gantt-groups>
+                                        <gantt-tooltips template-url="assets/plugins/angular-gantt/angular-tooltip/tooltip.tmpl.html" ></gantt-tooltips>
+                                        <gantt-bounds></gantt-bounds>
+                                        <gantt-progress></gantt-progress>
+                                        <gantt-sortable></gantt-sortable>
+                                        <gantt-movable enabled="!options.readOnly"></gantt-movable>
+                                        <gantt-draw-task
+                                            enabled="options.canDraw"
+                                            move-threshold="2"
+                                            task-factory="options.drawTaskFactory">
+                                        </gantt-draw-task>
+                                        <gantt-overlap></gantt-overlap>
+                                        <gantt-resize-sensor></gantt-resize-sensor>
+                                    </div>
+								</div>
+						
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<ng-include src="'./assets/templates/truckstop/iteration_modal.html'"></ng-include>
+<ng-include src="'./assets/templates/truckstop/modals.html'"></ng-include>
+
+<style>
+.show-google-map-route {
+  float: left;
+  width: 100%;
+  margin-top:20px;
+  border: 4px solid #34d6c7;
+
+
+}
+
+.change-table-height {
+	max-height: 640px;
+}
+#map_canvas {
+
+}
+
+</style>
+
+<script>
+$(document).ready(function(){
+	$('.itinery-section-inner h4 a').click(function(){
+		$('.itinery-section').toggleClass('slide-close');
+		$('.itinery-distance-detail').toggleClass('slide-fullwidth');
+	});
+});
+</script>
+

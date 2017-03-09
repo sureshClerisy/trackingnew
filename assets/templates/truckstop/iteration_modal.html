@@ -1,0 +1,149 @@
+<!-- Estimated Time for next Iteration-->	
+
+<div class="modal fade slide-down" id="iterationNextLoadModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content-wrapper">
+			<div class="modal-content">
+			
+				<div class="modal-header model-heading-main">
+					<div class="model-heading-inner">
+						<h4 class="modal-title" id="myModalLabel">{{ languageArray.nextIteration }}</h4>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					</div>
+				</div>
+			 <form method="POST" name="newIteration" role="form" ng-submit="fetchNewIterationLoad()">
+				<div class="modal-body main-pop-body">
+					
+					<div class="popup-body-bg popup-body-bg1">
+						<div class="row">
+							<div class='col-lg-12'>
+								<div class="col-lg-12">
+									{{ languageArray.estimatedTime }}<b> {{ iterationPopData.tEstimatedTimeInHours }} </b> + <b> {{ iterationPopData.estimatedTimeDeadMile }}</b>{{ languageArray.deadMiles }}+ <b>4 {{ languageArray.hours }} </b>{{ languageArray.loadNUnload }}
+								</div>
+								<!-- <div class="col-lg-12">
+									Driving Hours: <input type="text" class="iteration-pop-input" ng-model="dailyWorkingHoursLimit" ng-change="changeDailyHour(dailyWorkingHoursLimit)" /> 
+								</div> -->
+							</div>
+							
+							<div class="col-lg-12 top-iteration">
+								<b>{{ iterationPopData.driver_name }} </b> {{ languageArray.willReach }} <b class="bold-b">{{ iterationPopData.OriginCity }} </b>,<b class="bold-b-capital"> {{ iterationPopData.OriginState }}</b> {{ languageArray.on }} <b>{{ iterationPopData.nextPickupDate1 }} </b>
+							</div>
+						</div>
+						<div class="form-group-attached1">
+							<div class="row clearfix">
+								<div class='col-lg-12'>
+									<b class="search-record">{{ languageArray.searchingRecordsFor }}</b>
+									<div pg-form-group class="form-group form-group-default">
+										<label>{{ languageArray.date }}</label>
+										<div class="input-group date" ui-jq="datepicker" ui-options='{format: "yyyy-mm-dd",startDate: {{ mindate}}, autoclose: true}'>
+											<input type="text" ng-click="refreshDatepicker($event)"  value="{{iterationPopData.nextPickupDate}}" ng-model="iterationPopData.nextPickupDate"  class="form-control"><span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row clearfix">	
+								<div class='col-lg-12'>
+									<div class="checkbox check1 check-success multi-state-check">
+										<input type="checkbox" ng-click="iterationcheckmultistate(); iterationShowMultiState()" ng-checked="iterationpopcheck" id="checkboxMultiIterations"/>
+							            <label for="checkboxMultiIterations">{{ languageArray.multistate }}</label>
+									</div>
+									<div pg-form-group class="form-group form-group-default newtxtarea textarea-drag">
+										<label>{{ languageArray.destination }}</label>
+										<div class="input-group date" ng-if="!iterationpopcheck">
+											<input ng-model="iterationPopData.singleDestination" ng-change="askCustomCitiesSuggestions(iterationPopData.singleDestination, 'fromChain')" class="form-control ng-pristine ng-scope ng-empty ng-invalid ng-invalid-required ng-touched" placeholder="Please search origin city" autocomplete="off" ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }" type="text" close-on-click-outside="hideAskCustomSuggestionList('fromChain')" />
+										</div>
+										<textarea id="wysiwyg5" readonly="readonly" type="text" ng-if="iterationpopcheck" ng-model="iterationPopData.multiDestinations" class="form-control form-control-txtarea-main wysiwyg demo-form-wysiwyg fill-textBox" wysihtml5 ></textarea>
+
+									</div>
+									<ul class="mlist-unstyled listPlan-searchFrom" ng-show="haveAskCities">
+										<li class="show-pointer" ng-repeat="obj in askSuggestedCities" ng-click="selectAskSuggestedCity(obj.city,obj.state_code,obj.country,'fromChain')" shouldFocus>{{obj.city}}, {{ obj.state_code }}, {{ obj.country }}</li>
+									</ul>
+
+								</div>
+							</div>					
+								
+							</div>
+						</div>
+					</div>
+					<!-- Advance Search -->
+					
+					
+					
+		
+				
+				<div class="modal-footer">
+					<button class="btn btn-primary btn-cons m-b-10" type="submit" ng-disabled="newIteration.$invalid"><i ng-show="newIterationButtonShow == true" class="glyphicon glyphicon-refresh spinning"></i><i ng-show="newIterationButtonShow != true" class="fa fa-search"></i><span class="bold"> {{ languageArray.searchButton }} </span>
+                    </button>				
+				</div>
+			
+			</form>	
+			</div>
+		</div>
+	</div>  
+			<!--------table-full-width------>
+</div>	<!----modal fade-------------->
+
+<!-- Estimated Time for next Iteration End -->	
+
+<div class="modal fade slide-down" id="askForCustomSearch" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content-wrapper">
+			<div class="modal-content">
+				<div class="modal-header model-heading-main">
+					<div class="model-heading-inner">
+						<h4 class="modal-title">Search From </h4>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					</div>
+				</div>
+				<form method="POST" class="askForCustomSearch" name="askCustomForm" role="form" ng-submit="customLocationSearch()">
+					<div class="modal-body main-pop-body ">
+						<div class="popup-body-bg popup-body-bg1">
+							<div class="form-group-attached1">
+								<div class="row clearfix">
+									<div class='col-lg-12 no-padding'>
+										<div pg-form-group class="form-group form-group-default">
+											<label>{{ languageArray.date }}(s)</label>
+											<div class="input-group date" ui-jq="datepicker" ui-options='{format: "yyyy-mm-dd",multidate : true,multidateSeparator: ", ", startDate: {{ mindate}}, autoclose: false}'>
+												<input type="text" ng-click="refreshDatepicker($event)" required ng-model="askCustom.date"  class="form-control" />
+												<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+											</div>
+										</div>
+									</div>
+									<div class='col-lg-12'>
+										<div class="checkbox check1 check-success multi-check-right">
+											<input type="checkbox" ng-click="iterationcheckmultistate('searchFrom')" ng-checked="iterationpopcheck_searchFrom" id="checkboxMultiIterations-searchFrom"/>
+											<label for="checkboxMultiIterations-searchFrom">{{ languageArray.multistate }}</label>
+										</div>
+										
+										<div pg-form-group class="form-group form-group-default multi-default-left">
+											<label>Origin</label>
+											<div class="input-group date" ng-if="multistateSearchFromCheck == 0">
+												<input required ng-model="askCustom.searchFrom" ng-change="askCustomCitiesSuggestions(askCustom.searchFrom)" class="form-control ng-pristine ng-scope ng-empty ng-invalid ng-invalid-required ng-touched" placeholder="Please search origin city" autocomplete="off" ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }" type="text" close-on-click-outside="hideAskCustomSuggestionList()" />
+											</div>
+											
+											<textarea readonly="readonly" ng-model="askCustom.multiOrigins"  class="form-control form-control-txtarea-main wysiwyg demo-form-wysiwyg close-expand" wysihtml5 ng-if="multistateSearchFromCheck == 1"></textarea>
+																									
+										</div>
+										
+										
+										<ul class="mlist-unstyled listPlan-searchFrom" ng-show="haveAskCities">
+											<li class="show-pointer" ng-repeat="obj in askSuggestedCities" ng-click="selectAskSuggestedCity(obj.city,obj.state_code,obj.country)" shouldFocus>{{obj.city}}, {{ obj.state_code }}, {{ obj.country }}</li>
+										</ul>											
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- Advance Search -->
+					<div class="modal-footer">
+						<button class="btn btn-primary btn-cons " type="submit" ng-disabled="askCustomForm.$invalid">
+							<i ng-show="askCustomFormLoader == true" class="glyphicon glyphicon-refresh spinning"></i>
+							<i ng-show="askCustomFormLoader != true" class="fa fa-search"></i>
+							<span class="bold"> {{ languageArray.searchButton }} </span>
+	                    </button>				
+					</div>
+				</form>	
+			</div>
+		</div>
+	</div>  
+</div>

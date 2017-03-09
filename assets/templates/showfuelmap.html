@@ -1,0 +1,187 @@
+
+<script>
+
+
+	jQuery(function(){
+	if(!window.google||!window.google.maps){
+		
+	  var script = document.createElement('script');
+		script.type = 'text/javascript';
+		script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyAzqFSjwfCSB_x9jNIfBwOI2k-BqV2NT9c&v=3&libraries=places&callback=initialize';
+		document.body.appendChild(script);
+	}
+	else{
+
+	  initialize();
+	}});
+	</script>
+
+
+	<script>
+	var infowindow = new google.maps.InfoWindow();
+	var directions = new google.maps.DirectionsService();
+	var renderer = new google.maps.DirectionsRenderer({ 
+	  infoWindow: infowindow,
+	  polylineOptions: {
+	   // strokeColor: '#C83939',
+		strokeOpacity: 0,
+		strokeWeight: 1,
+		}
+	});
+	var map;
+
+	function initialize() {
+
+	  var mapOptions = {
+		zoom: 14,
+		scrollwheel: false,
+		center: new google.maps.LatLng(40.7482333, -73.8681295),
+		mapTypeId: google.maps.MapTypeId.ROADMAP
+	  };
+	  
+		map = new google.maps.Map(document.getElementById('map_canvas'), mapOptions);
+		route();
+		//initMap();
+	}
+
+	function route() {
+		var directions = new google.maps.DirectionsService();
+		var renderer = new google.maps.DirectionsRenderer({
+			infoWindow: infowindow,
+			polylineOptions: {
+				strokeOpacity: 0,
+				strokeWeight: 1,
+			}
+		});
+		
+	  var request = {
+		origin: document.getElementById('from').value,
+		destination: document.getElementById('to').value,
+		travelMode: google.maps.DirectionsTravelMode.DRIVING,
+	   // provideRouteAlternatives: true
+	  };
+
+	  var panel = document.getElementById('panel');
+	  panel.innerHTML = '';
+		directions.route(request, function(response, status) {
+		 
+			if (status == google.maps.DirectionsStatus.OK) {
+				renderer.setDirections(response);
+				renderer.setMap(map);
+				renderer.setPanel(panel);
+				  //renderDirectionsPolylines(response);
+				   new google.maps.DirectionsRenderer({
+							map: map,
+							directions: response,
+							routeIndex: 0
+						});
+						
+			} else {
+			  renderer.setMap(null);
+			  renderer.setPanel(null);
+			}
+		});
+
+	}
+
+
+	/*
+	google.maps.event.addDomListener(window, "load", initialize);
+	*/
+
+	</script>
+
+	<script>
+		  // This example requires the Places library. Include the libraries=places
+		  // parameter when you first load the API. For example:
+		  // <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places">
+
+		  var mapStop;
+		  var infowindowStop;
+
+		function initMap() {
+
+			mapStop = new google.maps.Map(document.getElementById('map'), {
+				zoom: 13,
+				 scrollwheel: false,
+				center: new google.maps.LatLng(40.7482333, -73.8681295),
+			});
+
+			infowindowStop = new google.maps.InfoWindow();
+			var directionsService = new google.maps.DirectionsService();
+			var requestStop = {
+				origin: document.getElementById('from').value,
+				destination: document.getElementById('to').value,
+				travelMode: google.maps.DirectionsTravelMode.DRIVING,
+			};
+
+				directionsService.route(requestStop, function(result, status) {
+					if (status == google.maps.DirectionsStatus.OK) {
+						
+						new google.maps.DirectionsRenderer({
+							map: mapStop,
+							directions: result,
+							routeIndex: 0
+						});
+						var currentRouteArray = result.routes[0];
+						var currentRoute = currentRouteArray.overview_path;
+									
+						latArray = [];
+						lngArray = [];
+						var j = 0;
+						for (var x = 0; x < currentRoute.length; x++) {
+							if( x % 4 == 0 && x != 0) {
+								latArray[j] = currentRoute[x].lat(); //Returns the latitude
+								lngArray[j] = currentRoute[x].lng(); //Returns the longitude
+								j++;
+							}
+						}
+							
+						latLength = latArray.length;
+						console.log(latLength);
+						
+						for( var i = 0; i < latLength; i++) {
+							(function(i){
+							setTimeout(function(){
+								paymont = {lat: latArray[i], lng: lngArray[i]};
+							//	console.log(paymont);
+								//return false;
+								var service = new google.maps.places.PlacesService(map);
+									
+									service.nearbySearch({
+										location: paymont,
+										radius: 3000,
+										type: ['gas_station']
+									}, callback);
+								}, 500 * i);
+							}(i));
+						}
+					}
+				});
+			
+		}
+
+		function callback(results, status) {
+			if (status === google.maps.places.PlacesServiceStatus.OK) {
+				for (var i = 0; i < results.length; i++) {
+					createMarker(results[i]);
+				}
+			}
+		}
+	   
+		function createMarker(place) {
+			var placeLoc = place.geometry.location;
+			var marker = new google.maps.Marker({
+				map: mapStop,
+				position: place.geometry.location
+			});
+
+			google.maps.event.addListener(marker, 'click', function() {
+				console.log(place);
+				infowindowStop.setContent(place.name);
+				infowindowStop.open(mapStop, this);
+			});
+		}
+		
+
+    </script>

@@ -1,0 +1,100 @@
+      <!-- START PAGE CONTENT WRAPPER -->
+      <div class="page-content-wrapper ">
+        <!-- START PAGE CONTENT -->
+        <div class="content sm-gutter">
+          <!-- START CONTAINER FLUID -->
+          <div class="container-fluid padding-25 sm-padding-10">
+			<div class="row">
+				<div class="col-md-12 col-xlg-12">
+					<div ng-show="alertmsg == true&&alertdeletemsg != true&&alertdeleteErrormsg != true" class="alert alert-success" role="alert">
+					<button ng-click = "hidedeletemessage()" class="close"></button>
+					{{Message}}
+					</div>
+					<div ng-show="alertErrorMsg == true&&alertdeletemsg != true&&alertdeleteErrormsg != true" class="alert alert-danger" role="alert">
+					<button ng-click = "hidedeletemessage()" class="close"></button>
+					{{errorMessage}}
+					</div>
+					<div ng-show="alertdeletemsg == true&&alertdeleteErrormsg != true" class="alert alert-success" role="alert">
+					<button ng-click = "hidedeletemessage()" class="close"></button>
+					{{truckdeleteMessage}}
+					</div>
+					<div ng-show="alertdeleteErrormsg == true" class="alert alert-danger" role="alert">
+					<button ng-click = "hidedeletemessage()" class="close"></button>
+					{{truckdeleteMessage}}
+					</div>
+					<div class="commen-heading truck-page">
+						<h2 class="oprate-dashbord">{{ languageArray.truckHeading }}</h2>
+					</div>
+				</div>
+			</div>
+			
+			<div class="row invocie-block-row">
+				<div class="col-md-12 col-xlg-12">
+					<div class="load-new-block-table">
+						<div class="panel-body add-new-data">
+							<div class="load-tabe-auto map-load-section">
+								<a href="#/addTruck" class="add-new-data-button"><button class="btn btn-primary"><i class="fa fa-plus" style="margin-right:3px"></i><span class="bold"> {{ languageArray.AddTruckButton }}</span></button></a>
+								<table datatable="ng" dt-options="dtOptions" class=" table tr-hover table-hover table-striped driver-table" id="tableWithExportOptions">
+									<thead>
+										<tr>
+											<th>{{ languageArray.truckNumbetTableTh }}</th>
+											<th>{{ languageArray.truckNumbetTableThvin }}</th>
+											<th>{{ languageArray.truckNumbetTableThmodel}}</th>
+											<th>{{ languageArray.truckNumbetTableThdname}}</th>
+											<th>{{ languageArray.dispatcher}}</th>
+											<th>{{ languageArray.truckNumbetTableThvtype}}</th>
+											<th>{{ languageArray.truckNumbetTableThpspeed}}</th>
+											<th>{{ languageArray.truckNumbetTableThweight}}</th>
+											<th class="text-center">{{ languageCommonVariables.commonTableThAction }}</th>
+										</tr>
+									</thead>
+									<tbody>
+										
+										<tr ng-repeat="value in data" >	
+											<td>{{ value.label }} </td>
+											<td>{{ value.vin }} </td>
+											<td>{{ value.model }}</td>
+											<td>{{ value.teamDriverName !== null && value.teamDriverName !== undefined && value.teamDriverName !== '' ? value.teamDriverName : value.driverName }}</td>
+											<td>{{ value.dispatcher }}</td>
+											<td>{{ value.vehicleType }}</td>
+											<td>{{ value.permitted_speed }} </td>
+											<td>{{ value.cargo_capacity}} lbs</td>
+																			 
+											<td class="text-center action-btn-ryt"> 
+												
+                                                <div class="export-options-container">
+													<div class="exportOptions">
+														<div class="DTTT btn-group">
+															<a href="#/editTruck/{{value.id}}" class="btn btn-default DTTT_button_pdf" title="{{languageCommonVariables.editTruck}}" ui-jq="tooltip" >
+																<span><i class="fa fa-edit" aria-hidden="true"></i></span>
+															</a>
+															<!--a class="btn btn-default DTTT_button_copy" title="{{languageCommonVariables.deleteTruck}}" ui-jq="tooltip" ng-click='removeTruck(value.id,$index)' >
+																<span><i class="fa fa-trash" aria-hidden="true"></i></span>
+															</a-->
+															<a class="btn btn-default DTTT_button_csv" title="{{languageCommonVariables.deactivateTruck}}" ui-jq="tooltip" ng-click="changeVehicleStatus(value.id,value.vehicle_status,$index)" ng-if="value.vehicle_status == 1">
+																<span><i class="fa fa-check-square"></i></span>
+															</a>
+															<a class="btn btn-default DTTT_button_csv" title="{{languageCommonVariables.activateTruck}}" ui-jq="tooltip" ng-click="changeVehicleStatus(value.id,value.vehicle_status,$index)" ng-if="value.vehicle_status == 0 || value.vehicle_status == ''">
+																<span><i class="fa fa-square-o"></i></span>
+															</a>
+															<a class="btn btn-default DTTT_button_csv" data-original-title="{{languageCommonVariables.exportCSV}}" ui-jq="tooltip" ng-click="exportCsv($event,'vehicles',value.id)">
+																<span><i class="pg-grid"></i></span>
+															</a>
+														</div>
+													</div>
+												</div>
+												
+											</td>
+										</tr>
+									</tbody>
+								</table>
+
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<ng-include src="'./assets/templates/common_modals.html'"></ng-include>

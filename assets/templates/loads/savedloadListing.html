@@ -1,0 +1,855 @@
+  
+
+<script>
+jQuery(function(){
+if(!window.google||!window.google.maps){
+	
+  var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = 'http://maps.google.com/maps/api/js?key=LjagRYIsTqr14TgfZD9u8a1F2fdglWmOj4268cHs&&libraries=places';
+    document.body.appendChild(script);
+}
+else{
+
+ // initAutocomplete();
+}});
+</script>
+      <!-- START PAGE CONTENT WRAPPER -->
+      <div class="page-content-wrapper ">
+        <!-- START PAGE CONTENT -->
+        <div class="content sm-gutter">
+          <!-- START CONTAINER FLUID -->
+          <div class="container-fluid padding-25 sm-padding-10">
+			  <!--p ng-if='LoadMessage != "" || LoadMessage != "undefined"' class='successMessages'>{{LoadMessage}}</p-->
+			  <div ng-show="alertloadmsg == true" class="alert alert-success" role="alert">
+						<button ng-click = "hideloadmessage()" class="close"></button>
+						{{LoadMessage}}
+						</div>
+			<div class="row">
+				<div class="col-md-12 col-xlg-12">
+					<h2 class="oprate-dashbord">{{ languageArray.planthsavedloads }}</h2>
+				</div>
+			</div>
+			
+			<div class="row invocie-block-row">
+				<div class="col-md-12 col-xlg-12">
+					<div class="load-new-block-table">
+						<div class="panel-body">
+							<div class="load-tabe-auto">
+								
+								<table  datatable="ng" dt-options="dtOptions" class=" table table-striped row-border hover" id="tableWithExportOptions">
+									<thead>
+										<tr>
+											<th class="text-center">{{ languageArray.bondLoadTableThHeading }}</th>
+											<th>{{ languageCommonVariables.commonTableThPhone }}</th>
+											<th>{{ languageArray.trlrLoadTableThHeading }}</th>
+											<th>{{ languageArray.planthfl }}</th>
+											<th>{{ languageArray.planthcompany }}</th>
+											<th>{{ languageArray.planthorigincity }}</th>
+											<th>{{ languageArray.planthst }}</th>
+											<th>{{ languageArray.planthpickup }}</th>
+											<th>{{ languageArray.planthdesticity }}</th>
+											<th>{{ languageArray.planthst }}</th>
+											<th>{{ languageArray.planthweight }}</th>
+											<th>{{ languageArray.planthmiles }}</th>
+											<th>{{ languageArray.planthvehical }}</th>
+											<th>{{ languageArray.planthpayment }}</th>
+											<th>{{ languageCommonVariables.commonTableThStatus }}</th>
+											<th class="text-center">{{ languageCommonVariables.commonTableThAction }}</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr dir-paginate="value in data | itemsPerPage:10" total-items="totalItems">
+										
+											<td class="text-center">{{ value.bond }}</td>
+											<td>{{ value.posting_phone }}</td>
+											<td>{{ value.equipment_options }}</td>
+											<td>{{ value.load_size }} </td>
+											<td class="company_name"><span class="text-comp-name">{{ value.posting_name|capitalize }}</span></td>
+											<td class="text-same-lower">{{ value.origin_city|capitalize}}</td>
+											<td class="state-capital">{{ value.origin_state }}</td>
+											<td>{{ value.pickup_date }}</td>
+											<td class="text-same-lower" >{{ value.destination_city|capitalize}}</td>
+											<td class="state-capital">{{ value.destination_state }}</td>
+											<td>{{ value.weight }}</td>
+											<td>{{ value.distance }}</td>
+											<td>{{ value.equipment }}</td>
+											<td>{{ value.payment_amount }}</td>
+											<td>{{ value.status }}</td>
+																			
+										 
+											<td class="text-center"> 
+												<!--a href="#" class="icon-action edit"><i class="fa fa-edit"></i></a--> 
+												<a class="icon-action search round-shape" ng-click="editSaveLoad(value.truckstopID,value.id)" ><i class="fa fa-search"></i></a> 
+												<a href="javascript:void(0)" ng-click="remove(value.id,$index)" class="icon-action del round-shape"><i class="fa fa-trash"></i></a> 
+											</td>
+										</tr>
+									</tbody>
+								</table>
+
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+ 
+
+<!-- Create Modal -->
+<div class="modal fade slide-up " id="edit-load" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="popup-overlay" >
+		<div class="popup-container-wid">
+		<div class="popup-container-wid1" data-jquery-scrollbar="jqueryScrollbarOptions">
+			<div class="popup-tb-main">
+				<div class="popup-cell-main">
+					<!--content-popup-->
+					<div class="popup-content">
+						<ul class="popup-tab-row">
+							<li ng-class="showhighlighted == 'loadDetail' ? 'active' : ''" ><a href="javascript:void(0)" ng-click="editSaveLoad(editSavedLoad.ID,primaryLoadId)" >Load Details</a></li>
+							<li ng-class="showhighlighted == 'matchTruck' ? 'active' : ''" ><a href="javascript:void(0)" ng-click="fetchMatchingTruck( editSavedLoad.ID,primaryLoadId )">
+								<span ng-show="showMatchingTrucks == true"><i class="glyphicon glyphicon-refresh spinning"></i></span>
+								Truck Details</a></li>
+							<li ng-class="showhighlighted == 'showMap' ? 'active' : ''" ><a href="javascript:void(0)" ng-click="showRelatedMap( editSavedLoad.ID,primaryLoadId )">Maps</a></li>
+							
+						</ul>
+						<a href="#" class="close" data-dismiss="modal"><img src="assets/img/close.png"/></a>
+						
+					<!--p ng-if='Message != "" || Message != "undefined"' class='successMessages'>{{Message}}</p-->
+					
+						<div class="popup-inner-content-main"  ng-show="editLoads == true">
+							<div ng-show="alertmsg == true" class="alert alert-success" role="alert">
+						<button ng-click = "hidemessage()" class="close"></button>
+						{{Message}}
+						</div>
+							<div class="pop-up-orign">
+								<div class="orign-left-block">
+									<div class="orign-txt-block">
+										<span class="popup-origin">
+											<i class="fa  fa-map-marker"></i>
+											<span>Origin </span>
+											{{ editSavedLoad.OriginCity}}, {{ editSavedLoad.OriginState }}  {{ editSavedLoad.OriginCountry }} 
+										</span>
+									</div>
+									<div class="orign-txt-block">
+										<span class="popup-origin">
+											<i class="fa  fa-map-marker red"></i>
+											<span>Destination </span>
+											{{ editSavedLoad.DestinationCity}}, {{ editSavedLoad.DestinationState }}  {{ editSavedLoad.DestinationCountry }}
+										</span>
+									</div>
+								</div>
+								<div class="orign-right-block">
+									<div class="est-block">
+										<p>Loaded Distance <span> <b class="clr-r timer_edit">{{ editSavedLoad.timer_distance }} </b> miles</span> </p>
+									</div>
+									<div class="est-block">
+										<p>Estimated Fuel Cost <span> <b class="clr-b">$137.92 </b> </span> </p>
+									</div>
+									
+									<span class="timer_value" style="display:none;">{{ editSavedLoad.timer_distance }}</span>
+									<div class="est-block">
+										<p>Per Mile <span> <b class="clr-g">{{ editSavedLoad.overall_total_rate_mile }} </b> </span> </p>
+									</div>
+								</div>
+							</div>
+						
+						<form method="POST" name="editLoad" role="form" ng-submit="saveEditLoad(editSavedLoad)"  ng-class="showFormClass == true ? 'saveform' : ''">
+							<div class="lode-detail-outer-block">
+								
+				<div class="enable-disable-inputs">
+								<div class="row-lode-block">
+									<div class="lode1-block-main1" >
+										<div class="truck-lode-block">
+											<div class="pop-up-heading-main">
+												<h2>Load Details <span>Posted: {{ editSavedLoad.PostedOn }}</span></h2>
+												<div class="save-can-block">
+													<!--a href="#" class="save"></a-->
+													<div class="save-cancel" ng-show="save_cancel_div == true">
+														<button type="submit" ng-disabled="editLoad.$invalid" class="save saveTheLoad" title="Save"></button>
+														<a href="javascript:void(0)" ng-click="changeSaveStatus()" class="close1 cancelTheLoad"></a>
+													</div>
+													<a href="javascript:void(0);" ng-click="changeEditStatus()" class="edit1 edit1Load" title="Edit" ng-show = "save_edit_div == true"></a>
+												</div>
+											</div>
+									
+											<div class="edit-input-popblock">
+												<div class="pop-edit-half-block">
+													<div class="pop-full-edit-block1">
+														<div class="pop-edit-row-block">
+															<p>Pick-up Date</p>
+															<!--<div  class="input-group date" ui-jq="datepicker" ui-options='{format: "yyyy-mm-dd"}'  >
+																<input ng-model="editSavedLoad.PickupDate" value="{editSavedLoad.PickupDate}" type="text"  class="mdate form-control">
+																	<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+															</div>-->
+
+
+															<div class="input-block-edit date"  >
+																<input ng-click="refreshDatepicker($event)" autocomplete = "off" class="mdate" type="text" name="pickup_date" value="{{editSavedLoad.PickupDate}}" ng-model="editSavedLoad.PickupDate" datepicker/>
+															</div>
+														</div>
+																									
+														
+														<div class="pop-edit-row-block">
+															<p>Pick-up Time</p>
+															<div class="input-block-edit bootstrap-timepicker">
+																<input type="text" id="timedpicker" name="pickup_time" ng-model="editSavedLoad.PickupTime" timepicker/>
+															</div>
+														</div>
+														
+													<input ng-model="primaryLoadId" type="hidden" name="id" class="form-control" />
+												
+													<!--input type ="hidden" name = "estimated_time" ng-model="editSavedDist.time" /-->
+													<input type ="hidden" name = "bond" ng-model="editSavedLoad.Bond" />
+														<div class="pop-edit-row-block">
+															<p>Origin City</p>
+															<div class="input-block-edit">
+																<input type="text" name="origin_city" ng-model="editSavedLoad.OriginCity" required />
+															</div>
+														</div>
+														<div class="pop-edit-row-block">
+															<p>Origin State</p>
+															<div class="input-block-edit">
+																<!--input type="text" name="origin_state" ng-model="editSavedLoad.OriginState" /-->
+																<select name="origin_state" ng-model="editSavedLoad.OriginState" required >
+																	<option ng-repeat="(key, value ) in statesData" value="{{value.code}}">{{value.label}}</option>
+																</select>
+															</div>
+														</div>
+														<div class="pop-edit-row-block">
+															<p>Origin Country</p>
+															<div class="input-block-edit">
+																<input type="text" name="origin_country" ng-model="editSavedLoad.OriginCountry" required />
+															</div>
+														</div>
+														<div class="pop-edit-row-block">
+															<p>Delivery Date</p>
+															<div class="input-block-edit">
+																<input id="delivery" type="text" autocomplete = "off" ng-click="refreshDatepicker($event)" name="delivery_date" value="{{editSavedLoad.DeliveryDate}}" ng-model="editSavedLoad.DeliveryDate" datepicker/>
+															</div>
+														</div>
+														<div class="pop-edit-row-block">
+															<p>Destination City</p>
+															<div class="input-block-edit">
+																<input type="text" name="destination_city" ng-model="editSavedLoad.DestinationCity" />
+															</div>
+														</div>
+														<div class="pop-edit-row-block">
+															<p>Destination State</p>
+															<div class="input-block-edit">
+																
+																<select name="destination_state" ng-model="editSavedLoad.DestinationState" >
+																	<option ng-repeat="(key, value ) in statesData" value="{{value.code}}">{{value.label}}</option>
+																</select>
+															</div>
+														</div>
+														<div class="pop-edit-row-block">
+															<p>Destination Country</p>
+															<div class="input-block-edit">
+																<input type="text" name="destination_country" ng-model="editSavedLoad.DestinationCountry" /> 
+															</div>
+														</div>
+														<div class="pop-edit-row-block">
+															<p>Equipment</p>
+															<div class="input-block-edit">
+																<input type="text" name="equipment" ng-model="editSavedLoad.EquipmentTypes.Description" required />
+															</div>
+														</div>
+														<div class="pop-edit-row-block">
+															<p>Equipment Options </p>
+															<div class="input-block-edit">
+																<input type="text" name="equipment_options" ng-model="editSavedLoad.EquipmentTypes.Code" />
+															</div>
+														</div>
+														
+													</div>
+												</div>
+												<div class="pop-edit-half-block">
+													<div class="pop-full-edit-block">
+														<div class="pop-edit-row-block">
+															<p>Load Size</p>
+															<div class="input-block-edit">
+																<input type="text" name="load_size" ng-model="editSavedLoad.LoadType" />
+															</div>
+														</div>
+														<div class="pop-edit-row-block">
+															<p>Weight</p>
+															<div class="input-block-edit">
+																<input type="text" name="weight" ng-model="editSavedLoad.Weight" required />
+															</div>
+														</div>
+														<div class="pop-edit-row-block">
+															<p>Length</p>
+															<div class="input-block-edit">
+																<input type="text" name="length" ng-model="editSavedLoad.Length" required />
+															</div>
+														</div>
+														<div class="pop-edit-row-block">
+															<p>Distance</p>
+															<div class="input-block-edit">
+																<input type="text" name="distance" ng-model="editSavedLoad.Mileage"  />
+															</div>
+														</div>
+														<div class="pop-edit-row-block">
+															<p>Payment Amount</p>
+															<div class="input-block-edit">
+																<input type="text" name="payment_amount" ng-model="editSavedLoad.PaymentAmount" />
+															</div>
+														</div>
+														<div class="pop-edit-row-block">
+															<p>Load Quantity</p>
+															<div class="input-block-edit">
+																<input type="text" name="load_quantity" ng-model="editSavedLoad.Quantity" />
+															</div>
+														</div>
+														<div class="pop-edit-row-block">
+															<p>Stops</p>
+															<div class="input-block-edit">
+																<input type="text" name="stops" ng-model="editSavedLoad.Stops" /> 
+															</div>
+														</div>
+														<div class="pop-edit-row-block">
+															<p>Rate</p>
+															<div class="input-block-edit">
+																<input type="text" name="rate" ng-model="editSavedLoad.Rate" /> 
+															</div>
+														</div>
+														<div class="pop-edit-row-block">
+															<p>Posted On</p>
+															<div class="input-block-edit">
+																<input class="mdate" type="text" autocomplete = "off" ng-click="refreshDatepicker($event)" name="posted_on" value = "{{editSavedLoad.PostedOn}}" ng-model="editSavedLoad.PostedOn" datepicker />
+															</div>
+														</div>
+														<div class="pop-edit-row-block">
+															<p>Status</p>
+															<div class="input-block-edit">
+																<select name="status" ng-model="editSavedLoad.JobStatus" >
+																	<option 'assigned'>Assigned</option>
+																	<option 'intransit'>Intransit</option>
+																	<option 'dispatched'>Dispatched</option>
+																	<option 'delivered'>Delivered</option>
+																	<option 'closed'>Closed</option>
+																</select>
+															</div>
+														</div>
+														
+													</div>
+												</div>
+												<div class="notes">
+													<div class="pop-edit-row-block">
+														<p>notes </p>
+														<div class="input-block-edit">
+															<textarea ng-model="editSavedLoad.Notes"></textarea>
+														</div>
+													</div>
+													<div class="pop-edit-row-block">
+														<p>Extra Info </p>
+														<div class="input-block-edit">
+															<textarea  ng-model="editSavedLoad.ExtraInfo"></textarea>
+														</div>
+													</div>
+												</div>
+											</div>
+											
+										</div>
+									</div>
+									<div class="lode1-block-main2">
+										<div class="truck-lode-block">
+											
+											<div class="pop-up-heading-main">
+												<h2>Company Details</h2>
+												<div class="save-can-block" >
+													<div class="save-cancel" ng-show="save_cancel_div == true">
+														<button type="submit" ng-disabled="editLoad.$invalid" class="save saveTheLoad" title="Save"></button>
+														<a href="javascript:void(0)" ng-click="changeSaveStatus()" class="close1 cancelTheLoad"></a>
+													</div>
+													<a href="javascript:void(0)" ng-click="changeEditStatus()" class="edit1 edit1Load" title="Edit" ng-show = "save_edit_div == true"></a>
+												</div>
+											</div>
+											<div class="ratig-block1">
+												<p>{{ editSavedLoad.TruckCompanyName }}</p>
+												<div class="rating-str">
+													
+													<img ng-src="pages/img/green-dot.png" ng-if="editSavedLoad.brokerStatus == 'Approved'">
+													<img ng-src="pages/img/red-dot.png" ng-if="editSavedLoad.brokerStatus == 'Not Approved'">
+													<span>{{ editSavedLoad.brokerStatus }}</span>
+<!--
+													<img src="assets/img/str.png" >
+													<img src="assets/img/str.png" >
+													<img src="assets/img/str.png" >
+													<img src="assets/img/str.png" >
+													<img src="assets/img/str.png" >
+-->
+												</div>
+											</div>
+											<div class="contact-info contact-info-edit-frm">
+												<h2>Contact Information</h2>
+												<div class="info-row pop-edit-row-block">
+													<p><i class="fa fa-user"></i>
+														Handle</p>
+														<div class="input-block-edit">
+															<input type="text" name="posting_name" ng-model="editSavedLoad.PointOfContact" /> 
+														</div>
+												</div>
+												<div class="info-row pop-edit-row-block">
+													<p><i class="fa fa-user"></i>Contact</p>
+														<div class="input-block-edit">
+															<input type="text" name="posting_contact" ng-model="editSavedLoad.pointOfContactPhone" /> 
+														</div>													
+												</div>
+												<div class="info-row pop-edit-row-block">
+													<p><i class="fa fa-envelope"></i>Email</p>
+														<div class="input-block-edit">
+															<input type="text" name="posting_email" ng-model="editSavedLoad.TruckCompanyEmail" />
+														</div>													
+												</div>
+												<div class="info-row pop-edit-row-block">
+													<p><i class="fa fa-phone"></i>Office</p>
+														<div class="input-block-edit">
+															<input type="text" name="posting_phone" ng-model="editSavedLoad.TruckCompanyPhone" />
+														</div>													
+												</div>
+												<div class="info-row pop-edit-row-block">
+													<p><i class="fa fa-fax"></i>Fax</p>
+														<div class="input-block-edit">
+															<input type="text" name="posting_fax" ng-model="editSavedLoad.TruckCompanyFax" />
+														</div>
+													
+												</div>
+												<div class="info-row pop-edit-row-block">
+													<p>	<i class="fa fa-home"></i>	Base </p>
+														<div class="input-block-edit">
+															<input type="text" name="posting_address"  ng-model="editSavedLoad.postingAddress" />
+														</div>
+													
+												</div>
+												<input type="hidden" name="status" ng-model="editSavedLoad.JobStatus" />
+											</div>
+											<div class="contact-info">
+												<h2 class="authority-h2">Authority</h2>
+												<!--a class="btn btn-primary" ng-click="fetch_triumph_request(editSavedLoad.MCNumber,editSavedLoad.DOTNumber)"> 
+													<span ng-show="showSearchButtonText == true"><i class="glyphicon glyphicon-refresh spinning"></i></span>
+													{{ searchButtonText }}
+												</a-->
+												
+												
+													<span class="loader-triumph" ng-show="showSearchButtonText == true"><i class="glyphicon glyphicon-refresh spinning"></i></span>
+													
+												
+												<div class="info-row pop-edit-row-block">
+													<p>	Carrier</p>
+														<div class="input-block-edit">
+															<input type="text" name="carrier_mc"  />
+														</div>
+													
+												</div>
+												<div class="info-row pop-edit-row-block">
+													<p>	Broker MC </p>
+														<div class="input-block-edit">
+															<input type="text" name="broker_mc" ng-model="editSavedLoad.MCNumber" />
+														</div>
+													
+												</div>
+												<div class="info-row pop-edit-row-block">
+													<p>US Dot</p>
+														<div class="input-block-edit">
+															<input type="text" name="us_dot" ng-model="editSavedLoad.DOTNumber" />
+														</div>
+												
+												</div>
+											</div>
+										</div>
+										
+									</div>
+									
+									
+								</div>
+							
+				</div>  <!----enable-disable-inputs ---------->
+							</div>
+							</form>
+						</div> <!--popup-inner-content-main--->
+						
+						
+				<!-------Matching Trucks------------------>
+						<div class="popup-inner-content-main" ng-show="matchingTrucks == true">
+							<ng-include src="'./assets/templates/vehicleCalulation.html'"></ng-include>
+							<h4 class="main-common-heading"><span>MATCHING TRUCKS</span></h4>
+						
+						
+							<div class="truck-detail-block" ng-repeat="(key, TruckData ) in matchedTruckData" on-finish-render="ngRepeatFinished" >
+							
+								<div class="truck-detail-heading">
+									<h2><span>{{ TruckData.label }}</span> ({{ TruckData.vehicle_type }}, {{ TruckData.cargo_capacity }}LBS)</h2>
+								</div>
+								<div class="truck-pop-detail-main">
+									<a style="display:none" href="javascript:void(0)" class="minus-plus-icon arr-down"></a>
+									
+									<div class="truck-detail-img-block">
+										<div class="truck-p-img">
+											<!-- img ng-src="./assets/uploads/vehicles/{{ TruckData.vehicle_image }}" ng-if="TruckData.vehicle_image != '' || TruckData.vehicle_image != null" /-->
+											<img src="./assets/img/t1.png" />
+											
+											 
+										</div>
+										<div class="truck-d-pop-block">
+											<p><span>Driver Name <b>:</b></span> {{ TruckData.first_name }} {{ TruckData.last_name }}</p>
+											<p><span>Truck Length<b>:</b></span> {{ TruckData.cargo_bay_l }} ft</p>
+											<p><span>Truck Width<b>:</b></span> {{ TruckData.cargo_bay_w }} ft</p>
+											<a style="display:none" href="javascript:void(0)" ng-click="assignJob(TruckData.id,matchedTruckJobData.id)" class="assign-job">Asign job</a>
+										</div>
+									</div>
+									<div class="truck-detail-amount-block">
+										<div class="amount-row">
+											<p>AMOUNT INVOICED <span class="clr-b" id="overall-total-payment-amount-{{$index}}"> {{ TruckData.overall_total_payment_amount }} </span> <span class="clr-b">$</span> </p>
+										</div>
+										<div class="amount-row">
+											<p>TOTAL CHARGES <span class="clr-r" id="overall-total-charge-{{$index}}"> {{ TruckData.overall_total_charge }} </span><span class="clr-r">$</span>  </p>
+										</div>
+										<div class="amount-row">
+											<p>RATE / MILE <span id="overall-total-rate-mile-{{$index}}">{{ TruckData.overall_total_rate_mile }}</span></p>
+											
+										</div>
+									</div>
+									<div class="truck-detail-rate-block">
+										
+										<h2>PROFIT  
+											<span class="show-not-calculated" ng-show="showNotCalculatedRecords == true">
+												Not calculated <a class="show-not-calulated-info" data-toggle="modal" data-target="#notCalulatedData"><img src="./pages/img/question-mark.png" /></a>
+											</span>
+											<span class="clr-g" ng-show="showNotCalculatedRecords == false">$
+												<b id="overall-total-profit-{{$index}}"> {{ TruckData.overall_total_profit }}</b>
+												<i class="precent-block">(<h6 id="overall-total-profit-percent-{{$index}}">{{ TruckData.overall_total_profit_percent}}</h6> %)</i>
+											</span> 
+										</h2>
+									</div>
+								</div>
+								<div class="lode-detail-outer-block" >
+								<div class="row-lode-block">
+									<div class="lode1-block-main1 new-lodel-block-main1" data-jquery-scrollbar="jqueryScrollbarOptions">
+										<div class="truck-lode-block">
+											<div class="edit-input-popblock popblock-main">
+												<div class="pop-edit-half-block">
+													<div class="pop-full-edit-block1">
+														<div class="pop-up-heading-main">
+															<h2>dIESAL CALCULATIONS </h2>
+															<div class="save-can-block">
+																<!--a href="#" class="edit1"></a-->
+															</div>
+														</div>
+														
+														<div class="pop-edit-row-block">
+															<p>Origin to Destination</p>
+															<div class="input-block-edit">
+																<input id="diesel-orig-dest-{{$index}}" class="edit-diesel-input" type="text" ng-model="TruckData.originToDestination" />
+															</div>
+														</div>
+														<div class="pop-edit-row-block">
+															<p>Dead Miles</p>
+															<div class="input-block-edit">
+																<input id="diesel-dead-mile-{{$index}}" class="edit-diesel-input" type="text" ng-model="TruckData.deadMileDist" />
+															</div>
+														</div>
+														<div class="pop-edit-row-block">
+															<p>Total Miles </p>
+															<div class="input-block-edit">
+																<input id="diesel-comp-dist-{{$index}}" class="edit-diesel-input" type="text" ng-model="TruckData.total_complete_distance" />
+															</div>
+														</div>
+														<div class="pop-edit-row-block">
+															<p>Vehicle/Avg</p>
+															<div class="input-block-edit">
+																<input id="diesel-consm-{{$index}}" class="edit-diesel-input" type="text" ng-model="TruckData.fuel_consumption" />
+															</div>
+														</div>
+														<div class="pop-edit-row-block">
+															<p>Diesel Needed</p>
+															<div class="input-block-edit">
+																<input id="diesel-gallon-need-{{$index}}" class="edit-diesel-input" type="text" ng-model="TruckData.gallon_needed" />
+															</div>
+														</div>
+														<div class="pop-edit-row-block">
+															<p>Avg cost of Diesel</p>
+															<div class="input-block-edit">
+																<input id="diesel-per-gallon-{{$index}}" class="edit-diesel-input" type="text" ng-model="TruckData.diesel_rate_per_gallon" />
+															</div>
+														</div>
+														<div class="pop-edit-row-block">
+															<p>Diesel Cost</p>
+															<div class="input-block-edit">
+																<input id="diesel-total-cost-{{$index}}" class="edit-diesel-input" disabled="disabled" placeholder="1780" type="text" ng-model="TruckData.comp_diesel_cost" />
+															</div>
+														</div>
+														
+													</div>
+												</div>
+												<div class="pop-edit-half-block popblock-child-right">
+													<a href="javascript:void(0)" title="Save" class="mt-save-icon arr-down" ></a>
+													<div class="pop-full-edit-block pop-full-edit-block-driver">
+														<div class="pop-up-heading-main">
+															<h2>dRIVER CALCULATIONS  </h2>
+															<div class="save-can-block">
+																<a class="edit1 clicked make-driver-fields-editable"  ng-show="TruckData.EditCalulations == true" text="{{$index}}" title="Edit"></a>
+																<a href="javascript:void(0)" class="save make-driver-fields-saved" style="display:none;" text="{{$index}}" title="Save"></a>
+																<!--a href="#" class="close1"></a-->
+																
+																
+															</div>
+														</div>
+													<div class="custom_drivers">
+														<div class="pop-edit-row-block">
+															<p>Origin to Destination</p>
+															<div class="input-block-edit">
+																<input id="driver-orig-dest-{{$index}}" disabled="disabled" placeholder="1780" type="text" ng-model="TruckData.originToDestDistDriver" >
+															</div>
+														</div>
+														<div class="pop-edit-row-block">
+															<p>Dead Miles to Dest</p>
+															<div class="input-block-edit">
+																<input id="driver-dead-mile-{{$index}}" class="edit-driver-input"  placeholder="0" type="text" ng-model="TruckData.driver_dead_mile">
+															</div>
+														</div>
+														<div class="pop-edit-row-block">
+															<p>Dead Miles not Paid</p>
+															<div class="input-block-edit">
+																<input id="driver-dead-miles-not-paid-{{$index}}" class="edit-driver-input"  placeholder="0" type="text" ng-model="TruckData.driver_dead_miles_not_paid">
+															</div>
+														</div>
+														<div class="pop-edit-row-block">
+															<p>Dead head miles paid</p>
+															<div class="input-block-edit">
+																<input id="driver-dead-miles-paid-{{$index}}" class="edit-driver-input"  placeholder="0" type="text" ng-model="TruckData.driver_dead_miles_paid">
+															</div>
+														</div>
+														<div class="pop-edit-row-block">
+															<p>Pay for dead head Miles</p>
+															<div class="input-block-edit">
+																<input id="driver-pay-for-dead-miles-{{$index}}" class="edit-driver-input"  placeholder="0.4" type="text" ng-model="TruckData.driver_pay_for_dead_mile">
+															</div>
+														</div>
+														<div class="pop-edit-row-block">
+															<p>Dead Head Miles Paid</p>
+															<div class="input-block-edit">
+																<input id="driver-dead-mile-paid-{{$index}}" disabled="disabled" placeholder="0" type="text" ng-model="TruckData.driver_dead_mile_paid">
+															</div>
+														</div>
+														<div class="pop-edit-row-block">
+															<p>Pay for milesw/cargo</p>
+															<div class="input-block-edit">
+																<input id="driver-miles-cargo-{{$index}}" class="edit-driver-input"  placeholder="0.45" type="text" ng-model="TruckData.driver_pay_miles_cargo">
+															</div>
+														</div>
+														<div class="pop-edit-row-block">
+															<p>Amount paid with cargo</p>
+															<div class="input-block-edit">
+																<input id="driver-amount-cargo-{{$index}}" disabled="disabled"  placeholder="0.45" type="text" ng-model="TruckData.driver_amount_cargo">
+															</div>
+														</div>
+														<div class="pop-edit-row-block">
+															<p>Due to Driver</p>
+															<div class="input-block-edit">
+																<input id="driver-due-driver-{{$index}}" disabled="disabled"  placeholder="0.45" type="text" ng-model="TruckData.driver_due_driver">
+															</div>
+														</div>
+													</div><!----custom drives-------->	
+													</div>
+												</div>
+											</div>
+											
+										</div>
+									</div>
+									<div class="lode1-block-main2">
+										<a href="javascript:void(0)" title="Save" class="mt-save-icon arr-down" ></a>
+										<div class="truck-lode-block">
+											
+											<div class="pop-up-heading-main">
+												<h2>Toll and taxes </h2>
+												<div class="save-can-block">
+													<a href="javascript:void(0)" class="edit1 make-taxes-fields-editable" ng-show="TruckData.EditCalulations == true" text="{{$index}}" title="Edit"></a>
+													<a href="javascript:void(0)" class="save clicked make-taxes-fields-saved" style="display:none;" text="{{$index}}" title="Save"></a>
+												</div>
+											</div>
+											<div class="pop-full-edit-block">
+												<div class="pop-edit-row-block ful-block">
+													<p>IFTA Taxes</p>
+													<div class="input-block-edit">
+														<input id="tax-ifta-{{$index}}" class="edit-tax-input" placeholder="0.45" type="text" ng-model="TruckData.tax_ifta_tax">
+													</div>
+												</div>
+												<div class="pop-edit-row-block ful-block">
+													<p>EXTRA STOPS</p>
+													<div class="input-block-edit">
+														<input id="tax-extra-stops-{{$index}}" class="edit-tax-input" placeholder="0.45" type="text" ng-model="TruckData.tax_extra_stop">
+													</div>
+												</div>
+												<div class="pop-edit-row-block ful-block">
+													<p>Tarps</p>
+													<div class="input-block-edit">
+														<input id="tax-tarps-{{$index}}"  class="edit-tax-input"placeholder="0.45" type="text" ng-model="TruckData.tax_tarps">
+													</div>
+												</div>
+												<div class="pop-edit-row-block ful-block">
+													<p>Detention Time</p>
+													<div class="input-block-edit">
+														<input id="tax-det-time-{{$index}}"  class="edit-tax-input"placeholder="0.45" type="text" ng-model="TruckData.tax_det_time">
+													</div>
+												</div>
+												<div class="pop-edit-row-block ful-block">
+													<p>Tolls</p>
+													<div class="input-block-edit">
+														<input id="tax-tolls-{{$index}}" class="edit-tax-input" placeholder="0.45" type="text" ng-model="TruckData.tax_tolls">
+													</div>
+												</div>
+												<div class="pop-edit-row-block ful-block">
+													<p>CHARGES</p>
+													<div class="input-block-edit">
+														<input id="tax-total-charges-{{$index}}" disabled="disabled" placeholder="0.45" type="text" ng-model="TruckData.tax_total_charge">
+													</div>
+												</div>
+												
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							
+							
+							</div>
+							
+							
+							
+							
+							
+									
+						</div>
+						
+							<!-------Matching Trucks End----------------->
+							
+							
+						<!-------Map start------------------>
+						<input class="input" id="from" type="hidden" value="{{ MapData.origin_value }}" >
+						<input class="input" id="to" type="hidden" value="{{ MapData.dest_value }}">
+						<div class="popup-inner-content-main" ng-show="showMaps == true" ng-if="showMaps == true" ng-init="showMap();">
+							
+							<h4 class="main-common-heading"><span class="map-icon">Flying J and Pilot Truckstops</span></h4>
+								<div class="truck-detail-block" >
+											
+										<div class="directions-map-div">
+											<div class="row main-lg-map">
+												<div class="col-lg-12">
+													<div class="col-lg-12 no-padding">
+														<div class="map-inner">
+															<div id="map" class="map-iw"></div>
+															<a href="javascript:void(0);" title="Route Directions" ng-click="showHidePanel()" class="minus-plus-icon show-hide-panel"></a>
+														</div>
+													</div>
+													<div class="col-lg-12 main-directions-div no-padding" >
+														<div id="paneldiv" class="map-inner" style="display:none">
+															<div class="main-directions1">
+																<div id="panel" ></div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+								</div>
+							<!---------------Fuel Stops start------------------->
+								<h4 class="main-common-heading"><span class = "map-icon">Fuel Stops</span></h4>
+								<div class="truck-detail-block" >
+									<div class="directions-map-div">
+										<div class="row main-lg-map">
+											<div class="col-lg-12">
+												<div class="col-lg-12 no-padding">
+													<div class="map-inner">
+														<div id="Fuelmap"></div>
+														
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							<!---------------Fuel Stops end------------------->
+							
+						</div>
+							
+							<!-------Maps End----------------->
+						
+						</div>
+						
+						
+					</div>
+					<!--content-popup end-->
+				</div>
+			</div>
+		</div>
+     </div>
+</div>
+
+<Script>
+	
+$(function() {
+	$(document).on('click','.edit1Load',function(){ 
+		$(".enable-disable-inputs").find("input,textarea,select").attr("disabled", false);
+	});
+	
+	$(document).on('click','.saveTheLoad,.cancelTheLoad',function() {
+		$(".enable-disable-inputs").find("input,textarea,select").attr("disabled", true);
+	});
+});
+function make_fields_editable(){
+	$(".make-driver-fields-editable").click();
+	$(".make-taxes-fields-editable").click();
+}	    
+$(function(){
+	$(".enable-disable-inputs").find("input,textarea,select").attr("disabled", true);
+	$("input.edit-driver-input").prop('disabled', true);
+	$("input.edit-diesel-input").prop('disabled', true);
+	$("input.edit-tax-input").prop('disabled', true);
+});
+
+</Script>
+
+
+<!---------------calculation Not Done popup------------------------->
+
+
+<div class="modal fade slide-up" id="notCalulatedData" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content-wrapper">
+			<div class="modal-content">
+			
+				<div class="modal-header model-heading-main">
+					<div class="model-heading-inner">
+						<h4 class="modal-title" id="myModalLabel">Profit Calculation</h4>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					</div>
+				</div>
+			 
+				<div class="modal-body main-pop-body">
+					<div class="popup-body-bg">
+						<div class="form-group-attached1">
+							<div class="row clearfix">
+								<div class='col-lg-12'>
+									<div pg-form-group class="form-group form-group-default form-special-info">
+										The Payment Amount is not given so profit is not calculated.
+									</div>
+								</div>
+							</div>
+												
+								
+							</div>
+						</div>
+					</div>
+					
+				<div class="modal-footer">
+					<button class="btn btn-primary" data-dismiss="modal" aria-label="Close">OK</button>
+				</div>
+			</div>
+		</div>
+	</div>  
+			<!--------table-full-width------>
+</div>
+<!----------------calculation not done popup ends--------------------->

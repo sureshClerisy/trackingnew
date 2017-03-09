@@ -1,0 +1,616 @@
+ <script>
+/*jQuery(function(){
+if(!window.google||!window.google.maps){
+	
+  var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = 'http://maps.google.com/maps/api/js?key=AIzaSyBSPVGmxdOqe2yrxzla4iezs00zWe_p6j4&libraries=places';
+    document.body.appendChild(script);
+}
+else{
+
+ //initialize();
+}});*/
+</script>
+
+     <!-- START PAGE CONTENT WRAPPER -->
+      <div class="page-content-wrapper ">
+        <!-- START PAGE CONTENT -->
+        <div class="content sm-gutter">
+          <!-- START CONTAINER FLUID -->
+          <div class="container-fluid padding-25 sm-padding-10">
+			<div class="row">
+				<div class="col-md-12 col-xlg-12">
+					<div class="commen-heading dashboard-page" ng-class="{'show-drivers' : showDrivers}">
+						<h2 class="oprate-dashbord">{{ languageArray.dashboardHeading }}</h2>
+						<div class="label_select_box"> 
+							
+							<div class="input-cal-block">
+								<div class="input-prepend input-group">
+									<span class="add-on input-group-addon"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i></span>
+								   <input date-range-picker placeholder="Select date range" id="drpicker"  class="form-control date-picker customDateRange" type="text" options="opts" ng-model="dateRangeSelector" />
+								</div>
+							</div>
+
+							<div class="dashbord-select-dropdown">
+								<ui-select class="mdrivers" ng-model="search_vehicle1.selected" theme="bootstrap" ng-click = "changeLang()" on-select="onSelectVehicleCallback($item, $model);" required>
+									<ui-select-match class="ui-select-match" placeholder="{{ languageArray.selectDriver }}">{{$select.selected.label == "_idispatcher" ? "Dispatcher : " + $select.selected.username : $select.selected.driverName}}    </ui-select-match>
+									<ui-select-choices class="ui-select-choices" group-by="groupFind" repeat="item in vehicleList | propsFilter: {driverName: $select.search, username: $select.search} | orderBy: groupFind">
+										<span ng-bind-html="trustAsHtml((item.driverName | highlight: $select.search))"></span>
+									</ui-select-choices>
+								</ui-select>
+							</div>
+						</div>
+					</div>
+
+					<div class="drivers-selected">
+					   <div class="drivers-cont pgn push-on-sidebar-open pgn-circle" ng-repeat="driver in driversOnDashboard">
+					      <div class="alert alert-info">
+					         <div>
+					            <div class="pgn-thumbnail">
+					               <div><img style="display: inline-block;" on-error-src="pages/img/user.png" ng-src="assets/uploads/drivers/thumbnail/{{driver.profile_image}}" ui-jq="unveil" alt="" width="40" height="40"></div>
+					            </div>
+					            <div class="pgn-message">
+					               <div>
+					                  <p class="bold">{{driver.driverName}}</p>
+					                  <p>{{driver.city}}</p>
+					               </div>
+					            </div>
+					         </div>
+					         <button type="button" ng-click="removeDashboardView(driver)" class="close" data-dismiss="alert"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+					      </div>
+					   </div>
+					</div>
+
+				</div>
+			</div>
+     	<!-- START CONTAINER FLUID -->
+		<div class="row">
+		    <div class="panel panel-transparent">
+		        <div class="panel-body sortable widget_div no-padding">
+		            <div class="row " >
+			            <div style="display: none;" id="left"></div>
+	    				<div style="display: none;" id="right"></div>
+			            <canvas id="viewport" style="display: none;"></canvas>
+		                <div class="col-md-6 sortable-column " id="placeholder_left" ui-jq="sortable" ui-options='sortableOptions'>
+		                    <div class="panel panel-default green-border wpanel" id="1" pg-portlet>
+		                        <div class="panel-heading">
+		                            <div class="panel-title">{{ languageArray.bestSafetyHeading }}
+		                            </div>
+		                            <div class="panel-controls">
+		                                <ul>
+		                                    <li><a class="portlet-collapse" href="" data-toggle="collapse"><i class="portlet-icon portlet-icon-collapse"></i></a>
+		                                    </li>
+		                                    <li><a class="portlet-refresh" href="" data-toggle="refresh"><i class="portlet-icon portlet-icon-refresh"></i></a>
+		                                    </li>
+		                                    <li><a class="portlet-close" href="" data-toggle="close"><i class="portlet-icon portlet-icon-close"></i></a>
+		                                    </li>
+		                                </ul>
+		                            </div>
+		                        </div>
+		                        <div class="panel-body">
+		                            <div class="row">
+									    <div class="col-lg-12 dashboard-small">
+											<div class="audits-block">
+												<p>{{ languageArray.auditsHeading }}</p>
+												<!-- <div class="one-third-block">
+													<ul class="bext-safty-block">
+														<li> <span style="background:rgba(245,87,83,1);"> </span>{{ languageArray.auditsfail }}</li>
+														<li> <span style="background:rgba(52, 214, 199, 1);"> </span>{{ languageArray.auditspassed }}</li>
+														<li> <span style="background:rgba(7, 126, 208, 1);"> </span>{{ languageArray.auditsissues }}</li>
+													</ul>
+												</div> -->
+												<div class="pos-ab">
+													<div id="best_safety" style="min-width: 310px; height: 229px; margin: 0 auto"></div>
+												</div>
+											</div>								
+										</div>
+										<div class="col-lg-12">
+											<div class="">
+												<div class="best-safty-table">
+													<div class="table-mainass">
+														<div class="table-responsive">
+														  <table class="table table-hover table-condensed table-detailed" id="detailedTable">
+															<thead>
+															  <tr>
+																<th style="width:20%">{{ languageArray.auditsasset }}</th>
+																<th style="width:20%">{{ languageArray.auditsdriver }}</th>
+																<th style="width:20%">{{ languageArray.auditsshipper }}</th>
+																<th style="width:20%">{{ languageArray.auditscon }}</th>
+																<th style="width:20%">{{ languageArray.auditscust }}</th>
+															  </tr>
+															</thead>
+															<tbody>
+															  <tr>
+																<td class="v-align-middle semi-bold">130</td>
+																<td class="v-align-middle">John H.</td>
+																<td class="v-align-middle semi-bold">Col/Oh</td>
+																<td class="v-align-middle">Mpls/Mn</td>
+																<td class="v-align-middle">CH R</td>
+															  </tr>
+															  <tr>
+																<td class="v-align-middle semi-bold">130</td>
+																<td class="v-align-middle">John H.</td>
+																<td class="v-align-middle semi-bold">Col/Oh</td>
+																<td class="v-align-middle">Mpls/Mn</td>
+																<td class="v-align-middle">CH R</td>
+															  </tr>
+															</tbody>
+														  </table>
+														</div>
+											 		</div>
+												</div>
+											</div>
+										</div>
+									</div>
+		                        </div><!-- panel-body -->
+		                    </div>
+		                    <div class="panel panel-default black-border wpanel" id="2" pg-portlet>
+		                        <div class="panel-heading">
+		                            <div class="panel-title">{{ languageArray.capacityanalysis }}
+		                            </div>
+		                            <div class="panel-controls">
+		                                <ul>
+		                                    <li><a class="portlet-collapse" href="" data-toggle="collapse"><i class="portlet-icon portlet-icon-collapse"></i></a>
+		                                    </li>
+		                                    <li><a class="portlet-refresh" href="" data-toggle="refresh"><i class="portlet-icon portlet-icon-refresh"></i></a>
+		                                    </li>
+		                                    <li><a class="portlet-close" href="" data-toggle="close"><i class="portlet-icon portlet-icon-close"></i></a>
+		                                    </li>
+		                                </ul>
+		                            </div>
+		                        </div>
+		                        <div class="panel-body">
+									<div class="ser-chat">
+										<div id="fleet_load" style="min-width: 310px; height: 180px; margin: 0 auto"></div>
+									</div>
+		                        </div><!-- panel-body -->
+		                    </div>
+		                    <div class="panel panel-default parpal-border wpanel" id="3" pg-portlet>
+		                        <div class="panel-heading">
+		                            <div class="panel-title">{{ languageArray.drivermsg }}
+		                            </div>
+		                            <div class="panel-controls">
+		                                <ul>
+		                                    <li><a class="portlet-collapse" href="" data-toggle="collapse"><i class="portlet-icon portlet-icon-collapse"></i></a>
+		                                    </li>
+		                                    <li><a class="portlet-refresh" href="" data-toggle="refresh"><i class="portlet-icon portlet-icon-refresh"></i></a>
+		                                    </li>
+		                                    <li><a class="portlet-close" href="" data-toggle="close"><i class="portlet-icon portlet-icon-close"></i></a>
+		                                    </li>
+		                                </ul>
+		                            </div>
+		                        </div>
+		                        <div class="panel-body">
+									<div class="row drive-msg-block">
+										<div class="col-md-4 col-xlg-4 chart-block skyline-block">
+											<div jq-sparkline class="sparkline-chart" ng-model="sparkline_line_data" opts="{{ sparkline_line_options }}"></div>
+										</div>
+										<div class="col-md-4 col-xlg-4 chart-block1">
+											<div id="driver_msg" style="width:150px; height:150px;"></div>
+										</div>
+										<div class="col-md-4 col-xlg-4 last-chart-block">
+											<div class="cart-color">
+												<ul class="print-listing chart-color">
+													<li><span style="background:#626262;"></span> <P>{{ languageArray.drivermsginemncy }}</P></li>
+													<li><span style="background:#34d6c7;"></span> <P>{{ languageArray.drivermsgonhighprior }}</P></li>
+													<li> <span style="background:#6d5cae;"></span><P>{{ languageArray.drivermsgopened }}</P></li>
+													<li><span style="background:#077ed0;"></span> <P>{{ languageArray.drivermsgunopened }}</P></li>
+												</ul>
+											</div>
+										</div>
+									</div>
+		                        </div><!-- panel-body -->
+		                    </div>
+		                    <div class="panel panel-default green-border wpanel"  id="4" pg-portlet>
+		                        <div class="panel-heading">
+		                            <div class="panel-title">{{ languageArray.trucklocation }}
+		                            </div>
+		                            <div class="panel-controls">
+		                                <ul>
+		                                    <li><a class="portlet-collapse" href="" data-toggle="collapse"><i class="portlet-icon portlet-icon-collapse"></i></a>
+		                                    </li>
+		                                    <li><a class="portlet-refresh" href="" data-toggle="refresh"><i class="portlet-icon portlet-icon-refresh"></i></a>
+		                                    </li>
+		                                    <li><a class="portlet-close" href="" data-toggle="close"><i class="portlet-icon portlet-icon-close"></i></a>
+		                                    </li>
+		                                </ul>
+		                            </div>
+		                        </div>
+		                        <div class="panel-body no-padding">
+		                            <div class="row invocie-block-row no-margin">
+										<div class="col-xlg-12 col-md-12 no-padding">
+											<div class="map-block-main text-center">
+												<div id="dash-map"></div>
+											</div>
+										</div>     	
+									</div>
+		                        </div><!-- panel-body -->
+		                    </div>
+		                    <div class="panel panel-default bg-danger wpanel" id="5" pg-portlet>
+		                        <div class="panel-heading">
+		                            <div class="panel-title color-fff">{{ languageArray.newsfeed }}
+		                            </div>
+		                            <div class="panel-controls ul-color-fff">
+		                                <ul>
+		                                    <li><a class="portlet-collapse" href="" data-toggle="collapse"><i class="portlet-icon portlet-icon-collapse"></i></a>
+		                                    </li>
+		                                    <li><a class="portlet-refresh" href="" data-toggle="refresh"><i class="portlet-icon portlet-icon-refresh"></i></a>
+		                                    </li>
+		                                    <li><a class="portlet-close" href="" data-toggle="close"><i class="portlet-icon portlet-icon-close"></i></a>
+		                                    </li>
+		                                </ul>
+		                            </div>
+		                        </div>
+		                        <div class="panel-body no-padding">
+		                            <div class="row invocie-block-row no-margin">
+							          	<div class="col-xlg-12 col-md-12 no-padding">
+							          		<div class="rss-outer-main">
+							          			<!-- START WIDGET -->
+						                        <div class="metro live-tile" data-mode="carousel" data-start-now="true" data-delay="3000" ui-jq="liveTile">
+						                            <div class="rss-ul-outer slide-front tiles slide active">
+						                                <ul>
+								          					<li class="slide-front tiles slide active" ng-repeat="feed in rssfeeds[0]">
+								          						<h6><a href="{{feed.link}}"  class="feed-link" target="_target"> {{feed.title}} </a> </h6>
+								          						<span>{{feed.pubDate}} </span>
+								          					</li>
+								          				</ul>
+						                            </div>
+						                            <div class="rss-ul-outer slide-back tiles">
+						                                <ul>
+								          					<li class="slide-front tiles slide active" ng-repeat="feed in rssfeeds[1]">
+								          						<h6><a href="{{feed.link}}"  class="feed-link" target="_target"> {{feed.title}} </a></h6>
+								          						<span>{{feed.pubDate}} </span>
+								          					</li>
+								          				</ul>
+						                            </div>
+						                        </div>
+						                        <!-- END WIDGET -->
+							          		</div>
+						          		</div>
+						          	</div>
+		                        </div><!-- panel-body -->
+			                </div>
+		                </div>
+		                <div class="col-md-6 sortable-column " id="placeholder_right" ui-jq="sortable" ui-options='sortableOptions'>
+		                    <div class="panel panel-default red-border wpanel" id="6" pg-portlet>
+		                        <div class="panel-heading">
+		                            <div class="panel-title">{{ languageArray.topcustomer }}
+		                            </div>
+		                            <div class="panel-controls">
+		                                <ul>
+		                                    <li><a class="portlet-collapse text-white" href="" data-toggle="collapse"><i class="portlet-icon portlet-icon-collapse"></i></a>
+		                                    </li>
+		                                    <li><a class="portlet-refresh text-white" href="" data-toggle="refresh"><i class="portlet-icon portlet-icon-refresh"></i></a>
+		                                    </li>
+		                                    <li><a class="portlet-close text-white" href="" data-toggle="close"><i class="portlet-icon portlet-icon-close"></i></a>
+		                                    </li>
+		                                </ul>
+		                            </div>
+		                        </div>
+		                        <div class="panel-body">
+									<div class="row drive-msg-block">
+										<!-- <div class="col-sm-12 col-md-12 col-xlg-12 chart-block"> -->
+										<div class="col-sm-6 col-md-7 col-xlg-7 chart-block">
+											<div id="customers" style="min-width: 150px; min-height: 160px; margin: 0 auto"></div>
+											<!-- <div style="width: 100%;">
+												<highchart id="cust" class="top-brokers"  config="chartConfigTopCustomers" class="span9" ></highchart>	
+											</div> -->
+										</div>
+										<div class="col-sm-6 col-md-5 col-xlg-5 gp-mp-block cart-color-size">
+											<div class="cart-color">
+												<ul class="print-listing chart-color">
+													<li><span style="background:rgba(7, 126, 208, 1);"></span> <p>{{ languageArray.topcustomercamas }}</p></li>
+													<li> <span style="background:rgba(109,92,174,1);"></span><p>{{ languageArray.topcustomerrpm }}</p></li>
+													<li><span style="background:rgba(52, 214, 199, 1);"></span> <p>{{ languageArray.topcustomervclogist }}</p></li>
+													<li><span style="background:rgba(245,87,83,1);"></span> <p>{{ languageArray.topcustomermaston }}</p></li>
+													<li><span style="background:rgba(109,92,174,1);"></span> <p>{{ languageArray.topcustomerbennett }}</p></li>
+												</ul>
+											</div>
+										</div>
+									</div>
+		                        </div><!-- panel-body -->
+		                    </div>
+		                    <div class="panel panel-default green-border wpanel" id="7" pg-portlet>
+		                        <div class="panel-heading">
+		                            <div class="panel-title">Loads Tracking
+		                            </div>
+		                            <div class="panel-controls">
+		                                <ul>
+		                                    <li><a class="portlet-collapse" href="" data-toggle="collapse"><i class="portlet-icon portlet-icon-collapse"></i></a>
+		                                    </li>
+		                                    <li><a class="portlet-refresh" href="" data-toggle="refresh"><i class="portlet-icon portlet-icon-refresh"></i></a>
+		                                    </li>
+		                                    <li><a class="portlet-close" href="" data-toggle="close"><i class="portlet-icon portlet-icon-close"></i></a>
+		                                    </li>
+		                                </ul>
+		                            </div>
+		                        </div>
+		                        <div class="panel-body">
+		                           <div class="graph-block-tabel">
+										<div class="load-road-graph text-center ">
+											<!-- <div id="load_on_road" style="min-width: 400px; height:400px; margin: 0 auto"></div> -->
+											<!-- <hc-pie-chart title="Browser usage" data="pieData">Placeholder for pie chart</hc-pie-chart> -->
+											<div style="width: 100%;">
+												<highchart id="chart1" class="loads-tracking"  config="chartConfig" class="span9" ></highchart>	
+											</div>
+											
+
+										</div>
+										<div class="table-mainass">
+											<div class="table-responsive">
+												<div class="table-scroll-custom">
+												  <table class="lperform table table-hover table-condensed table-detailed" id="detailedTable">
+													<thead>
+													  <tr>
+														<th style="width:20%">{{ fColumn }}</th>
+														
+														<th class="text-center" ng-show="typeOfData == '_idriver'" style="width:20%">{{ languageArray.pickupdate }} </th>
+														<th class="text-center" ng-show="typeOfData == '_idriver'" style="width:20%">{{ languageArray.deliverdate }} </th> 
+
+														<th class="text-center" style="width:20%">{{ languageArray.miles }} </th>
+														<th class="text-center" style="width:20%">{{ languageArray.deadmiles}}   </th>
+														<th class="text-center" style="width:20%">{{ languageArray.invoiced }}</th>
+														<th class="text-center" style="width:20%">{{ languageArray.charges }}  </th>
+														<th class="text-center" style="width:20%">{{ languageArray.profit }}   </th>
+														<th class="text-center" style="width:20%">{{ languageArray.profit_percent }}   </th>
+													  </tr>
+													</thead>
+													<tbody>
+													  <tr ng-repeat="loads in loadPerformance" ng-class="{'skip-click':skipClick}" ng-click="skipClick || clickMatchLoadDetail(loads.truckstopID, loads.loadid, loads.deadmiles, loads.invoice, loads.totalCost, loads.pickDate, loads.vehicle_id , $index)">
+														<td class="v-align-middle semi-bold">{{loads.fcolumn}}</td>
+														
+														<td ng-show="typeOfData == '_idriver'" class="text-center v-align-middle semi-bold">{{loads.PickupDate}}</td>
+														<td ng-show="typeOfData == '_idriver'" class="text-center v-align-middle semi-bold">{{loads.DeliveryDate}}</td>
+
+														<td  class="text-center v-align-middle semi-bold">{{loads.miles}}</td>
+														<td  class="text-center v-align-middle">{{loads.deadmiles}}</td>
+														<td  class="text-center v-align-middle semi-bold">{{loads.invoice | currency:"$":2}}</td>
+														<td  class="text-center v-align-middle">{{loads.charges | currency:"$":2}}</td>
+														<td  class="text-center v-align-middle">{{loads.profit | currency:"$":2}}</td>
+														<td  class="text-center v-align-middle">{{loads.ppercent}}%</td>
+													  </tr>
+													  <tr ng-show="!haveRecords"><td class="semi-bold" style="text-align: center;" colspan="9"> Oops! No Record Found</td></tr>
+													</tbody>
+												  </table>
+												</div>
+											</div>
+										  </div>
+									 </div>
+		                        </div> <!-- panel body -->
+		                    </div>
+		                    <div class="panel panel-default red-border wpanel pos-rel " id="8" pg-portlet>
+								<div class="col-middle loader-outer weather-loader" ng-show = "weatherShow == false">
+									<!-- START PANEL -->
+									<div class="loader-inner">
+										<div class="full-height">
+											<div class="panel-body text-center">
+												<img class="image-responsive-height demo-mw-50" src="assets/img/demo/progress.svg" alt="Progress">
+											</div>
+										</div>
+									</div>
+								</div>
+		                        <div class="panel-heading">
+		                            <div class="panel-title min-heg-none">{{ languageArray.wheatherinfo }} 
+		                            	<span class="info-w">
+		                            		( <i class="fa fa-info" data-toggle="tooltip" data-original-title="{{languageArray.showingWeatherFor}} {{wdriver}}." ui-jq="tooltip"></i> )
+		                            	</span>
+		                            </div>
+		                            <div class="panel-controls">
+		                                <ul>
+		                                    <li><a class="portlet-collapse text-white" href="" data-toggle="collapse"><i class="portlet-icon portlet-icon-collapse"></i></a>
+		                                    </li>
+		                                    <li><a class="portlet-refresh text-white" href="" data-toggle="refresh"><i class="portlet-icon portlet-icon-refresh"></i></a>
+		                                    </li>
+		                                    <li><a class="portlet-close text-white" href="" data-toggle="close"><i class="portlet-icon portlet-icon-close"></i></a>
+		                                    </li>
+		                                </ul>
+		                            </div>
+		                        </div>
+		                        <div class="panel-body">
+		                            <div class="row ">
+										<div class="col-md-12 col-lg-12 col-xlg-12 widget-height no-padding">
+												
+				                
+										   <div class="widget-17 widget-17-height panel  no-border no-margin widget-loader-circle">
+											    <div class="panel-heading no-padding panel-height" ng-show = "weatherShow == true">
+													<div class="panel-title weather-dropdown">
+														<div class="weather-location no-padding weth-text">
+														<i class="pg-map pull-right"></i> {{currentWeather.name}}, {{currentWeather.country}}</div>
+													</div>
+												</div>
+											<!-- weather not found-->
+												<div class="weather-forecast" ng-show="weatherStatus == true">
+													<div class="weather-forecast-inner">
+														<div class="weather-forecast-content">
+															 <canvas height="64" width="64" class="rain" skycons></canvas>
+															<h2>{{ languageArray.nowheatherinfo }}</h2>
+														</div>
+													</div>
+												</div>
+												
+												<!-- weather not found-->
+											      <div class="panel-body no-padding" ng-show = "weatherShow == true && weatherStatus != true">
+											         <div class="p-l-5">
+											            <div class="row">
+											               <div class="col-sm-6 col-md-6 col-xlg-6">
+											                  <div class="row m-t-20">
+											                     <div class="col-md-5">
+											                        <h4 class="no-margin">{{currentWeather.today}}</h4>
+											                        <p class="small hint-text">{{currentWeather.date}}</p>
+											                        
+											                     </div>
+											                     <div class="col-md-7">
+											                        <div class="pull-left">
+											                           <p class="small hint-text no-margin">{{ languageArray.wheatherinfocurrently }}</p>
+											                           <h4 class="text-danger bold no-margin">{{currentWeather.current_temperature}}{{ languageArray.wheatherinfoscale }}
+											                           </h4>
+											                        </div>
+											                        <div class="pull-right">
+											                           <canvas height="64" width="64" class="{{currentWeather.weather_class}}" skycons></canvas>
+											                        </div>
+											                     </div>
+											                  </div>
+											                  <h5>{{ languageArray.wheatherfeellike }}
+											                     <span class="semi-bold text-caps">{{currentWeather.weather_description}}</span>
+											                  </h5>
+											                  <p>{{ languageArray.wheatherinfo1 }}</p>
+											                  <div class="widget-17-weather">
+											                     <div class="row">
+											                        <div class="col-xs-12 p-r-10">
+											                           <div class="row padding-row1">
+											                              <div class="col-md-12">
+											                                 <p class="pull-left"><img src="./pages/img/wind.png">{{ languageArray.wheatherwind }}</p>
+											                                 <p class="pull-right bold">{{currentWeather.wind}}m/h</p>
+											                              </div>
+											                           </div>
+											                           
+											                           <div class="row">
+											                              <div class="col-md-12">
+											                                 <p class="pull-left"><img src="./pages/img/sunsine.png">{{ languageArray.wheathersunrise }}</p>
+											                                 <p class="pull-right bold">{{currentWeather.sunrise}}</p>
+											                              </div>
+											                           </div>
+											                        </div>
+											                        <div class="col-xs-12 p-l-10">
+											                        <div class="row padding-row1">
+											                              <div class="col-md-12">
+											                                 <p class="pull-left"><img src="./pages/img/humidity.png">{{ languageArray.wheatherhumidity }}</p>
+											                                 <p class="pull-right bold">{{currentWeather.humidity}}%</p>
+											                              </div>
+											                           </div>
+											                           <div class="row">
+											                              <div class="col-md-12">
+											                                 <p class="pull-left"><img src="./pages/img/sunset.png">{{ languageArray.wheathersunset }}</p>
+											                                 <p class="pull-right bold">{{currentWeather.sunset}}</p>
+											                              </div>
+											                           </div>
+											                        </div>
+											                     </div>
+											                  </div>
+											               </div>
+											               <div class="col-sm-6 col-md-6 col-xlg-6">
+											                  <div class="row">
+											                    <div class="forecast-day col-sm-6 col-md-6 text-center m-t-10 " ng-repeat="daily in dailyForecast.list | limitTo:2">
+											                        <div class="bg-master-lighter p-b-10 p-t-10">
+											                           <h4 class="p-t-10 no-margin">{{daily.today}}</h4>
+											                           <p class="small hint-text m-b-20">{{daily.date}}</p>
+											                           <canvas class="{{daily.weather_class}}" width="64" height="64" skycons></canvas>
+											                           <h5 class="text-danger">{{daily.current_temperature}}{{ languageArray.wheatherinfoscale }}</h5>
+											                           <p>{{ languageArray.wheatherfeellike }}
+											                              <span class="bold">{{daily.weather_description}}</span>
+											                           </p>
+											                           <p class="small">{{ languageArray.wheatherwind }}
+											                              <span class="bold p-l-20">{{daily.wind}}m/h</span>
+											                           </p>
+											                           <div class="m-t-20 block">
+											                              <div class="padding-10">
+											                                 <div class="row">
+											                                    <div class="col-md-6 text-center">
+											                                       <p class="small">{{ languageArray.wheathersunset }}</p>
+											                                       <canvas class="{{daily.weather_class}}" width="25" height="25" skycons></canvas>
+											                                       <p class="text-danger bold">{{daily.noon}}{{ languageArray.wheatherinfoscale }}</p>
+											                                    </div>
+											                                    <div class="col-md-6 text-center">
+											                                       <p class="small">{{ languageArray.wheathernight }}</p>
+											                                       <canvas class="{{daily.weather_class}}" width="25" height="25" skycons></canvas>
+											                                       <p class="text-danger bold">{{daily.night}}{{ languageArray.wheatherinfoscale }}</p>
+											                                    </div>
+											                                 </div>
+											                              </div>
+											                           </div>
+											                        </div>
+											                    </div>
+											                  </div>
+											               </div>
+											            </div>
+											         </div>
+											      </div>
+										   </div>
+										</div>
+									</div>
+		                        </div> <!-- panel-body -->
+		                    </div>
+		                    <div class="panel panel-default parpal-border wpanel" id="9" pg-portlet>
+		                        <div class="panel-heading">
+		                            <div class="panel-title">{{ languageArray.loadstatus }}
+		                            </div>
+		                            <div class="panel-controls">
+		                                <ul>
+		                                    <li><a class="portlet-collapse" href="" data-toggle="collapse"><i class="portlet-icon portlet-icon-collapse"></i></a>
+		                                    </li>
+		                                    <li><a class="portlet-refresh" href="" data-toggle="refresh"><i class="portlet-icon portlet-icon-refresh"></i></a>
+		                                    </li>
+		                                    <li><a class="portlet-close" href="" data-toggle="close"><i class="portlet-icon portlet-icon-close"></i></a>
+		                                    </li>
+		                                </ul>
+		                            </div>
+		                        </div>
+		                        <div class="panel-body">
+		                            <div class="row invocie-block-row">
+										<div class="col-md-6 col-xlg-6 dashboard-small delivery-metrics-block">
+											<div class="invocie-block no-border bg-trans">
+												<div class="row drive-msg-block">
+													<div class="col-md-7 col-xlg-6 chart-block ">
+														<div id="delivery_matrix" style="min-width: 150px; height: 170px; max-width: 400px; margin: 0 auto"></div>
+													</div>
+													<div class="col-md-5 col-xlg-6 pie-color-block ">
+														<div class="cart-color">
+															<ul class="print-listing chart-color">
+																<li class="view-loads"><span style="background:#077ed0;"></span> <p ng-click="showRecordsWithFilter('inprogress','loads')">{{ languageArray.loadstatusinprogress }}</p></li>
+																<li class="view-loads"> <span style="background:#6D5CAE;"></span><p ng-click="showRecordsWithFilter('delivered','loads')">{{ languageArray.loadstatusdelivered }}</p></li>
+																<li class="view-loads"><span style="background:#34d6c7;"></span> <p ng-click="showRecordsWithFilter('booked','loads')">{{ languageArray.loadstatusbooked }}</p></li>
+																<li> <span style="background:#626262;"></span><p>{{ languageArray.loadstatusnoloads }}</p></li>
+															</ul>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="col-md-6 col-xlg-6 dashboard-small dashbord-invoice-block">
+											<div class="invoices-iner">
+												<h4>{{ languageArray.loadstatusinvoice }}</h4>
+												<div class="invoic-ul">
+													<ul>
+
+														<li class="view-lcount"> <p ng-click="showRecordsWithFilter('invoices','billings')">{{ languageArray.loadstatusinvoice }} </p><h6>{{summary.invoiceCount}}</h6><span> : </span></li>
+														<li class="view-lcount"> <p ng-click="showRecordsWithFilter('waiting-paperwork','billings')">{{ languageArray.loadstatusinvoicwaitppr }}</p><h6>{{summary.waitingPaperworkCount}}</h6><span> : </span></li>
+														<li > <p>{{ languageArray.loadstatusinvoicpaynoreciv }}</p><h6>{{summary.paymentNotRecievedCount}}</h6><span> : </span></li>
+														<li class="view-lcount"> <p ng-click="showRecordsWithFilter('sentForPayment','billings')">{{ languageArray.loadstatusinvoicpayoncoll }}  </p><h6>{{summary.sentForPaymentCount}}</h6><span> : </span></li>
+													</ul>
+												</div>
+											</div>
+										</div>
+									</div>
+		                        </div><!-- panel-body -->
+		                    </div>
+		                </div>
+		            </div><!--  row end -->
+		        </div><!-- panel sorting -->
+		    </div>
+		</div>
+		<!-- END CONTAINER FLUID -->
+
+		<div class="col-middle loader-outer" ng-show="autoFetchLoads == true">
+			<div class="loader-inner">
+				<div class="full-height">
+					<div class="panel-body text-center">
+						<img class="image-responsive-height demo-mw-50" src="assets/img/demo/progress.svg" alt="Progress">
+					</div>
+				</div>
+			</div>
+        </div>
+    </div>
+    
+</div>
+</div>
+</div>    
+
+
+<style type="text/css">
+	#dash-map{height: 700px}
+</style>
+<!-- test -->
+
+<!-- test -->
+<ng-include src="'./assets/templates/truckstop/modals.html'"></ng-include>

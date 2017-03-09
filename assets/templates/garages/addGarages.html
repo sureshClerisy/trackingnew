@@ -1,0 +1,82 @@
+<!--
+    <script type="text/javascript">
+      $('#form-project').on('keyup keypress', function(e) {
+		var keyCode = e.keyCode || e.which;
+		if (keyCode === 13) { 
+			e.preventDefault();
+			return false;
+			}
+			});
+	</script> 
+-->
+     <!-- START HEADER -->
+     <ng-include src="'./assets/templates/googleMap.html'"></ng-include>
+      <!-- START PAGE CONTENT WRAPPER -->
+      <div class="page-content-wrapper ">
+        <!-- START PAGE CONTENT -->
+        <div class="content sm-gutter">
+          <!-- START CONTAINER FLUID -->
+          <div class="container-fluid padding-25 sm-padding-10">
+			<div class="row">
+				<div class="col-md-12 col-xlg-12">
+					<h2 class="oprate-dashbord">Add Garages</h2>
+					
+				</div>
+			</div>
+			
+			<div class="row">
+				<div class="col-lg-12 col-md-12">
+					
+						<div class="panel panel-transparent">
+							 <div class="panel-body">
+							<form id="form-project" name="addGarages" role="form" autocomplete="off" ng-submit="addGarage()">
+								<p class="Summary-heading">Summary</p>
+							
+									<!--row-->
+									<div class="row clearfix">
+										<div class="col-sm-5">
+											
+											<div pg-form-group class="form-group form-group-default required">
+												<label> Organization</label>
+												<input type="text" class="form-control" name="organization" ng-model="addGaragesData.organization_name" required>
+											</div>
+											<div pg-form-group class="form-group form-group-default required" >
+												<label> Name Of Master Mechanic</label>
+												<input type="text" class="form-control" name="mechanic_name" ng-model="addGaragesData.mechanic_name" required>
+											</div>
+											<div pg-form-group class="form-group form-group-default " >
+												<label> Name Of Master Dispatcher</label>
+												<input type="text" class="form-control" name="dispactcher" ng-model="addGaragesData.dispatcher_name" >
+											</div>
+											<div pg-form-group class="form-group form-group-default">
+												<label> Address</label>
+												<input ng-click="refreshAddress($event)" type="text" class="form-control" id = 'pac-input' name="address" ng-model="addGaragesData.address">
+											</div>
+										<div class="update-truck-block-btn">
+											 <button class="btn p-color" ng-disabled="addGarages.$invalid" type="submit">ADD</button>
+											<a href="#/garages"><button class="btn gray-color">CLOSE</button></a>
+										</div>
+								
+									  </div>
+									  
+										<div class="col-sm-7">
+											<div class="row">
+												<div id="map" style="height:550px;"></div>
+											</div>
+										</div>
+									</div> 
+									<!--row clearfix-->
+									<!--row-->
+								
+								
+							</form>
+						</div>
+						<!---->
+					</div>
+              
+				</div>
+			</div>
+		
+		</div>
+		</div>
+	</div>
