@@ -54,7 +54,6 @@ class Filteredbillings extends Admin_Controller{
 			$gDateRange = json_decode($_COOKIE["_gDateRange"],true);
 			$filters["startDate"] = $gDateRange["startDate"]; $filters["endDate"] = $gDateRange["endDate"];
 		}
-
 		if($filters["userType"] == "team" || $filters["userType"] == "driver"){
 
 			$driverInfo = $this->Driver->getInfoByDriverId($filters["userId"]);
@@ -456,7 +455,7 @@ class Filteredbillings extends Admin_Controller{
 
 		$jobs = $this->Billing->getFilteredLoads( $params);
 		$total = $this->Billing->getFilteredLoads( $params,true);
-
+		if(!$jobs){$jobs = array();}
 		echo json_encode(array("data"=>$jobs,"total"=>$total));
 	}	
 	

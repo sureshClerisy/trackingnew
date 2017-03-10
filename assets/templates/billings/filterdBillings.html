@@ -28,15 +28,17 @@
 				<div class="col-md-12 col-xlg-12">
 					<div class="commen-heading billing-page">
 						<h2 class="oprate-dashbord">{{ languageArray.billingLoadsHeading }}</h2>
-					</div>
-					
-					<div class="input-cal-block">
-						<div class="input-prepend input-group">
-							<span class="add-on input-group-addon"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i></span>
-						   <input date-range-picker id="filteredLoadsDRPicker" placeholder="Select date range" ng-change="selectDateRange(dateRangeSelector)" options="opts" class="form-control date-picker customDateRange" type="text" ng-model="dateRangeSelector" />
+						<div class="label_select_box ">
+							<div class="input-cal-block m-r-0">
+								<div class="input-prepend input-group">
+									<span class="add-on input-group-addon"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i></span>
+								   <input date-range-picker id="filteredLoadsDRPicker" placeholder="Select date range" ng-change="selectDateRange(dateRangeSelector)" options="opts" class="form-control date-picker customDateRange" type="text" ng-model="dateRangeSelector" />
 
+								</div>
+							</div>
 						</div>
 					</div>
+					
 				</div>
 			</div>
 			
@@ -79,7 +81,9 @@
 												<span class="lode-arrow {{LoadTypeSortType}}">{{ languageArray.planthfl }}</span>
 											</div>
 
-											<div class="tb-cell Driver-bill">{{ languageArray.driversHeading }} </div>
+											<div class="tb-cell Driver-bill stype" ng-click="sortCustom('driverName', driverNameSortType)">
+												<span class="lode-arrow {{driverNameSortType}}"> {{ languageArray.driversHeading }} </span>
+											</div>
 
 											
 											<div class="tb-cell Origin-bill stype" ng-click="sortCustom('OriginCity', OriginCitySortType)"> 
@@ -106,15 +110,17 @@
 												<span class="lode-arrow {{deadmilesSortType}}">{{ languageArray.planthdeadmiles }}</span>
 											</div>
 
-											<div class="tb-cell ppm-bill	"> 
-												{{ languageArray.planthrpm }}
+											<div class="tb-cell ppm-bill stype" ng-click="sortCustom('rpm', RpmSortType)"> 
+												<span class="lode-arrow {{RpmSortType}}">{{ languageArray.planthrpm }}</span>
 											</div>
 
 											<div class="tb-cell payment-bill	stype" ng-click="sortCustom('PaymentAmount', PaymentAmountSortType)"> 
 												<span class="lode-arrow {{PaymentAmountSortType}}">{{ languageArray.planthpayment }}</span>
 											</div>
 											
-											<div class="tb-cell company-bill ">  {{ languageArray.planthcompany }} </div>
+											<div class="tb-cell company-bill stype" ng-click="sortCustom('TruckCompanyName', TruckCompanyNameSortType)"> 
+												<span class="lode-arrow {{TruckCompanyNameSortType}}"> {{ languageArray.planthcompany }} </span>
+											</div>
 											
 											<div class="tb-cell source-bill" ng-click="sortCustom('load_source', load_sourceSortType)">  
 												<span class="lode-arrow {{load_sourceSortType}}"> Source</span>	
@@ -124,7 +130,7 @@
 												<span class="wid">{{ languageCommonVariables.commonTableThAction }}</span>
 											</div>
 										</div>
-										<div class="table-row-main1 tb-body" dir-paginate="value in billingLoads | itemsPerPage: itemsPerPage track by value.id"  total-items="total" current-page="currentPage" ng-click="clickMatchLoadDetail(value.truckstopID, value.id, value.deadmiles, value.PaymentAmount, value.totalCost, value.pickDate,value.vehicleID, $index )" ng-class="value.ready_for_invoice == 1 ? 'readyForInovice' : ''" >
+										<div class="table-row-main1 tb-body" dir-paginate="value in filteredBillingLoads | itemsPerPage: itemsPerPage track by $index"  total-items="total" current-page="currentPage" ng-click="clickMatchLoadDetail(value.truckstopID, value.id, value.deadmiles, value.PaymentAmount, value.totalCost, value.pickDate,value.vehicleID, $index )">
 											
 											<div class="tb-cell ld-id-bill ld-id"> 
 												<span>

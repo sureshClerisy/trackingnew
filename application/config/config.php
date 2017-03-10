@@ -23,7 +23,7 @@ error_reporting(-1);
 | a PHP script and you can easily do that on your own.
 |
 */
-$config['base_url'] = 'localhost/trackingnew';
+$config['base_url'] = 'http://localhost/trackingnew';
 setlocale(LC_MONETARY, 'en_US.UTF-8');
 /*
 |--------------------------------------------------------------------------

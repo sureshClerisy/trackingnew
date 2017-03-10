@@ -350,7 +350,11 @@ class Test extends Admin_Controller {
 			//~ $newID = $newDest[1].'-'.$newDest[0].' ('.$this->lang->line('withIn').' '.$origin_range.' '.$this->lang->line('milesRadius').')'.$this->lang->line('pickup').' '.$pickupDate.' '.$this->lang->line('withIn').' '.$todest.' ('.$load_type.'/'.$this->lang->line('TLOnly').')';
 			//~ $newID = ltrim($newID,'-');
 		
+<<<<<<< .mine
+			$data['rows']  = $this->commonApiHitsTest( $this->orign_city, $this->orign_state, $equipment_type, $dateTime, $posted_time, $origin_country, $origin_range, $destination_city, $destination_states,$destination_range, $dest_country, $load_type);
+=======
 			$data['rows']  = $this->commonApiHits( $equipment_type, $dateTime, $posted_time, $origin_country, $origin_range, $destination_city, $destination_states,$destination_range, $dest_country, $load_type);
+>>>>>>> .r123
 			
 			echo 'Total number of records are '.count($data['rows']);
 			pr($data['rows']); 
@@ -477,8 +481,9 @@ class Test extends Admin_Controller {
 			} else {
 				$dateTime = array ();
 			}
-		
-			$data['rows'] = $this->commonApiHits($equipment_type, $dateTime, $posted_time, $origin_country, $origin_range, $destination_city, $destination_states,$destination_range, $dest_country, $load_type);
+
+			$data['rows'] = $this->commonApiHitsTestNew( $this->orign_city, $this->orign_state, $equipment_type, $dateTime, $posted_time, $origin_country, $origin_range, $destination_city, $destination_states,$destination_range, $dest_country, $load_type);
+
 			
 			//~ echo 'Total number of records are '.count($data['rows']);
 			
@@ -505,6 +510,83 @@ class Test extends Admin_Controller {
 		
 	}
 
+	public function commonApiHitsTestNew( $orign_city = '' , $orign_state = '', $abbreviation = 'F', $dateTime = array() , $hoursOld = '', $origin_country = 'USA', $origin_range = 300 ,$destination_city = '', $destination_states = '', $destination_range = 300, $dest_country = 'USA', $load_type = 'Full') {
+		if ( strpos($orign_state,',') !== false ) {
+			$states = explode(',',$orign_state);
+			$statesCount = count($states);
+		} else {
+			$statesCount = 1;
+		} 
+		
+		$tsid 			= $this->config->item('truck_id');	
+		$username 	= $this->config->item('truck_username');
+		$password 	= $this->config->item('truck_password');
+		$wsdl_url		= 'http://webservices.truckstop.com/V13/Searching/LoadSearch.svc?wsdl'; //Live Mode Api 
+			
+			$pageNo = 1;
+			$dat = array();
+			while(true) {
+				$client   = new SOAPClient($wsdl_url);
+				$params   = array(
+					'searchRequest' => array(
+						'UserName' => $username, 'Password' => $password, 'IntegrationId' => $tsid,
+						'Criteria' => array(
+							'OriginCity' => $orign_city,
+							'OriginState' => $orign_state,//Getting records of first state(Dispatcher)
+							'OriginCountry' => $origin_country,
+							'OriginRange' => $origin_range,
+							'OriginLatitude' => '',
+							'OriginLongitude' => '',
+							'DestinationCity' => $destination_city,
+							'DestinationState' => $destination_states,
+							'DestinationCountry' =>	$dest_country,
+							'DestinationRange' => $destination_range,
+							'EquipmentType' => $abbreviation,
+							'LoadType' => 'Full',
+							'PickupDates' => $dateTime,
+							'HoursOld' => $hoursOld,
+							'EquipmentOptions' => '',
+							'PageNumber'   => $pageNo,
+							'PageSize' => 200,
+							'SortBy' => 'Miles',
+							'SortDescending' => true
+							)
+						)
+					);
+				
+				$return = $client->GetLoadSearchResults($params);
+				
+				if(empty($return->GetLoadSearchResultsResult->SearchResults)  || empty($return->GetLoadSearchResultsResult->SearchResults->LoadSearchItem)){
+					$this->rows   = array();
+				} else if(empty($return->GetLoadSearchResultsResult->Errors->Error)){
+					$this->rows   = $return->GetLoadSearchResultsResult->SearchResults->LoadSearchItem;
+				} else{			
+					$data['no_result'] 	= $return->GetLoadSearchResultsResult->Errors->Error->ErrorMessage;
+				}
+
+				$data['rows'] = array();
+				if(count($this->rows) == 1){
+					$data['rows'][]   = json_decode(json_encode($this->rows),true);
+				}else{
+					$data['rows'] 	  = json_decode(json_encode($this->rows),true);
+				}
+				
+				$dat = array_merge($dat,$data['rows']);				
+				
+				if( count($data['rows']) < 200 )  {
+					break;
+				}
+				$pageNo++;
+				
+				
+			}
+			
+			$this->finalArray  = $dat;
+			unset($dat);
+			unset($data['rows']);
+			return $this->finalArray;
+		}
+		
 	/**
 	 *  finding diesel cost for loaded distance, deadmiles
 	 */ 

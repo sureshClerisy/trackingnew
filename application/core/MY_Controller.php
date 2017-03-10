@@ -217,7 +217,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 				if($_FILES['file']['error'] == 0 ){
 					$extArr = explode('.',$_FILES['file']['name']);
 					$extension = strtolower(end($extArr));
-					$config['file_name']   = $config['_prefix'].time().'.'.$extension;
+					$config['file_name']   = $config['_prefix'].uniqid().'.'.$extension;
 					$config['upload_path']          = 'assets/uploads/documents/'.$uploadFolder.'/';
 					$config['allowed_types']        = 'pdf|gif|jpg|png|docx|doc|xls|xlsx|txt|ico|bmp|svg';
 					

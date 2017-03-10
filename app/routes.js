@@ -125,7 +125,6 @@ app.controller('AppCtrl', ['$scope','$rootScope', function ($scope,$rootScope) {
 	});
 });
 
-
 app.controller('loginCheck', function (dataFactory,$scope, $sce,$rootScope, $location, $http , $cookies, $state, $localStorage, $q, $timeout,$window, $compile) {
 $rootScope.logoutmessage=false;
     $scope.login = {};
@@ -545,7 +544,7 @@ $rootScope.logoutmessage=false;
 			$rootScope.form.ttype = ttype;
 			$cookies.remove("_search");
 			$cookies.putObject('_search', $rootScope.form);
-		 	$state.go('searchresults', {q:encodeURI(q)}, {reload: true});
+		 	$state.go('searchresults', {q:encodeURI(q),type:true}, {reload: true});
 		 	$("#mainSearchOverlay").hide();
 		}
 
@@ -1328,6 +1327,31 @@ $rootScope.logoutmessage=false;
 			$rootScope.disableInputs();	
 		}
 	}
+
+	$scope.printBrokerInfo = function( editSavedLoad, id, infoType) {
+		
+		// alert(editSavedLoad);
+		// alert(id);
+		// alert(infoType);
+
+		var newWindowUrl = URL;
+		switch(infoType){
+			case 'loadDetail':
+				newWindowUrl +='/truckstop/printLoadDetails/'+editSavedLoad+'/'+id;
+			break;
+			case 'brocker':
+				newWindowUrl += '/assignedloads/PrintBrokersDetails/'+id;				
+			break;
+			case 'tripDetails':
+				newWindowUrl += '/truckstop/printTripDetails/'+id;				
+			break;
+		}
+		var winPrint = $window.open(newWindowUrl,'_blank',null,"location=no");
+		winPrint.focus();
+		setTimeout(function () {
+			winPrint.print();
+		},1000);
+	};
 	
 	/**
 	 * change driver dropdown
@@ -3032,6 +3056,8 @@ $rootScope.logoutmessage=false;
 							$rootScope.tableTitle = [];	
 							$rootScope.tableTitle.push(data.table_title);
 						}
+					}else if(saveType != undefined && saveType == 'fassignedLoads'){
+						$rootScope.resetListing();
 					}else if(saveType != undefined && saveType == 'dashboard'){
 						var returnedData = {fcolumn:data.savedData.id, PickupDate: data.savedData.PickupDate, DeliveryDate: data.savedData.DeliveryDate, miles:data.savedData.Mileage, deadmiles: data.savedData.deadmiles, invoice: data.savedData.PaymentAmount, charges: data.savedData.totalCost, profit: data.savedData.overallTotalProfit,ppercent : data.savedData.overallTotalProfitPercent  };
 						//angular.copy(returnedData, $rootScope.loadPerformance[$rootScope.globalListingIndex]);
@@ -3736,6 +3762,9 @@ $rootScope.logoutmessage=false;
 							$rootScope.readyToSendPaymentCount = parseInt($rootScope.readyToSendPaymentCount) - 1;		// changing the inbox send for payment count on deleting invoice
 						} else {
 							$rootScope.Message = 'Success: The document has been deleted successfully.';
+							if($rootScope.saveTypeLoad == 'filteredBillingLoads'){
+								$rootScope.showInvoicedLoads();
+							}
 						}							
 					}
 				});
@@ -3879,8 +3908,11 @@ $rootScope.logoutmessage=false;
 				$rootScope.alertExceedMsg = true;
 				$rootScope.ExceedMessage = data.errorMessage;
 			} else {
-				if ( $rootScope.saveTypeLoad != undefined && $rootScope.saveTypeLoad != 'sendForPayment' )
+				if ( $rootScope.saveTypeLoad != undefined && $rootScope.saveTypeLoad == 'filteredBillingLoads' ){
+					$rootScope.showInvoicedLoads();
+				}else  if ( $rootScope.saveTypeLoad != undefined && $rootScope.saveTypeLoad != 'sendForPayment' ){
 					$rootScope.billingLoads = data.billingLoads;
+				}
 					
 				$rootScope.alertloadmsg = true;
 				$rootScope.alertExceedMsg = false;
@@ -4395,6 +4427,9 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
 				templateUrl: 'assets/templates/loads/loads.html',
                 controller: 'loadsController',
                 moduleName: 'loads',
+                params: {
+                	type: true,
+                },
                 resolve:{
 					 deps: ['$ocLazyLoad', function($ocLazyLoad) {
                             return $ocLazyLoad.load([
@@ -4406,6 +4441,7 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
                                     'signature',
                                     //~ 'dropzone',
                                     'inputMask',
+                                    'telephonefilter',
                                 ], {
                                     insertBefore: '#lazyload_placeholder'
                                 });
@@ -4415,7 +4451,13 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
 						if($stateParams.q != undefined){
 							 qstr = "/?"+$stateParams.q;
 						}
-						return dataFactory.httpRequest(URL+'/Loads/index/'+$stateParams.key+qstr);
+						if ( $stateParams.type == true){
+							return dataFactory.httpRequest(URL+'/Loads/index/'+$stateParams.key+qstr);
+						}
+						else{
+							var response = {table_title: "",total: 0,vehicleIdRepeat: "", loadSource:"truckstop.com", assigned_loads: [], filterArgs:[]};
+							return response;
+						}
 					},
 				},
 			}).state('myLoad', {
@@ -4438,6 +4480,7 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
                                     'signature',
                                     //~ 'dropzone',
                                     'inputMask',
+                                    'telephonefilter'
                                 ], {
                                     insertBefore: '#lazyload_placeholder'
                                 });
@@ -4590,10 +4633,12 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
 					deps: ['$ocLazyLoad', function($ocLazyLoad) {
                             return $ocLazyLoad.load([
                                     'datepicker',
+                                    'daterangepicker',
 									'timepicker',
                                     'autonumeric',
                                     'wysihtml5',
-                                   'inputMask'
+                                   'inputMask',
+                                   'telephonefilter'
                                 ], {
                                     insertBefore: '#lazyload_placeholder'
                                 });
@@ -4608,10 +4653,13 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
 				}
 			}).state('billings',{
 				url: '/billings/:key/?:q',
-				title: 'Billable',
+				title: 'Filtered Loads',
 				templateUrl: 'assets/templates/billings/filterdBillings.html',
 				controller: 'filteredBillingsController',
 				moduleName: 'loads',
+				params: {
+                	type: true,
+                },
 				resolve: {
 					deps: ['$ocLazyLoad', function($ocLazyLoad) {
                             return $ocLazyLoad.load([
@@ -4620,7 +4668,8 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
 									'timepicker',
                                     'autonumeric',
                                     'wysihtml5',
-                                   'inputMask'
+                                   'inputMask',
+                                   'telephonefilter'
                                 ], {
                                     insertBefore: '#lazyload_placeholder'
                                 });
@@ -4630,7 +4679,12 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
 						if($stateParams.q != undefined){
 							 qstr = "/?"+$stateParams.q;
 						}
-						return dataFactory.httpRequest(URL+'/Filteredbillings/index/'+$stateParams.key+qstr);
+						if($stateParams.type){
+							return dataFactory.httpRequest(URL+'/Filteredbillings/index/'+$stateParams.key+qstr);
+						}else{
+							var response = {total:0, loads: [], billType: "billing", filterArgs: []};
+							return response;
+						}
 					}
 
 				}

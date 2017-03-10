@@ -173,8 +173,9 @@ app.controller('assignedLoadsController', ["dataFactory","$scope","$http","$root
         //~ }
         //~ isSending = true;
         //~ canceller = $q.defer();
-
+		$scope.autoFetchLoads = true;
         dataFactory.httpRequest(URL+'/Assignedloads/getRecords/','Post',{} ,{ pageNo:pageNumber, itemsPerPage:$scope.itemsPerPage,searchQuery: search, sortColumn:sortColumn, sortType:sortType,startDate: $scope.dateRangeSelector.startDate, endDate:$scope.dateRangeSelector.endDate }).then(function(data){
+        	$scope.autoFetchLoads = false;
         	$rootScope.assignedLoads = data.data;
         	if(Object.keys($rootScope.assignedLoads).length <= 0){
 				$scope.haveRecords = true;
@@ -196,7 +197,7 @@ app.controller('assignedLoadsController', ["dataFactory","$scope","$http","$root
 		type = type == "ASC" ? "DESC" : "ASC";
 		$scope.lastSortedColumn = sortColumn;
     	$scope.lastSortType 	= type;
-    	$scope.idSortType = ''; $scope.PointOfContactPhoneSortType = ''; $scope.equipment_optionsSortType = ''; $scope.LoadTypeSortType = ''; $scope.PickupDateSortType = ''; $scope.DeliveryDateSortType = ''; $scope.OriginCitySortType = ''; $scope.OriginStateSortType = ''; $scope.DestinationCitySortType = ''; $scope.DestinationStateSortType = ''; $scope.driverNameSortType = ''; $scope.invoiceNoSortType = ''; $scope.PaymentAmountSortType = ''; $scope.MileageSortType = '';$scope.deadmilesSortType = ''; $scope.LengthSortType = ''; $scope.LengthSortType = ''; $scope.WeightSortType = ''; $scope.companyNameSortType = ''; $scope.load_sourceSortType = ''; $scope.JobStatusSortType = '';
+    	$scope.idSortType = ''; $scope.PointOfContactPhoneSortType = ''; $scope.equipment_optionsSortType = ''; $scope.LoadTypeSortType = ''; $scope.PickupDateSortType = ''; $scope.DeliveryDateSortType = ''; $scope.OriginCitySortType = ''; $scope.OriginStateSortType = ''; $scope.DestinationCitySortType = ''; $scope.DestinationStateSortType = ''; $scope.driverNameSortType = ''; $scope.invoiceNoSortType = ''; $scope.PaymentAmountSortType = ''; $scope.MileageSortType = '';$scope.deadmilesSortType = ''; $scope.LengthSortType = ''; $scope.LengthSortType = ''; $scope.WeightSortType = ''; $scope.companyNameSortType = ''; $scope.load_sourceSortType = ''; $scope.JobStatusSortType = ''; $scope.RpmSortType = '';
 
     	switch(sortColumn){
     		case 'id' 					: $scope.idSortType = type;  break;
@@ -213,7 +214,7 @@ app.controller('assignedLoadsController', ["dataFactory","$scope","$http","$root
     		case 'invoiceNo'			: $scope.invoiceNoSortType = type; break;
     		case 'PaymentAmount'		: $scope.PaymentAmountSortType = type; break;
     		case 'Mileage'			 	: $scope.MileageSortType = type; break;
-    		case 'Mileage'			 	: $scope.MileageSortType = type; break;
+    		case 'rpm'			 		: $scope.RpmSortType = type; break;
     		case 'deadmiles'			: $scope.deadmilesSortType = type; break;
     		case 'Length'			 	: $scope.LengthSortType = type; break;
     		case 'Weight'			 	: $scope.WeightSortType = type; break;

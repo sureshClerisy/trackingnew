@@ -556,15 +556,34 @@ class Assignedloads extends Admin_Controller{
 	 * Fetching Broker list on add load
 	 */
 	 
-	public function getBrokersList( $loadId = null ) {
+	public function getBrokersList( $loadId = null ,$print = null) {
 		$brokersData = $this->BrokersModel->getBrokersList();
 		if ( !empty($brokersData) ) 
 			$this->data['brokersList'] = $brokersData;
 			
 		$getBrokerLoad = $this->BrokersModel->getBrokerDetail( $loadId );
 		$this->data['brokerLoadDetail'] = $getBrokerLoad;
+		
+		if($print){ return $this->data; }
 		echo json_encode($this->data);
-	} 
+	}
+
+	/**
+	* Method PrintBrokersDetails
+	* @param Load ID
+	* @return NULL
+	* 
+	*/
+	public function PrintBrokersDetails( $loadID = null){
+		
+		$data 				= $this->getBrokersList($loadID, TRUE );
+		$data['loadID'] 	= $loadID;
+		$columns 			= ['JobStatus','invoiceNo'];
+		$fetchedColumns 	= $this->Job->fetchLoadFields($loadID,$columns);
+		$data['invoceNo'] 	= $fetchedColumns[0]['invoiceNo'];
+		$data['JobStatus'] 	= $fetchedColumns[0]['JobStatus'];
+		$this->load->view('printTemplates/broker',$data);
+	}
 	
 	
 	public function demo() {

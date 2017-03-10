@@ -80,7 +80,7 @@ app.controller('truckstopController', function( dataFactory,$scope,$sce,$http ,$
 	//~ $rootScope.tableTitle = [];
 	
 	$scope.states_data = {};
-	console.log(getAllTrucksStopData);
+	
 	if ( getAllTrucksStopData.loadsData != undefined && getAllTrucksStopData.loadsData.shouldNotMoveFurther != undefined && getAllTrucksStopData.loadsData.shouldNotMoveFurther == false ) {
 		return false;
 	}

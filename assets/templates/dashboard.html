@@ -48,7 +48,7 @@ else{
 					      <div class="alert alert-info">
 					         <div>
 					            <div class="pgn-thumbnail">
-					               <div><img style="display: inline-block;" on-error-src="pages/img/user.png" ng-src="assets/uploads/drivers/thumbnail/{{driver.profile_image}}" ui-jq="unveil" alt="" width="40" height="40"></div>
+					               <div><img style="display: inline-block;" on-error-src="pages/img/user.png" ng-src="assets/uploads/drivers/thumbnail/{{driver.profile_image}}" ui-jq="unveil" alt="" width="40" height="40" src="pages/img/user.png"></div>
 					            </div>
 					            <div class="pgn-message">
 					               <div>
@@ -557,9 +557,9 @@ else{
 													<div class="col-md-5 col-xlg-6 pie-color-block ">
 														<div class="cart-color">
 															<ul class="print-listing chart-color">
-																<li class="view-loads"><span style="background:#077ed0;"></span> <p ng-click="showRecordsWithFilter('inprogress','loads')">{{ languageArray.loadstatusinprogress }}</p></li>
-																<li class="view-loads"> <span style="background:#6D5CAE;"></span><p ng-click="showRecordsWithFilter('delivered','loads')">{{ languageArray.loadstatusdelivered }}</p></li>
-																<li class="view-loads"><span style="background:#34d6c7;"></span> <p ng-click="showRecordsWithFilter('booked','loads')">{{ languageArray.loadstatusbooked }}</p></li>
+																<li class="view-loads" ng-click="showRecordsWithFilter('inprogress','loads')"><span style="background:#077ed0;"></span> <p >{{ languageArray.loadstatusinprogress }}</p></li>
+																<li class="view-loads" ng-click="showRecordsWithFilter('delivered','loads')"> <span style="background:#6D5CAE;"></span><p >{{ languageArray.loadstatusdelivered }}</p></li>
+																<li class="view-loads" ng-click="showRecordsWithFilter('booked','loads')"><span style="background:#34d6c7;"></span> <p >{{ languageArray.loadstatusbooked }}</p></li>
 																<li> <span style="background:#626262;"></span><p>{{ languageArray.loadstatusnoloads }}</p></li>
 															</ul>
 														</div>
@@ -572,11 +572,10 @@ else{
 												<h4>{{ languageArray.loadstatusinvoice }}</h4>
 												<div class="invoic-ul">
 													<ul>
-
-														<li class="view-lcount"> <p ng-click="showRecordsWithFilter('invoices','billings')">{{ languageArray.loadstatusinvoice }} </p><h6>{{summary.invoiceCount}}</h6><span> : </span></li>
-														<li class="view-lcount"> <p ng-click="showRecordsWithFilter('waiting-paperwork','billings')">{{ languageArray.loadstatusinvoicwaitppr }}</p><h6>{{summary.waitingPaperworkCount}}</h6><span> : </span></li>
+														<li class="view-lcount" ng-click="showRecordsWithFilter('invoices','billings')"> <p >{{ languageArray.loadstatusinvoice }} </p><h6>{{summary.invoiceCount}}</h6><span> : </span></li>
+														<li class="view-lcount" ng-click="showRecordsWithFilter('waiting-paperwork','billings')"> <p >{{ languageArray.loadstatusinvoicwaitppr }}</p><h6>{{summary.waitingPaperworkCount}}</h6><span> : </span></li>
 														<li > <p>{{ languageArray.loadstatusinvoicpaynoreciv }}</p><h6>{{summary.paymentNotRecievedCount}}</h6><span> : </span></li>
-														<li class="view-lcount"> <p ng-click="showRecordsWithFilter('sentForPayment','billings')">{{ languageArray.loadstatusinvoicpayoncoll }}  </p><h6>{{summary.sentForPaymentCount}}</h6><span> : </span></li>
+														<li class="view-lcount" ng-click="showRecordsWithFilter('sentForPayment','billings')"> <p >{{ languageArray.loadstatusinvoicpayoncoll }}  </p><h6>{{summary.sentForPaymentCount}}</h6><span> : </span></li>
 													</ul>
 												</div>
 											</div>

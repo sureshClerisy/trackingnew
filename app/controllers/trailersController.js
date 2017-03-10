@@ -157,6 +157,7 @@ app.controller('addEditTrailerController', function(dataFactory, getAddTrailerDa
 					
 				}*/
 				$scope.$apply();
+				$location.path('trailers');
 			}
 		},
 	};
@@ -202,6 +203,7 @@ app.controller('addEditTrailerController', function(dataFactory, getAddTrailerDa
 				}
 				else{
 					$rootScope.trailerEditMessage = $rootScope.languageArray.trailerUpdateMsg;
+					$location.path('trailers');
 				}
 				
 				
@@ -210,8 +212,10 @@ app.controller('addEditTrailerController', function(dataFactory, getAddTrailerDa
 					$rootScope.trailerEditMessage = $rootScope.languageArray.trailerSaveErrMsg;
 				else
 					$rootScope.trailerEditMessage = $rootScope.languageArray.trailerUpdateErrMsg;
+
+				$scope.dropzone.processQueue();
 			}
-			$location.path('trailers');
+			
 		});
 	}
 	

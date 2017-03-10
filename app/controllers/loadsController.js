@@ -62,22 +62,25 @@ app.controller('loadsController', ["dataFactory","$scope","$http","$rootScope", 
 	$rootScope.Docs = [];
 	$scope.vDriversList = [];
 	
-	$scope.firstParam = getAllLoads.filterArgs.firstParam;
+	$scope.firstParam = (getAllLoads.filterArgs.firstParam != undefined ) ? getAllLoads.filterArgs.firstParam : 'all'; 
+	$rootScope.assignedLoads = (getAllLoads.assigned_loads != undefined ) ? getAllLoads.assigned_loads : [];
+	$scope.filterArgs = (getAllLoads.filterArgs != undefined ) ? getAllLoads.filterArgs : []; 
 	
-	$rootScope.assignedLoads = getAllLoads.assigned_loads;
-	$scope.filterArgs = getAllLoads.filterArgs;
 	if(Object.keys($rootScope.assignedLoads).length <= 0){
 		$scope.haveRecords = true;
 	}else{
 		$scope.haveRecords = false;
 	}
 	$scope.DeliveryDateSortType = 'DESC';				// initially setting value of delivery date column to desc
-	$rootScope.tableTitle.push(getAllLoads.table_title);
-	
-	$rootScope.selectedVehicleId = '';
-	$rootScope.vehicleIdRepeat = getAllLoads.vehicleIdRepeat;
-	$scope.vDriversList = getAllLoads.labelArray;
-	$scope.total = getAllLoads.total;
+	if( getAllLoads.table_title != undefined ){
+		$rootScope.tableTitle.push(getAllLoads.table_title);	
+	}
+	if( getAllLoads.total != undefined ){
+		$scope.total = getAllLoads.total;
+	}
+	if( getAllLoads.loadSource != undefined ){
+		$scope.loadSource = getAllLoads.loadSource; 			// setting load source for getting loads listing
+	}
 
 	//~ $scope.dateRangeSelector = getAllLoads.dateRangeValue;
 	
@@ -111,10 +114,6 @@ app.controller('loadsController', ["dataFactory","$scope","$http","$rootScope", 
 	
 
 
-	
-	$rootScope.selectedScope = getAllLoads.selectedDriver;  // Before it is search_label 
-			
-	$rootScope.selectedVehicleId = $rootScope.vehicleIdRepeat.toString();
 	$scope.deletedRowIndex = '';
 	
 	$scope.initialOrder = [[ 14, "desc" ]];
@@ -123,9 +122,9 @@ app.controller('loadsController', ["dataFactory","$scope","$http","$rootScope", 
 
 	$rootScope.dataTableOpts(25,21,'',dtoptions);			 // change total column count for loads added from truckstop
 		
-	$rootScope.saveTypeLoad = 'assignedLoads';    			// setting the save type for dynamic changing the listing on routes
+	$rootScope.saveTypeLoad = 'fassignedLoads';    			// setting the save type for dynamic changing the listing on routes
 	
-	$scope.loadSource = getAllLoads.loadSource; 			// setting load source for getting loads listing
+	
 	
 	$scope.newRowsArray = [];
 	$scope.newDriversArray = [];
@@ -162,6 +161,9 @@ app.controller('loadsController', ["dataFactory","$scope","$http","$rootScope", 
             return item.username;
     }
 
+    $rootScope.resetListing = function(){
+    	$scope.loadItems();
+    }
 
     //-------------- Pagination functions ------------------------- 
 
@@ -182,25 +184,19 @@ app.controller('loadsController', ["dataFactory","$scope","$http","$rootScope", 
     };
 
     $scope.loadNextPage = function(pageNumber,search,sortColumn,sortType){
-    	//~ var canceller, isSending = false;
-    	//~ if(isSending) {
-            //~ canceller.resolve();
-        //~ }
-        //~ isSending = true;
-        //~ canceller = $q.defer();
-
+    	$scope.autoFetchLoads = true;
         dataFactory.httpRequest(URL+'/Loads/getRecords/','Post',{} ,{ pageNo:pageNumber, itemsPerPage:$scope.itemsPerPage,searchQuery: search, sortColumn:sortColumn, sortType:sortType,startDate: $scope.dateRangeSelector.startDate, endDate:$scope.dateRangeSelector.endDate,filterArgs:$scope.filterArgs }).then(function(data){
+        	$scope.autoFetchLoads = false;
         	$rootScope.assignedLoads = data.data;
+
         	if(Object.keys($rootScope.assignedLoads).length <= 0){
 				$scope.haveRecords = true;
 			}else{
 				$scope.haveRecords = false;
 			}
             $scope.total = data.total;
-            //~ isSending = false;
         	return data;
 		});
-		//~ canceler.resolve();  // Aborts the $http request if it isn't finished.
     };
 
     $scope.callSearchFilter = function(query){
@@ -211,7 +207,7 @@ app.controller('loadsController', ["dataFactory","$scope","$http","$rootScope", 
 		type = type == "ASC" ? "DESC" : "ASC";
 		$scope.lastSortedColumn = sortColumn;
     	$scope.lastSortType 	= type;
-    	$scope.idSortType = ''; $scope.PointOfContactPhoneSortType = ''; $scope.equipment_optionsSortType = ''; $scope.LoadTypeSortType = ''; $scope.PickupDateSortType = ''; $scope.DeliveryDateSortType = ''; $scope.OriginCitySortType = ''; $scope.OriginStateSortType = ''; $scope.DestinationCitySortType = ''; $scope.DestinationStateSortType = ''; $scope.driverNameSortType = ''; $scope.invoiceNoSortType = ''; $scope.PaymentAmountSortType = ''; $scope.MileageSortType = '';$scope.deadmilesSortType = ''; $scope.LengthSortType = ''; $scope.LengthSortType = ''; $scope.WeightSortType = ''; $scope.companyNameSortType = ''; $scope.load_sourceSortType = ''; $scope.JobStatusSortType = '';
+    	$scope.idSortType = ''; $scope.PointOfContactPhoneSortType = ''; $scope.equipment_optionsSortType = ''; $scope.LoadTypeSortType = ''; $scope.PickupDateSortType = ''; $scope.DeliveryDateSortType = ''; $scope.OriginCitySortType = ''; $scope.OriginStateSortType = ''; $scope.DestinationCitySortType = ''; $scope.DestinationStateSortType = ''; $scope.driverNameSortType = ''; $scope.invoiceNoSortType = ''; $scope.PaymentAmountSortType = ''; $scope.MileageSortType = '';$scope.deadmilesSortType = ''; $scope.LengthSortType = ''; $scope.LengthSortType = ''; $scope.WeightSortType = ''; $scope.companyNameSortType = ''; $scope.load_sourceSortType = ''; $scope.JobStatusSortType = ''; $scope.RpmSortType = '';
 
     	switch(sortColumn){
     		case 'id' 					: $scope.idSortType = type;  break;
@@ -228,7 +224,7 @@ app.controller('loadsController', ["dataFactory","$scope","$http","$rootScope", 
     		case 'invoiceNo'			: $scope.invoiceNoSortType = type; break;
     		case 'PaymentAmount'		: $scope.PaymentAmountSortType = type; break;
     		case 'Mileage'			 	: $scope.MileageSortType = type; break;
-    		case 'Mileage'			 	: $scope.MileageSortType = type; break;
+    		case 'rpm'			 		: $scope.RpmSortType = type; break;
     		case 'deadmiles'			: $scope.deadmilesSortType = type; break;
     		case 'Length'			 	: $scope.LengthSortType = type; break;
     		case 'Weight'			 	: $scope.WeightSortType = type; break;
@@ -311,13 +307,6 @@ app.controller('loadsController', ["dataFactory","$scope","$http","$rootScope", 
 
 			//---------------- Hours of Service --------------
 
-
-			//valueArray.dailyDriving 	= data.dailyDriving;
-			//valueArray.totalDrivingHour = data.totalDrivingHour;
-			//valueArray.totalWorkingDays = data.totalWorkingDays;
-			//valueArray.hoursRemaining 	= data.hoursRemaining;
-			//valueArray.drivingHours 	= data.drivingHours;
-			//valueArray.workingHour 	= data.compWorkingHours;
 			valueArray.vehicleLog 	= data.vehicleLogForJob;
 
 			if ( valueArray.PickupAddress != '' && valueArray.PickupAddress != undefined ) {
@@ -585,56 +574,7 @@ app.controller('loadsController', ["dataFactory","$scope","$http","$rootScope", 
 	   	angular.element($event.currentTarget).keyup();
    	}
    	
-   	/**
-   	 * On Change Driver Iteration load
-   	 * 
-   	 */
-   	  
-   	$scope.changeDriverLoads = function() {
-		if ( $scope.dateRangeSelector != undefined && Object.keys($scope.dateRangeSelector).length > 0 ) {
-			date  = $scope.dateRangeSelector;
-			$cookies.putObject('_gDateRange', $scope.dateRangeSelector);
-			/*month = parseInt(date.startDate.month() + 1 );
-			$scope.startDate = date.startDate.year()+'-'+month+'-'+date.startDate.date();
-			month = parseInt(date.endDate.month() + 1 );
-			$scope.endDate = date.endDate.year()+'-'+month+'-'+date.endDate.date();*/
-		} else {
-			$scope.startDate = '';
-			$scope.endDate = '';
-		}
-			
-		if ( $rootScope.scope != undefined && $rootScope.selScope != undefined ) {
-			$scope.autoFetchLoads = true;
-		
-			dataFactory.httpRequest(URL+'/Loads/getChangeDriverLoads/'+$rootScope.selectedVehicle+'/'+$rootScope.setVehicleDriverId,'POST',{},{scopeType:$rootScope.scope, scope: $rootScope.selScope, loadSource : $scope.loadSource, startingDate: $scope.dateRangeSelector.startDate, endingDate : $scope.dateRangeSelector.endDate}).then(function(data) {
-				$rootScope.assignedLoads = [];
-				$rootScope.assignedLoads = data.assigned_loads;
-				if(Object.keys($rootScope.assignedLoads).length <= 0){
-					$scope.haveRecords = true;
-				}else{
-					$scope.haveRecords = false;
-				}
-				$scope.idSortType = ''; $scope.PointOfContactPhoneSortType = ''; $scope.equipment_optionsSortType = ''; $scope.LoadTypeSortType = ''; $scope.PickupDateSortType = ''; $scope.DeliveryDateSortType = ''; $scope.OriginCitySortType = ''; $scope.OriginStateSortType = ''; $scope.DestinationCitySortType = ''; $scope.DestinationStateSortType = ''; $scope.driverNameSortType = ''; $scope.invoiceNoSortType = ''; $scope.PaymentAmountSortType = ''; $scope.MileageSortType = '';$scope.deadmilesSortType = ''; $scope.LengthSortType = ''; $scope.LengthSortType = ''; $scope.WeightSortType = ''; $scope.companyNameSortType = ''; $scope.load_sourceSortType = ''; $scope.JobStatusSortType = '';
-				$scope.DeliveryDateSortType = 'DESC';				// initially setting value of delivery date column to desc
-				$scope.total = data.total;
-				$scope.currentPage = 1;
-				if(data.hasOwnProperty('vehicleIdRepeat')){
-					$rootScope.vehicleIdRepeat = data.vehicleIdRepeat;
-					$rootScope.tableTitle = [];	
-					$rootScope.tableTitle.push(data.table_title);
-				}
-				
-				//$rootScope.search_label = driverValue;
-				
-				$scope.newChangeDriverLoads = false;
-				$scope.showRouteOnMap = false;
-				$scope.showGantt = false;
-				
-				$scope.autoFetchLoads = false;
-			});	
-		}
-				
-	}
+   	
 	
 	if( $cookies.getObject('_gDateRange') ){
         $scope.dateRangeSelector = $cookies.getObject('_gDateRange');
@@ -648,6 +588,7 @@ app.controller('loadsController', ["dataFactory","$scope","$http","$rootScope", 
 
 	
      $scope.opts = {
+     	opens:'left',
      	autoUpdateInput: false,
         locale: {
             applyClass: 'btn-green',
@@ -694,7 +635,7 @@ app.controller('loadsController', ["dataFactory","$scope","$http","$rootScope", 
 		$rootScope.firstTimeClick = true;
 		var url = decodeURI($rootScope.absUrl.q);
 		if ( url != '' && url != undefined && url != 'undefined' ) {
-			$state.go('loads', {'key':$scope.firstParam,q:url}, {notify: false,reload: false});
+			$state.go('loads', {'key':$scope.firstParam,q:url,type:false}, {notify: false,reload: false});
 		} 
 		else {
 			$state.go('search', {}, {notify: false,reload: false});	
@@ -708,9 +649,9 @@ app.controller('loadsController', ["dataFactory","$scope","$http","$rootScope", 
 		var url = decodeURI($rootScope.absUrl.q);
 		if($trigger1 !== event.target && !$trigger1.has(event.target).length){
 			if ( $rootScope.statesArr[0] != '' && $rootScope.statesArr[0] != undefined ) {
-				$state.go($rootScope.statesArr[0], {'key':$scope.firstParam,q:url}, {notify: false,reload: false});
+				$state.go($rootScope.statesArr[0], {'key':$scope.firstParam,q:url,type:false}, {notify: false,reload: false});
 			} else {
-				$state.go('loads', {'key':$scope.firstParam,q:url}, {notify: false,reload: false});
+				$state.go('search', {}, {notify: false,reload: false});
 			}
 		}
 	});
@@ -726,37 +667,37 @@ app.controller('loadsController', ["dataFactory","$scope","$http","$rootScope", 
 
 	/***********Load Details ends******************/
 	
-		$scope.updateDashboard = function(direction){
-			if(direction == "prev"){
-				$scope.options.fromDate = moment($scope.options.fromDate).subtract(1,  'days');
-				var bufferedDate = $scope.options.fromDate;
-				$scope.options.toDate = moment(bufferedDate).add(23.59,'hours');
+	$scope.updateDashboard = function(direction){
+		if(direction == "prev"){
+			$scope.options.fromDate = moment($scope.options.fromDate).subtract(1,  'days');
+			var bufferedDate = $scope.options.fromDate;
+			$scope.options.toDate = moment(bufferedDate).add(23.59,'hours');
 
-				var response = Sample.fetchEastimateHOS($scope.HOS,$scope.options.fromDate);
-				$scope.data = response.vlog;
-	        	$scope.onDuty = parseFloat(response.totals.onDuty).toFixed(2);
-	        	$scope.offDuty = parseFloat(response.totals.offDuty).toFixed(2);
-	        	$scope.SB = parseFloat(response.totals.SB).toFixed(2);
-	        	$scope.driving = parseFloat(response.totals.driving).toFixed(2);
+			var response = Sample.fetchEastimateHOS($scope.HOS,$scope.options.fromDate);
+			$scope.data = response.vlog;
+        	$scope.onDuty = parseFloat(response.totals.onDuty).toFixed(2);
+        	$scope.offDuty = parseFloat(response.totals.offDuty).toFixed(2);
+        	$scope.SB = parseFloat(response.totals.SB).toFixed(2);
+        	$scope.driving = parseFloat(response.totals.driving).toFixed(2);
 
-	        	$scope.thours = response.totals.thours;
+        	$scope.thours = response.totals.thours;
 
-			}else if(direction = "next"){
-				$scope.options.fromDate = moment($scope.options.fromDate).add(1,  'days');
-				var bufferedDate = $scope.options.fromDate;
-				$scope.options.toDate = moment(bufferedDate).add(23.59,  'hours');
-				var response = Sample.fetchEastimateHOS($scope.HOS,$scope.options.fromDate);
-				$scope.data = response.vlog;
-	        	$scope.onDuty = parseFloat(response.totals.onDuty).toFixed(2);
-	        	$scope.offDuty = parseFloat(response.totals.offDuty).toFixed(2);
-	        	$scope.SB = parseFloat(response.totals.SB).toFixed(2);
-	        	$scope.driving = parseFloat(response.totals.driving).toFixed(2);
+		}else if(direction = "next"){
+			$scope.options.fromDate = moment($scope.options.fromDate).add(1,  'days');
+			var bufferedDate = $scope.options.fromDate;
+			$scope.options.toDate = moment(bufferedDate).add(23.59,  'hours');
+			var response = Sample.fetchEastimateHOS($scope.HOS,$scope.options.fromDate);
+			$scope.data = response.vlog;
+        	$scope.onDuty = parseFloat(response.totals.onDuty).toFixed(2);
+        	$scope.offDuty = parseFloat(response.totals.offDuty).toFixed(2);
+        	$scope.SB = parseFloat(response.totals.SB).toFixed(2);
+        	$scope.driving = parseFloat(response.totals.driving).toFixed(2);
 
-	        	$scope.thours = response.totals.thours;
+        	$scope.thours = response.totals.thours;
 
-			}
-			$scope.displayHOSDate = moment($scope.options.fromDate).format("MMMM Do YYYY");
 		}
+		$scope.displayHOSDate = moment($scope.options.fromDate).format("MMMM Do YYYY");
+	}
 
 	//------------------------------------- Gantt Chart Options ----------------------------
 	$scope.options = {

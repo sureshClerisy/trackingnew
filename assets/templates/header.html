@@ -206,7 +206,7 @@
 										</ui-select>
 									</div>
 								</div>
-								<a href="javascript:void(0)" class="close-btn-poup" ng-click="hideLoadDetailPopup()" data-dismiss="modal"><img src="./pages/img/close-icon.png"></a>
+								<a href="javascript:void(0)" class="close-btn-poup" data-dismiss="modal"><img src="./pages/img/close-icon.png"></a>
 							</div>
 						</div>
 					<div class="col-xs-12 error-success-msg">
@@ -1050,7 +1050,7 @@
 						</div>
 					   <!-- END PANEL -->
 					   
-					   <section class="truck-load-pdf" ng-repeat="brokerDoc in brokerDocuments">
+					   <section class="truck-load-pdf-adjust-width" ng-repeat="brokerDoc in brokerDocuments">
 							<div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 truck-load-pdf-left">
 								<div class="row">
 									<div class="pdf-cover" data-id="{{brokerDoc.id}}" data-loadid="{{brokerDoc.load_id}}" data-url="assets/uploads/documents/broker/{{brokerDoc.doc_name}}" ng-click="perviewDoc($event)">

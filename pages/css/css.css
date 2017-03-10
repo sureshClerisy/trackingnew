@@ -2676,6 +2676,14 @@ table.dataTable thead .sorting_desc:after{
 	overflow:visible;
 }
 /**@media****/
+/**6 march****/
+.list-view .list-view-group-container {
+    padding: 0 0;
+}
+.list-view .list-view-group-container ul {
+    padding-top: 29px!important;
+}
+/**6 march****/
 
 .dashboard-small .invocie-block {
   height: auto;
@@ -3144,6 +3152,11 @@ top:40px;
   font-size: 15px;
   padding-top: 116px;
   text-transform: uppercase;
+}
+.truck-load-pdf-adjust-width {
+  float: left;
+  margin-top: 15px;
+  width: 50%;
 }
 .truck-load-pdf {
   float: left;
@@ -5452,7 +5465,7 @@ border:1px solid rgba(0, 0, 0, 0.07)!important
   color: rgba(98, 98, 98, 0.47)!important;
 }
 .daterangepicker {
-  max-width: 445px !important;
+  max-width: 426px !important;
 }
 .daterangepicker .off.active {
   background: #fff none repeat scroll 0 0 !important;
@@ -5561,7 +5574,7 @@ body .split-view .split-list .list-view-wrapper .item .inline.email-check-sub .s
   font-size: 10px;
 }
 .delivery-metrics-block .cart-color {
-  padding-left: 12px;
+  padding-left: 8px;
   
 }
 }
@@ -5718,6 +5731,9 @@ body .split-view .split-list .list-view-wrapper .item .inline.email-check-sub .s
 }
 /***************************dashbord********************/
 .loads-tracking{width: 90%; max-width: 100%;}
+.truck-load-pdf-adjust-width {
+  width: 100%;
+}
 }
 .show-pointer{cursor:pointer}
 .show-pointer:hover{background:rgb(240,240,240)}

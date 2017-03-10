@@ -44,8 +44,16 @@ class Billings extends Admin_Controller{
 	
 	public function index( $parameter = '' ) {
 		$data = array();
-		$jobs = $this->Billing->getInProgressLoads( $parameter );
-		$data['total'] = $this->Billing->getInProgressLoads( $parameter,true );
+		$filters = array("itemsPerPage"=>20, "limitStart"=>1, "sortColumn"=>"DeliveryDate", "sortType"=>"DESC");
+		$filters["startDate"] = date('Y-m-d', strtotime('-29 days'));
+		$filters["endDate"] = date("Y-m-d"); 
+		if(isset($_COOKIE["_gDateRange"]) && !empty($_COOKIE["_gDateRange"])){
+			$gDateRange = json_decode($_COOKIE["_gDateRange"],true);
+			$filters["startDate"] = $gDateRange["startDate"]; $filters["endDate"] = $gDateRange["endDate"];
+		}
+
+		$jobs = $this->Billing->getInProgressLoads( $parameter, false, $filters );
+		$data['total'] = $this->Billing->getInProgressLoads( $parameter, true, $filters );
 		
 		$data['loads'] = $jobs;
 		$data['billType'] = 'billing';

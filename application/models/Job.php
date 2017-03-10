@@ -72,7 +72,7 @@ class Job extends Parent_Model {
         					CASE loads.driver_type 
         						WHEN "team" THEN CONCAT(d.first_name," + ",team.first_name) 
         									ELSE concat(d.first_name," ",d.last_name) 
-        									END AS driverName, loads.driver_type, loads.id, loads.invoiceNo, loads.vehicle_id, loads.truckstopID,loads.Bond,broker_info.PointOfContactPhone,loads.equipment_options,loads.LoadType,loads.PickupDate,loads.DeliveryDate,loads.OriginCity,loads.OriginState,loads.DestinationCity,loads.DestinationState,loads.PickupAddress,loads.DestinationAddress,loads.PaymentAmount,loads.Mileage,loads.deadmiles,loads.Weight,loads.Length,loads.JobStatus,loads.totalCost,loads.pickDate,loads.load_source,broker_info.TruckCompanyName as companyName');
+        									END AS driverName, loads.driver_type, loads.id, loads.invoiceNo, loads.vehicle_id, loads.truckstopID,loads.Bond,broker_info.PointOfContactPhone,loads.equipment_options,loads.LoadType,loads.PickupDate,loads.DeliveryDate,loads.OriginCity,loads.OriginState,loads.DestinationCity,loads.DestinationState,loads.PickupAddress,loads.DestinationAddress,loads.PaymentAmount,loads.Mileage, (loads.PaymentAmount/loads.Mileage) as rpm, loads.deadmiles,loads.Weight,loads.Length,loads.JobStatus,loads.totalCost,loads.pickDate,loads.load_source,broker_info.TruckCompanyName as companyName');
 		
 		$this->db->join("vehicles as v", "loads.vehicle_id = v.id","Left");
 		$this->db->join("drivers as d", "loads.driver_id = d.id","Left");
@@ -143,13 +143,24 @@ class Job extends Parent_Model {
             $this->db->group_end();
 		}
 		$filters["limitStart"] = $filters["limitStart"] == 1 ? 0 : $filters["limitStart"];
-		$this->db->order_by("loads.".$filters["sortColumn"],$filters["sortType"]);
+	
+		if(isset($filters["sortColumn"]) && $filters["sortColumn"] == "driverName"){
+			$this->db->order_by('CASE 
+								     WHEN loads.driver_type  = "team" THEN CONCAT(d.first_name, " + ", team.first_name) 
+								     ELSE concat(d.first_name, " ", d.last_name) 
+								 END '.$filters["sortType"]);
+		}else if(in_array($filters["sortColumn"] ,array("PointOfContactPhone", "TruckCompanyName"))){
+			$this->db->order_by("broker_info.".$filters["sortColumn"],$filters["sortType"]);	
+		}else if($filters["sortColumn"] == "rpm"){
+			$this->db->order_by("(loads.PaymentAmount/loads.Mileage) ",$filters["sortType"]);	 
+		}else if($filters["sortColumn"] == "Weight"){
+			$this->db->order_by("CAST(loads.".$filters["sortColumn"]."  AS DECIMAL)",$filters["sortType"]);	
+		}else{
+			$this->db->order_by("loads.".$filters["sortColumn"],$filters["sortType"]);	
+		}
 
 		$this->db->limit($filters["itemsPerPage"],$filters["limitStart"]);
-
-
 		$query = $this->db->get('loads');
-		//~ echo $this->db->last_query();die;
 		if ($query->num_rows() > 0) {
 			return $query->result_array();
 		} else {
@@ -345,7 +356,7 @@ class Job extends Parent_Model {
 
 	public function getWaitingPaperworkCount($args = null, $driverType){
 		$this->db->select('count(loads.id) as waitingPaperwork'); 
-		$this->db->join('documents',"documents.load_id = loads.id and documents.doc_type NOT IN ('pod','rateSheet') ",'LEFT');
+		//$this->db->join('documents',"documents.load_id = loads.id and documents.doc_type NOT IN ('pod','rateSheet') ",'LEFT');
 		
  		
 		if($driverType == "_idispatcher"){
@@ -373,7 +384,7 @@ class Job extends Parent_Model {
 		}
 		
 		$this->db->where(array('loads.sent_for_payment' => 0, 'loads.delete_status' => 0,'loads.ready_for_invoice' => 0));
-		
+		$this->db->where("(SELECT  count(documents.load_id) as c FROM  documents WHERE  documents.load_id  =  loads.id and documents.doc_type in ('pod','rateSheet') )< 2  ");
 		$query = $this->db->get('loads');
 		//echo $this->db->last_query();die;
 		if ($query->num_rows() > 0) {
@@ -504,6 +515,22 @@ class Job extends Parent_Model {
 			return $this->db->get('loads')->row()->$column;
 		} else {
 			return false;
+		}
+	}
+	
+	/**
+	* Fetching multiple field from load 
+	* Method fetchLoadFields
+	* @param Load ID, columns
+	* @return columns
+	*/
+	 
+	public function fetchLoadFields( $loadId = null , $column = '') {
+		if ( $column != '' ) {
+			return $this->db->select(implode(',',$column))
+			->where('id', $loadId)
+			->get('loads')
+			->result_array();			
 		}
 	}
 	
@@ -1547,6 +1574,9 @@ class Job extends Parent_Model {
 		$this->db->select('id');
 		$this->db->where('truckstopID',$truckstopId);
 		$result = $this->db->get('loads');
+		
+		// echo $this->db->last_query();
+
 		if ( $result->num_rows() > 0 ) {
 			return $result->row_array();
 		} else {
@@ -1657,6 +1687,25 @@ class Job extends Parent_Model {
 			return false;
 		}
 	}
+
+
+	public function isInvoiceGenerated($loadId){
+		$this->db->select("*, CASE
+								WHEN doc_type LIKE 'invoice'
+								THEN 'yes'
+								ELSE 'no'
+								END AS haveInvoice");
+		$this->db->where(array('load_id' => $loadId, "doc_type"=>"invoice"));
+		
+		$result = $this->db->get('documents');
+		//echo $this->db->last_query();die;
+		if ( $result->num_rows() > 0 ) {
+			return $result->row_array()["haveInvoice"];
+		} else {
+			return false;
+		}	
+	}
+
 
 	/**
 	 * Deleting uploaded doc from db
@@ -1985,6 +2034,13 @@ class Job extends Parent_Model {
 			$this->checkRequiredFeildsForInvoice($res['id']);
 		}
 	}
-	
+
+	public function getTripDetailsById($load_id = null){
+		return $this->db->select('*')->from('trip_details')->where('load_id',$load_id)->get()->result_array();
+	}
+
+	public function getLoadDetailsById($load_id = null){
+		return $this->db->select('*')->from('loads')->where('id',$load_id)->get()->result_array();
+	}	
 }
 ?>

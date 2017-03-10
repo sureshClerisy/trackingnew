@@ -80,6 +80,7 @@ class Billing extends CI_Model {
 				$this->db->where('loads.dispatcher_id',$filters["userId"]);
 			}
 		}
+		
 
 		if(isset($filters["startDate"]) && !empty($filters["startDate"])){
 			$this->db->where("DATE(loads.PickupDate) >= ",date("Y-m-d",strtotime($filters["startDate"])));
@@ -95,14 +96,27 @@ class Billing extends CI_Model {
 			$this->db->where_in('loads.id', $in_aray);
 			$this->db->where(array('loads.sent_for_payment' => 0, 'loads.delete_status' => 0));
 		} else if ( isset($filters["filterType"]) && $filters["filterType"] == 'waiting-paperwork' ) {	
-			$this->db->join('documents',"documents.load_id = loads.id and documents.doc_type NOT IN ('pod','rateSheet') ",'LEFT');
 			$this->db->where(array('loads.sent_for_payment' => 0, 'loads.delete_status' => 0,'loads.ready_for_invoice' => 0));
+			$this->db->where("(SELECT  count(documents.load_id) as c FROM  documents WHERE  documents.load_id  =  loads.id and documents.doc_type in ('pod','rateSheet') )< 2  ");
 		}else if ( isset($filters["filterType"]) && $filters["filterType"] == 'sentForPayment' ) {	
 			$this->db->where(array('loads.sent_for_payment' => 1, 'loads.delete_status' => 0));
 		}
+		//$this->db->order_by("loads.".$filters["sortColumn"],$filters["sortType"]);
 
+		if(isset($filters["sortColumn"]) && $filters["sortColumn"] == "driverName"){
+			$this->db->order_by('CASE 
+								     WHEN loads.driver_type  = "team" THEN CONCAT(drivers.first_name, " + ", team.first_name) 
+								     ELSE concat(drivers.first_name, " ", drivers.last_name) 
+								 END '.$filters["sortType"]);
+		}else if( isset($filters["sortColumn"]) && in_array($filters["sortColumn"] ,array( "TruckCompanyName"))){
+			$this->db->order_by("broker_info.".$filters["sortColumn"],$filters["sortType"]);	
+		}else if(isset($filters["sortColumn"]) && $filters["sortColumn"] == "rpm"){
+			$this->db->order_by("(loads.PaymentAmount/loads.Mileage) ",$filters["sortType"]);	 
+		}else{
+			$this->db->order_by("loads.".$filters["sortColumn"],$filters["sortType"]);	
+		}
 
-		$this->db->order_by("loads.".$filters["sortColumn"],$filters["sortType"]);
+		
 		if(!$total){
 			$filters["limitStart"] = $filters["limitStart"] == 1 ? 0 : $filters["limitStart"];
 			$this->db->limit($filters["itemsPerPage"],$filters["limitStart"]);
@@ -144,7 +158,7 @@ class Billing extends CI_Model {
 		case loads.driver_type
 			when "team" then concat(drivers.first_name," + ",team.first_name,"-",vehicles.label)
 			ELSE concat(drivers.first_name," ",drivers.last_name,"-",vehicles.label)
-		end as driverName,loads.LoadType, loads.PickupDate, loads.PickupAddress, loads.OriginCity, loads.OriginState, loads.DestinationCity, loads.DestinationState, loads.DestinationAddress, loads.PaymentAmount, loads.Mileage, loads.deadmiles, loads.DeliveryDate, loads.JobStatus, loads.truckstopID, loads.id, loads.deadmiles, loads.totalCost, loads.pickDate, loads.invoiceNo, loads.load_source,loads.ready_for_invoice,broker_info.TruckCompanyName,vehicles.id as vehicleID');
+		end as driverName,loads.LoadType, loads.PickupDate, loads.PickupAddress, loads.OriginCity, loads.OriginState, loads.DestinationCity, loads.DestinationState, loads.DestinationAddress, loads.PaymentAmount, loads.Mileage, (loads.PaymentAmount/loads.Mileage) as rpm, loads.deadmiles, loads.DeliveryDate, loads.JobStatus, loads.truckstopID, loads.id, loads.deadmiles, loads.totalCost, loads.pickDate, loads.invoiceNo, loads.load_source,loads.ready_for_invoice,broker_info.TruckCompanyName,vehicles.id as vehicleID');
 		$this->db->join('broker_info','broker_info.id = loads.broker_id','LEFT');
 		$this->db->join('drivers','drivers.id = loads.driver_id','LEFT');
 		$this->db->join('drivers as team','team.id = loads.second_driver_id','LEFT');
@@ -156,6 +170,14 @@ class Billing extends CI_Model {
 			$this->db->where_not_in('loads.id', $in_aray);
 			$this->db->where_IN('documents.doc_type',array('pod','rateSheet'));
 
+			if(isset($filters["startDate"]) && !empty($filters["startDate"])){
+				$this->db->where("DATE(loads.PickupDate) >= ",date("Y-m-d",strtotime($filters["startDate"])));
+			}
+
+			if(isset($filters["endDate"]) && !empty($filters["endDate"])){
+				$this->db->where("DATE(loads.PickupDate) <= ",date("Y-m-d",strtotime($filters["endDate"])));
+			}
+			
 
 			if(isset($filters["searchQuery"]) && !empty($filters["searchQuery"])){
 	            $this->db->group_start();
@@ -187,6 +209,16 @@ class Billing extends CI_Model {
 			$this->db->where(array('loads.vehicle_id != ' => null, 'loads.vehicle_id != ' => 0, 'loads.delete_status' => 0));
 			$this->db->where_not_in('loads.id', $in_aray);
 
+			if(isset($filters["startDate"]) && !empty($filters["startDate"])){
+				$this->db->where("DATE(loads.PickupDate) >= ",date("Y-m-d",strtotime($filters["startDate"])));
+			}
+
+			if(isset($filters["endDate"]) && !empty($filters["endDate"])){
+				
+				$this->db->where("DATE(loads.PickupDate) <= ",date("Y-m-d",strtotime($filters["endDate"])));
+			}
+			
+
 			if(isset($filters["searchQuery"]) && !empty($filters["searchQuery"])){
 	            $this->db->group_start();
 	            $this->db->like('LOWER(CONCAT(drivers.first_name," ", drivers.last_name))', 		strtolower($filters['searchQuery']));
@@ -211,7 +243,20 @@ class Billing extends CI_Model {
 			}
 		}
 
-		$this->db->order_by("loads.".$filters["sortColumn"],$filters["sortType"]);
+		//$this->db->order_by("loads.".$filters["sortColumn"],$filters["sortType"]);
+		if(isset($filters["sortColumn"]) && $filters["sortColumn"] == "driverName"){
+			$this->db->order_by('CASE 
+								     WHEN loads.driver_type  = "team" THEN CONCAT(drivers.first_name, " + ", team.first_name) 
+								     ELSE concat(drivers.first_name, " ", drivers.last_name) 
+								 END '.$filters["sortType"]);
+		}else if( isset($filters["sortColumn"]) && in_array($filters["sortColumn"] ,array( "TruckCompanyName"))){
+			$this->db->order_by("broker_info.".$filters["sortColumn"],$filters["sortType"]);	
+		}else if(isset($filters["sortColumn"]) && $filters["sortColumn"] == "rpm"){
+			$this->db->order_by("(loads.PaymentAmount/loads.Mileage) ",$filters["sortType"]);	 
+		}else{
+			$this->db->order_by("loads.".$filters["sortColumn"],$filters["sortType"]);	
+		}
+
 		if(!$total){
 			$filters["limitStart"] = $filters["limitStart"] == 1 ? 0 : $filters["limitStart"];
 			$this->db->limit($filters["itemsPerPage"],$filters["limitStart"]);

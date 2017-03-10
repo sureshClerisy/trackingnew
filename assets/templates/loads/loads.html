@@ -96,8 +96,8 @@
 													<span class="lode-arrow {{DestinationStateSortType}}">{{ languageArray.planthst }}</span>
 												</div>
 
-												<div class="tb-cell Driver">
-													{{ languageArray.driver }}	
+												<div class="tb-cell Driver stype" ng-click="sortCustom('driverName', driverNameSortType)">
+													<span class="lode-arrow {{driverNameSortType}}">{{ languageArray.driver }}</span>	
 												</div>
 												
 												<div class="tb-cell Invoice-No stype" ng-click="sortCustom('invoiceNo', invoiceNoSortType)" >
@@ -108,8 +108,8 @@
 													<span class="lode-arrow {{PaymentAmountSortType}}">{{ languageArray.planthpayment }}</span>
 												</div>
 
-												<div class="tb-cell ppm	"> 
-													{{ languageArray.planthrpm }}
+												<div class="tb-cell ppm	stype" ng-click="sortCustom('rpm', RpmSortType)"> 
+													<span class="lode-arrow {{RpmSortType}}">{{ languageArray.planthrpm }}</span>
 												</div>
 
 												<div class="tb-cell miles stype" ng-click="sortCustom('Mileage', MileageSortType)"> 
@@ -124,10 +124,12 @@
 													<span class="lode-arrow {{LengthSortType}}">{{ languageArray.planthlength }}</span>
 												</div>
 
-												<div class="tb-cell weight stype" >  {{ languageArray.planthweight }}</div>
+												<div class="tb-cell weight stype" ng-click="sortCustom('Weight', WeightSortType)">
+													<span class="lode-arrow {{WeightSortType}}">  {{ languageArray.planthweight }}</span>
+												</div>
 
-												<div class="tb-cell company "> 
-													{{ languageArray.planthcompany }}
+												<div class="tb-cell company stype" ng-click="sortCustom('TruckCompanyName', TruckCompanyNameSortType)"> 
+													<span class="lode-arrow {{TruckCompanyNameSortType}}">{{ languageArray.planthcompany }}</span>
 												</div>
 												
 												<div class="tb-cell source" ng-click="sortCustom('load_source', load_sourceSortType)"> 

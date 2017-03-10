@@ -490,7 +490,7 @@ class Truckstop extends Admin_Controller{
 			$return 	 = $client->GetLoadSearchDetailResult($params);
 			$loadResults = $return->GetLoadSearchDetailResultResult->LoadDetail;
 
-			$jobRecord  = json_decode(json_encode($loadResults),true);
+			$jobRecord   = json_decode(json_encode($loadResults),true);
 			
 			$jobRecord['OriginCountry'] = (isset($jobRecord['OriginCountry']) && $jobRecord['OriginCountry'] != '' ) ? $jobRecord['OriginCountry'] : 'USA';
 			$jobRecord['DestinationCountry'] = (isset($jobRecord['DestinationCountry']) && $jobRecord['DestinationCountry'] != '' ) ? $jobRecord['DestinationCountry'] : 'USA';
@@ -519,7 +519,7 @@ class Truckstop extends Admin_Controller{
 				
 			$jobRecord['PaymentAmount'] = str_replace(',','',$jobRecord['PaymentAmount']);
 			$jobRecord['PaymentAmount1'] = $jobRecord['PaymentAmount'];
-			$data['primaryLoadId'] = '';
+			$data['primaryLoadId'] 		= '';
 			$jobRecord['originalDistance'] = $jobRecord['Mileage'];
 			$truckAverage = $this->defaultTruckAvg;
 			$jobRecord['totalCost'] = $_POST['totalCost'];			
@@ -632,6 +632,11 @@ class Truckstop extends Admin_Controller{
 		$data['extra_stops_data'] 	= $this->extraStopsDataArray;
 		$data['trailerTypes'] 		= $this->getTrailerTypes();
 		$data['userRoleId'] 		= $this->userRoleId;
+
+		if (!$this->input->is_ajax_request()) {
+			return $data;
+		}
+
 		echo json_encode($data);
 	}
 	
@@ -639,7 +644,181 @@ class Truckstop extends Admin_Controller{
 	 * 
 	 * Assign truck to driver
 	 */
-	 
+	
+
+
+	public function matchLoadDetailNew( $truckStopId = null,$loadId = null ) 
+	{
+		
+		$data['vehicleInfo'] = array();
+		$data['brokerData'] = array();
+		$data['rateSheetUploaded'] = 'no';
+	
+		if ( $loadId != '' && is_numeric($loadId) ) {
+			$jobRecord = $this->Job->FetchSingleJob($loadId);
+			
+			$origin = $jobRecord['OriginCity'].' '.$jobRecord['OriginState'].' '.$jobRecord['OriginCountry'];
+			$destination = $jobRecord['DestinationCity'].' '.$jobRecord['DestinationState'].' '.$jobRecord['DestinationCountry'];
+			
+			if($jobRecord['PickupDate'] == '0000-00-00') {
+				$jobRecord['PickupDate']='';
+			}
+			
+			if($jobRecord['DeliveryDate']=='0000-00-00') {
+				$jobRecord['DeliveryDate']='';
+			}
+		
+			$jobRecord['PaymentAmount'] = str_replace(',','',$jobRecord['PaymentAmount']);
+			if(@$jobRecord['Entered'] == '0000-00-00') {
+				$jobRecord['Entered']='';
+			}
+			$jobRecord['EquipmentTypes']['Code'] = $jobRecord['equipment_options'];
+			$jobRecord['EquipmentTypes']['Description'] = $jobRecord['equipment'];
+		
+			$jobRecord['totalMiles'] = $jobRecord['deadmiles'] + $jobRecord['Mileage'];
+			
+			if ( $jobRecord['Stops'] > 0 ) {
+				$this->extraStopsDataArray = $this->Job->getExtraStops( $jobRecord['id']);
+			} 
+			
+			if ( $jobRecord['vehicle_id'] != ''  && $jobRecord['vehicle_id'] != null && $jobRecord['vehicle_id'] != 0 ) {
+				if(isset($jobRecord["driver_type"]) && $jobRecord["driver_type"] == "team"){
+					$data['vehicleInfo'] = $this->Vehicle->getTeamVehicleInfo( $jobRecord['id']);	
+					$jobRecord['assignedDriverName'] = $data['vehicleInfo']['driverName'];
+				}else{
+					$data['vehicleInfo'] = $this->Vehicle->getVehicleInfo( $jobRecord['vehicle_id'] );	
+					//~ $jobRecord['assignedDriverName'] = @$data['vehicleInfo']['first_name'].' '.@$data['vehicleInfo']['last_name'].' - '.$data['vehicleInfo']['label'];
+				}
+			}
+		
+			if ( !empty($data['vehicleInfo']) && $data['vehicleInfo']['fuel_consumption'] != '' ) {
+				$truckAverage = (int)($data['vehicleInfo']['fuel_consumption'] / 100);
+			} else {
+				$truckAverage = $this->defaultTruckAvg;
+			}
+			
+		} else {
+			$client   = new SOAPClient($this->wsdl_url);
+			$params   = array(
+				'detailRequest' => array(
+					'UserName' => $this->username,
+					'Password' => $this->password,
+					'IntegrationId' => $this->id,
+					'LoadId' => $truckStopId,
+					)
+				);
+			$return 	 = $client->GetLoadSearchDetailResult($params);
+			$loadResults = $return->GetLoadSearchDetailResultResult->LoadDetail;
+
+			$jobRecord   = json_decode(json_encode($loadResults),true);
+			
+			$jobRecord['OriginCountry'] = (isset($jobRecord['OriginCountry']) && $jobRecord['OriginCountry'] != '' ) ? $jobRecord['OriginCountry'] : 'USA';
+			$jobRecord['DestinationCountry'] = (isset($jobRecord['DestinationCountry']) && $jobRecord['DestinationCountry'] != '' ) ? $jobRecord['DestinationCountry'] : 'USA';
+		
+			if ( $jobRecord['PickupDate'] != '' && $jobRecord['PickupDate'] != 'DAILY') {
+				$jobRecord['PickupDate'] = date('Y-m-d',strtotime($jobRecord['PickupDate']));
+			} else {
+				$jobRecord['PickupDate'] = '';
+			}
+			
+			if ( $jobRecord['DeliveryDate'] != '' ) {
+				$jobRecord['DeliveryDate'] = date('Y-m-d',strtotime($jobRecord['DeliveryDate']));
+			}
+			
+			if ( $jobRecord['Entered'] != '' ) {
+				$enteredArray = explode('T',$jobRecord['Entered']);
+				$jobRecord['Entered'] = $enteredArray[0];
+			}
+			
+			$jobRecord['PostedOn'] = $jobRecord['Entered'];
+			$jobRecord['JobStatus'] = '';
+			$jobRecord['commodity'] = '';
+			
+			$jobRecord['PaymentAmount'] = str_replace(',','',$jobRecord['PaymentAmount']);
+			$data['primaryLoadId'] 		= '';
+			$jobRecord['originalDistance'] = $jobRecord['Mileage'];
+			$truckAverage = $this->defaultTruckAvg;
+			$jobRecord['totalCost'] = $_POST['totalCost'];			
+			$jobRecord['deadmiles'] = $_POST['deadmiles'];
+			
+			if ( isset($_POST['deadMilesLocation']) && $_POST['deadMilesLocation'] != '' ) {
+				$deadMilesDestination 	=  $jobRecord['OriginCity'].','.$jobRecord['OriginState'].','.$jobRecord['OriginCountry'];
+				$deadMilesDestination 	= trim($deadMilesDestination,',');
+				
+				$deadMilesArray = $this->User->getTimeMiles($_POST['deadMilesLocation'],$deadMilesDestination);
+				if(!empty($deadMilesArray)){
+					$jobRecord['deadmiles'] = $deadMilesArray['miles'];					
+				} else {
+					$deadMilesArray 		= $this->GetDrivingDistance($_POST['deadMilesLocation'],$deadMilesDestination);
+					if ( !empty($deadMilesArray) ) {
+						$jobRecord['deadmiles'] = ceil($deadMilesArray['distance']);
+					}
+				}
+				
+				$total_cost = $this->getCompleteCost($jobRecord['Mileage'],$jobRecord['deadmiles'],$truckAverage);
+				if ( !empty($total_cost) )
+					$jobRecord['totalCost'] = $total_cost;		
+			}			
+			
+			$jobRecord['pickDate'] = $_POST['originPickDate'];
+			$jobRecord['totalMiles'] = $jobRecord['deadmiles'] + $jobRecord['Mileage'];
+			$jobRecord['driver_id'] = '';
+			$jobRecord['assignedDriverName'] = '';
+			
+			$jobRecord['postingAddress'] = $jobRecord['TruckCompanyCity'].', '.$jobRecord['TruckCompanyState'];
+			if ( isset($jobRecord['PointOfContactPhone']) && $jobRecord['PointOfContactPhone'] != '' ) {
+				$jobRecord['PointOfContactPhone'] = $this->sanitize_phone($jobRecord['PointOfContactPhone']);
+			}
+			
+			if ( isset($jobRecord['TruckCompanyPhone']) && $jobRecord['TruckCompanyPhone'] != '' ) {
+				$jobRecord['TruckCompanyPhone'] = $this->sanitize_phone($jobRecord['TruckCompanyPhone']);
+			}
+			
+			$jobRecord['PickupTime'] = '';
+			$jobRecord['PickupTimeRangeEnd'] = '';
+			$jobRecord['DeliveryTime'] = '';
+			$jobRecord['DeliveryTimeRangeEnd'] = '';
+			
+		}
+
+		$jobRecord['Stops'] = ( isset($jobRecord['Stops']) && $jobRecord['Stops'] != '' ) ? $jobRecord['Stops'] : 0;
+		
+		$jobRecord['overall_total_rate_mile'] = '';
+		if($jobRecord['Mileage'] > 0)
+			$jobRecord['overall_total_rate_mile'] = round($jobRecord['PaymentAmount'] / $jobRecord['Mileage'], 2);
+		
+		$payment = $jobRecord['PaymentAmount'];
+		$jobRecord['overallTotalProfit'] = ($payment - $jobRecord['totalCost']);
+		if( isset($payment) && $payment != '' && $payment != 0 ) {	
+			$jobRecord['overallTotalProfitPercent'] = round(( ($jobRecord['overallTotalProfit'] / $payment) * 100 ),2);
+		} else {
+			$jobRecord['overallTotalProfitPercent'] = 0;
+		}
+
+		//--------- Code for team task ----------------
+		$driverAssignType = 'driver';
+		if(isset($jobRecord["driver_type"]) && $jobRecord["driver_type"] == "team"){
+			$driverAssignType = 'team';
+		}else if(isset($_POST["driverType"]) && ($_POST["driverType"] == "team" || $_POST["driverType"] == "_team")){
+			$driverAssignType = 'team';
+		}
+		//--------- Code for team task ----------------
+
+		$jobRecord['loadedDistanceCost'] = $this->findDieselCosts( $truckAverage,$jobRecord['Mileage'],$this->diesel_rate_per_gallon , 'driverMiles', $driverAssignType );		// driverMiles for calulating fuel cost+ driver miles with cargo cost
+		$jobRecord['deadMileDistCost'] = $this->findDieselCosts( $truckAverage,$jobRecord['deadmiles'],$this->diesel_rate_per_gallon, 'driverMiles', $driverAssignType );
+		$jobRecord['estimatedFuelCost'] = $this->findDieselCosts( $truckAverage, ( $jobRecord['Mileage'] + $jobRecord['deadmiles'] ),$this->diesel_rate_per_gallon, '', $driverAssignType );
+		
+			//Skip driver if he is already in team
+		$data['encodedJobRecord'] 	= $jobRecord;
+		$data['extra_stops_data'] 	= $this->extraStopsDataArray;
+		
+
+		if (!$this->input->is_ajax_request()) {
+			return $data;
+		}
+
+		echo json_encode($data);
+	} 
 	public function assignTruckToDriver( $driverId = null ) {
 		
 		$_POST = json_decode(file_get_contents('php://input'), true);
@@ -813,11 +992,50 @@ class Truckstop extends Admin_Controller{
 		$data['vehicles_Available'] = $VehiclesArray;
 		//~ $data['vehicles_Available'][0]['xtraInfo']['stops'] = isset($jobRecord['Stops']) ? $jobRecord['Stops'] : 0;
 		$data['vehicles_Available'][0]['xtraInfo']['charges'] = $jobRecord['Stops'] * $perExtraStopCharges;
-		$data['jobRecord'] = $jobRecord;
-		$data['truckStopId'] = $truckStopId;
-		$data['fetchAssigedTruck'] = $fetchAssigedTruck;
-		$data['tripDetailPrId'] = $tripDetailPrId;
+		$data['jobRecord'] 			= $jobRecord;
+		$data['truckStopId'] 		= $truckStopId;
+		$data['fetchAssigedTruck'] 	= $fetchAssigedTruck;
+		$data['tripDetailPrId'] 	= $tripDetailPrId;
 		echo json_encode($data);
+	}
+
+	/**
+	* Method printTripDetails
+	* @param Load ID
+	* @return NULL
+	*/
+
+	public function printTripDetails($loadid = null){
+
+		$columns 			= ['JobStatus','invoiceNo','Stops'];
+		$fetchedColumns 	= $this->Job->fetchLoadFields($loadid,$columns);
+		$data['invoceNo'] 	= $fetchedColumns[0]['invoiceNo'];
+		$data['JobStatus'] 	= ucfirst($fetchedColumns[0]['JobStatus']);
+		$data['extra_stop_charges'] = ($fetchedColumns[0]['Stops']*$this->extraStopPerStopChargeTeam);
+		$data['loadID'] 	= $loadid;
+		$data['tripDetails'] = $this->Job->getTripDetailsById($loadid);
+		$this->load->view('printTemplates/tripdetails',$data);
+	}
+
+	/**
+	* Method printLoadDetails
+	* @param Load ID
+	* @return NULL
+	*/
+
+	public function printLoadDetails($truckstopId = null,$loadid = null){
+		
+		$data 				= $this->matchLoadDetailNew($truckstopId,$loadid);
+		pr($data);
+		// $columns 			= ['JobStatus','invoiceNo','Stops'];
+		// $fetchedColumns 	= $this->Job->fetchLoadFields($loadid,$columns);
+		// $data['invoceNo'] 	= $fetchedColumns[0]['invoiceNo'];
+		// $data['JobStatus'] 	= ucfirst($fetchedColumns[0]['JobStatus']);
+		// $data['extra_stop_charges'] 		= ($fetchedColumns[0]['Stops']*$this->extraStopPerStopChargeTeam);
+		// $data['loadDetails'] = $this->Job->getLoadDetailsById($loadid);
+		// pr($data['loadDetails']);
+
+		$this->load->view('printTemplates/loaddetail.php',$data);
 	}
 	
 	public function save_trip_details( $truckstopId = null, $id = null, $tripDetailId = null ) {
@@ -848,8 +1066,8 @@ class Truckstop extends Admin_Controller{
 				$this->payForDeadMile = str_replace("$", "", $truckInfo['driver_pay_for_dead_mile']);
 			}
 
-			$this->iftaTax = $truckInfo['tax_ifta_tax'];
-			$this->tarps = $truckInfo['tax_tarps'];
+			$this->iftaTax 	= $truckInfo['tax_ifta_tax'];
+			$this->tarps 	= $truckInfo['tax_tarps'];
 			$this->det_time = $truckInfo['tax_det_time'];
 			$this->tollsTax = $truckInfo['tax_tolls'];
 		}
@@ -1821,7 +2039,7 @@ class Truckstop extends Admin_Controller{
 		echo json_encode(array('result' => $docs_list, 'error_exceed' => $exceedMsg));
 	}
 	 
-	public function fetchDocuments($loadId = FALSE, $errorResponse = array() ){
+	public function fetchDocuments($loadId = FALSE, $errorResponse = array(), $from = "" ){
 		if(!$loadId){
 			$_POST = json_decode(file_get_contents('php://input'), true);
 			$loadId = $_POST['loadId'];
@@ -1836,8 +2054,12 @@ class Truckstop extends Admin_Controller{
 		} else {
 			$exceedMsg = '';
 		}
-		
-		echo json_encode(array('result' => $response, 'error_exceed' => $exceedMsg));
+		$haveInvoice = "";
+		if($from == "invoice"){
+			$haveInvoice = $this->Job->isInvoiceGenerated($loadId);
+		}
+
+		echo json_encode(array('result' => $response, 'error_exceed' => $exceedMsg,"haveInvoice" =>$haveInvoice));
 	}
 
 	private function uploadFileToServer($files, $prefix, $parameter = '', $loadId = null ) {
@@ -2008,8 +2230,8 @@ class Truckstop extends Admin_Controller{
 			$this->fetchBrokerDocuments($brokerId);
 		} else  {
 			$this->Job->deleteDocument($_POST['docId'], $_POST['loadId'], $_POST['doc_type']);
-			$this->fetchDocuments();
-		}
+			$this->fetchDocuments(false, array(), $_POST['doc_type']);
+		}	
 	}
 
 	private function joinAddress($args){

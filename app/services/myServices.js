@@ -28,7 +28,7 @@ app.factory('dataFactory', function($http) {
       var promise = $http(passParameters).then(function (response) {
         if(typeof response.data == 'string' && response.data != 1){
           if(response.data.substr('loginMark')){
-              location.reload();
+              //location.reload();
               return;
           }
           $.gritter.add({

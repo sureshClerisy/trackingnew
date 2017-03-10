@@ -623,9 +623,8 @@ class Loads extends Admin_Controller{
 				$jobs = $this->getSingleVehicleLoads($this->userId,array(),"all",false,false,$params["startDate"],$params["endDate"],$params); 
 				$total = $this->Job->fetchSavedJobsTotal($this->userId,array(),"all",false,false,$params["startDate"],$params["endDate"],$params); 
 			}
-		/*} else {
-			
-		}*/
+		
+		if(!$jobs){$jobs = array();}
 
 		echo json_encode(array("data"=>$jobs,"total"=>$total));
 	}

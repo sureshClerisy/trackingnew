@@ -113,8 +113,8 @@
 													<span class="lode-arrow {{DestinationStateSortType}}">{{ languageArray.planthst }}</span>
 												</div>
 
-												<div class="tb-cell Driver">
-													{{ languageArray.driver }}	
+												<div class="tb-cell Driver stype" ng-click="sortCustom('driverName', driverNameSortType)">
+													<span class="lode-arrow {{driverNameSortType}}">{{ languageArray.driver }}</span>	
 												</div>
 												
 												<div class="tb-cell Invoice-No stype" ng-click="sortCustom('invoiceNo', invoiceNoSortType)" >
@@ -125,8 +125,8 @@
 													<span class="lode-arrow {{PaymentAmountSortType}}">{{ languageArray.planthpayment }}</span>
 												</div>
 
-												<div class="tb-cell ppm	"> 
-													{{ languageArray.planthrpm }}
+												<div class="tb-cell ppm	stype" ng-click="sortCustom('rpm', RpmSortType)"> 
+													<span class="lode-arrow {{RpmSortType}}">{{ languageArray.planthrpm }}</span>
 												</div>
 
 												<div class="tb-cell miles stype" ng-click="sortCustom('Mileage', MileageSortType)"> 
@@ -141,10 +141,12 @@
 													<span class="lode-arrow {{LengthSortType}}">{{ languageArray.planthlength }}</span>
 												</div>
 
-												<div class="tb-cell weight stype" >  {{ languageArray.planthweight }}</div>
+												<div class="tb-cell weight stype" ng-click="sortCustom('Weight', WeightSortType)">
+													<span class="lode-arrow {{WeightSortType}}">  {{ languageArray.planthweight }}</span>
+												</div>
 
-												<div class="tb-cell company "> 
-													{{ languageArray.planthcompany }}
+												<div class="tb-cell company stype" ng-click="sortCustom('TruckCompanyName', TruckCompanyNameSortType)"> 
+													<span class="lode-arrow {{TruckCompanyNameSortType}}">{{ languageArray.planthcompany }}</span>
 												</div>
 												
 												<div class="tb-cell source" ng-click="sortCustom('load_source', load_sourceSortType)"> 
@@ -162,7 +164,7 @@
 											<div class="table-row-main1 tb-body" ng-class="{'visited' : value.visited}" data-pickdate="{{value.pickDate}}" data-uinfo="{{value.ID}}" dir-paginate="value in assignedLoads | itemsPerPage: itemsPerPage"  total-items="total" current-page="currentPage" pagination-id="myLoadPage" ng-click="clickMatchLoadDetail(value.truckstopID, value.id, value.deadmiles, value.PaymentAmount, value.totalCost, value.pickDate, value.vehicle_id , $index)">
 												
 												<div class="tb-cell ld-id"> <span> <div class="plus-1" ng-click="$event.stopPropagation();toggleRow($event,$index);"></div>{{ value.id }}</span></div>
-												<div class="tb-cell ph"> <span> {{ value.PointOfContactPhone }}</span></div>
+												<div class="tb-cell ph"> <span> {{ value.PointOfContactPhone | bcTelephone:'format'}}</span></div>
 												<div class="tb-cell trlr"> <span>{{ value.equipment_options }}</span></div>
 												<div class="tb-cell fl"> <span>{{ value.LoadType }} </span></div>
 												<div class="tb-cell pickup"> <span>{{ (value.PickupDate != '0000-00-00' && value.PickupDate != '' ) ? value.PickupDate : ''}}</span>
@@ -173,7 +175,7 @@
 												<div class="tb-cell st"> <span>{{ value.OriginState | uppercase}}</span></div>
 												<div class="tb-cell Destination	"> <span>{{ value.DestinationCity|capitalize}}</span></div>
 												<div class="tb-cell st1	"> <span>{{ value.DestinationState | uppercase }}</span></div>
-												<div class="tb-cell Driver	"> <span>{{ (value.driver_type == "team" ? value.teamdriverName : value.driverName) }}</span>
+												<div class="tb-cell Driver	"> <span>{{value.driverName }}</span>
 												</div>
 												<div class="tb-cell Invoice-No	"> <span>{{ value.invoiceNo }} </span></div>
 												<div class="tb-cell payment	"> <span>{{ value.PaymentAmount | currency:"$":2 }}</span></div>
@@ -214,7 +216,7 @@
 														<div class="tb-cell ph">
 															<span> 
 																<div class="heading">{{ languageCommonVariables.commonTableThPhone }} <b>:</b></div>
-																<div class="value">{{ value.PointOfContactPhone }}</div>
+																<div class="value">{{ value.PointOfContactPhone | bcTelephone:'format' }}</div>
 															</span>
 														</div>
 														<div class="tb-cell trlr">
@@ -242,7 +244,7 @@
 															<span><div class="heading"> {{ languageArray.planthst }}  <b>:</b></div><div class="value">{{ value.DestinationState | uppercase }}</div></span>
 														</div>
 														<div class="tb-cell Driver	">
-															<span><div class="heading"> {{ languageArray.driver }}  <b>:</b></div><div class="value">{{ (value.driver_type == "team" ? value.teamdriverName : value.driverName) }} </div></span>
+															<span><div class="heading"> {{ languageArray.driver }}  <b>:</b></div><div class="value">{{ value.driverName }} </div></span>
 														</div>
 														<div class="tb-cell Invoice-No	">
 															<span><div class="heading">{{ languageCommonVariables.invoiceNo }} <b>:</b></div><div class="value">{{ value.invoiceNo }}</div> </span>

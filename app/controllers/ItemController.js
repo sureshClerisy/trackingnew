@@ -70,27 +70,32 @@ app.controller('AdminController', function($scope,$http,$rootScope, $localStorag
                 sendToURL += "all/";
                 args = "filterType="+type+"&userType=all";
                 sendToURL +=  "?q="+encodeURIComponent(args);
-                 $window.open(sendToURL, '_blank');
+                // $window.open(sendToURL, '_blank');
+                $state.go(page, {'key':"all",q:args,type:true}, {reload: true});
             }else if(tempBuffer.label == "_idispatcher"){
-                sendToURL += tempBuffer.username.toLowerCase().replace(/[\s]/g, '')+"/";
+                var keyParam = tempBuffer.username.toLowerCase().replace(/[\s]/g, '');
                 args = "filterType="+type+"&userType=dispatcher&userToken="+tempBuffer.dispId;
-                sendToURL +=  "?q="+encodeURIComponent(args);
-                $window.open(sendToURL, '_blank');
+                //sendToURL +=  "?q="+encodeURIComponent(args);
+                //$window.open(sendToURL, '_blank');
+                $state.go(page, {'key':keyParam,q:args,type:true}, {reload: true});
             }else  if(tempBuffer.vid !="" && tempBuffer.vid != undefined ){
-                sendToURL += tempBuffer.driverName.toLowerCase().replace(/[\s+]/g, '')+"/";
+                //sendToURL += tempBuffer.driverName.toLowerCase().replace(/[\s+]/g, '')+"/";
+                var keyParam = tempBuffer.driverName.toLowerCase().replace(/[\s+]/g, '');
                 if(tempBuffer.label == "_team"){
                     //$rootScope.vtype = "_iteam";
                     args = "filterType="+type+"&userType=team&userToken="+tempBuffer.id;
                 }else{
                     args = "filterType="+type+"&userType=driver&userToken="+tempBuffer.id;
                 }
-                sendToURL +=  "?q="+encodeURIComponent(args);
-                $window.open(sendToURL, '_blank');
+                $state.go(page, {'key':keyParam,q:args,type:true}, {reload: true});
+                //sendToURL +=  "?q="+encodeURIComponent(args);
+                //$window.open(sendToURL, '_blank');
             }else{
                 sendToURL += "all/";
                 args = "filterType="+type+"&userType=all";
                 sendToURL +=  "?q="+encodeURIComponent(args);
-                $window.open(sendToURL, '_blank');
+                //$window.open(sendToURL, '_blank');
+                $state.go(page, {'key':"all",q:args,type:true}, {reload: true});
             }
         }
     }

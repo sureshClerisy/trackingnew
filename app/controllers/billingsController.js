@@ -93,6 +93,47 @@ app.controller('billingsController', ["dataFactory","$scope","$http","$rootScope
 	var totalPayment = 0;
 	
 	$scope.getNextDateForIt = 1;
+
+
+	if( $cookies.getObject('_gDateRange') ){
+        $scope.dateRangeSelector = $cookies.getObject('_gDateRange');
+        if($scope.dateRangeSelector.startDate == null || $scope.dateRangeSelector.endDate == null){
+        	$scope.dateRangeSelector = {};
+        }
+    }else{
+        $scope.dateRangeSelector = {startDate: moment().subtract(29, 'days'), endDate: moment()};    
+        $cookies.putObject('_gDateRange', $scope.dateRangeSelector);  
+    }
+
+	
+     $scope.opts = {
+     	autoUpdateInput: false,
+        locale: {
+            applyClass: 'btn-green',
+            applyLabel: "Apply",
+            fromLabel: "From",
+            format: "YYYY-MM-DD",
+            toLabel: "To",
+            cancelLabel: 'Clear',
+        },
+        eventHandlers: {
+            'apply.daterangepicker': function(ev, picker) {  
+                $scope.loadItems();
+            },
+            'cancel.daterangepicker': function(ev, picker) {  
+                $scope.dateRangeSelector = {};
+                $cookies.putObject('_gDateRange', {startDate:null,endDate:null});    
+                angular.element('#billingDRPicker').data('daterangepicker').setStartDate(new Date());
+                angular.element('#billingDRPicker').data('daterangepicker').setEndDate(new Date());
+                $scope.loadItems();
+            }
+        },
+    };
+
+
+
+
+	
 	$scope.getProfitPercent = function(profitAmount1, totalPayment1){
 		var profitPercent= ((profitAmount1 / totalPayment1) * 100).toFixed(2);	
 		return profitPercent;
@@ -180,20 +221,14 @@ app.controller('billingsController', ["dataFactory","$scope","$http","$rootScope
     };
 
     $scope.loadNextPage = function(pageNumber,search,sortColumn,sortType){
-    	/*var canceller, isSending = false;
-    	if(isSending) {
-            canceller.resolve();
-        }
-        isSending = true;
-        canceller = $q.defer();*/
-		//alert(pageNumber + ' - ' + search + ' - ' + sortColumn + ' - ' + sortType);
-        dataFactory.httpRequest(URL+'/Billings/getRecords/'+$scope.listTypeParameter,'Post',{} ,{ pageNo:pageNumber, itemsPerPage:$scope.itemsPerPage,searchQuery: search, sortColumn:sortColumn, sortType:sortType,startDate: $scope.startDate, endDate:$scope.endDate }).then(function(data){
+    	$scope.autoFetchLoads = true;
+        dataFactory.httpRequest(URL+'/Billings/getRecords/'+$scope.listTypeParameter,'Post',{} ,{ pageNo:pageNumber, itemsPerPage:$scope.itemsPerPage,searchQuery: search, sortColumn:sortColumn, sortType:sortType,startDate: $scope.dateRangeSelector.startDate, endDate:$scope.dateRangeSelector.endDate }).then(function(data){
+        	$scope.autoFetchLoads = false;
         	$rootScope.billingLoads = data.data;
 			$scope.total            = data.total;
             isSending = false;
         	return data;
 		});
-		//canceler.resolve();  // Aborts the $http request if it isn't finished.
     };
 
     $scope.callSearchFilter = function(query){
@@ -204,7 +239,7 @@ app.controller('billingsController', ["dataFactory","$scope","$http","$rootScope
 		type = type == "ASC" ? "DESC" : "ASC";
 		$scope.lastSortedColumn = sortColumn;
     	$scope.lastSortType 	= type;
-    	$scope.PointOfContactPhoneSortType = ''; $scope.equipment_optionsSortType = ''; $scope.LoadTypeSortType = ''; $scope.PickupDateSortType = ''; $scope.DeliveryDateSortType = ''; $scope.OriginCitySortType = ''; $scope.OriginStateSortType = ''; $scope.DestinationCitySortType = ''; $scope.DestinationStateSortType = ''; $scope.driverNameSortType = ''; $scope.invoiceNoSortType = ''; $scope.PaymentAmountSortType = ''; $scope.MileageSortType = '';$scope.deadmilesSortType = ''; $scope.LengthSortType = ''; $scope.LengthSortType = ''; $scope.WeightSortType = ''; $scope.companyNameSortType = ''; $scope.load_sourceSortType = ''; $scope.JobStatusSortType = '';
+    	$scope.PointOfContactPhoneSortType = ''; $scope.equipment_optionsSortType = ''; $scope.LoadTypeSortType = ''; $scope.PickupDateSortType = ''; $scope.DeliveryDateSortType = ''; $scope.OriginCitySortType = ''; $scope.OriginStateSortType = ''; $scope.DestinationCitySortType = ''; $scope.DestinationStateSortType = ''; $scope.driverNameSortType = ''; $scope.invoiceNoSortType = ''; $scope.PaymentAmountSortType = ''; $scope.MileageSortType = '';$scope.deadmilesSortType = ''; $scope.LengthSortType = ''; $scope.LengthSortType = ''; $scope.WeightSortType = ''; $scope.companyNameSortType = ''; $scope.load_sourceSortType = ''; $scope.JobStatusSortType = ''; $scope.RpmSortType = '';
 
     	switch(sortColumn){
     		case 'id' 					: $scope.idSortType = type;  break;
@@ -221,7 +256,7 @@ app.controller('billingsController', ["dataFactory","$scope","$http","$rootScope
     		case 'invoiceNo'			: $scope.invoiceNoSortType = type; break;
     		case 'PaymentAmount'		: $scope.PaymentAmountSortType = type; break;
     		case 'Mileage'			 	: $scope.MileageSortType = type; break;
-    		case 'Mileage'			 	: $scope.MileageSortType = type; break;
+    		case 'rpm'			 		: $scope.RpmSortType = type; break;
     		case 'deadmiles'			: $scope.deadmilesSortType = type; break;
     		case 'Length'			 	: $scope.LengthSortType = type; break;
     		case 'Weight'			 	: $scope.WeightSortType = type; break;
