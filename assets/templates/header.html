@@ -1112,9 +1112,6 @@
 																		<div class="estimate-input">
 																			<input id="diesel-consm-{{$index}}" class="edit-diesel-input disclas" type="text" ng-model="TruckData.fuel_consumption" />
 																		</div>
-																		<div class="actual-input actuals-class">
-																			<input id="diesel-consm-actual-{{$index}}" class="edit-diesel-input-actual" type="text" ng-model="TruckData.vehicle_average_actual"  />
-																		</div>
 																	</div>
 																</div>
 																<div class="pop-edit-row-block">
@@ -1122,9 +1119,6 @@
 																	<div class="estimate-cover">
 																		<div class="estimate-input">
 																			<input id="diesel-gallon-need-{{$index}}" class="edit-diesel-input disclas" type="text" ng-model="TruckData.gallon_needed" />
-																		</div>
-																		<div class="actual-input actuals-class">
-																			<input id="diesel-gallon-need-actual-{{$index}}" class="edit-diesel-input-actual" type="text" ng-model="TruckData.gallon_needed_actual" />
 																		</div>
 																	</div>
 																</div>
@@ -1134,9 +1128,6 @@
 																		<div class="estimate-input">
 																			<input id="diesel-per-gallon-{{$index}}" class="autonumeric edit-diesel-input disclas" type="text" ng-model="TruckData.diesel_rate_per_gallon" data-a-sign="$" ui-jq="autoNumeric" ui-options="'init'" />
 																		</div>
-																		<div class="actual-input actuals-class">
-																			<input id="diesel-per-gallon-actual-{{$index}}" class="autonumeric edit-diesel-input-actual" type="text" ng-model="TruckData.avg_cost_diesel_actual" data-a-sign="$" ui-jq="autoNumeric" ui-options="'init'"  />
-																		</div>
 																	</div>
 																</div>
 																<div class="pop-edit-row-block">
@@ -1144,9 +1135,6 @@
 																	<div class="estimate-cover">
 																		<div class="estimate-input">
 																			<input id="diesel-total-cost-{{$index}}" class="autonumeric edit-diesel-input disclas" disabled="disabled" placeholder="1780" type="text" ng-model="TruckData.comp_diesel_cost" data-a-sign="$" ui-jq="autoNumeric" ui-options="'init'" />
-																		</div>
-																		<div class="actual-input actuals-class">
-																			<input id="diesel-total-cost-actual-{{$index}}" class="autonumeric edit-diesel-input-actual disclas" disabled="disabled" type="text" ng-model="TruckData.comp_diesel_cost_actual" data-a-sign="$" ui-jq="autoNumeric" ui-options="'init'" />
 																		</div>
 																	</div>
 																</div>
@@ -1174,9 +1162,6 @@
 																		<div class="estimate-input">
 																			<input id="tax-ifta-{{$index}}" ng-disabled="disableTripDetail" class="autonumeric edit-tax-input" placeholder="0.45" type="text" ng-model="TruckData.tax_ifta_tax" data-a-sign="$" ui-jq="autoNumeric" ui-options="'init'">
 																		</div>
-																		<div class="actual-input actuals-class">
-																			<input id="tax-ifta-actual-{{$index}}" class="autonumeric edit-tax-input" placeholder="0.45" type="text" ng-model="TruckData.ifta_taxes_actual" data-a-sign="$" ui-jq="autoNumeric" ui-options="'init'">
-																		</div>
 																	</div>
 																</div>
 																<div class="pop-edit-row-block">
@@ -1184,9 +1169,6 @@
 																	<div class="estimate-cover">
 																		<div class="estimate-input">
 																			<input id="tax-tarps-{{$index}}" ng-disabled="disableTripDetail" class="autonumeric edit-tax-input" type="text" ng-model="TruckData.tax_tarps" data-a-sign="$" ui-jq="autoNumeric" ui-options="'init'">
-																		</div>
-																		<div class="actual-input actuals-class">
-																			<input id="tax-tarps-actual-{{$index}}" class="autonumeric edit-tax-input" type="text" ng-model="TruckData.tarps_actual" data-a-sign="$" ui-jq="autoNumeric" ui-options="'init'">
 																		</div>
 																	</div>
 																</div>
@@ -1196,9 +1178,6 @@
 																		<div class="estimate-input">
 																			<input id="tax-det-time-{{$index}}" ng-disabled="disableTripDetail" class="autonumeric edit-tax-input" type="text" ng-model="TruckData.tax_det_time" data-a-sign="$" ui-jq="autoNumeric" ui-options="'init'">
 																		</div>
-																		<div class="actual-input actuals-class">
-																			<input id="tax-det-time-actual-{{$index}}" class="autonumeric edit-tax-input" type="text" ng-model="TruckData.detention_time_actual" data-a-sign="$" ui-jq="autoNumeric" ui-options="'init'">
-																		</div>
 																	</div>
 																</div>
 																<div class="pop-edit-row-block">
@@ -1207,9 +1186,6 @@
 																		<div class="estimate-input">
 																			<input id="tax-tolls-{{$index}}" ng-disabled="disableTripDetail" class="autonumeric edit-tax-input" type="text" ng-model="TruckData.tax_tolls" data-a-sign="$" ui-jq="autoNumeric" ui-options="'init'">
 																		</div>
-																		<div class="actual-input actuals-class">
-																			<input id="tax-tolls-actual-{{$index}}" class="autonumeric edit-tax-input" type="text" ng-model="TruckData.tolls_actual" data-a-sign="$" ui-jq="autoNumeric" ui-options="'init'">
-																		</div>
 																	</div>
 																</div>
 																<div class="pop-edit-row-block">
@@ -1217,9 +1193,6 @@
 																	<div class="estimate-cover">
 																		<div class="estimate-input">
 																			<input id="tax-total-charges-{{$index}}" class="autonumeric disclas" disabled="disabled" type="text" ng-model="TruckData.tax_total_charge" data-a-sign="$" ui-jq="autoNumeric" ui-options="'init'">
-																		</div>
-																		<div class="actual-input actuals-class">
-																			<input id="tax-total-charges-actual-{{$index}}"  class="autonumeric disclas" disabled="disabled" type="text" ng-model="TruckData.tax_total_charge_actual" data-a-sign="$" ui-jq="autoNumeric" ui-options="'init'">
 																		</div>
 																	</div>
 																</div>
@@ -1250,9 +1223,6 @@
 																		<div class="estimate-input">
 																			<input id="driver-orig-dest-{{$index}}" class="disclas" disabled="disabled" placeholder="1780" type="text" ng-model="TruckData.originToDestDistDriver" >
 																		</div>
-																		<div class="actual-input actuals-class">
-																			<input id="driver-orig-dest-actual-{{$index}}" placeholder="1780" type="text" ng-model="TruckData.originToDestDistDriver_actual" >
-																		</div>
 																	</div>
 																</div>
 																<div class="pop-edit-row-block">
@@ -1260,9 +1230,6 @@
 																	<div class="estimate-cover">
 																		<div class="estimate-input">
 																			<input id="driver-dead-mile-{{$index}}" ng-disabled="disableTripDetail" class="edit-driver-input"  placeholder="0" type="text" ng-model="TruckData.driver_dead_mile">
-																		</div>
-																		<div class="actual-input actuals-class">
-																			<input id="driver-dead-mile-actual-{{$index}}" class="edit-driver-input"  placeholder="0" type="text" ng-model="TruckData.driver_dead_mile_actual">
 																		</div>
 																	</div>
 																</div>
@@ -1272,9 +1239,6 @@
 																		<div class="estimate-input">
 																			<input id="diesel-comp-dist-{{$index}}" ng-disabled="disableTripDetail" class="edit-driver-input" type="text" ng-model="TruckData.total_complete_distance" />
 																		</div>
-																		<div class="actual-input actuals-class">
-																			<input id="diesel-comp-dist-actual-{{$index}}" class="edit-driver-input" type="text" ng-model="TruckData.origin_to_dest_actual" />
-																		</div>
 																	</div>
 																</div>
 																<div class="pop-edit-row-block">
@@ -1282,9 +1246,6 @@
 																	<div class="estimate-cover">
 																		<div class="estimate-input">
 																			<input id="driver-dead-miles-not-paid-{{$index}}" ng-disabled="disableTripDetail" class="edit-driver-input"  placeholder="0" type="text" ng-model="TruckData.driver_dead_miles_not_paid">
-																		</div>
-																		<div class="actual-input actuals-class">
-																			<input id="driver-dead-miles-not-paid-actual-{{$index}}" class="edit-driver-input"  placeholder="0" type="text" ng-model="TruckData.dead_miles_not_paid_actual">
 																		</div>
 																	</div>
 																</div>
@@ -1294,9 +1255,6 @@
 																		<div class="estimate-input">
 																			<input id="driver-dead-miles-paid-{{$index}}" ng-disabled="disableTripDetail" class="edit-driver-input"  placeholder="0" type="text" ng-model="TruckData.driver_dead_miles_paid">
 																		</div>
-																		<div class="actual-input actuals-class">
-																			<input id="driver-dead-miles-paid-actual-{{$index}}" class="edit-driver-input"  placeholder="0" type="text" ng-model="TruckData.dead_head_miles_paid_actual">
-																		</div>
 																	</div>
 																</div>
 																<div class="pop-edit-row-block">
@@ -1304,9 +1262,6 @@
 																	<div class="estimate-cover">
 																		<div class="estimate-input">
 																			<input id="driver-pay-for-dead-miles-{{$index}}" ng-disabled="disableTripDetail" class="edit-driver-input"  placeholder="0.4" type="text" ng-model="TruckData.driver_pay_for_dead_mile">
-																		</div>
-																		<div class="actual-input actuals-class">
-																			<input id="driver-pay-for-dead-miles-actual-{{$index}}" class="edit-driver-input"  placeholder="0.4" type="text" ng-model="TruckData.pay_for_dead_head_mile_actual">
 																		</div>
 																	</div>
 																</div>
@@ -1316,9 +1271,6 @@
 																		<div class="estimate-input">
 																			<input id="driver-dead-mile-paid-{{$index}}" disabled="disabled" placeholder="0" type="text" class="autonumeric disclas" ng-model="TruckData.driver_dead_mile_paid" data-a-sign="$" ui-jq="autoNumeric" ui-options="'init'">
 																		</div>
-																		<div class="actual-input actuals-class">
-																			<input id="driver-dead-mile-paid-actual-{{$index}}" disabled="disabled" placeholder="0" type="text" class="autonumeric disclas" ng-model="TruckData.driver_dead_mile_paid_actual" data-a-sign="$" ui-jq="autoNumeric" ui-options="'init'">
-																		</div>
 																	</div>
 																</div>
 																<div class="pop-edit-row-block">
@@ -1326,9 +1278,6 @@
 																	<div class="estimate-cover">
 																		<div class="estimate-input">
 																			<input id="driver-xtrastops-{{$index}}" disabled="disabled" placeholder="0" type="text" class="autonumeric disclas" ng-model="TruckData.xtraInfo.charges" data-a-sign="$" ui-jq="autoNumeric" ui-options="'init'">
-																		</div>
-																		<div class="actual-input actuals-class">
-																			<input id="driver-dead-mile-paid-actual-{{$index}}" disabled="disabled" placeholder="0" type="text" class="autonumeric disclas" ng-model="TruckData.xtraInfo.charges" data-a-sign="$" ui-jq="autoNumeric" ui-options="'init'">
 																		</div>
 																	</div>
 																</div>
@@ -1338,9 +1287,6 @@
 																		<div class="estimate-input">
 																			<input id="driver-miles-cargo-{{$index}}" ng-disabled="disableTripDetail" class="edit-driver-input"  placeholder="0.45" type="text" ng-model="TruckData.driver_pay_miles_cargo">
 																		</div>
-																		<div class="actual-input actuals-class">
-																			<input id="driver-miles-cargo-actual-{{$index}}" class="edit-driver-input"  placeholder="0.45" type="text" ng-model="TruckData.pay_for_miles_cargo_actual">
-																		</div>
 																	</div>
 																</div>
 																<div class="pop-edit-row-block">
@@ -1349,9 +1295,6 @@
 																		<div class="estimate-input">
 																			<input id="driver-amount-cargo-{{$index}}" disabled="disabled" type="text" class="autonumeric disclas" ng-model="TruckData.driver_amount_cargo" data-a-sign="$" ui-jq="autoNumeric" ui-options="'init'">
 																		</div>
-																		<div class="actual-input actuals-class">
-																			<input id="driver-amount-cargo-actual-{{$index}}" disabled="disabled" type="text" class="autonumeric disclas" ng-model="TruckData.driver_amount_cargo_actual" data-a-sign="$" ui-jq="autoNumeric" ui-options="'init'">
-																		</div>
 																	</div>
 																</div>
 																<div class="pop-edit-row-block">
@@ -1359,9 +1302,6 @@
 																	<div class="estimate-cover">
 																		<div class="estimate-input">
 																			<input id="driver-due-driver-{{$index}}" disabled="disabled" class="autonumeric disclas" type="text" ng-model="TruckData.driver_due_driver" data-a-sign="$" ui-jq="autoNumeric" ui-options="'init'">
-																		</div>
-																		<div class="actual-input actuals-class">
-																			<input id="driver-due-driver-actual-{{$index}}" class="autonumeric disclas" disabled="disabled" type="text" ng-model="TruckData.driver_due_driver_actual" data-a-sign="$" ui-jq="autoNumeric" ui-options="'init'">
 																		</div>
 																	</div>
 																</div>

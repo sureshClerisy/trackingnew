@@ -7,6 +7,10 @@ vika.io server phpmyadmin details:
 username: root
 password: DGxDeH5qgR3sG
 
+filezilla credentials
+
+- 34.192.253.130
+- SFTP
 Google Key used for google maps:
 
 emailId = gsm.jatt@gmail.com

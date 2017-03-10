@@ -1328,29 +1328,23 @@ $rootScope.logoutmessage=false;
 		}
 	}
 
-	$scope.printBrokerInfo = function( editSavedLoad, id, infoType) {
-		
-		// alert(editSavedLoad);
-		// alert(id);
-		// alert(infoType);
-
+	$scope.printLoadsInfo = function( editSavedLoad, id) {
 		var newWindowUrl = URL;
-		switch(infoType){
-			case 'loadDetail':
-				newWindowUrl +='/truckstop/printLoadDetails/'+editSavedLoad+'/'+id;
-			break;
-			case 'brocker':
-				newWindowUrl += '/assignedloads/PrintBrokersDetails/'+id;				
-			break;
-			case 'tripDetails':
-				newWindowUrl += '/truckstop/printTripDetails/'+id;				
-			break;
-		}
-		var winPrint = $window.open(newWindowUrl,'_blank',null,"location=no");
-		winPrint.focus();
-		setTimeout(function () {
-			winPrint.print();
-		},1000);
+		// switch(infoType){
+		// 	case 'loadDetail':
+		// 		newWindowUrl +='/truckstop/printLoadDetails/'+editSavedLoad+'/'+id;
+		// 	break;
+		// 	case 'brocker':
+		// 		newWindowUrl += '/assignedloads/PrintBrokersDetails/'+id;				
+		// 	break;
+		// 	case 'tripDetails':
+		// 		newWindowUrl += '/truckstop/printTripDetails/'+id;				
+		// 	break;
+		// }
+		newWindowUrl +='/truckstop/printLoadDetails/'+editSavedLoad+'/'+id;
+		var winPrint = $window.open(newWindowUrl,'_blank');
+		// winPrint.focus();
+		setTimeout(function () {winPrint.print();},1000);
 	};
 	
 	/**

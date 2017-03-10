@@ -402,7 +402,6 @@ class Truckstop extends Admin_Controller{
 
 	public function matchLoadDetail(  $truckStopId = null, $vehicleId = null, $loadId = null ) 
 	{
-					
 		$_POST = json_decode(file_get_contents('php://input'), true);
 		if ( $truckStopId != '' && $truckStopId != null && $truckStopId != 0 )
 			$loadIdArray = $this->Job->getTruckstopRelatedId( $truckStopId );
@@ -633,192 +632,16 @@ class Truckstop extends Admin_Controller{
 		$data['trailerTypes'] 		= $this->getTrailerTypes();
 		$data['userRoleId'] 		= $this->userRoleId;
 
-		if (!$this->input->is_ajax_request()) {
-			return $data;
-		}
-
 		echo json_encode($data);
 	}
 	
 	/**
-	 * 
-	 * Assign truck to driver
+	 * method  : get
+	 * params  : driverId
+	 * return  : driver array or error
+	 * comment :Assignment of truck to driver
 	 */
 	
-
-
-	public function matchLoadDetailNew( $truckStopId = null,$loadId = null ) 
-	{
-		
-		$data['vehicleInfo'] = array();
-		$data['brokerData'] = array();
-		$data['rateSheetUploaded'] = 'no';
-	
-		if ( $loadId != '' && is_numeric($loadId) ) {
-			$jobRecord = $this->Job->FetchSingleJob($loadId);
-			
-			$origin = $jobRecord['OriginCity'].' '.$jobRecord['OriginState'].' '.$jobRecord['OriginCountry'];
-			$destination = $jobRecord['DestinationCity'].' '.$jobRecord['DestinationState'].' '.$jobRecord['DestinationCountry'];
-			
-			if($jobRecord['PickupDate'] == '0000-00-00') {
-				$jobRecord['PickupDate']='';
-			}
-			
-			if($jobRecord['DeliveryDate']=='0000-00-00') {
-				$jobRecord['DeliveryDate']='';
-			}
-		
-			$jobRecord['PaymentAmount'] = str_replace(',','',$jobRecord['PaymentAmount']);
-			if(@$jobRecord['Entered'] == '0000-00-00') {
-				$jobRecord['Entered']='';
-			}
-			$jobRecord['EquipmentTypes']['Code'] = $jobRecord['equipment_options'];
-			$jobRecord['EquipmentTypes']['Description'] = $jobRecord['equipment'];
-		
-			$jobRecord['totalMiles'] = $jobRecord['deadmiles'] + $jobRecord['Mileage'];
-			
-			if ( $jobRecord['Stops'] > 0 ) {
-				$this->extraStopsDataArray = $this->Job->getExtraStops( $jobRecord['id']);
-			} 
-			
-			if ( $jobRecord['vehicle_id'] != ''  && $jobRecord['vehicle_id'] != null && $jobRecord['vehicle_id'] != 0 ) {
-				if(isset($jobRecord["driver_type"]) && $jobRecord["driver_type"] == "team"){
-					$data['vehicleInfo'] = $this->Vehicle->getTeamVehicleInfo( $jobRecord['id']);	
-					$jobRecord['assignedDriverName'] = $data['vehicleInfo']['driverName'];
-				}else{
-					$data['vehicleInfo'] = $this->Vehicle->getVehicleInfo( $jobRecord['vehicle_id'] );	
-					//~ $jobRecord['assignedDriverName'] = @$data['vehicleInfo']['first_name'].' '.@$data['vehicleInfo']['last_name'].' - '.$data['vehicleInfo']['label'];
-				}
-			}
-		
-			if ( !empty($data['vehicleInfo']) && $data['vehicleInfo']['fuel_consumption'] != '' ) {
-				$truckAverage = (int)($data['vehicleInfo']['fuel_consumption'] / 100);
-			} else {
-				$truckAverage = $this->defaultTruckAvg;
-			}
-			
-		} else {
-			$client   = new SOAPClient($this->wsdl_url);
-			$params   = array(
-				'detailRequest' => array(
-					'UserName' => $this->username,
-					'Password' => $this->password,
-					'IntegrationId' => $this->id,
-					'LoadId' => $truckStopId,
-					)
-				);
-			$return 	 = $client->GetLoadSearchDetailResult($params);
-			$loadResults = $return->GetLoadSearchDetailResultResult->LoadDetail;
-
-			$jobRecord   = json_decode(json_encode($loadResults),true);
-			
-			$jobRecord['OriginCountry'] = (isset($jobRecord['OriginCountry']) && $jobRecord['OriginCountry'] != '' ) ? $jobRecord['OriginCountry'] : 'USA';
-			$jobRecord['DestinationCountry'] = (isset($jobRecord['DestinationCountry']) && $jobRecord['DestinationCountry'] != '' ) ? $jobRecord['DestinationCountry'] : 'USA';
-		
-			if ( $jobRecord['PickupDate'] != '' && $jobRecord['PickupDate'] != 'DAILY') {
-				$jobRecord['PickupDate'] = date('Y-m-d',strtotime($jobRecord['PickupDate']));
-			} else {
-				$jobRecord['PickupDate'] = '';
-			}
-			
-			if ( $jobRecord['DeliveryDate'] != '' ) {
-				$jobRecord['DeliveryDate'] = date('Y-m-d',strtotime($jobRecord['DeliveryDate']));
-			}
-			
-			if ( $jobRecord['Entered'] != '' ) {
-				$enteredArray = explode('T',$jobRecord['Entered']);
-				$jobRecord['Entered'] = $enteredArray[0];
-			}
-			
-			$jobRecord['PostedOn'] = $jobRecord['Entered'];
-			$jobRecord['JobStatus'] = '';
-			$jobRecord['commodity'] = '';
-			
-			$jobRecord['PaymentAmount'] = str_replace(',','',$jobRecord['PaymentAmount']);
-			$data['primaryLoadId'] 		= '';
-			$jobRecord['originalDistance'] = $jobRecord['Mileage'];
-			$truckAverage = $this->defaultTruckAvg;
-			$jobRecord['totalCost'] = $_POST['totalCost'];			
-			$jobRecord['deadmiles'] = $_POST['deadmiles'];
-			
-			if ( isset($_POST['deadMilesLocation']) && $_POST['deadMilesLocation'] != '' ) {
-				$deadMilesDestination 	=  $jobRecord['OriginCity'].','.$jobRecord['OriginState'].','.$jobRecord['OriginCountry'];
-				$deadMilesDestination 	= trim($deadMilesDestination,',');
-				
-				$deadMilesArray = $this->User->getTimeMiles($_POST['deadMilesLocation'],$deadMilesDestination);
-				if(!empty($deadMilesArray)){
-					$jobRecord['deadmiles'] = $deadMilesArray['miles'];					
-				} else {
-					$deadMilesArray 		= $this->GetDrivingDistance($_POST['deadMilesLocation'],$deadMilesDestination);
-					if ( !empty($deadMilesArray) ) {
-						$jobRecord['deadmiles'] = ceil($deadMilesArray['distance']);
-					}
-				}
-				
-				$total_cost = $this->getCompleteCost($jobRecord['Mileage'],$jobRecord['deadmiles'],$truckAverage);
-				if ( !empty($total_cost) )
-					$jobRecord['totalCost'] = $total_cost;		
-			}			
-			
-			$jobRecord['pickDate'] = $_POST['originPickDate'];
-			$jobRecord['totalMiles'] = $jobRecord['deadmiles'] + $jobRecord['Mileage'];
-			$jobRecord['driver_id'] = '';
-			$jobRecord['assignedDriverName'] = '';
-			
-			$jobRecord['postingAddress'] = $jobRecord['TruckCompanyCity'].', '.$jobRecord['TruckCompanyState'];
-			if ( isset($jobRecord['PointOfContactPhone']) && $jobRecord['PointOfContactPhone'] != '' ) {
-				$jobRecord['PointOfContactPhone'] = $this->sanitize_phone($jobRecord['PointOfContactPhone']);
-			}
-			
-			if ( isset($jobRecord['TruckCompanyPhone']) && $jobRecord['TruckCompanyPhone'] != '' ) {
-				$jobRecord['TruckCompanyPhone'] = $this->sanitize_phone($jobRecord['TruckCompanyPhone']);
-			}
-			
-			$jobRecord['PickupTime'] = '';
-			$jobRecord['PickupTimeRangeEnd'] = '';
-			$jobRecord['DeliveryTime'] = '';
-			$jobRecord['DeliveryTimeRangeEnd'] = '';
-			
-		}
-
-		$jobRecord['Stops'] = ( isset($jobRecord['Stops']) && $jobRecord['Stops'] != '' ) ? $jobRecord['Stops'] : 0;
-		
-		$jobRecord['overall_total_rate_mile'] = '';
-		if($jobRecord['Mileage'] > 0)
-			$jobRecord['overall_total_rate_mile'] = round($jobRecord['PaymentAmount'] / $jobRecord['Mileage'], 2);
-		
-		$payment = $jobRecord['PaymentAmount'];
-		$jobRecord['overallTotalProfit'] = ($payment - $jobRecord['totalCost']);
-		if( isset($payment) && $payment != '' && $payment != 0 ) {	
-			$jobRecord['overallTotalProfitPercent'] = round(( ($jobRecord['overallTotalProfit'] / $payment) * 100 ),2);
-		} else {
-			$jobRecord['overallTotalProfitPercent'] = 0;
-		}
-
-		//--------- Code for team task ----------------
-		$driverAssignType = 'driver';
-		if(isset($jobRecord["driver_type"]) && $jobRecord["driver_type"] == "team"){
-			$driverAssignType = 'team';
-		}else if(isset($_POST["driverType"]) && ($_POST["driverType"] == "team" || $_POST["driverType"] == "_team")){
-			$driverAssignType = 'team';
-		}
-		//--------- Code for team task ----------------
-
-		$jobRecord['loadedDistanceCost'] = $this->findDieselCosts( $truckAverage,$jobRecord['Mileage'],$this->diesel_rate_per_gallon , 'driverMiles', $driverAssignType );		// driverMiles for calulating fuel cost+ driver miles with cargo cost
-		$jobRecord['deadMileDistCost'] = $this->findDieselCosts( $truckAverage,$jobRecord['deadmiles'],$this->diesel_rate_per_gallon, 'driverMiles', $driverAssignType );
-		$jobRecord['estimatedFuelCost'] = $this->findDieselCosts( $truckAverage, ( $jobRecord['Mileage'] + $jobRecord['deadmiles'] ),$this->diesel_rate_per_gallon, '', $driverAssignType );
-		
-			//Skip driver if he is already in team
-		$data['encodedJobRecord'] 	= $jobRecord;
-		$data['extra_stops_data'] 	= $this->extraStopsDataArray;
-		
-
-		if (!$this->input->is_ajax_request()) {
-			return $data;
-		}
-
-		echo json_encode($data);
-	} 
 	public function assignTruckToDriver( $driverId = null ) {
 		
 		$_POST = json_decode(file_get_contents('php://input'), true);
@@ -974,7 +797,8 @@ class Truckstop extends Admin_Controller{
 		if ( $vehicle_id == '' || $vehicle_id == 0 || $vehicle_id == null ) 
 			$vehicle_id = $jobRecord['vehicle_id'];
 
-		$dataN['vehicles_Available'] = $VehiclesArray = $this->Job->FindVehicles( $jobSpec, $jobCollect, $jobDeliver, $jobVehicle, $fetchAssigedTruck ,$jobVehicleType, $jobId, $this->userId, $jobWidth, $jobLength, $vehicle_id);
+		$dataN['vehicles_Available'] = $VehiclesArray = $this->Job->FindVehicles( $vehicle_id);
+		// $dataN['vehicles_Available'] = $VehiclesArray = $this->Job->FindVehicles( $jobSpec, $jobCollect, $jobDeliver, $jobVehicle, $fetchAssigedTruck ,$jobVehicleType, $jobId, $this->userId, $jobWidth, $jobLength, $vehicle_id);
 		
 		//--------------- Code for Team task ----------------
 		$perExtraStopCharges = $this->extraStopPerStopCharge;
@@ -1024,19 +848,124 @@ class Truckstop extends Admin_Controller{
 	*/
 
 	public function printLoadDetails($truckstopId = null,$loadid = null){
-		
 		$data 				= $this->matchLoadDetailNew($truckstopId,$loadid);
-		pr($data);
-		// $columns 			= ['JobStatus','invoiceNo','Stops'];
-		// $fetchedColumns 	= $this->Job->fetchLoadFields($loadid,$columns);
-		// $data['invoceNo'] 	= $fetchedColumns[0]['invoiceNo'];
-		// $data['JobStatus'] 	= ucfirst($fetchedColumns[0]['JobStatus']);
-		// $data['extra_stop_charges'] 		= ($fetchedColumns[0]['Stops']*$this->extraStopPerStopChargeTeam);
-		// $data['loadDetails'] = $this->Job->getLoadDetailsById($loadid);
-		// pr($data['loadDetails']);
-
-		$this->load->view('printTemplates/loaddetail.php',$data);
+		$html = $this->load->view('printTemplates/loaddetail',$data);
 	}
+
+
+	public function matchLoadDetailNew( $truckStopId = null,$loadId = null ) 
+	{
+		$data['vehicleInfo'] = array();
+		$data['brokerData']  = array();
+				
+		if ( $loadId != '' && is_numeric($loadId) ) {
+			$jobRecord = $this->Job->FetchSingleJobForPrint($loadId);
+
+			if ($jobRecord['broker_id'] != 0 && $jobRecord['broker_id'] != '' ) {
+				$data['brokerData'] = $this->Job->getBrokerForLoadDetailForPrint($jobRecord['broker_id']);
+			}
+			
+			
+			$origin = $jobRecord['OriginCity'].' '.$jobRecord['OriginState'].' '.$jobRecord['OriginCountry'];
+			$destination = $jobRecord['DestinationCity'].' '.$jobRecord['DestinationState'].' '.$jobRecord['DestinationCountry'];
+			
+			if($jobRecord['PickupDate'] == '0000-00-00') {
+				$jobRecord['PickupDate']='';
+			}
+			
+			if($jobRecord['DeliveryDate']=='0000-00-00') {
+				$jobRecord['DeliveryDate']='';
+			}
+		
+			$jobRecord['PaymentAmount'] = str_replace(',','',$jobRecord['PaymentAmount']);
+			$jobRecord['Entered'] 		= ( isset($jobRecord['Entered']) && $jobRecord['Entered'] != '0000-00-00' ) ? $jobRecord['Entered'] : '';
+		
+			$jobRecord['totalMiles'] = $jobRecord['deadmiles'] + $jobRecord['Mileage'];
+			
+			if ( $jobRecord['Stops'] > 0 ) {
+				$this->extraStopsDataArray = $this->Job->getExtraStops( $jobRecord['id']);
+			} 
+			
+			if ( $jobRecord['vehicle_id'] != ''  && $jobRecord['vehicle_id'] != null && $jobRecord['vehicle_id'] != 0 ) {
+				if(isset($jobRecord["driver_type"]) && $jobRecord["driver_type"] == "team"){
+					$data['vehicleInfo'] = $this->Vehicle->getTeamVehicleInfo( $jobRecord['id']);	
+					$jobRecord['assignedDriverName'] = $data['vehicleInfo']['driverName'];
+				}else{
+					$data['vehicleInfo'] = $this->Vehicle->getVehicleInfo( $jobRecord['vehicle_id'] );	
+				}
+			}
+		
+			if ( !empty($data['vehicleInfo']) && $data['vehicleInfo']['fuel_consumption'] != '' ) {
+				$truckAverage = (int)($data['vehicleInfo']['fuel_consumption'] / 100);
+			} else {
+				$truckAverage = $this->defaultTruckAvg;
+			}
+		}
+
+		$jobRecord['Stops'] = ( isset($jobRecord['Stops']) && $jobRecord['Stops'] != '' ) ? $jobRecord['Stops'] : 0;
+		
+		$jobRecord['overall_total_rate_mile'] = '';
+		if($jobRecord['Mileage'] > 0)
+			$jobRecord['overall_total_rate_mile'] = round($jobRecord['PaymentAmount'] / $jobRecord['Mileage'], 2);
+		
+		$jobRecord['overallTotalProfit'] = ($jobRecord['PaymentAmount'] - $jobRecord['totalCost']);
+		$jobRecord['overallTotalProfitPercent'] = 0;
+		if( isset($jobRecord['PaymentAmount']) && $jobRecord['PaymentAmount'] != '' && $jobRecord['PaymentAmount'] != 0 ) {	
+			$jobRecord['overallTotalProfitPercent'] = round(( ($jobRecord['overallTotalProfit'] / $jobRecord['PaymentAmount']) * 100 ),2);
+		}
+
+		$driverAssignType = (isset($jobRecord["driver_type"]) && $jobRecord["driver_type"] == "team") ? $jobRecord["driver_type"] : 'driver';
+
+		$jobRecord['loadedDistanceCost']	= $this->findDieselCosts( $truckAverage,$jobRecord['Mileage'],$this->diesel_rate_per_gallon , 'driverMiles', $driverAssignType );	
+		$jobRecord['deadMileDistCost'] 		= $this->findDieselCosts( $truckAverage,$jobRecord['deadmiles'],$this->diesel_rate_per_gallon, 'driverMiles', $driverAssignType );
+		$jobRecord['estimatedFuelCost'] 	= $this->findDieselCosts( $truckAverage, ( $jobRecord['Mileage'] + $jobRecord['deadmiles'] ),$this->diesel_rate_per_gallon, '', $driverAssignType );
+		
+		$this->saveDead = $jobRecord['deadmiles'];		
+		$truckDetails = $this->Job->FindTruckInfo( $jobRecord['id'] );
+	
+		if ( !empty($truckDetails) ) {
+			$this->deadMilePaid = $truckDetails['dead_head_miles_paid'] ;
+			$this->deadMileNotPaid = $truckDetails['dead_miles_not_paid'];
+			
+			if(isset($driverAssignType) && ($driverAssignType == "team") ){
+				$this->payForDeadMile_team = $truckDetails['pay_for_dead_head_mile']; 
+				$this->driver_pay_miles_cargo_team = $truckDetails['pay_for_miles_cargo']; 
+			} else {
+				$this->payForDeadMile = $truckDetails['pay_for_dead_head_mile']; 
+				$this->driver_pay_miles_cargo = $truckDetails['pay_for_miles_cargo']; 	
+			}
+			$this->iftaTax = $truckDetails['ifta_taxes'];
+			$this->tarps = $truckDetails['tarps'];
+			$this->det_time = $truckDetails['detention_time'];
+			$this->tollsTax = $truckDetails['tolls'];
+		}
+
+		
+		$driverPayMilesCargo = $this->driver_pay_miles_cargo;
+		$driverPayForDeadMile = $this->payForDeadMile;
+		$vehicle_id = $jobRecord['vehicle_id'];
+
+		$dataN['vehicles_Available'] = $VehiclesArray = $this->Job->FindVehicles($vehicle_id);
+		
+		$perExtraStopCharges = $this->extraStopPerStopCharge;
+		if($driverAssignType == "team"){
+			$perExtraStopCharges 	= $this->extraStopPerStopChargeTeam;
+			$driverPayMilesCargo 	= $this->driver_pay_miles_cargo_team;
+			$driverPayForDeadMile 	= $this->payForDeadMile_team;
+		}
+		
+		$xtraStopCharges = isset($jobRecord['Stops']) ? ($jobRecord['Stops'] * $perExtraStopCharges) : 0;
+
+		if( !empty($VehiclesArray) ) {
+			$VehiclesArray = $this->vehicleCalculations( $dataN['vehicles_Available'], $jobRecord['OriginCity'], $jobRecord['OriginState'], $jobRecord['OriginCountry'], $this->saveDead, $jobRecord['Mileage'], $jobRecord['PaymentAmount'], $this->deadMilePaid, $this->deadMileNotPaid, $driverPayForDeadMile, $driverPayMilesCargo, $this->iftaTax, $this->tarps, $this->det_time, $this->tollsTax, $xtraStopCharges, $truckDetails, '', $driverAssignType);
+		}
+		$VehiclesArray	[0]['xtraStopCharges'] 	= $xtraStopCharges; 
+		$data['tripDetails'] = $VehiclesArray;
+		$data['jobDetails'] 	= $jobRecord;
+		$data['extraStopsData'] 	= $this->extraStopsDataArray;
+		
+		return $data;
+	} 
 	
 	public function save_trip_details( $truckstopId = null, $id = null, $tripDetailId = null ) {
 		$_POST = json_decode(file_get_contents('php://input'), true);
@@ -1161,62 +1090,62 @@ class Truckstop extends Admin_Controller{
 					
 					$truckAverage = ( $truckAverage != null && $truckAverage != '' && $truckAverage != 0 ) ? $truckAverage : 6;
 					$VehiclesArray[$i]['fuel_consumption'] = $truckAverage;
-					$VehiclesArray[$i]['vehicle_average_actual'] = @$truckDetails['vehicle_average_actual'];
+					// $VehiclesArray[$i]['vehicle_average_actual'] = @$truckDetails['vehicle_average_actual'];
 					
 					$loadedDistanceCost = $this->findDieselCosts( $truckAverage,$originToDestDist,$this->diesel_rate_per_gallon , 'driverMiles', $driverAssignType );		
 					$deadMileDistCost = $this->findDieselCosts( $truckAverage,$deadMileDist,$this->diesel_rate_per_gallon, 'driverMiles', $driverAssignType );
 
 					//$VehiclesArray[$i]['gallon_needed'] = ceil($originToDestDist/$truckAverage);
 					$VehiclesArray[$i]['gallon_needed'] = round(($originToDestDist + $deadMileDist)/$truckAverage,2);
-					$VehiclesArray[$i]['gallon_needed_actual'] = @$truckDetails['gallon_needed_actual'];
+					// $VehiclesArray[$i]['gallon_needed_actual'] = @$truckDetails['gallon_needed_actual'];
 					
 					$VehiclesArray[$i]['diesel_rate_per_gallon'] = $dieselFuelPrice;
-					$VehiclesArray[$i]['avg_cost_diesel_actual'] = @$truckDetails['avg_cost_diesel_actual'];
+					// $VehiclesArray[$i]['avg_cost_diesel_actual'] = @$truckDetails['avg_cost_diesel_actual'];
 					
 					$VehiclesArray[$i]['comp_diesel_cost'] = $VehiclesArray[$i]['diesel_rate_per_gallon'] * $VehiclesArray[$i]['gallon_needed'];
-					$VehiclesArray[$i]['comp_diesel_cost_actual'] = $VehiclesArray[$i]['avg_cost_diesel_actual'] * $VehiclesArray[$i]['gallon_needed_actual'];
+					// $VehiclesArray[$i]['comp_diesel_cost_actual'] = $VehiclesArray[$i]['avg_cost_diesel_actual'] * $VehiclesArray[$i]['gallon_needed_actual'];
 					
 					$VehiclesArray[$i]['originToDestDistDriver'] = $originToDestDist;
-					$VehiclesArray[$i]['originToDestDistDriver_actual'] = @$truckDetails['origin_to_dest_actual'];
+					// $VehiclesArray[$i]['originToDestDistDriver_actual'] = @$truckDetails['origin_to_dest_actual'];
 					
 					$VehiclesArray[$i]['driver_dead_mile'] = $deadMileDist;
-					$VehiclesArray[$i]['driver_dead_mile_actual'] = $this->deadMilesActual;
+					// $VehiclesArray[$i]['driver_dead_mile_actual'] = $this->deadMilesActual;
 					
 					$VehiclesArray[$i]['driver_dead_miles_paid'] = $deadMilePaid;
-					$VehiclesArray[$i]['dead_head_miles_paid_actual'] = @$truckDetails['dead_head_miles_paid_actual'];
+					// $VehiclesArray[$i]['dead_head_miles_paid_actual'] = @$truckDetails['dead_head_miles_paid_actual'];
 					
 					$VehiclesArray[$i]['driver_dead_miles_not_paid'] = $deadMileNotPaid;
-					$VehiclesArray[$i]['dead_miles_not_paid_actual'] = @$truckDetails['dead_miles_not_paid_actual'];
+					// $VehiclesArray[$i]['dead_miles_not_paid_actual'] = @$truckDetails['dead_miles_not_paid_actual'];
 					
 					$VehiclesArray[$i]['driver_pay_for_dead_mile'] = $payForDeadMile;
-					$VehiclesArray[$i]['pay_for_dead_head_mile_actual'] = @$truckDetails['pay_for_dead_head_mile_actual'];
+					// $VehiclesArray[$i]['pay_for_dead_head_mile_actual'] = @$truckDetails['pay_for_dead_head_mile_actual'];
 					
 					$VehiclesArray[$i]['driver_dead_mile_paid'] = (float)($VehiclesArray[$i]['driver_dead_miles_paid'] * $VehiclesArray[$i]['driver_pay_for_dead_mile']);
-					$VehiclesArray[$i]['driver_dead_mile_paid_actual'] = (float)($VehiclesArray[$i]['dead_head_miles_paid_actual'] * $VehiclesArray[$i]['pay_for_dead_head_mile_actual']);
+					// $VehiclesArray[$i]['driver_dead_mile_paid_actual'] = (float)($VehiclesArray[$i]['dead_head_miles_paid_actual'] * $VehiclesArray[$i]['pay_for_dead_head_mile_actual']);
 					
 					$VehiclesArray[$i]['driver_pay_miles_cargo'] = $payMilesCargo;
-					$VehiclesArray[$i]['pay_for_miles_cargo_actual'] = @$truckDetails['pay_for_miles_cargo_actual'];
+					// $VehiclesArray[$i]['pay_for_miles_cargo_actual'] = @$truckDetails['pay_for_miles_cargo_actual'];
 					
 					$VehiclesArray[$i]['driver_amount_cargo'] = (float)($VehiclesArray[$i]['driver_pay_miles_cargo'] * ($originToDestDist + $deadMileDist));
-					$VehiclesArray[$i]['driver_amount_cargo_actual'] = (float)($VehiclesArray[$i]['pay_for_miles_cargo_actual'] * $originToDestDist);
+					// $VehiclesArray[$i]['driver_amount_cargo_actual'] = (float)($VehiclesArray[$i]['pay_for_miles_cargo_actual'] * $originToDestDist);
 					
 					$VehiclesArray[$i]['driver_due_driver'] = (float)($VehiclesArray[$i]['driver_amount_cargo'] + $VehiclesArray[$i]['driver_dead_mile_paid']) + $xtraStopCharges;
-					$VehiclesArray[$i]['driver_due_driver_actual'] = (float)($VehiclesArray[$i]['driver_amount_cargo_actual'] + $VehiclesArray[$i]['driver_dead_mile_paid_actual'])+$xtraStopCharges;
+					// $VehiclesArray[$i]['driver_due_driver_actual'] = (float)($VehiclesArray[$i]['driver_amount_cargo_actual'] + $VehiclesArray[$i]['driver_dead_mile_paid_actual'])+$xtraStopCharges;
 					
 					$VehiclesArray[$i]['tax_ifta_tax'] = str_replace('$', '',$iftaTax);
-					$VehiclesArray[$i]['ifta_taxes_actual'] = str_replace('$', '',@$truckDetails['ifta_taxes_actual']);
+					// $VehiclesArray[$i]['ifta_taxes_actual'] = str_replace('$', '',@$truckDetails['ifta_taxes_actual']);
 					
 					$VehiclesArray[$i]['tax_tarps'] = str_replace('$', '',$tarps);
-					$VehiclesArray[$i]['tarps_actual'] = str_replace('$', '',@$truckDetails['tarps_actual']);
+					// $VehiclesArray[$i]['tarps_actual'] = str_replace('$', '',@$truckDetails['tarps_actual']);
 					
 					$VehiclesArray[$i]['tax_det_time'] = str_replace('$', '',$det_time);
-					$VehiclesArray[$i]['detention_time_actual'] = str_replace('$', '',@$truckDetails['detention_time_actual']);
+					// $VehiclesArray[$i]['detention_time_actual'] = str_replace('$', '',@$truckDetails['detention_time_actual']);
 					
 					$VehiclesArray[$i]['tax_tolls'] = str_replace('$', '',$tollsTax);
-					$VehiclesArray[$i]['tolls_actual'] = str_replace('$', '',@$truckDetails['tolls_actual']);
+					// $VehiclesArray[$i]['tolls_actual'] = str_replace('$', '',@$truckDetails['tolls_actual']);
 					
 					$VehiclesArray[$i]['tax_total_charge'] = (float)($VehiclesArray[$i]['tax_ifta_tax'] + $VehiclesArray[$i]['tax_tarps'] + $VehiclesArray[$i]['tax_det_time'] + $VehiclesArray[$i]['tax_tolls']);
-					$VehiclesArray[$i]['tax_total_charge_actual'] = (float)($VehiclesArray[$i]['ifta_taxes_actual'] + $VehiclesArray[$i]['tarps_actual'] + $VehiclesArray[$i]['detention_time_actual'] + $VehiclesArray[$i]['tolls_actual']);
+					// $VehiclesArray[$i]['tax_total_charge_actual'] = (float)($VehiclesArray[$i]['ifta_taxes_actual'] + $VehiclesArray[$i]['tarps_actual'] + $VehiclesArray[$i]['detention_time_actual'] + $VehiclesArray[$i]['tolls_actual']);
 					
 					$VehiclesArray[$i]['overall_total_payment_amount'] = $loadPaymentAmount;
 					
@@ -2078,32 +2007,33 @@ class Truckstop extends Admin_Controller{
 				$parameter = 'docs';
 				
 			if($_FILES['file']['error'] == 0 ){
-				$extArr = explode('.',$_FILES['file']['name']);
-				$extension = strtolower(end($extArr));
+
+				$extArr 						= explode('.',$_FILES['file']['name']);
+				$extension 						= strtolower(end($extArr));
 				
-			   	$config['file_name']   = $config['_prefix'].time().'.'.$extension;
+			   	$config['file_name']   			= $config['_prefix'].time().'.'.$extension;
 				$config['upload_path']          = 'assets/uploads/documents/'.$parameter.'/';
 				$config['allowed_types']        = 'pdf|gif|jpg|png|docx|doc|xls|xlsx|txt|ico|bmp|svg';
 				
 				$this->load->library('upload', $config);
 				
 				if ( !$this->upload->do_upload('file'))	{
-					$response['error'] = true;
+					$response['error'] 		= true;
 					$response['error_desc'] = $this->upload->display_errors();
 				} else {
-					$response['error'] = false;
-					$response['data'] = $this->upload->data();
-// pr($response['data']);
-					
+					$response['error'] 		= false;
+					$response['data'] 		= $this->upload->data();
 					
 					if ( ($parameter == 'rateSheet' || $parameter == 'pod') &&  $extension == 'pdf' ) {
 						$fileCheck = $this->CheckPdfNotCompressed($response['data']['file_name'], $parameter);		// code to check uploaded pdf file is compressed or not
+						
 						if ( $fileCheck == 'pdfCompression' ) {
+							// $degradedFileName = $this->degradePdfVersion($response['data']);
+							$response['data']['file_name'] = $this->degradePdfVersion($response['data']);
 							unlink($response['data']['full_path']);
-							$response['compressionError'] = 1;
-							return $response;					// return error response if file is compressed
-						} else {
-							$response['compressionError'] = 0;
+							// $response['compressionError'] = 1;
+							// $response['compressionError'] = 0;
+							// return $response;					// return error response if file is compressed
 						}
 					}
 					
@@ -2116,7 +2046,7 @@ class Truckstop extends Admin_Controller{
 						$cmd = 'cd '.$response['data']['file_path'];
 				    	$cmd .= '; convert -thumbnail x600 '.$response['data']['file_name'].'[0] -flatten ../'.$thumbFolder.'/thumb_'.$response['data']['raw_name'].'.jpg';
 				    	$response['data']['cmd'] = $cmd;
-				        exec($cmd . " > /dev/null &");   
+				        exec($cmd . " > /dev/null &");
 				    } 
 				    
 					if ( !empty($result) && $result['doc_name'] != '' ) {
@@ -2143,6 +2073,32 @@ class Truckstop extends Admin_Controller{
 		return $response;
 	}
 	
+	/**
+	* Method degradePdfVersion
+	* @param File Path
+	* @return File Name
+	* @package gs-920-linux_x86_64
+	* Degrading PDF(1.5+) to 1.4 version
+	*/
+
+	public function degradePdfVersion( $data = NULL ){
+		
+		$fileName = $data['raw_name'].'_1.pdf';
+		$outputfile = $data['file_path'].'/'.$fileName;
+		$sourcefile = $data['full_path'];
+
+		$pathGen 	= str_replace('application/', '', APPPATH.'assets/');
+		$gostscript = $pathGen.'ghostscript/gs-920-linux_x86_64';
+		
+		try{
+			shell_exec("{$gostscript} -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dNOPAUSE -dQUIET -dBATCH -sOutputFile={$outputfile} {$sourcefile}"); 
+			return $fileName;
+		}catch(Exception $e){
+			$e->getMessage();
+		}
+	}
+
+
 	/**
 	 *  Check if uploaded pdf file is not compressed
 	 */ 

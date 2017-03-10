@@ -361,16 +361,13 @@ class Assignedloads extends Admin_Controller{
 					$showError = 1;
 				}
 			}
-			
-			
 						
 			if ( $showError == 0 ) {
 				if ( $data['jobRecord']['invoiceNo'] == '' || $data['jobRecord']['invoiceNo'] == null  || $data['jobRecord']['invoiceNo'] == 'undefined' || $data['jobRecord']['invoiceNo'] == 0 ) {
 					$invoicedNo = $this->Billing->generateInvoiceNumber($data['jobRecord']['id']);
 					$data['jobRecord']['invoiceNo'] = $invoicedNo;
 				}
-				
-			//~ pr($data); 
+			
 				$invoicedDate = $this->Billing->addGenerateInvoiceDate($data['jobRecord']['id']);
 				
 				$data['jobRecord']['invoicedDate'] = $invoicedDate;
@@ -556,66 +553,64 @@ class Assignedloads extends Admin_Controller{
 	 * Fetching Broker list on add load
 	 */
 	 
-	public function getBrokersList( $loadId = null ,$print = null) {
+	public function getBrokersList( $loadId = null ) {
 		$brokersData = $this->BrokersModel->getBrokersList();
 		if ( !empty($brokersData) ) 
 			$this->data['brokersList'] = $brokersData;
 			
 		$getBrokerLoad = $this->BrokersModel->getBrokerDetail( $loadId );
 		$this->data['brokerLoadDetail'] = $getBrokerLoad;
-		
-		if($print){ return $this->data; }
 		echo json_encode($this->data);
-	}
-
-	/**
-	* Method PrintBrokersDetails
-	* @param Load ID
-	* @return NULL
-	* 
-	*/
-	public function PrintBrokersDetails( $loadID = null){
-		
-		$data 				= $this->getBrokersList($loadID, TRUE );
-		$data['loadID'] 	= $loadID;
-		$columns 			= ['JobStatus','invoiceNo'];
-		$fetchedColumns 	= $this->Job->fetchLoadFields($loadID,$columns);
-		$data['invoceNo'] 	= $fetchedColumns[0]['invoiceNo'];
-		$data['JobStatus'] 	= $fetchedColumns[0]['JobStatus'];
-		$this->load->view('printTemplates/broker',$data);
-	}
+	} 
 	
 	
 	public function demo() {
+
 		require_once("application/third_party/fpdf/fpdf.php");//http://www.fpdf.org/
 		require_once("application/third_party/fpdi/FPDI.php");
 		require_once("application/third_party/fpdi/FPDI_Protection.php");
-		
-		$files = array('/home/csolution/Downloads/podNew.pdf','/home/csolution/Downloads/podNew(1).pdf');
-		$pdf = new FPDI();
+
+		$pathGen = str_replace('application/', '', APPPATH.'assets/');
+
+		$files1 = $pathGen.'/compresspdf_demo/Compressed.pdf';
+		$files2 = $pathGen.'/compresspdf_demo/PDFReference15_v5.pdf';
+		$files 	= array($files1,$files2);
+		$pdf 	= new FPDI();
 	
-		for ($i = 0; $i < count($files); $i++ )
-		{
+		for ($i = 0; $i < count($files); $i++ ) {
 			$pagecount = $pdf->setSourceFile($files[$i]);
-			echo $pagecount; die;
-			for($j = 0; $j < $pagecount ; $j++)
-			{
+			
+			for($j = 0; $j < $pagecount ; $j++) {
+
 				$tplidx = $pdf->importPage(($j +1), '/MediaBox'); // template index.
 				$pdf->addPage('P','A4');// orientation can be P|L
 				$pdf->useTemplate($tplidx, 0, 0, 0, 0, TRUE);                   
 			}
-			
 		}
 
-			// set the metadata.
+		// set the metadata.
 		//~ $pdf->SetAuthor($data->user->user_name);
 		$pdf->SetCreator('website name!');
 		$pdf->SetSubject('PDF subject !');
 		//~ $pdf->SetKeywords('website name!'.", keywords! ".$data->user->user_name);
 		$output = $pdf->Output('', 'S');
 		$name = 'test.pdf';
-
 		$this->output->set_header("Content-Disposition: filename=$name;")->set_content_type('Application/pdf')->set_output($output);
+	}
+
+
+	public function gestScript(){
+		
+		$pathGen 	= str_replace('application/', '', APPPATH.'assets/');
+		$gostscript = $pathGen.'ghostscript/gs-920-linux_x86_64';
+		$files1 	= $pathGen.'/compresspdf_demo/Compressed.pdf';
+		$files2 	= $pathGen.'/compresspdf_demo/Compressed2222.pdf';	
+
+		try{
+			shell_exec("{$gostscript} -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dNOPAUSE -dQUIET -dBATCH -sOutputFile={$files2} {$files1}"); 
+		}catch(Exception $e){
+			$e->getMessage();
+		}
 	}
 
 	public function demoNew( $loadId = null ) {

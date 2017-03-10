@@ -15,7 +15,7 @@ class Vehicle extends Parent_Model
 
     public function get_vechicls( $userId = false ) {
 		$this->db->DISTINCT();
-		$this->db->select('CONCAT(concat( drivers.first_name, " ", `drivers`.`last_name` )," + ", concat(team.first_name," ",team.last_name)) AS teamDriverName  , vehicles.id,vehicles.label, CONCAT(users.first_name," ",users.last_name) AS dispatcher, vehicles.vin, vehicles.model, vehicles.vehicle_type,vehicles.vehicle_status,vehicles.permitted_speed, vehicles.cargo_capacity,concat(drivers.first_name," ",drivers.last_name) as driverName,GROUP_CONCAT(equipment_types.name) as vehicleType',FALSE)->from('vehicles');
+		$this->db->select('CONCAT(concat( drivers.first_name, " ", `drivers`.`last_name` )," + ", concat(team.first_name," ",team.last_name)) AS teamDriverName  , vehicles.id,vehicles.label, CONCAT(users.first_name," ",users.last_name) AS dispatcher, vehicles.vin, vehicles.model, vehicles.vehicle_type,vehicles.vehicle_status,vehicles.cargo_bay_l, vehicles.cargo_capacity,concat(drivers.first_name," ",drivers.last_name) as driverName,GROUP_CONCAT(equipment_types.name) as vehicleType',FALSE)->from('vehicles');
         $this->db->join('drivers','drivers.id=vehicles.driver_id','LEFT');
         $this->db->join('equipment_types',("FIND_IN_SET(equipment_types.abbrevation , vehicles.vehicle_type) > 0"), 'LEFT');
         $this->db->join('users',("drivers.user_id = users.id"), 'LEFT');
@@ -383,8 +383,9 @@ class Vehicle extends Parent_Model
 	 */
 	  
 	public function getVehicleInfo( $vehicleId = null ) {
-        $this->db->select('vehicles.id,label,vehicle_type,cargo_capacity,cargo_bay_l,cargo_bay_w,fuel_consumption,vehicles.vehicle_image,drivers.profile_image');
+        $this->db->select('vehicles.id,label,vehicle_type,cargo_capacity,cargo_bay_l,cargo_bay_w,fuel_consumption,vehicles.vehicle_image,drivers.profile_image,trailers.unit_id');
         $this->db->join('drivers', 'drivers.id = vehicles.driver_id');
+        $this->db->join('trailers', 'trailers.truck_id = vehicles.id','LEFT');
         $this->db->where('vehicles.id',$vehicleId);
         $result = $this->db->get('vehicles');
         if ( $result->num_rows() > 0 ) {
@@ -399,10 +400,11 @@ class Vehicle extends Parent_Model
 	 */
 	  
     public function getTeamVehicleInfo( $loadId = null ) {
-        $this->db->select('CONCAT( drivers.first_name, " + ", team.first_name," - ",vehicles.label) AS driverName, vehicles.id,label,vehicle_type,cargo_capacity,cargo_bay_l,cargo_bay_w,drivers.first_name,drivers.last_name,fuel_consumption,vehicles.driver_id,vehicles.vehicle_image,drivers.profile_image');
+        $this->db->select('CONCAT( drivers.first_name, " + ", team.first_name," - ",vehicles.label) AS driverName, vehicles.id,label,vehicle_type,cargo_capacity,cargo_bay_l,cargo_bay_w,drivers.first_name,drivers.last_name,fuel_consumption,vehicles.driver_id,vehicles.vehicle_image,drivers.profile_image,trailers.unit_id');
         $this->db->join('drivers', 'drivers.id = loads.driver_id');
         $this->db->join('drivers as team','loads.second_driver_id = team.id','left');
         $this->db->join('vehicles', 'vehicles.id = loads.vehicle_id','Left');
+        $this->db->join('trailers', 'trailers.truck_id = vehicles.id','LEFT');
         $this->db->where(array('loads.id' => $loadId));
         $result = $this->db->get('loads');
        

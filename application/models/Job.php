@@ -540,6 +540,7 @@ class Job extends Parent_Model {
 	 
 	public function FindTruckInfo( $tripId = null, $truckstopID = null ) {
 		$condition = array('load_id' => $tripId);
+		$this->db->select('id,load_id, truckstopID, vehicle_average,diesel_needed,avg_cost_diesel,origin_to_dest,deadmiles_dist, dead_miles_not_paid, dead_head_miles_paid, pay_for_dead_head_mile, pay_for_miles_cargo, ifta_taxes, tarps, detention_time, tolls');
 		$this->db->where($condition);
 		$this->db->order_by('id','desc');
 		$result = $this->db->get('trip_details');
@@ -577,65 +578,59 @@ class Job extends Parent_Model {
 		return $this->db->get('vehicles')->result_array();
 	}
 	
-	public function FindVehicles( $jobSpec = '', $jobCollect = '', $jobDeliver = '', $jobVehicle = '' ,$fetchAssignedTruck = null , $jobVehicleType = '' ,$jobId = null ,$loggedUserId = null, $jobWidth = 0, $jobLength = 0, $vehicleId = null) {
+	// public function FindVehicles( $jobSpec = '', $jobCollect = '', $jobDeliver = '', $jobVehicle = '' ,$fetchAssignedTruck = null , $jobVehicleType = '' ,$jobId = null ,$loggedUserId = null, $jobWidth = 0, $jobLength = 0, $vehicleId = null) {
+	public function FindVehicles( $vehicleId = null ) {
 		
-		$jobLength = (int)$jobLength;
-		$fianlJobVehicle = array();
-		$finalJobSpec = '';
-		$jobSpec = trim($jobSpec);
-		$truckStatus = 0;
-		$vehicleMaxWidth = 8.5;
-		if ( $jobId != '' && is_numeric($jobId) ) {
-			if ( strpos($jobVehicle, ',') !== false ) {
-				$vehicleArray = explode(',',$jobVehicle);
-				$vehicleArrayLength = count($vehicleArray);
-				for ($i = 0; $i < $vehicleArrayLength; $i++) {
-					$fianlJobVehicle[] = $vehicleArray[$i];
-				}
-			} else {
-				$fianlJobVehicle[0] = $jobVehicle;
-			}
-		} else {
-				$equipmentOption = $jobVehicleType;
-				$equipmentResult = $this->getRelatedEquipment( $equipmentOption);
-				if ( strpos($equipmentResult, ',') !== false ) {
-					$vehicleArray = explode(',',$equipmentResult);
-					$vehicleArrayLength = count($vehicleArray);
-					for ($i = 0; $i < $vehicleArrayLength; $i++) {
-						$fianlJobVehicle[] = $vehicleArray[$i];
-					}
-				} else {
-					$fianlJobVehicle[0] = $equipmentResult;
-				}
-		}
+		// $jobLength = (int)$jobLength;
+		// $fianlJobVehicle = array();
+		// $finalJobSpec = '';
+		// $jobSpec = trim($jobSpec);
+		// $truckStatus = 0;
+		// $vehicleMaxWidth = 8.5;
+		// if ( $jobId != '' && is_numeric($jobId) ) {
+		// 	if ( strpos($jobVehicle, ',') !== false ) {
+		// 		$vehicleArray = explode(',',$jobVehicle);
+		// 		$vehicleArrayLength = count($vehicleArray);
+		// 		for ($i = 0; $i < $vehicleArrayLength; $i++) {
+		// 			$fianlJobVehicle[] = $vehicleArray[$i];
+		// 		}
+		// 	} else {
+		// 		$fianlJobVehicle[0] = $jobVehicle;
+		// 	}
+		// } else {
+		// 		$equipmentOption = $jobVehicleType;
+		// 		$equipmentResult = $this->getRelatedEquipment( $equipmentOption);
+		// 		if ( strpos($equipmentResult, ',') !== false ) {
+		// 			$vehicleArray = explode(',',$equipmentResult);
+		// 			$vehicleArrayLength = count($vehicleArray);
+		// 			for ($i = 0; $i < $vehicleArrayLength; $i++) {
+		// 				$fianlJobVehicle[] = $vehicleArray[$i];
+		// 			}
+		// 		} else {
+		// 			$fianlJobVehicle[0] = $equipmentResult;
+		// 		}
+		// }
 				
-		if ( strpos($jobSpec, 'TL ') !== false && strpos($jobSpec, 'Klbs') !== false) {
-			preg_match_all('!\d+!', $jobSpec, $specMatches);
-			$finalJobSpec = round($specMatches[0][0] * 1000);
-		} else if ( is_numeric($jobSpec) ) {
-			if( strlen($jobSpec) <= 2 ) {
-				$jobSpec = $jobSpec * 1000;
-			}
-			$finalJobSpec = $jobSpec;
-		} else if ( strpos($jobSpec, 'lbs') !== false ) {
-			$jobSpec = str_replace(' ','',$jobSpec);
-			preg_match_all('!\d+!', $jobSpec, $specMatches);
-			$finalJobSpec = round($specMatches[0][0]);
-		}
+		// if ( strpos($jobSpec, 'TL ') !== false && strpos($jobSpec, 'Klbs') !== false) {
+		// 	preg_match_all('!\d+!', $jobSpec, $specMatches);
+		// 	$finalJobSpec = round($specMatches[0][0] * 1000);
+		// } else if ( is_numeric($jobSpec) ) {
+		// 	if( strlen($jobSpec) <= 2 ) {
+		// 		$jobSpec = $jobSpec * 1000;
+		// 	}
+		// 	$finalJobSpec = $jobSpec;
+		// } else if ( strpos($jobSpec, 'lbs') !== false ) {
+		// 	$jobSpec = str_replace(' ','',$jobSpec);
+		// 	preg_match_all('!\d+!', $jobSpec, $specMatches);
+		// 	$finalJobSpec = round($specMatches[0][0]);
+		// }
 
-		$finalJobSpec = (int)$finalJobSpec;
-		$finalJobCollect = $jobCollect;
-	
 		$this->db->select('vehicles.id,vehicles.fuel_consumption,vehicles.destination_address');
 		$this->db->join('drivers', 'drivers.id = vehicles.driver_id','LEFT');
 			
 		$i = 1;
 		$string = '';
 	
-		//~ $string .= " (`cargo_capacity` >= ".$finalJobSpec.")";
-		//~ $string .= " (`cargo_bay_l` >= ".$jobLength.")";
-		//~ $string .= " AND (`cargo_bay_w` <= ".$vehicleMaxWidth.")";
-		
 		if ( $vehicleId != '' && $vehicleId != null ) {
 			$string .= "`vehicles.id` = ".$vehicleId;	
 		}
@@ -1176,7 +1171,7 @@ class Job extends Parent_Model {
 		$savedata['truckstopID'] = $truckstopID;
 		$savedata['load_id'] = $result;
 		
-		$savedata['vehicle_average_actual'] = @$data['vehicle_average_actual'];
+		/*$savedata['vehicle_average_actual'] = @$data['vehicle_average_actual'];
 		$savedata['gallon_needed_actual'] = @$data['gallon_needed_actual'];
 		$savedata['avg_cost_diesel_actual'] = str_replace('$','',@$data['avg_cost_diesel_actual']);
 		$savedata['origin_to_dest_actual'] = @$data['origin_to_dest_actual'];
@@ -1188,7 +1183,7 @@ class Job extends Parent_Model {
 		$savedata['ifta_taxes_actual'] = str_replace('$','',@$data['ifta_taxes_actual']);
 		$savedata['tarps_actual'] = str_replace('$','',@$data['tarps_actual']);
 		$savedata['detention_time_actual'] = str_replace('$','',@$data['detention_time_actual']);
-		$savedata['tolls_actual'] = str_replace('$','',@$data['tolls_actual']);
+		$savedata['tolls_actual'] = str_replace('$','',@$data['tolls_actual']);*/
 		
 		if ( $tripDetailId  != null && $tripDetailId != '' && $tripDetailId  != 'undefined' ) {
 			$this->db->where('id', $tripDetailId);
@@ -1324,8 +1319,7 @@ class Job extends Parent_Model {
 		//$result = $this->db->query('SELECT store_id, name, address, city, state, zip, phone, fax, tRestaurants, parking_spaces, diesel_lanes, showers, latitude, longitude, distance
 		$query = 'SELECT store_id, name, address, city, state, zip, phone, fax, tRestaurants, parking_spaces, diesel_lanes, showers, latitude, longitude, distance
 					        FROM (
-					             SELECT loc.store_id,
-					                    loc.name,
+					             SELECT loc.store_id,loc.name,
 					                    loc.address,
 					                    loc.city,
 					                    loc.state,
@@ -2042,5 +2036,36 @@ class Job extends Parent_Model {
 	public function getLoadDetailsById($load_id = null){
 		return $this->db->select('*')->from('loads')->where('id',$load_id)->get()->result_array();
 	}	
+
+	/*
+	* method  : post
+	* params  : loadId
+	* return  : load detail array
+	* comment : for fetching load detail information for printing ticket
+	*/
+
+	public function FetchSingleJobForPrint( $jobId = null ) {
+		$this->db->select('loads.id,loads.vehicle_id, loads.driver_id, loads.second_driver_id, loads.driver_type,loads.shipper_entity, loads.shipper_name, loads.shipper_phone, loads.PickupDate, loads.PickupTime, loads.PickupTimeRangeEnd,loads.PickupAddress, loads.OriginCity, loads.OriginState, loads.OriginCountry, loads.OriginZip, loads.consignee_entity, loads.consignee_phone, loads.consignee_name, loads.DeliveryDate, loads.DeliveryTime, loads.DeliveryTimeRangeEnd, loads.DestinationAddress, loads.DestinationCity, loads.DestinationState, loads.DestinationCountry, loads.DestinationZip, loads.equipment, loads.equipment_options, loads.LoadType, loads.Weight, loads.Length, loads.Mileage, loads.PaymentAmount, loads.Quantity, loads.Stops, loads.commodity, loads.Rate, loads.specInfo, loads.deadmiles, loads.JobStatus, loads.invoiceNo, loads.Entered, loads.totalCost, loads.overallTotalProfit, loads.overallTotalProfitPercent, loads.woRefno, loads.broker_id, loads.	PointOfContact, loads.PointOfContactPhone, loads.TruckCompanyEmail, loads.TruckCompanyPhone, loads.TruckCompanyFax, concat(drivers.first_name," ",drivers.last_name,"-",vehicles.label) as assignedDriverName');
+		$this->db->join('drivers', 'drivers.id = loads.driver_id','Left');
+		$this->db->join('vehicles', 'vehicles.id = loads.vehicle_id','Left');
+		$this->db->where('loads.id', $jobId);
+		
+		return $this->db->get('loads')->row_array();
+	}
+
+	/*
+	* method  : post
+	* params  : loadId
+	* return  : load detail array
+	* comment : for fetching load detail information for printing ticket
+	*/
+
+	public function getBrokerForLoadDetailForPrint( $brokerId = null ) {
+		$this->db->select('TruckCompanyName, postingAddress, city, state, zipcode, MCNumber, CarrierMC, DOTNumber, brokerStatus');
+		$this->db->where('broker_info.id', $brokerId);
+		return $this->db->get('broker_info')->row_array();
+	}
+
+	
 }
 ?>
