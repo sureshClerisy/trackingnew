@@ -32606,7 +32606,7 @@ function SetSourceFile($filename) {
 		$this->parsers[$fn] = new fpdi_pdf_parser($fn,$this);
 		
 	if (!$this->parsers[$fn]->success) {
-		//~ $this->Error($this->parsers[$fn]->errormsg);	// Delete this line to return false on fail
+		// $this->Error($this->parsers[$fn]->errormsg);	// Delete this line to return false on fail
 		return 'file compression issue';				// custom added this line to handle the error
 		return false;
 	}

@@ -2093,6 +2093,8 @@ class Truckstop extends Admin_Controller{
 				} else {
 					$response['error'] = false;
 					$response['data'] = $this->upload->data();
+// pr($response['data']);
+					
 					
 					if ( ($parameter == 'rateSheet' || $parameter == 'pod') &&  $extension == 'pdf' ) {
 						$fileCheck = $this->CheckPdfNotCompressed($response['data']['file_name'], $parameter);		// code to check uploaded pdf file is compressed or not

@@ -40,7 +40,13 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 		}
 		
 		public function commonApiHits($abbreviation = 'F', $dateTime = array() , $hoursOld = '', $origin_country = 'USA', $origin_range = 300 ,$destination_city = '', $destination_states = '', $destination_range = 300, $dest_country = 'USA', $load_type = 'Full') {
-			
+		if ( strpos($this->origin_state,',') !== false ) {
+			$states = explode(',',$this->origin_state);
+			$statesCount = count($states);
+		} else {
+			$statesCount = 1;
+		} 
+		
 			$pageNo = 1;
 			$dat 	= array();
 
@@ -92,7 +98,17 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 				
 				$dat = array_merge($dat,$data['rows']);				
 				
-				if( count($data['rows']) < 200 ) {
+				//~ if ( $statesCount > 3 ) {
+					//~ if( count($data['rows']) < 200 || count($data['rows']) >= 3000)  {
+						//~ break;
+					//~ }
+				//~ } else {
+					//~ if( count($data['rows']) < 200 ) {
+						//~ break;
+					//~ }
+				//~ }
+					
+				if( count($data['rows']) < 200 || count($dat) >= 3000)  {
 					break;
 				}
 				$pageNo++;

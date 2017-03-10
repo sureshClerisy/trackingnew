@@ -591,12 +591,13 @@ class Assignedloads extends Admin_Controller{
 		require_once("application/third_party/fpdi/FPDI.php");
 		require_once("application/third_party/fpdi/FPDI_Protection.php");
 		
-		$files = array('/home/csolution/Downloads/rateSheetNew.pdf','/home/csolution/Downloads/podNew(1).pdf');
+		$files = array('/home/csolution/Downloads/podNew.pdf','/home/csolution/Downloads/podNew(1).pdf');
 		$pdf = new FPDI();
-		
+	
 		for ($i = 0; $i < count($files); $i++ )
 		{
 			$pagecount = $pdf->setSourceFile($files[$i]);
+			echo $pagecount; die;
 			for($j = 0; $j < $pagecount ; $j++)
 			{
 				$tplidx = $pdf->importPage(($j +1), '/MediaBox'); // template index.
@@ -617,6 +618,149 @@ class Assignedloads extends Admin_Controller{
 		$this->output->set_header("Content-Disposition: filename=$name;")->set_content_type('Application/pdf')->set_output($output);
 	}
 
+	public function demoNew( $loadId = null ) {
+		$pdf = $this->load->library('m_pdf');
+		$pdf = new mPDF();
+		$pdf->SetImportUse();
+		
+
+		$files = array('/home/csolution/Downloads/semail_(2) (1).pdf','/home/csolution/Downloads/podNew(1).pdf');
+		// include('class.pdf2text.php');
+		$this->load->library('PDF2text.php');
+$a = new PDF2Text();
+$a->setFilename('/home/csolution/Downloads/semail_(2) (1).pdf'); //grab the test file at http://www.newyorklivearts.org/Videographer_RFP.pdf
+$out = $a->decodePDF();
+pr($out);
+echo $a->output();
+
+ die;
+		/*$resu = $this->pdf2string($files[0]);
+		$pdf->SetProtection($resu);
+
+		$new = $pdf->WriteHTML('allo World');
+		// $pdf->Output('filename.pdf');
+		$files[0] = $new;*/
+		for ($i = 0; $i < count($files); $i++ ) {
+			$pagecount = $pdf->setSourceFile($files[$i]);	
+			
+			for($j = 1; $j <= $pagecount ; $j++)
+			{
+				$tplidx = $pdf->importPage(($j), '/MediaBox'); // template index.
+				$pdf->addPage('P','A4');// orientation can be P|L
+				$pdf->useTemplate($tplidx, 0, 0, 0, 0, TRUE);                   
+			}
+		}		
+			
+		
+		$pdf->Output(); 
+	} 
+
+	function pdf2string($sourcefile) { 
+
+    $fp = fopen($sourcefile, 'rb'); 
+    $content = fread($fp, filesize($sourcefile)); 
+    fclose($fp); 
+
+    $searchstart = 'stream'; 
+    $searchend = 'endstream'; 
+    $pdfText = ''; 
+    $pos = 0; 
+    $pos2 = 0; 
+    $startpos = 0; 
+
+    while ($pos !== false && $pos2 !== false) { 
+
+        $pos = strpos($content, $searchstart, $startpos); 
+        $pos2 = strpos($content, $searchend, $startpos + 1); 
+
+        if ($pos !== false && $pos2 !== false){ 
+
+            if ($content[$pos] == 0x0d && $content[$pos + 1] == 0x0a) { 
+                $pos += 2; 
+            } else if ($content[$pos] == 0x0a) { 
+                $pos++; 
+            } 
+
+            if ($content[$pos2 - 2] == 0x0d && $content[$pos2 - 1] == 0x0a) { 
+                $pos2 -= 2; 
+            } else if ($content[$pos2 - 1] == 0x0a) { 
+                $pos2--; 
+            } 
+
+            $textsection = substr( 
+                $content, 
+                $pos + strlen($searchstart) + 2, 
+                $pos2 - $pos - strlen($searchstart) - 1 
+            ); 
+            $data = @gzuncompress($textsection); 
+            $pdfText .= $this->pdfExtractText($data); 
+            $startpos = $pos2 + strlen($searchend) - 1; 
+
+        } 
+    } 
+
+    return preg_replace('/(\s)+/', ' ', $pdfText); 
+
+} 
+
+function pdfExtractText($psData){ 
+
+    if (!is_string($psData)) { 
+        return ''; 
+    } 
+
+    $text = ''; 
+
+    // Handle brackets in the text stream that could be mistaken for 
+    // the end of a text field. I'm sure you can do this as part of the 
+    // regular expression, but my skills aren't good enough yet. 
+    $psData = str_replace('\)', '##ENDBRACKET##', $psData); 
+    $psData = str_replace('\]', '##ENDSBRACKET##', $psData); 
+
+    preg_match_all( 
+        '/(T[wdcm*])[\s]*(\[([^\]]*)\]|\(([^\)]*)\))[\s]*Tj/si', 
+        $psData, 
+        $matches 
+    ); 
+
+    for ($i = 0; $i < sizeof($matches[0]); $i++) { 
+        if ($matches[3][$i] != '') { 
+            // Run another match over the contents. 
+            preg_match_all('/\(([^)]*)\)/si', $matches[3][$i], $subMatches); 
+            foreach ($subMatches[1] as $subMatch) { 
+                $text .= $subMatch; 
+            } 
+        } else if ($matches[4][$i] != '') { 
+            $text .= ($matches[1][$i] == 'Tc' ? ' ' : '') . $matches[4][$i]; 
+        } 
+    } 
+
+    // Translate special characters and put back brackets. 
+    $trans = array( 
+        '...'                => '…', 
+        '\205'                => '…', 
+        '\221'                => chr(145), 
+        '\222'                => chr(146), 
+        '\223'                => chr(147), 
+        '\224'                => chr(148), 
+        '\226'                => '-', 
+        '\267'                => '•', 
+        '\('                => '(', 
+        '\['                => '[', 
+        '##ENDBRACKET##'    => ')', 
+        '##ENDSBRACKET##'    => ']', 
+        chr(133)            => '-', 
+        chr(141)            => chr(147), 
+        chr(142)            => chr(148), 
+        chr(143)            => chr(145), 
+        chr(144)            => chr(146), 
+    ); 
+
+    $text = strtr($psData, $trans); 
+
+    return $text; 
+
+} 
 	public function getRecords(){
 		$params = json_decode(file_get_contents('php://input'),true);
 		$total = 0;

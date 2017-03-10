@@ -77,7 +77,6 @@ class Iterationloads extends Admin_Controller{
 	 */ 
 	
 	public function index(){
-
 		$currentDateTime = '';
 		$pickupDateDest = '';
 		
@@ -198,7 +197,9 @@ class Iterationloads extends Admin_Controller{
 				// $pickupDateDest = date('Y-m-d');
 			}
 
+			
 			$deadMilesOriginLocation = $this->origin_city.','.$this->origin_state.', '.$country; 
+			
 			$data['rows'] = $this->commonApiHits( $statesAddress['0']['vehicle_type'], $dateTime, $hoursOld);	
 				
 			$price = array();
@@ -278,12 +279,7 @@ class Iterationloads extends Admin_Controller{
 	private function giveBestLoads( $loads = array(),$todayDate = '', $vehicleId = null , $hoursRem = 0, $loadsIdArray = array(), $abbreviation = '',$driverType="driver") {	// abbreviation to filer records with particular search type
 
 		$newLoads 			= array();
-		$newLoadsAbove20 	= array();
-		$loadsAboveNine 	= array();
-		$loadsLessNine 		= array();
 		$finalArray 		= array();
-		$allLoads 			= array();
-		$singleLoad 		= array();
 		$storeTempRecord 	= array();
 
 		if ( !empty($loads) ) {
@@ -307,9 +303,9 @@ class Iterationloads extends Admin_Controller{
 				// $blackListedBrokers = $this->BrokersModel->getListOfBlacklistedBrokers();
 				$blackListedBrokers = $this->BrokersModel->getListOfBlacklisted(); //Getting all blacklisted compnies array
 
-				foreach ($loads as $key => $val) {
+				foreach ($loads as $key => $value) {
 					
-					$loadWeight = str_replace(',','',$val['Weight']);
+					$loadWeight = str_replace(',','',$value['Weight']);
 					if ( strlen($loadWeight) == 2 ) {
 						$loadWeight = $loadWeight * 1000;
 					} else if ( strpos($loadWeight, 'K') !== false ){
@@ -322,141 +318,131 @@ class Iterationloads extends Admin_Controller{
 					} 
 					
 					$loadWeight = (double)$loadWeight;
-					if ( strpos($val['Length'], 'FT') !== false ){
-						$length = explode('FT',$val['Length']);
-						$val['Length'] = $length[0];
+					if ( strpos($value['Length'], 'FT') !== false ){
+						$length = explode('FT',$value['Length']);
+						$value['Length'] = $length[0];
 					}
 					
 					// $cmpnumber 	= str_replace('-','',$val['PointOfContactPhone']);
-					$compayName = strtolower($val['CompanyName']);
+					$compayName = strtolower($value['CompanyName']);
 					
-				   	if ( (double)$val['Length'] > $defaultLength || $loadWeight > $defaultWeight || strtolower($val['Equipment']) == 'cong' || strtolower($val['Equipment']) == 'fws' || (in_array($val['ID'], $loadsIdArray)) || (in_array($compayName, $blackListedBrokers)) ) {
+				   	if ( (double)$value['Length'] > $defaultLength || $loadWeight > $defaultWeight || (in_array($value['ID'], $loadsIdArray)) || (in_array($compayName, $blackListedBrokers)) ) {
 				   		continue;
 					}
+
 					$want_to_see = explode(",", $abbreviation);
-					$current_user_can_see = explode(",", $val['Equipment']);
+					$current_user_can_see = explode(",", $value['Equipment']);
 					$show = array_intersect($want_to_see, $current_user_can_see);
 					
 					if ( empty($show) )  {					
 						continue;
 					}
 					
-					$val['Weight'] = $loadWeight;
-					if ( $val['Miles'] >= 500 ) {
-						$newLoadsAbove20[] = $val;
-					} else {
-						$newLoads[] = $val;
-					}
-				}
-			} else {
-				$singleLoad[] = $loads[0];
-			}
-		
-			if ( !empty($newLoadsAbove20)) {
-				$finalArray = $newLoadsAbove20;
-			} else if ( !empty($newLoads) ) {
-				$finalArray = $newLoads;
-			} else {
-				$finalArray = $singleLoad;
-			}
+					$value['Weight'] = $loadWeight;
 			
-			$storeTempRecord = $newLoads;
-			foreach( $finalArray as $key => $value ) {
-				$this->Rpm_value = 0;
-				$loadWeight = (double)$value['Weight'];	
-				
-				//----------------- PROFIT CALCULATION -------------------------------------------
-				$finalArray[$key]['deadmiles'] = $value['OriginDistance'];
-				$total_complete_distance = $value['Miles'] + $finalArray[$key]['deadmiles'];
-				$gallon_needed =  ($total_complete_distance / $truckAverage);
-				
-				$total_diesel_cost = $this->diesel_rate_per_gallon * $gallon_needed;
-				
-				//----------- Code for team task ---------------------------
-				$driverPayMileCargo = $this->driver_pay_miles_cargo;
-				if($driverType == "team"){
-					$driverPayMileCargo = $this->driver_pay_miles_cargo_team;
-				}
-				//----------- Code for team task ---------------------------
-				$total_driver_cost = $driverPayMileCargo * $total_complete_distance;
-				$total_cost = round(($total_diesel_cost + $total_driver_cost + $this->total_tax),2);
-				if ( $value['Payment'] != 0 && $value['Payment'] != '' && $value['Payment'] != null ) {
-					if ( ((double)$value['Payment'] < (double)$total_cost) && $value['Payment'] != null ) {
-						unset($finalArray[$key]);
-						continue;
-					}
+					if ( $value['Miles'] >= 500 ) {
+						$finalArray[$key] = $value;
+						$this->Rpm_value = 0;
+						$loadWeight = (double)$value['Weight'];	
+						
+						$finalArray[$key]['deadmiles'] = $value['OriginDistance'];
+						$total_complete_distance = $value['Miles'] + $finalArray[$key]['deadmiles'];
+						$gallon_needed =  ($total_complete_distance / $truckAverage);
+						
+						$total_diesel_cost = $this->diesel_rate_per_gallon * $gallon_needed;
+						
+						$driverPayMileCargo = $this->driver_pay_miles_cargo;
+						if($driverType == "team"){
+							$driverPayMileCargo = $this->driver_pay_miles_cargo_team;
+						}
+						
+						$total_driver_cost = $driverPayMileCargo * $total_complete_distance;
+						$total_cost = round(($total_diesel_cost + $total_driver_cost + $this->total_tax),2);
+						if ( $value['Payment'] != 0 && $value['Payment'] != '' && $value['Payment'] != null ) {
+							if ( ((double)$value['Payment'] < (double)$total_cost) && $value['Payment'] != null ) {
+								unset($finalArray[$key]);
+								continue;
+							}
 
-					if ( $value['Miles'] != 0 )
-					$this->Rpm_value = round( $value['Payment'] / $value['Miles'], 2 );
-					$finalArray[$key]['highlight'] = 0;
-					$finalArray[$key]['profitAmount'] = round(($value['Payment'] - $total_cost),2); 
-					$finalArray[$key]['percent'] = getProfitPercent($finalArray[$key]['profitAmount'], $value['Payment']);
-					$finalArray[$key]['Payment'] = (float)$value["Payment"];
-				//----------------- PROFIT CALCULATION -------------------------------------------	
-				} else {
-					$calPayment = getPaymentFromProfitMargin($total_cost, 30);
-					$finalArray[$key]['percent'] =  30;
-					$finalArray[$key]['Payment'] = (float)$calPayment;
-					if ( $value['Miles'] != 0 )
-					$this->Rpm_value = round( $calPayment / $value['Miles'], 2 );
-					$finalArray[$key]['highlight'] = 1;
-					$finalArray[$key]['profitAmount'] =  round(($finalArray[$key]['Payment'] - $total_cost),2);
-				} 
-				
-				$finalArray[$key]['RPM'] = $this->Rpm_value;
-				$finalArray[$key]['FuelCost'] = trim(str_replace('$','',$value["FuelCost"]));
-				$finalArray[$key]['Miles'] =(float)trim(str_replace(',','',$value["Miles"]));
-				$finalArray[$key]['deadmiles'] = (float)trim(str_replace(',','',$finalArray[$key]['deadmiles']));
-				
-				if ( $value['Age'] != '9+' ) {
-						$AGE = '0'.$value['Age'].':00';
+							if ( $value['Miles'] != 0 )
+							$this->Rpm_value = round( $value['Payment'] / $value['Miles'], 2 );
+							$finalArray[$key]['highlight'] = 0;
+							$finalArray[$key]['profitAmount'] = round(($value['Payment'] - $total_cost),2); 
+							$finalArray[$key]['percent'] = getProfitPercent($finalArray[$key]['profitAmount'], $value['Payment']);
+							$finalArray[$key]['Payment'] = (float)$value["Payment"];
+						} else {
+							$calPayment = getPaymentFromProfitMargin($total_cost, 30);
+							$finalArray[$key]['percent'] =  30;
+							$finalArray[$key]['Payment'] = (float)$calPayment;
+							if ( $value['Miles'] != 0 )
+							$this->Rpm_value = round( $calPayment / $value['Miles'], 2 );
+							$finalArray[$key]['highlight'] = 1;
+							$finalArray[$key]['profitAmount'] =  round(($finalArray[$key]['Payment'] - $total_cost),2);
+						} 
+						
+						$finalArray[$key]['RPM'] = $this->Rpm_value;
+						$finalArray[$key]['FuelCost'] = trim(str_replace('$','',$value["FuelCost"]));
+						$finalArray[$key]['Miles'] =(float)trim(str_replace(',','',$value["Miles"]));
+						$finalArray[$key]['deadmiles'] = (float)trim(str_replace(',','',$finalArray[$key]['deadmiles']));
+						
+						if ( $value['Age'] != '9+' ) {
+							$AGE = '0'.$value['Age'].':00';
+						} else {
+							$AGE = '9:00+';
+						}
+
+						$finalArray[$key]['Age'] = $AGE;
+						$finalArray[$key]['TotalCost'] = $total_cost;
+						$newDestin = $value['DestinationCity'].','.$value['DestinationState'].',USA';
+						
+						if ( strtolower($value['PickUpDate']) == 'daily' ) {
+							$finalArray[$key]['pickDate'] = $todayDate;
+							$finalArray[$key]['displayPickUpDate'] = $value['PickUpDate'];
+						} else {
+							$finalArray[$key]['pickDate'] = $value['PickUpDate'];
+							$finalArray[$key]['displayPickUpDate'] = date('Y-m-d',strtotime($value['PickUpDate']));	
+						}
+						//------------------ Add class on job if open first time ---------------------------------
+						$_COOKIE_NAME = 'VISIT_'.$value['ID'].'_'.str_replace("/", "_", $finalArray[$key]['pickDate']);
+						if(isset($_COOKIE[$_COOKIE_NAME])) {
+							$finalArray[$key]['visited']	= true;
+						}else{
+							$finalArray[$key]['visited'] = false;
+						}
+						//------------------ Add class on job if open first time ---------------------------------
+						$finalArray[$key]['hoursRemaining'] = $hoursRem;
+						$finalArray[$key]['hoursRemainingNextDay'] = $hoursRem;
+						$this->loadsIdArray[] = $value['ID'];	
 					} else {
-						$AGE = '9:00+';
+						$storeTempRecord[] = $value;
 					}
-				$finalArray[$key]['Age'] = $AGE;
-				$finalArray[$key]['TotalCost'] = $total_cost;
-				$newDestin = $value['DestinationCity'].','.$value['DestinationState'].',USA';
+				}
 				
-				if ( strtolower($value['PickUpDate']) == 'daily' ) {
-					$finalArray[$key]['pickDate'] = $todayDate;
-					$finalArray[$key]['displayPickUpDate'] = $value['PickUpDate'];
-				} else {
-					$finalArray[$key]['pickDate'] = $value['PickUpDate'];
-					$finalArray[$key]['displayPickUpDate'] = date('Y-m-d',strtotime($value['PickUpDate']));	
-				}
-				//------------------ Add class on job if open first time ---------------------------------
-				$_COOKIE_NAME = 'VISIT_'.$value['ID'].'_'.str_replace("/", "_", $finalArray[$key]['pickDate']);
-				if(isset($_COOKIE[$_COOKIE_NAME])) {
-					$finalArray[$key]['visited']	= true;
-				}else{
-					$finalArray[$key]['visited'] = false;
-				}
-				//------------------ Add class on job if open first time ---------------------------------
-				$finalArray[$key]['hoursRemaining'] = $hoursRem;
-				$finalArray[$key]['hoursRemainingNextDay'] = $hoursRem;
-				$this->loadsIdArray[] = $value['ID'];	
-			}
-		
-			if ( count($finalArray) < 1 ) {
-				if ( !empty($newLoadsAbove20) ) {
-					$results = $this->calculateTempRecord($storeTempRecord,$todayDate,$vehicleId, $hoursRem, $loadsIdArray,$driverType, $truckAverage);
-					if ( !empty($results) ) {
-						$finalArray = array_merge($finalArray,$results[0]); 
-						$this->loadsIdArray = array_merge($this->loadsIdArray,$results[1]);
+				if ( count($finalArray) < 1 ) {
+					if ( !empty($storeTempRecord) ) {
+						$results = $this->calculateTempRecord($storeTempRecord,$todayDate,$vehicleId, $hoursRem, $loadsIdArray,$driverType, $truckAverage);
+						if ( !empty($results) ) {
+							$finalArray = array_merge($finalArray,$results[0]); 
+							$this->loadsIdArray = array_merge($this->loadsIdArray,$results[1]);
+						}
 					}
 				}
-			}
 
-			if ( !empty($finalArray) && count($finalArray) > 1)  {
-				$havePayment = array();
-				foreach ($finalArray as $key => $row)
-				{
-					$price[$key] = $row['profitAmount'];
-					$havePayment[$key] = $row['highlight'];
+				if ( !empty($finalArray) && count($finalArray) > 1)  {
+					$havePayment = array();
+					foreach ($finalArray as $key => $row)
+					{
+						$price[$key] = $row['profitAmount'];
+						$havePayment[$key] = $row['highlight'];
+					}
+					array_multisort($havePayment, SORT_ASC, $price, SORT_DESC, $finalArray); //Loads with payment and have heighest profit will be on top
 				}
-				array_multisort($havePayment, SORT_ASC, $price, SORT_DESC, $finalArray); //Loads with payment and have heighest profit will be on top
+			
+			} else {
+				$finalArray[] = $loads;
 			}
 		}
+		
 		return array($finalArray, $this->loadsIdArray);
 	}
 	
