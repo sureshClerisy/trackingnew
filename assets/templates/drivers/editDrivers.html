@@ -31,7 +31,7 @@
                                                 <label>Select Dispatcher</label>
                                                 <ui-select class="mdrivers" name="dispatchersList" ng-model="dispatcher.selected" theme="bootstrap" on-select="onSelectDispatcherCallback($item, $model);" >
 													<ui-select-match class="ui-select-match" placeholder="Select Dispatcher">{{$select.selected.username}}</ui-select-match>
-													<ui-select-choices class="ui-select-choices" group-by="groupFind" repeat="item in dispatcherList | filter: $select.search | orderBy:'username'">
+													<ui-select-choices class="ui-select-choices" group-by="groupFind" repeat="item in dispatcherList | filter: $select.search ">
 														<span ng-bind-html="trustAsHtml((item.username | highlight: $select.search))"></span>
 													</ui-select-choices>
 												</ui-select>

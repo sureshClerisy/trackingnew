@@ -3250,10 +3250,9 @@ fieldset[disabled] .btn-danger.active {
   border-color: #e6e6e6;
   color: #2c2c2c;
 }
-.btn-default.hover,
-.btn-default:hover {
-  background-color: #fafafa;
-  border-color: rgba(98, 98, 98, 0.27);
+.btn-default.hover, .btn-default:hover {
+  background-color: rgba(0, 0, 0, 0);
+  border-color: #b3b3b3;
   color: #1a1a1a;
 }
 .btn-default.active:hover {
@@ -5862,7 +5861,7 @@ form legend {
 .form-control {
   background-color: #fff;
   background-image: none;
-  border: 1px solid rgba(0, 0, 0, 0.07);
+  border: 1px solid #b6b6b6;
   font-family: Arial, sans-serif;
   -webkit-appearance: none;
   color: #2c2c2c;
@@ -5885,8 +5884,8 @@ form legend {
   transition: background 0.2s linear 0s;
 }
 .form-control:focus {
-  border-color: rgba(0, 0, 0, 0.1);
-  background-color: #f0f0f0;
+  border-color: #b6b6b6;
+  background-color: transparent;
   outline: 0 !important;
   -webkit-box-shadow: none;
   box-shadow: none;
@@ -6296,7 +6295,7 @@ body.rtl .checkbox label::after {
 }
 .form-group label:not(.error) {
   font-family: 'Montserrat';
-  font-size: 11px;
+  font-size: 13px;
   text-transform: uppercase;
   font-weight: 600;
 }
@@ -6310,7 +6309,7 @@ body.rtl .checkbox label::after {
 .form-group-default {
   background-color: #fff;
   position: relative;
-  border: 1px solid rgba(0, 0, 0, 0.07);
+  border: 1px solid #b6b6b6;
   border-radius: 2px;
   padding-top: 7px;
   padding-left: 12px;
@@ -6343,11 +6342,11 @@ body.rtl .checkbox label::after {
   opacity: 1;
 }
 .form-group-default.focused {
-  border-color: rgba(0, 0, 0, 0.1) !important;
+  border-color: #b6b6b6 !important;
   background-color: #f0f0f0;
 }
 .form-group-default.focused label {
-  opacity: .4;
+  opacity: 1;
   -webkit-backface-visibility: hidden;
   -moz-backface-visibility: hidden;
   backface-visibility: hidden;
@@ -6429,7 +6428,7 @@ body.rtl .checkbox label::after {
   opacity: 1;
 }
 .form-group-default label.fade {
-  opacity: .5;
+  opacity: 1;
   -webkit-backface-visibility: hidden;
   -moz-backface-visibility: hidden;
   backface-visibility: hidden;

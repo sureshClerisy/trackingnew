@@ -1663,11 +1663,11 @@ padding-left: 35px;
 	float: right;
 }
 .popup-load-detail-inner {
-    border-top: 1px solid #ccc;
-    border-bottom: 1px solid #ccc;
-    padding: 10px 0;
-    width: 100%;
-    float: left;
+  border-bottom: 1px solid #cccccc;
+  border-top: 1px solid #cccccc;
+  float: left;
+  padding: 15px 0 ;
+  width: 100%;
 }
 .popup-load-detail-grid:first-child {
 	border-left: 1px solid transparent;
@@ -1707,16 +1707,21 @@ float: right;
     color: #000000;
 }
 .load-special-info textarea {
-  padding: 10px;
+  padding: 5px 10px;
   width: 100%;
+  border: 1px solid #b6b6b6!important;
+  margin-top: 13px;
 }
 .load-special-info {
    /* padding: 15px 0;*/
        margin-top: 15px;
 }
-.load-special-info p{
-  color:2c2c2c;
+.load-special-info p {
+  color: #2c2c2c;
+  float: left;
   font-size: 12px;
+  width: 100%;
+  padding: 0 4px;
 }
 .popup-load-extra {
     padding: 15px 0;
@@ -1993,9 +1998,6 @@ float: right;
 }
 .popup-input-edit-grid .form-group.form-group-default.date.remove-border {
     border: 1px solid transparent;
-}
-.saveform .form-group.form-group-default {
-  border:1px solid transparent;
 }
 .save-cancel{display:inline-block; float:right;}
 .save.saveTheLoad {
@@ -2644,7 +2646,10 @@ table.dataTable thead .sorting_desc:after{
     background-color: rgba(0, 0, 0, 0);
 }
 .popup-input-edit-grid .form-group.form-group-default label {
-  font-weight: normal;}
+  font-weight: 600;
+  font-size: 13px;
+  color: #5a5a5a;
+}
  .billing-manage .popup-input-edit-grid .form-group.form-group-default label {
   font-weight: 600;
 }
@@ -3107,7 +3112,7 @@ table.dataTable thead .sorting_desc:after{
   top: 24px;
 }
 .half-width-input .form-group.form-group-default:first-child {   float: left;  width: 72%;  border-right: 0 none;  position: relative;}
-.half-width-input.half-width-input-new .form-group.form-group-default:first-child {  width: 62%;}
+.half-width-input.half-width-input-new .form-group.form-group-default:first-child {  width: 50%;}
 .half-width-input.weight-input .form-group.form-group-default:first-child{	width:50%;}
 .half-width-input.weight-input.input-address .form-group.form-group-default:first-child{	width:100%;}
 /*
@@ -3117,7 +3122,9 @@ table.dataTable thead .sorting_desc:after{
 .half-width-input .form-group.form-group-default.noBackground:first-child::before { background: rgba(0, 0, 0, 0) none repeat scroll 0 0;}
 .half-width-input .form-group.form-group-default:last-child { border-left: 0 none; padding-left: 0 !important; }
 .extra-stops-btn a img { margin-right: 5px;}
-.bg-blue { background: rgb(209, 255, 246) none repeat scroll 0 0;}
+.bg-blue {
+  background: #fff;
+}
 .bg-red {  background: rgb(219, 224, 254) none repeat scroll 0 0 !important;}
 /*******************************9 nov popup*********************/
 .pickup-time-date{clear:both;}
@@ -5186,7 +5193,7 @@ label.error {
   float: left;
   position: relative;
   width: 100%;
-  border-bottom: 1px solid #fff;
+  padding:0 4px;
 }
 .shipper-start-new, .rel-entity:last-child {
   border-bottom: 0px;
@@ -5195,7 +5202,7 @@ label.error {
   width: 22px;
 }
 .shipper-start-new.bg-orange {
-  background: rgb(218,239,253)!important;
+  background: #EEEEEE!important;
 }
 /***************3-02 end***********************/
 .button-left {
@@ -5231,9 +5238,21 @@ input:-webkit-autofill {
   position: relative;
   top: 3px;
 }
+.saveform  .form-group-default.focused {
+ border: 1px solid #b6b6b6;
+}
+.saveform .form-control{
+opacity: 1 !important;  
+}
 .form-group-default .form-control {
-  color: #626262 !important;
+  /*color: #626262 !important;*/
   margin-top: 0px!important;
+   color: #2c2c2c !important;
+}
+.saveform .detail-inner-dsp .dropdown .ui-select-match .form-control.btn {
+  border: 1px solid #b3b3b3 !important;
+  color: #2c2c2c !important;
+  opacity: 0.70 !important;
 }
 .select2-container-multi .select2-choices .select2-search-field input {
   color: #626262 !important;
@@ -5326,7 +5345,7 @@ table.dataTable.dtr-inline.collapsed > tbody > tr > td:first-child, table.dataTa
 .half-width-input.weight-input.input-address .form-group.form-group-default.destination_add {
   width: 100%;
   padding-left: 10px !important;
-  border:1px solid rgba(0, 0, 0, 0.07);
+  border:1px solid #b6b6b6;
 }
 .saveform .form-group.form-group-default.destination_add{
 	border:1px solid transparent !important;
@@ -5471,8 +5490,8 @@ border:1px solid rgba(0, 0, 0, 0.07)!important
   background: #fff none repeat scroll 0 0 !important;
 }
 .half-width-input.google-places .form-group.form-group-default:last-child {
-  border-left: 1px solid rgba(0, 0, 0, 0.07);
-  border-right: 1px solid rgba(0, 0, 0, 0.07);
+  border-left: 1px solid #b6b6b6;
+  border-right: 1px solid #b6b6b6;
 }
 .load-tabe-auto th a.thead-fsort {
   color: #000;
@@ -5553,6 +5572,94 @@ body .split-view .split-list .list-view-wrapper .item .inline.email-check-sub .s
 .no-record-found{ float: left; width: 100%; text-align: center; margin-top: 10px; font-size: 15px; margin-bottom: 0; }
 .print-listing li.view-loads, li.view-lcount {cursor: pointer;}
 .edit-text .Summary-heading.no-marign-top{margin-top:0px;}
+.table-input-head {
+  padding-left: 6px;
+  padding-top: 11px;
+  position: relative;
+  text-transform: uppercase;
+  float: left;
+  width: 100%;
+}
+.table-input-head h1 {
+  float: left;
+  font-size: 19px;
+  font-weight: bold;
+  line-height: 14px;
+  position: relative;
+  text-transform: uppercase;
+  width: auto;
+  margin-bottom: 0px;
+  margin-top: 25px;
+  color:#0FCEBE;
+}
+.table-input-head .extra-add-btn {
+  background: #067fd2 none repeat scroll 0 0;
+  border-radius: 3px;
+  color: #ffffff;
+  display: inline-block;
+  float: right;
+  font-family: montserrat;
+  font-size: 15px;
+  font-weight: bold;
+  height: 39px;
+  min-width: 183px;
+  position: static;
+  right: unset;
+  text-transform: uppercase;
+  top: unset;
+  width: auto;
+}
+.table-input-head .extra-add-btn span {
+  font-size: 30px;
+  position: relative;
+  top: 4px;
+  margin-right: 5px;
+  line-height: 10px;
+}
+.rel-entity .table-input-head h1,.shipper-start-new .table-input-head h1 {
+  margin-top: 4px;color:#077DD4;
+}
+.load-det-main .table-input-head h1 {
+  color: #000;
+  margin-top: 0;
+}
+.load-det-main {
+  border-top: 1px solid #b6b6b6;
+  margin-top: 12px;
+  padding-top: 10px;
+}
+.consignee-start .table-input-head h1 {
+  color: rgb(99,88,157);
+  margin-top: 7px;
+}
+.load-special-info .table-input-head h1 {
+  margin-top: 0px;color:#000;
+}
+.load-special-info .table-input-head {
+padding-top: 0;
+}
+.origin-destination .table-input-head h1 {
+  margin-top: 12px;color:#796BB6;
+}
+.load-det-main .row.row-float, .load-det-main .row.row-float .cs-placeholder, .load-det-main .row , .load-det-main .row .cs-backdrop {
+  background: rgba(0, 0, 0, 0) none repeat scroll 0 0 !important;
+  border: 0px!important;
+  box-shadow: none!important;
+}
+.table-input-head .extra-close {
+  background: #ff0101 none repeat scroll 0 0;
+  border-radius: 50px;
+  color: #ffffff;
+  font-weight: bold;
+  height: 22px;
+  left: unset;
+  margin-top: -4px;
+  padding: 0;
+  position: relative;
+  right: 6px;
+  width: 22px;
+  top: 2px;
+}
 @media (min-width:2000px)
 {
 .map-load-section .dataTables_wrapper.no-footer table thead tr th.billing-origin{

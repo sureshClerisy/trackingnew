@@ -1952,10 +1952,10 @@ class Truckstop extends Admin_Controller{
 				}
 				$fileName = 'thumb_'.$fileName.'.jpg';
 				
-				$docs_list['brokerDocuments'][$i]['doc_name'] = $result[$i]['document_name'];
+				$docs_list['brokerDocuments'][$i]['doc_name'] 		= $result[$i]['document_name'];
 				$docs_list['brokerDocuments'][$i]['thumb_doc_name'] = $fileName;
-				$docs_list['brokerDocuments'][$i]['id'] = $result[$i]['id'];
-				$docs_list['brokerDocuments'][$i]['BrokerId'] = $brokerId;
+				$docs_list['brokerDocuments'][$i]['id'] 			= $result[$i]['id'];
+				$docs_list['brokerDocuments'][$i]['BrokerId'] 		= $brokerId;
 			}
 		}
 		
@@ -2028,15 +2028,12 @@ class Truckstop extends Admin_Controller{
 						$fileCheck = $this->CheckPdfNotCompressed($response['data']['file_name'], $parameter);		// code to check uploaded pdf file is compressed or not
 						
 						if ( $fileCheck == 'pdfCompression' ) {
-							// $degradedFileName = $this->degradePdfVersion($response['data']);
-							$response['data']['file_name'] = $this->degradePdfVersion($response['data']);
+
+							$response['data']['file_name'] 	= $this->degradePdfVersion($response['data']);
+							// $response['data']['raw_name'] 	= $response['data']['raw_name'].'_1';
 							unlink($response['data']['full_path']);
-							// $response['compressionError'] = 1;
-							// $response['compressionError'] = 0;
-							// return $response;					// return error response if file is compressed
 						}
 					}
-					
 					if (substr(php_uname(), 0, 7) == "Windows"){ 
 				        //pclose(popen("start /B ". $cmd, "r"));  
 				        $response['data']['cmd'] = 'Windows';

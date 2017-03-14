@@ -394,7 +394,9 @@
 								<div class="popup-load-detail-section">
 									<div class="popup-load-detail-heading">
 										<h4>{{ languageCommonVariables.popuploaddetails }}<span>(Posted: {{ editSavedLoad.Entered }})</span></h4>
-											
+											<button href="javascript:void(0);" ng-click="printLoadsInfo(editSavedLoad.ID,primaryLoadId)" class="edit-loadDetail edit1Load1 btn btn-info btn-info-print btn-cons m-b-10" type="button">
+												<i class="fa fa-print"></i> <span class="bold"> Print</span>
+											</button>
 											<div class="save-cancel" ng-show="save_cancel_div == true" >
 												 <button ng-click="submitted=true" class="save btn btn-primary btn-cons m-b-10" type="submit">
 												 	<i class="pg-form"></i> <span class="bold">Save</span>
@@ -414,9 +416,7 @@
 												<span class="bold">{{languageCommonVariables.uploadRateSheet}}</span>
 											</button>
 
-											<button href="javascript:void(0);" ng-click="printLoadsInfo(editSavedLoad.ID,primaryLoadId)" class="edit-loadDetail edit1Load1 btn btn-info btn-cons m-b-10" type="button">
-												<i class="fa fa-paste"></i> <span class="bold">Print</span>
-											</button>
+											
 										
 									</div>
 									
@@ -524,7 +524,11 @@
 		
 					<div class="col-xs-12 popup-input-edit-fields">
 								<div class="row row-float shipper-start bg-blue"> 
-									<button ng-click="addingNewExtraStop(editSavedLoad.Stops,'EditRequest')" ng-if="notShowPlusIcon == true" href="javascript:void(0)" type="button" class="extra-add-btn disable-anchor" ng-disabled="disablePerm"  title="Add Extra Stop"><img src="./pages/img/plus-icon.png"></button>
+								<div class="table-input-head">
+									<h1>Origin Detail</h1>
+									<button ng-click="addingNewExtraStop(editSavedLoad.Stops,'EditRequest')" ng-if="notShowPlusIcon == true" href="javascript:void(0)" type="button" class="extra-add-btn disable-anchor" ng-disabled="disablePerm"  title="Add Extra Stop"><span>+</span>Add extra stop</button>
+								</div>
+									
 										<div class="col-sm-4 col-md-4 popup-input-edit-grid">
 											<div class="form-group form-group-default th-select new-select-th">
 												<label>Entity</label>
@@ -610,6 +614,12 @@
 								
 								<div class="row bg-orange shipper-start-new" ng-show="extraStopTotLength == true">  
 									<div class="rel-entity" ng-repeat="i in extraStop">
+										<div class="table-input-head">
+											<h1>extra stop({{$index+1}})</h1>
+											<button class="extra-close" ng-disabled="disablePerm" ng-click="closeExtraStopFields($index,primaryLoadId,extraStops['id_'+ $index])" title="Remove Stop" type="button">
+												<span>X</span>
+											</button>	
+										</div>
 										<div class="col-md-4 popup-input-edit-grid">
 											<div class="form-group form-group-default th-select new-select-th">
 												<label>Entity</label> 
@@ -696,13 +706,14 @@
 										</div>
 										
 										<input type="hidden" id ="extraStopAddPrimaryId_{{$index}}"  class="form-control" ng-model="extraStops['id_'+ $index]">
-										<button class="extra-close" ng-disabled="disablePerm" ng-click="closeExtraStopFields($index,primaryLoadId,extraStops['id_'+ $index])" title="Remove Stop" type="button">
-											<img src="./pages/img/cros.png" >
-										</button>
+										
 									</div>									
 								</div>
 								
-								<div class="row consignee-start bg-red"> 
+								<div class="row consignee-start origin-destination"> 
+									<div class="table-input-head">
+										<h1>destination</h1>
+									</div>
 									<div class="col-sm-4 col-md-4 popup-input-edit-grid">
 										<div class="form-group form-group-default th-select new-select-th">
 											<label>Entity</label>
@@ -792,6 +803,10 @@
 								</div>
 								
 								<!--div id="directions-panel"></div-->
+							<div class="load-det-main">
+								<div class="table-input-head">
+									<h1 class="ng-binding">lOAD DETAILS</h1>
+								</div>
 								<div class="row row-float">
 									<div class="col-sm-3 col-md-3 popup-input-edit-grid">
 										<div class="form-group form-group-default th-select">
@@ -898,6 +913,7 @@
 										</div>
 									</div>
 								</div>
+							</div>
 						</div>
 
 					<!-- end of input fields -->
@@ -906,7 +922,9 @@
 					<!-- end of special info -->
 					<div class="col-xs-12">
 						<div class="load-special-info" ng-class="{'stop-resize':showFormClass == true}">
-							<label>{{ languageCommonVariables.popupspecialinfo }}</label>
+							<div class="table-input-head">
+								<h1>{{ languageCommonVariables.popupspecialinfo }}</h1>
+							</div>
 							<p><textarea id="special_info" ng-model="editSavedLoad.SpecInfo" ng-disabled="disableTemp" ></textarea></p>
 						</div>
 					</div>
