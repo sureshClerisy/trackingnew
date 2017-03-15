@@ -76,6 +76,7 @@
     <script src="assets/js/directives/pg-horizontal-menu.js" type="text/javascript"></script>
     <script src="assets/js/directives/pg-tab-dropdownfx.js" type="text/javascript"></script>
     <script src="assets/plugins/angular-signature/src/signature.js"></script>
+    <script src="assets/plugins/angular/angular-sortable-view.min.js"></script>
     
     <script src="assets/js/directives/skycons.js"></script>
     <script src='assets/plugins/bootstrap-datepicker/js/bootstrap-datepicker.js'></script>

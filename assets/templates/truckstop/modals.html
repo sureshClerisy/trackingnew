@@ -269,7 +269,7 @@
 											</div>
 										</div>
 										<div class="col-xs-12 col-sm-6 col-md-3">
-											<div class="amount-section-grid amount-section-grid2">
+											<div class="amount-section-grid amount-section-grid2 ">
 												<figure>
 													<img src="./pages/img/doller-icon.png">
 												</figure>
@@ -307,7 +307,7 @@
 						
 							<div class="col-xs-12 location-load-section">
 									<div class="">
-										<div class="col-sm-4 col-md-2 location-section-cover">
+										<div class="col-sm-4 col-md-2 location-section-cover pad-remove-left">
 											<div class="location-section-grid">
 												<figure>
 													<img src="./pages/img/location-blue.png">
@@ -361,7 +361,7 @@
 												<p class="load-price blue-price" > {{ editSavedLoad.loadedDistanceCost + editSavedLoad.deadMileDistCost  | currency:"$":2 }}</p>
 											</div>
 										</div>
-										<div class="col-sm-4 col-md-2 location-section-cover">
+										<div class="col-sm-4 col-md-2 location-section-cover pad-remove-right">
 											<div class="location-section-grid">
 												<figure>
 													<img src="./pages/img/fuel-green.png">
@@ -392,8 +392,8 @@
 							<!--  Sheet ends-->
 								
 								<div class="popup-load-detail-section">
-									<div class="popup-load-detail-heading">
-										<h4>{{ languageCommonVariables.popuploaddetails }}<span>(Posted: {{ editSavedLoad.Entered }})</span></h4>
+									<div class="table-input-head">
+										<h1>{{ languageCommonVariables.popuploaddetails }}<span>(Posted: {{ editSavedLoad.Entered }})</span></h1>
 											<button href="javascript:void(0);" ng-click="printLoadsInfo(editSavedLoad.ID,primaryLoadId)" class="edit-loadDetail edit1Load1 btn btn-info btn-info-print btn-cons m-b-10" type="button">
 												<i class="fa fa-print"></i> <span class="bold"> Print</span>
 											</button>
@@ -525,11 +525,11 @@
 					<div class="col-xs-12 popup-input-edit-fields">
 								<div class="row row-float shipper-start bg-blue"> 
 								<div class="table-input-head">
-									<h1>Origin Detail</h1>
-									<button ng-click="addingNewExtraStop(editSavedLoad.Stops,'EditRequest')" ng-if="notShowPlusIcon == true" href="javascript:void(0)" type="button" class="extra-add-btn disable-anchor" ng-disabled="disablePerm"  title="Add Extra Stop"><span>+</span>Add extra stop</button>
+									<h1>ORIGIN DETAIL</h1>
+									<button ng-click="addingNewExtraStop(editSavedLoad.Stops,'EditRequest')" ng-if="notShowPlusIcon == true" href="javascript:void(0)" type="button" class="extra-add-btn disable-anchor" ng-disabled="disablePerm"  title="Add Extra Stop"><span>+</span>Add Extra Stop</button>
 								</div>
 									
-										<div class="col-sm-4 col-md-4 popup-input-edit-grid">
+										<div class="col-sm-4 col-md-4 popup-input-edit-grid pad-remove-left">
 											<div class="form-group form-group-default th-select new-select-th">
 												<label>Entity</label>
 												<ui-select ng-disabled="disableTemp" name="shipper_entity" ng-model="editSavedLoad.shipper_entity" theme="bootstrap" on-select="onSelectChangeEntityCallback($item, $model,'shipper')" >
@@ -546,14 +546,14 @@
 												<input type="text" ng-disabled="disableTemp" name="shipper_name" ng-model="editSavedLoad.shipper_name"  class="form-control"  />
 											</div>
 										</div>	
-										<div class="col-sm-4 col-md-4 popup-input-edit-grid">
+										<div class="col-sm-4 col-md-4 popup-input-edit-grid pad-remove-right">
 											<div class=" dat-sec-1 form-group form-group-default">
 												<label>{{ languageCommonVariables.telephone }}</label>
 												<input type="text" ng-disabled="disableTemp" name="shipper_phone" ng-model="editSavedLoad.shipper_phone" ui-jq="mask" ui-options="'(999) 999-9999'" class="form-control"  />
 											</div>
 										</div>	
 										
-									<div class="col-xs-12 col-sm-6 col-md-6 popup-input-edit-grid pickup-time-date">
+									<div class="col-xs-12 col-sm-6 col-md-6 popup-input-edit-grid pickup-time-date pad-remove-left">
 										<div class="half-width-input weight-input weight-add-on">
 											<div class="dat-sec-1 form-group form-group-default date">
 												<label>{{ languageCommonVariables.popuppickup }} {{ languageCommonVariables.date }}</label>
@@ -574,7 +574,7 @@
 										</div>
 									</div>																			
 									
-									<div class="col-xs-12 col-sm-6 col-md-6 popup-input-edit-grid">
+									<div class="col-xs-12 col-sm-6 col-md-6 popup-input-edit-grid pad-remove-right">
 										<div class="half-width-input weight-input input-address google-places">
 											<div class="form-group form-group-default noBackground ">
 												<label>{{ languageCommonVariables.popuppickup }} {{ languageCommonVariables.address }}</label>
@@ -584,7 +584,7 @@
 									</div>
 									<div class="col-xs-12 no-padding">
 										
-										<div class="col-md-3 popup-input-edit-grid">
+										<div class="col-md-3 popup-input-edit-grid pad-remove-left">
 											<div class="form-group form-group-default noBackground">
 												<label>City</label>
 												<input type="text" class="form-control" id="OriginCity" ng-disabled="disablePerm" ng-blur="changeMilesDistance('origin',editSavedLoad.OriginCity)" ng-model="editSavedLoad.OriginCity" name="OriginCity" />
@@ -603,7 +603,7 @@
 												<input type="text" name="originAddZipCode" class="form-control"  ng-disabled="disablePerm" ng-model="editSavedLoad.OriginZip" />
 											</div>
 										</div>
-										<div class="col-md-3 popup-input-edit-grid">
+										<div class="col-md-3 popup-input-edit-grid pad-remove-right">
 												<div class="form-group form-group-default noBackground">
 													<label>Country</label>
 													<input type="text" class="form-control" id="OriginCountry"  ng-disabled="disablePerm" ng-blur="changeMilesDistance('origin',editSavedLoad.OriginCountry)" ng-model="editSavedLoad.OriginCountry" name="OriginCountry" />
@@ -615,12 +615,12 @@
 								<div class="row bg-orange shipper-start-new" ng-show="extraStopTotLength == true">  
 									<div class="rel-entity" ng-repeat="i in extraStop">
 										<div class="table-input-head">
-											<h1>extra stop({{$index+1}})</h1>
+											<h1>EXTRA STOP({{$index+1}})</h1>
 											<button class="extra-close" ng-disabled="disablePerm" ng-click="closeExtraStopFields($index,primaryLoadId,extraStops['id_'+ $index])" title="Remove Stop" type="button">
 												<span>X</span>
 											</button>	
 										</div>
-										<div class="col-md-4 popup-input-edit-grid">
+										<div class="col-md-4 popup-input-edit-grid pad-remove-left">
 											<div class="form-group form-group-default th-select new-select-th">
 												<label>Entity</label> 
 												<ui-select ng-disabled="disableTemp" name="extraStopEntity_{{$index}}" ng-model="extraStops['extraStopEntity_' + $index]" theme="bootstrap" on-select="onSelectChangeExtraEntityCallback($item, $model,$index)" >
@@ -637,14 +637,14 @@
 												<input type="text" ng-disabled="disableTemp" name="extraStopName_{{$index}}" id ="extraStopName_{{$index}}" ng-model="extraStops['extraStopName_' + $index]"  class="form-control" />
 											</div>
 										</div>	
-										<div class="col-sm-4 col-md-4 popup-input-edit-grid">
+										<div class="col-sm-4 col-md-4 popup-input-edit-grid pad-remove-right">
 											<div class=" dat-sec-1 form-group form-group-default">
 												<label>{{ languageCommonVariables.telephone }}</label>
 												<input type="text" ng-disabled="disableTemp" name="extraStopPhone_{{$index}}" id="extraStopPhone_{{$index}}" ui-jq="mask" ui-options="'(999) 999-9999'" ng-model="extraStops['extraStopPhone_' + $index]" class="form-control" />
 											</div>
 										</div>	
 																			
-										<div class="col-md-6 popup-input-edit-grid pickup-time-date">
+										<div class="col-md-6 popup-input-edit-grid pickup-time-date pad-remove-left">
 											<div class="half-width-input weight-input weight-a weight-add-on">
 												<div class="dat-sec-1 form-group form-group-default">
 													<label> {{ languageCommonVariables.date }}</label>
@@ -667,7 +667,7 @@
 												</div>
 											</div>
 										</div>
-										<div class="col-md-6 popup-input-edit-grid bg-red-last">
+										<div class="col-md-6 popup-input-edit-grid bg-red-last pad-remove-right">
 											<div class="half-width-input weight-input input-address google-places">
 												<div class="form-group form-group-default noBackground">
 													<label>{{ languageCommonVariables.address }}</label>
@@ -678,7 +678,7 @@
 
 										<div class="col-xs-12 no-padding">
 											
-											<div class="col-md-3 popup-input-edit-grid">
+											<div class="col-md-3 popup-input-edit-grid pad-remove-left">
 												<div class="form-group form-group-default noBackground">
 													<label>City</label>
 													<input type="text" ng-disabled="disablePerm" class="form-control" id="DestinationCity" ng-blur="changeExtraStopsMilesDistance($index)" ng-model="extraStops['extraStopCity_' + $index]" name="extraStopCity_{{$index}}"  />
@@ -696,7 +696,7 @@
 													<input type="text"  ng-disabled="disablePerm" name="extraStopZipCode_{{$index}}" class="form-control" ng-model="extraStops['extraStopZipCode_' + $index]"  />
 												</div>
 											</div>
-											<div class="col-md-3 popup-input-edit-grid">
+											<div class="col-md-3 popup-input-edit-grid pad-remove-right">
 												<div class="form-group form-group-default noBackground">
 													<label>Country</label>
 													<input type="text" class="form-control"  ng-disabled="disablePerm" id="DestinationCountry" ng-blur="changeExtraStopsMilesDistance($index)" ng-model="extraStops['extraStopCountry_' + $index]" name="extraStopCountry_{{$index}}" />
@@ -714,7 +714,7 @@
 									<div class="table-input-head">
 										<h1>destination</h1>
 									</div>
-									<div class="col-sm-4 col-md-4 popup-input-edit-grid">
+									<div class="col-sm-4 col-md-4 popup-input-edit-grid pad-remove-left">
 										<div class="form-group form-group-default th-select new-select-th">
 											<label>Entity</label>
 											<ui-select ng-disabled="disableTemp" name="consignee_entity" ng-model="editSavedLoad.consignee_entity" theme="bootstrap" on-select="onSelectChangeEntityCallback($item, $model,'consignee')" >
@@ -731,14 +731,14 @@
 											<input type="text" ng-disabled="disableTemp" name="consignee_name" ng-model="editSavedLoad.consignee_name" class="form-control"  />
 										</div>
 									</div>	
-									<div class="col-sm-4 col-md-4 popup-input-edit-grid">
+									<div class="col-sm-4 col-md-4 popup-input-edit-grid pad-remove-right">
 										<div class=" dat-sec-1 form-group form-group-default">
 											<label>{{ languageCommonVariables.telephone }}</label>
 											<input type="text" ng-disabled="disableTemp" name="consignee_phone" ui-jq="mask" ui-options="'(999) 999-9999'" ng-model="editSavedLoad.consignee_phone"  class="form-control" />
 										</div>
 									</div>	
 									
-									<div class="col-md-6 popup-input-edit-grid pickup-time-date">
+									<div class="col-md-6 popup-input-edit-grid pickup-time-date pad-remove-left">
 										<div class="half-width-input weight-input weight-a weight-add-on">
 											<div class="dat-sec-1 form-group form-group-default">
 												<label>{{ languageCommonVariables.popupdelivery}} {{ languageCommonVariables.date }}</label>
@@ -760,7 +760,7 @@
 										</div>
 									</div>
 									
-									<div class="col-md-6 popup-input-edit-grid">
+									<div class="col-md-6 popup-input-edit-grid pad-remove-right">
 										<div class="half-width-input weight-input input-address google-places">
 											<div class="form-group form-group-default noBackground">
 												<label>{{ languageCommonVariables.planthdesti }} {{ languageCommonVariables.address }}</label>
@@ -771,7 +771,7 @@
 
 									<div class="col-xs-12 no-padding">
 										
-										<div class="col-md-3 popup-input-edit-grid">
+										<div class="col-md-3 popup-input-edit-grid pad-remove-left">
 											<div class="form-group form-group-default noBackground">
 												<label>City</label>
 												<input type="text" ng-disabled="disablePerm" class="form-control" id="DestinationCity" ng-blur="changeMilesDistance('destination',editSavedLoad.DestinationCity)" ng-model="editSavedLoad.DestinationCity" name="destinationCity"  />
@@ -790,7 +790,7 @@
 												<input type="text" name="destinationZip" ng-disabled="disablePerm" class="form-control" ng-model="editSavedLoad.DestinationZip"  />
 											</div>
 										</div>
-										<div class="col-md-3 popup-input-edit-grid">
+										<div class="col-md-3 popup-input-edit-grid pad-remove-right">
 											<div class="form-group form-group-default noBackground">
 												<label>Country</label>
 												<input type="text" class="form-control" ng-disabled="disablePerm" id="DestinationCountry" ng-blur="changeMilesDistance('destination',editSavedLoad.DestinationCountry)" ng-model="editSavedLoad.DestinationCountry" name="DestinationCountry" />
@@ -808,7 +808,7 @@
 									<h1 class="ng-binding">lOAD DETAILS</h1>
 								</div>
 								<div class="row row-float">
-									<div class="col-sm-3 col-md-3 popup-input-edit-grid">
+									<div class="col-sm-3 col-md-3 popup-input-edit-grid pad-remove-left">
 										<div class="form-group form-group-default th-select">
 											<label>{{ languageCommonVariables.popupequipment }}</label>
 											<ui-select name="equipment_name" ng-model="editSavedLoad.equipment" theme="bootstrap" on-select="onSelectChangeEquipmentCallback($item, $model)" >
@@ -835,7 +835,7 @@
 											</select>
 										</div>
 									</div>
-									<div class="col-sm-3 col-md-3 popup-input-edit-grid">
+									<div class="col-sm-3 col-md-3 popup-input-edit-grid pad-remove-right">
 										<div class="half-width-input weight-input">
 											<div class="form-group form-group-default noBackground">
 												<label>{{ languageCommonVariables.weight }}</label>
@@ -850,7 +850,7 @@
 								</div>
 								
 								<div class="row">
-									<div class="col-sm-3 col-md-3 popup-input-edit-grid">
+									<div class="col-sm-3 col-md-3 popup-input-edit-grid pad-remove-left">
 										<div class="form-group form-group-default date overflow-visible">
 											<label>{{ languageCommonVariables.popupcommodity }}</label>
 
@@ -885,7 +885,7 @@
 										</div>
 									</div>
 																	
-									<div class="col-sm-3 col-md-3 popup-input-edit-grid">
+									<div class="col-sm-3 col-md-3 popup-input-edit-grid pad-remove-right">
 										<div class="half-width-input half-width-input-new">
 											<div class="form-group form-group-default noBackground">
 												<label>{{ languageCommonVariables.popupWoRefNo }} </label>
@@ -900,7 +900,7 @@
 								</div>
 								
 								<div class="row">
-									<div class="col-sm-3 col-md-3 popup-input-edit-grid">
+									<div class="col-sm-3 col-md-3 popup-input-edit-grid pad-remove-left">
 										<div class="form-group form-group-default date">
 											<label>{{languageCommonVariables.popupLoadId}}</label>
 											<input type="text" name="load_id" ng-readonly="true" class="form-control" ng-model="editSavedLoad.id"  />
@@ -937,21 +937,19 @@
 				
 					
 					<div class="popup-inner-content-main"  ng-show="brokerDetailInfo == true">
-						
-						<div class="form-group form-group-default th-select broker-detail-dropdown" ng-if="editSavedLoad.load_source == 'Vika Dispatch' && showBrokerDropdown == true">
-							<label>Select Broker</label>
-							<ui-select ng-disabled="disabledUISelect" ng-model="brokerSelectedId" theme="bootstrap" on-select="onSelectChangeBrokerCallback($item, $model)" >
-								<ui-select-match class="ui-select-match" placeholder="Select Broker">{{selectedBrokerName}}</ui-select-match>
-								<ui-select-choices class="ui-select-choices" repeat="item in brokersList | filter: $select.search">
-									<span ng-bind-html="trustAsHtml((item.TruckCompanyName | highlight: $select.search))"></span>
-								</ui-select-choices>
-							</ui-select>
+						<div class="col-xs-12">
+							<div class="form-group form-group-default th-select broker-detail-dropdown" ng-if="editSavedLoad.load_source == 'Vika Dispatch' && showBrokerDropdown == true">
+								<label>Select Broker</label>
+								<ui-select ng-disabled="disabledUISelect" ng-model="brokerSelectedId" theme="bootstrap" on-select="onSelectChangeBrokerCallback($item, $model)" >
+									<ui-select-match class="ui-select-match" placeholder="Select Broker">{{selectedBrokerName}}</ui-select-match>
+									<ui-select-choices class="ui-select-choices" repeat="item in brokersList | filter: $select.search">
+										<span ng-bind-html="trustAsHtml((item.TruckCompanyName | highlight: $select.search))"></span>
+									</ui-select-choices>
+								</ui-select>
+							</div>
 						</div>
 						
-						<div class="ratesheet-tripDetail-cover">
-							<button ng-click="uploadBrokerDocument(primaryLoadId,editSavedLoad.broker_id)" ng-if="showUploadBrokerButton == true" class="ratesheet-tripDetail btn btn-success btn-cons m-b-10" type="button"><i class="fa fa-cloud-upload"></i> <span class="bold">Upload Document</span>
-							</button>
-						</div>
+						
 						
 						<form method="POST" name="editLoad2" role="form" ng-submit="saveddEditLoad(editSavedLoad)" ng-class="showFormClass == true ? 'saveform' : ''">
 							
@@ -960,7 +958,8 @@
 										<h4>{{ editSavedLoad.TruckCompanyName }}
 											<span ng-if="showBrokerStatus != 'undefined' && showBrokerStatus != ''" ng-class="editSavedLoad.brokerStatus == 'Approved' ? 'green-color' : 'red-color'">({{ showBrokerStatus }})</span>
 										</h4>
-										
+										<button  style="float: right" ng-click="uploadBrokerDocument(primaryLoadId,editSavedLoad.broker_id)" ng-if="showUploadBrokerButton == true" class="ratesheet-tripDetail btn btn-success btn-cons m-b-10" type="button"><i class="fa fa-cloud-upload"></i> <span class="bold">Upload Document</span>
+										</button>
 											<div class="save-cancel" ng-show="save_cancel_div == true">
 												<button ng-click ="saveEditLoad(editSavedLoad)" ng-disabled="editLoad.$invalid" class="save btn btn-primary btn-cons m-b-10" type="button"><i class="pg-form"></i> <span class="bold">Save</span>
 												</button>
@@ -975,10 +974,12 @@
 
 
 					<!-- end of company detail heading -->		
-							<div class="enable-disable-inputs">
+							<div class="enable-disable-inputs header-disable-inp">
 
 								<div class="col-xs-12 amount-load-section company-load-section">
-									<h3 class="company-heading">{{ languageCommonVariables.contactinfo }}</h3>
+								<div class="table-input-head">
+									<h1>{{ languageCommonVariables.contactinfo }}</h1>
+								</div>
 									<div class="row">
 										
 										<div class="col-sm-4 col-md-4">
@@ -1024,7 +1025,7 @@
 									</div>
 									<div class="row">
 										<div class="col-sm-4 col-md-4">
-											<div class="amount-section-grid amount-section-grid1">
+											<div class="amount-section-grid amount-section-grid1 rem-mar-btm">
 												<figure>
 													<img src="./pages/img/phone-icon-company.png">
 												</figure>
@@ -1037,7 +1038,7 @@
 											</div>
 										</div>
 										<div class="col-sm-4 col-md-4">
-											<div class="amount-section-grid amount-section-grid2">
+											<div class="amount-section-grid amount-section-grid2 rem-mar-btm">
 												<figure>
 													<img src="./pages/img/fax-icon-company.png">
 												</figure>
@@ -1056,7 +1057,9 @@
 							<!-- end of location load section -->
 							
 								<div class="col-xs-12 company-autority-section comp-authority-new">
-									<h3 class="company-heading">ADDRESS</h3>
+									<div class="table-input-head">
+										<h1>address</h1>
+									</div>
 								<div class="company-autority-popup">
 									<div class="row">
 										<div class="col-xs-12 col-sm-3 col-md-3">
@@ -1088,7 +1091,9 @@
 							</div>
 								
 							<div class="col-xs-12 company-autority-section comp-authority-new">
-									<h3 class="company-heading">{{ languageCommonVariables.authority }}</h3>
+									<div class="table-input-head black-bg">
+										<h1>{{ languageCommonVariables.authority }}</h1>
+									</div>
 								<div class="company-autority-popup">
 									<div class="row">
 										<div class="col-xs-12 col-sm-4 col-md-4">
@@ -1127,7 +1132,7 @@
 							</div>
 						</div>
 					   <!-- END PANEL -->					   
-					   
+					   <div class="col-xs-12">
 					   <section class="truck-load-pdf-adjust-width" ng-repeat="brokerDoc in brokerDocuments">
 							<div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 truck-load-pdf-left">
 								<div class="row">
@@ -1142,21 +1147,19 @@
 									<button class="btn btn-success btn-cons m-b-10" type="button"><i class="fa fa-cloud-download"></i> <span class="bold"> {{ languageCommonVariables.downloadbutton }}</span>
 											</button>
 									
-<!--
-									<img src="./pages/img/image-aroow-down.png">{{ languageCommonVariables.downloadbutton }}-->
+
 									</a>
 
 								<a href="" class="no-padding" ng-click="deleteDoc(brokerDoc.id,brokerDoc.doc_name,'0','broker',brokerDoc.BrokerId)">
 									<button class="btn btn-danger btn-cons m-b-10" type="button"><i class="fa fa-trash"></i><span class="bold"> {{ languageCommonVariables.deletebutton }}</span>
 											</button>
-<!--
-									<img src="./pages/img/upload-cross.png">{{ languageCommonVariables.deletebutton }}
--->
+
 									</a>
 								
 																
 							</div>
 						</section>
+						</div>
 				</div> <!--popup-inner-content-main -->
 						
 				<!-------Matching Trucks------------------>
@@ -1169,11 +1172,7 @@
 						<!-- end of popup tabbing section -->
 								<div class="col-xs-12">
 									<div class="trip-detail-cover trip-detail-two-input manage-padding for-dropzone">
-										<div class="ratesheet-tripDetail-cover">
-											<button ng-click="uploadPOD(primaryLoadId)" ng-if="selectedVehicleId != '' && selectedVehicleId != 'undefined' && showUploadPODButton == true && showEditButton == true" class="ratesheet-tripDetail btn btn-success btn-cons m-b-10" type="button" scrollOnClick ><i class="fa fa-cloud-upload"></i> 
-												<span class="bold">{{languageCommonVariables.proofDelivery}}</span>
-											</button>
-										</div>
+										
 										<div class="row">
 											<div class="col-xs-12 col-sm-6 col-md-6">
 												<div class="trip-detail-left">
@@ -1411,9 +1410,14 @@
 														</form>
 														</div>
 													</div>
-
+												
 												<div>
-													
+												
+												<div class="ratesheet-tripDetail-cover">
+													<button ng-click="uploadPOD(primaryLoadId)" ng-if="selectedVehicleId != '' && selectedVehicleId != 'undefined' && showUploadPODButton == true && showEditButton == true" class="ratesheet-tripDetail btn btn-success btn-cons m-b-10" type="button" scrollOnClick ><i class="fa fa-cloud-upload"></i> 
+														<span class="bold">{{languageCommonVariables.proofDelivery}}</span>
+													</button>
+												</div>
 												<!-- START PANEL -->
 													<div class="drop-panel dropzone-padding rate-sheet-panel" id="movePodToBottom" ng-show="uploadPODDoc == true">
 														<div class="panel-body no-scroll no-padding">
@@ -1442,10 +1446,12 @@
 							</div>
 							
 							<div class="show-routes" ng-show="showNoRoutesSelected == false">
-								<h4 class="main-common-heading">
-									<span class = "map-icon" ng-show = "mapChange == true">{{ languageArray.flyingjnpilot }}</span>
-									<span class = "map-icon" ng-show = "mapChange == false">{{ languageArray.fuelstops }}</span>
-								</h4>
+								<div class="col-xs-12" >
+									<div class="table-input-head">
+										<h1 class = "map-icon" ng-show = "mapChange == true">{{ languageArray.flyingjnpilot }}</h1>
+										<h1 class = "map-icon" ng-show = "mapChange == false">{{ languageArray.fuelstops }}</h1>
+									</div>
+								</div>
 								<div id="floating-panel" class="floating-panel">
 									<button ng-click="CheckStop()" ng-show = "mapChange == true" class="btn btn-success btn-cons m-b-10" type="button">
 										<img src="./pages/img/gas-pump.png" height = "14" width = "14" ><span class="bold"> Fuel Stops </span>
@@ -1635,50 +1641,53 @@
 						</div>
 						
 						<div class="popup-inner-content-main " ng-show="showhighlighted == 'documents'" >
-						<div class="document-genrate-invoice">
-							<button ng-click="generateInvoiceForLoad(primaryLoadId)" ng-if="loggedUserRoleId == 3 || loggedUserRoleId == 1 || loggedUserRoleId == 5" href="javascript:void(0)" class="btn btn-info btn-cons m-b-10" type="button"><i class="fa fa-file-text"></i> <span class="bold">{{ languageCommonVariables.generateinvoice }}</span>
-							</button>
-						</div>
-						<div class="documents" >
-							<div class="alert alert-danger file-error" role="alert" style="display: none">
-								<span class="file-error-text"></span>
-							</div>
-							
-							<div class="custom-row">
-								 <!-- START PANEL -->
-					            <div class=" drop-panel">
-					              
-					                <div class="panel-body no-scroll no-padding">
-					                    <form class="dropzone" id="docsDropzone" method="post" enctype="multipart/form-data" ng-dropzone dropzone="dropzone" dropzone-config="dropzoneConfig">
-					                        <input name="file" type="file" multiple />
-					                    </form>
-					                </div>
-					            </div>
-					            <!-- END PANEL -->
-					            <div class="">
-					            	<section class="truck-load-pdf-adjust-width"  ng-repeat="docs in Docs">
-										<div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 truck-load-pdf-left">
-											<div class="row">
-												<div class="pdf-cover" data-id="{{docs.id}}" data-loadid="{{docs.load_id}}" data-url="assets/uploads/documents/{{docs.doc_type}}/{{docs.doc_name}}" ng-click="perviewDoc($event)">
-													<img ng-class="{'text-success': docs.thumb.includes('.doc') > -1}" ng-src="assets/uploads/documents/thumb_{{docs.doc_type}}/{{docs.thumb}}" on-error-src="pages/img/pdf.png" />
-												</div>
-											</div>
-										</div>
-										<div class="col-xs-12 col-sm-9 col-md-9 col-lg-9">
-											<p>{{docs.doc_name}}</p>
-											<p>Added {{docs.date | date : "fullDate"}}</p>
-											<a target="_blank" href="assets/uploads/documents/{{docs.doc_type}}/{{docs.doc_name}}"><button class="btn btn-success btn-cons m-b-10" type="button"><i class="fa fa-cloud-download"></i> <span class="bold"> {{ languageCommonVariables.downloadbutton }}</span>
-											</button></a>
-											 <a href="" ng-click="deleteDoc(docs.id, docs.doc_name,docs.load_id,docs.doc_type)" ng-if="docs.doc_type != 'bundle' && showEditButton == true"><button class="btn btn-danger btn-cons m-b-10" type="button"><i class="fa fa-trash"></i><span class="bold"> {{ languageCommonVariables.deletebutton }}</span>
-											</button></a>
-										</div>
-	                                </section>
+							<div class="document-genrate-pad">
+								<div class="document-genrate-invoice">
+									<button ng-click="generateInvoiceForLoad(primaryLoadId)" ng-if="loggedUserRoleId == 3 || loggedUserRoleId == 1 || loggedUserRoleId == 5" href="javascript:void(0)" class="btn btn-info btn-cons m-b-10" type="button"><i class="fa fa-file-text"></i> <span class="bold">{{ languageCommonVariables.generateinvoice }}</span>
+									</button>
 								</div>
-					        </div>
-				            <div class="row progress-div" style="display: none">
-                                	<img class="fetch-docs" src="pages/img/progress/progress-circle-master.svg" />
+								<div class="documents" >
+									<div class="alert alert-danger file-error" role="alert" style="display: none">
+										<span class="file-error-text"></span>
+									</div>
+									
+									<div class="custom-row">
+										 <!-- START PANEL -->
+							            <div class=" drop-panel">
+							              
+							                <div class="panel-body no-scroll no-padding">
+							                    <form class="dropzone" id="docsDropzone" method="post" enctype="multipart/form-data" ng-dropzone dropzone="dropzone" dropzone-config="dropzoneConfig">
+							                        <input name="file" type="file" multiple />
+							                    </form>
+							                </div>
+							            </div>
+							            <!-- END PANEL -->
+							            <div>
+							            	<section class="truck-load-pdf-adjust-width"  ng-repeat="docs in Docs">
+												<div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 truck-load-pdf-left">
+													<div class="row">
+														<div class="pdf-cover" data-id="{{docs.id}}" data-loadid="{{docs.load_id}}" data-url="assets/uploads/documents/{{docs.doc_type}}/{{docs.doc_name}}" ng-click="perviewDoc($event)">
+															<img ng-class="{'text-success': docs.thumb.includes('.doc') > -1}" ng-src="assets/uploads/documents/thumb_{{docs.doc_type}}/{{docs.thumb}}" on-error-src="pages/img/pdf.png" />
+														</div>
+													</div>
+												</div>
+												<div class="col-xs-12 col-sm-9 col-md-9 col-lg-9">
+													<p>{{docs.doc_name}}</p>
+													<p>Added {{docs.date | date : "fullDate"}}</p>
+													<a target="_blank" href="assets/uploads/documents/{{docs.doc_type}}/{{docs.doc_name}}"><button class="btn btn-success btn-cons m-b-10" type="button"><i class="fa fa-cloud-download"></i> <span class="bold"> {{ languageCommonVariables.downloadbutton }}</span>
+													</button></a>
+													 <a href="" ng-click="deleteDoc(docs.id, docs.doc_name,docs.load_id,docs.doc_type)" ng-if="docs.doc_type != 'bundle' && showEditButton == true"><button class="btn btn-danger btn-cons m-b-10" type="button"><i class="fa fa-trash"></i><span class="bold"> {{ languageCommonVariables.deletebutton }}</span>
+													</button></a>
+												</div>
+			                                </section>
+										</div>
+							        </div>
+						            <div class="row progress-div" style="display: none">
+		                                	<img class="fetch-docs" src="pages/img/progress/progress-circle-master.svg" />
+									</div>
+						            </div>
+								
 							</div>
-				            </div>
 						</div>
 						<!-- Maps End -->
 						</div>

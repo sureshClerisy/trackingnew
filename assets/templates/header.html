@@ -272,9 +272,9 @@
 									</div>
 								</div>
 						
-							<div class="col-xs-12 location-load-section">
+							<div class="col-xs-12 location-load-section ">
 									<div class="">
-										<div class="col-md-2 location-section-cover">
+										<div class="col-md-2 location-section-cover pad-remove-left">
 											<div class="location-section-grid">
 												<figure>
 													<img src="./pages/img/location-blue.png">
@@ -357,8 +357,8 @@
 							<div class="col-xs-12">
 								<!--  Sheet ends-->
 								<div class="popup-load-detail-section">
-									<div class="popup-load-detail-heading">
-										<h4>{{ languageCommonVariables.popuploaddetails }}</h4>
+									<div class="table-input-head"">
+										<h1>{{ languageCommonVariables.popuploaddetails }}</h1>
 										<div class="save-cancel" ng-show="add_load_div == true">
 											<button ng-click="submitted=true" class="btn btn-primary btn-cons m-b-10" type="submit"><i class="pg-form"></i> <span class="bold">Save</span></button>
 											<button href="javascript:void(0)" ng-show= "saveAddPrimaryId == ''" ng-click="resetAllForm()" class="btn btn-danger btn-cons m-b-10" type="button"><i class="fa fa-close"></i>
@@ -452,13 +452,13 @@
 										<div class="table-input-head">
 											<h1>Origin Detail</h1>
 											<button ng-click="addingNewExtraStop(extraStopsLength,'addRequest')" href="javascript:void(0)" type="button" class="extra-add-btn disable-anchor" title="Add Extra Stop">
-											<span>+</span>Add extra stop</button>
+											<span>+</span>Add Extra Stop</button>
 										</div>
 
 										<!-- <button ng-click="addingNewExtraStop(extraStopsLength,'addRequest')" href="javascript:void(0)" type="button" class="extra-add-btn disable-anchor" title="Add Extra Stop">
 										<img src="./pages/img/plus-icon.png"></button> -->
 
-										<div class="col-md-4 popup-input-edit-grid">
+										<div class="col-md-4 popup-input-edit-grid pad-remove-left">
 											<div class="form-group form-group-default th-select new-select-th">
 												<label>Entity</label>
 												<ui-select ng-disabled="disableTemp" name="shipper_entity" ng-model="editSavedLoad.shipper_entity" theme="bootstrap" on-select="onSelectChangeEntityCallback($item, $model,'shipper')" >
@@ -477,14 +477,14 @@
 											</div>
 										</div>	
 
-										<div class="col-md-4 popup-input-edit-grid">
+										<div class="col-md-4 popup-input-edit-grid pad-remove-right">
 											<div class=" dat-sec-1 form-group form-group-default">
 												<label>{{ languageCommonVariables.telephone }}</label>
 												<input type="text" ng-disabled="disableTemp" name="shipper_phone" ng-model="editSavedLoad.shipper_phone" ui-jq="mask" ui-options="'(999) 999-9999'" class="form-control"  />
 											</div>
 										</div>	
 										
-										<div class="col-md-6 popup-input-edit-grid pickup-time-date">
+										<div class="col-md-6 popup-input-edit-grid pickup-time-date pad-remove-left">
 											<div class="half-width-input weight-input weight-add-on">
 												<div class=" dat-sec-1 form-group form-group-default">
 													<label>{{ languageCommonVariables.popuppickup }} {{ languageCommonVariables.date }}</label>
@@ -506,7 +506,7 @@
 												</div>
 											</div>
 										</div>									
-										<div class="col-md-6 popup-input-edit-grid">
+										<div class="col-md-6 popup-input-edit-grid pad-remove-right">
 											<div class="col-md-12">
 												<div class="half-width-input weight-input input-address" >
 													<div class="form-group form-group-default noBackground destination_add">
@@ -518,7 +518,7 @@
 										</div>
 										
 										<div class="col-xs-12 no-padding">
-											<div class="col-md-3 popup-input-edit-grid">
+											<div class="col-md-3 popup-input-edit-grid pad-remove-left">
 												<div class="form-group form-group-default noBackground">
 													<label>City</label>
 													<input type="text" class="form-control" id="OriginCity" ng-disabled="disablePerm" ng-blur="changeAddMilesDistance('origin')" ng-model="editSavedLoad.OriginCity" name="OriginCity"  />
@@ -537,7 +537,7 @@
 													<input type="text" name="originAddZipCode" class="form-control" ng-disabled="disablePerm" ng-model="editSavedLoad.OriginZip" />
 												</div>
 											</div>
-											<div class="col-md-3 popup-input-edit-grid">
+											<div class="col-md-3 popup-input-edit-grid pad-remove-rightpad-remove-left">
 												<div class="form-group form-group-default noBackground">
 													<label>Country</label>
 													<input type="text" class="form-control" id="OriginCountry" ng-disabled="disablePerm" ng-blur="changeAddMilesDistance('origin')" ng-model="editSavedLoad.OriginCountry" name="OriginCountry" />
@@ -553,14 +553,14 @@
 									<div class="rel-entity" ng-repeat="i in extraStop">
 
 									<div class="table-input-head">
-										<h1>Extra stop({{$index+1}})</h1>
+										<h1>EXTRA STOP({{$index+1}})</h1>
 										<button class="extra-close" ng-click="closeExtraStopFields($index,saveAddPrimaryId,extraStops['id_'+ $index])" title="Remove Stop" type="button">
 											<span>X</span>
 										</button>
 									</div>
 
 
-										<div class="col-sm-4 col-md-4 popup-input-edit-grid">
+										<div class="col-sm-4 col-md-4 popup-input-edit-grid pad-remove-left">
 											<div class="form-group form-group-default th-select new-select-th">
 												<label>Entity</label>
 												<ui-select ng-disabled="disableTemp" name="extraStopEntity_{{$index}}" ng-model="extraStops['extraStopEntity_' + $index]" theme="bootstrap"  on-select="onSelectChangeExtraEntityCallback($item, $model,$index)" >
@@ -577,14 +577,14 @@
 												<input type="text" ng-disabled="disableTemp" name="extraStopName_{{$index}}" id ="extraStopName_{{$index}}" ng-model="extraStops['extraStopName_' + $index]"  class="form-control"  />
 											</div>
 										</div>	
-										<div class="col-md-4 popup-input-edit-grid">
+										<div class="col-md-4 popup-input-edit-grid pad-remove-right">
 											<div class=" dat-sec-1 form-group form-group-default">
 												<label>{{ languageCommonVariables.telephone }}</label>
 												<input type="text" ng-disabled="disableTemp" name="extraStopPhone_{{$index}}" id="extraStopPhone_{{$index}}" ui-jq="mask" ui-options="'(999) 999-9999'" ng-model="extraStops['extraStopPhone_' + $index]" class="form-control" />
 											</div>
 										</div>	
 																			
-										<div class="col-md-6 popup-input-edit-grid pickup-time-date" >
+										<div class="col-md-6 popup-input-edit-grid pickup-time-date pad-remove-left" >
 											<div class="half-width-input weight-input weight-a weight-add-on">
 												<div class="dat-sec-1 form-group form-group-default">
 													<label> {{ languageCommonVariables.date }}</label>
@@ -604,7 +604,7 @@
 												</div>
 											</div>
 										</div>
-										<div class="col-md-6 popup-input-edit-grid bg-red-last">
+										<div class="col-md-6 popup-input-edit-grid bg-red-last pad-remove-right">
 											<div class="full-width-input weight-input input-address">
 												<div class="form-group form-group-default noBackground">
 													<label>{{ languageCommonVariables.address }}</label>
@@ -614,7 +614,7 @@
 										</div>
 										<div class="col-xs-12 no-padding">
 											
-										<div class="col-md-3 popup-input-edit-grid">
+										<div class="col-md-3 popup-input-edit-grid pad-remove-left">
 											<div class="form-group form-group-default noBackground">
 												<label>City</label>
 												<input type="text" class="form-control" ng-disabled="disablePerm" id="DestinationCity" ng-blur="changeExtraStopsMilesDistance($index)" ng-model="extraStops['extraStopCity_' + $index]" name="extraStopCity_{{$index}}" />
@@ -632,7 +632,7 @@
 												<input type="text" name="extraStopZipCode_{{$index}}" ng-disabled="disablePerm" class="form-control" ng-model="extraStops['extraStopZipCode_' + $index]" />
 											</div>
 										</div>
-										<div class="col-md-3 popup-input-edit-grid">
+										<div class="col-md-3 popup-input-edit-grid pad-remove-rightpad-remove-left">
 											<div class="form-group form-group-default noBackground">
 												<label>Country</label>
 												<input type="text" class="form-control" id="DestinationCountry" ng-disabled="disablePerm" ng-blur="changeExtraStopsMilesDistance($index)" ng-model="extraStops['extraStopCountry_' + $index]" name="extraStopCountry_{{$index}}" />
@@ -652,10 +652,10 @@
 								<div class="row consignee-start"> 
 
 									<div class="table-input-head">
-										<h1>destination</h1>										
+										<h1>DESTINATION</h1>										
 									</div>
 
-									<div class="col-sm-4 col-md-4 popup-input-edit-grid">
+									<div class="col-sm-4 col-md-4 popup-input-edit-grid pad-remove-left">
 										<div class="form-group form-group-default th-select new-select-th">
 											<label>Entity</label>
 											<ui-select ng-disabled="disableTemp" name="consignee_entity" ng-model="editSavedLoad.consignee_entity" theme="bootstrap" on-select="onSelectChangeEntityCallback($item, $model,'consignee')">
@@ -672,14 +672,14 @@
 											<input type="text" name="consignee_names" ng-model="editSavedLoad.consignee_name" class="form-control"  />
 										</div>
 									</div>	
-									<div class="col-sm-4 col-md-4 popup-input-edit-grid">
+									<div class="col-sm-4 col-md-4 popup-input-edit-grid pad-remove-right">
 										<div class=" dat-sec-1 form-group form-group-default">
 											<label>{{ languageCommonVariables.telephone }}</label>
 											<input type="text" ng-disabled="disableTemp" name="consignee_phone" ui-jq="mask" ui-options="'(999) 999-9999'" ng-model="editSavedLoad.consignee_phone"  class="form-control" />
 										</div>
 									</div>	
 																		
-									<div class="col-md-6 popup-input-edit-grid pickup-time-date" >
+									<div class="col-md-6 popup-input-edit-grid pickup-time-date pad-remove-left" >
 										<div class="half-width-input weight-input weight-a weight-add-on">
 											<div class="dat-sec-1 form-group form-group-default">
 												<label>{{ languageCommonVariables.popupdelivery}} {{ languageCommonVariables.date }}</label>
@@ -700,7 +700,7 @@
 										</div>
 									</div>
 									
-									<div class="col-md-6 popup-input-edit-grid bg-red-last">
+									<div class="col-md-6 popup-input-edit-grid bg-red-last pad-remove-right">
 										<div class="col-md-12">
 											<div class="half-width-input weight-input input-address">									
 												<div class="form-group form-group-default noBackground destination_add">
@@ -711,7 +711,7 @@
 										</div>
 									</div>
 									<div class="col-xs-12 no-padding">
-										<div class="col-md-3 popup-input-edit-grid">
+										<div class="col-md-3 popup-input-edit-grid pad-remove-left">
 											<div class="form-group form-group-default noBackground">
 												<label>City</label>
 												<input type="text" class="form-control" ng-disabled="disablePerm" id="DestinationCity" ng-blur="changeAddMilesDistance('origin')" ng-model="editSavedLoad.DestinationCity" name="destinationCity" />
@@ -729,7 +729,7 @@
 												<input type="text" name="destinationZip" ng-disabled="disablePerm" class="form-control" ng-model="editSavedLoad.DestinationZip" />
 											</div>
 										</div>
-										<div class="col-md-3 popup-input-edit-grid">
+										<div class="col-md-3 popup-input-edit-grid pad-remove-right">
 											<div class="form-group form-group-default noBackground">
 												<label>Country</label>
 												<input type="text" class="form-control" ng-disabled="disablePerm" id="DestinationCountry" ng-blur="changeAddMilesDistance('origin')" ng-model="editSavedLoad.DestinationCountry" name="DestinationCountry" />
@@ -747,7 +747,7 @@
 									<h1 class="ng-binding">lOAD DETAILS</h1>
 								</div>
 								<div class="row row-float">
-									<div class="col-md-3 popup-input-edit-grid">
+									<div class="col-md-3 popup-input-edit-grid pad-remove-left">
 										<div class="form-group form-group-default th-select">
 											<label>{{ languageCommonVariables.popupequipment }}</label>
 											<ui-select ng-disabled="disableTemp" name="equipment_name" ng-model="editSavedLoad.equipment" theme="bootstrap" on-select="onSelectChangeEquipmentCallback($item, $model)" >
@@ -774,7 +774,7 @@
 											</select>
 										</div>
 									</div>
-									<div class="col-md-3 popup-input-edit-grid">
+									<div class="col-md-3 popup-input-edit-grid pad-remove-right">
 										<div class="half-width-input weight-input">
 											<div class="form-group form-group-default noBackground">
 												<label>{{ languageCommonVariables.weight }}</label>
@@ -862,6 +862,7 @@
 						<div class="load-special-info" ng-class="{'stop-resize':showFormClass == true}">
 							<div class="table-input-head">
 								<h1>{{ languageCommonVariables.popupspecialinfo }}</h1>
+							</div>
 							<p><textarea id="special_info" ng-model="editSavedLoad.SpecInfo" ng-disabled="disableTemp" ></textarea></p>
 						</div>
 					</div>
@@ -882,19 +883,20 @@
 							</ui-select>
 						</div>
 								
-						<div class="ratesheet-tripDetail-cover">
-							<button ng-click="uploadBrokerDocument(saveAddPrimaryId,editSavedLoad.broker_id)" ng-if="showUploadBrokerButton == true" class="ratesheet-tripDetail btn btn-success btn-cons m-b-10" type="button"><i class="fa fa-cloud-upload"></i> <span class="bold">Upload Document</span>
-							</button>
-						</div>
+						
 							
 						<form method="POST" name="addBrokerLoad" role="form" ng-submit="saveBrokerShipper(editBrokerLoadInfo)">
 							
-								<div class="col-xs-12">
+								<div class="">
 									<div class="company-detail-popup-heading">
 										<h4>{{ editBrokerLoadInfo.TruckCompanyName }}
 											<span ng-if="showBrokerStatus != 'undefined' && showBrokerStatus != ''" ng-class="editBrokerLoadInfo.brokerStatus == 'Approved' ? 'green-color' : 'red-color'">({{ showBrokerStatus }})</span>
 										</h4>
 										<div class="save-cancel" ng-show="add_broker_div == true">
+										
+											<button style="float: right" ng-click="uploadBrokerDocument(saveAddPrimaryId,editSavedLoad.broker_id)" ng-if="showUploadBrokerButton == true" class="ratesheet-tripDetail btn btn-success btn-cons m-b-10" type="button"><i class="fa fa-cloud-upload"></i> <span class="bold">Upload Document</span>
+											</button>
+										
 											<button ng-click="saveBrokerShipper(saveAddPrimaryId,'broker')" ng-disabled="addBrokerLoad.$invalid" class="btn btn-primary btn-cons m-b-10" type="button"><i class="pg-form"></i> <span class="bold">Save</span>
 											</button>
 											<button href="javascript:void(0)" ng-show= "saveAddPrimaryId == ''" ng-click="resetTheForm('broker')" class="btn btn-danger btn-cons m-b-10" type="button"><i class="fa fa-close"></i>
@@ -911,9 +913,11 @@
 
 
 					<!-- end of company detail heading -->				
-							<div class="enable-disable-inputs">
-								<div class="col-xs-12 amount-load-section company-load-section">
-									<h3 class="company-heading">{{ languageCommonVariables.contactinfo }}</h3>
+							<div class="enable-disable-inputs header-disable-inp">
+								<div class="amount-load-section company-load-section">
+									<div class="table-input-head">
+										<h1>{{ languageCommonVariables.contactinfo }}</h1>
+									</div>
 									<div class="row">
 										
 										<div class="col-sm-4 col-md-4">
@@ -962,7 +966,7 @@
 									</div>
 									<div class="row">
 										<div class="col-sm-4 col-md-4">
-											<div class="amount-section-grid amount-section-grid1">
+											<div class="amount-section-grid amount-section-grid1 rem-mar-btm">
 												<figure>
 													<img src="./pages/img/phone-icon-company.png">
 												</figure>
@@ -976,7 +980,7 @@
 											</div>
 										</div>
 										<div class="col-sm-4 col-md-4">
-											<div class="amount-section-grid amount-section-grid2">
+											<div class="amount-section-grid amount-section-grid2 rem-mar-btm">
 												<figure>
 													<img src="./pages/img/fax-icon-company.png">
 												</figure>
@@ -1005,7 +1009,9 @@
 
 					<!-- end of location load section -->
 							<div class="col-xs-12 company-autority-section comp-authority-new">
-									<h3 class="company-heading ng-binding">ADDRESS</h3>
+								<div class="table-input-head">
+									<h1>address</h1>
+								</div>
 								<div class="company-autority-popup">
 									<div class="row">
 										<div class="col-xs-12 col-sm-3 col-md-3">
@@ -1039,7 +1045,9 @@
 					
 					
 					<div class="col-xs-12 company-autority-section comp-authority-new">
-									<h3 class="company-heading">{{ languageCommonVariables.authority }}</h3>
+								<div class="table-input-head black-bg">
+									<h1>{{ languageCommonVariables.authority }}</h1>
+								</div>
 								<div class="company-autority-popup">
 									<div class="row">
 										<div class="col-xs-12 col-sm-4 col-md-4">
@@ -1104,10 +1112,10 @@
 						<!-- end of popup tabbing section -->
 									<div class="col-xs-12">
 										<div class="trip-detail-cover trip-detail-two-input manage-padding for-dropzone">
-											<div class="ratesheet-tripDetail-cover">
-												<button ng-click="uploadPOD(primaryLoadId)" ng-if="saveAddPrimaryId != '' && saveAddPrimaryId != 'undefined' && showUploadPODButton == true" class="ratesheet-tripDetail btn btn-success btn-cons m-b-10" type="button"><i class="fa fa-cloud-upload"></i> <span class="bold">{{languageCommonVariables.proofDelivery}}</span>
-												</button>
-											</div>
+											
+											<button ng-click="uploadPOD(primaryLoadId)" ng-if="saveAddPrimaryId != '' && saveAddPrimaryId != 'undefined' && showUploadPODButton == true" class="ratesheet-tripDetail btn btn-success btn-cons m-b-10" type="button"><i class="fa fa-cloud-upload"></i> <span class="bold">{{languageCommonVariables.proofDelivery}}</span>
+											</button>
+											
 											<div class="row">
 												<div class="col-xs-12 col-sm-6 col-md-6">
 													<div class="trip-detail-left">

@@ -118,8 +118,19 @@ z-index:9999;}
 .popup-open{height:100%;overflow:hidden;}
 .popup-container-wid{max-width:974px;width:100%;margin:0px auto;height:100%;padding:20px 0px;}
 .popup-container-wid1 { height: 100%;overflow: auto;position: relative; width: 100%;}
-.popup-tb-main{width:100%;height:100%;vertical-align:middle;display:table;}
-.popup-cell-main{width:100%;height:100%;vertical-align:middle;display:table-cell;}
+.popup-tb-main {
+  background: #ffffff none repeat scroll 0 0;
+  display: table;
+  height: 300px;
+  vertical-align: middle;
+  width: 100%;
+}
+.popup-cell-main {
+  display: table-cell;
+  height: 100%;
+  vertical-align: top;
+  width: 100%;
+}
 .popup-content{width:100%; float:left;background:#ededed;position:relative; }
 ul.popup-tab-row {list-style: none; padding: 0px;border-bottom: 3px solid #0190f4;text-transform: uppercase; font-size: 14px;width:100%; float:left;margin:0px;}
 ul.popup-tab-row li{width:auto; float:left;background:#fff;border-right:1px solid #ededed;padding:0px;}
@@ -128,7 +139,7 @@ ul.popup-tab-row li:hover a,ul.popup-tab-row li.active a{color:#fff;background:#
 .popup-content a.close {background: #303030;width: 44px;height: 44px;position: absolute;right: 0;top: 0;text-align: center; opacity: 1;  padding: 9px 0px;}
 .popup-inner-content-main{
 	float: left;
-    padding: 20px;
+    padding: 20px 15px;
     position: relative;
     width: 100%;
     background: #fff}
@@ -223,7 +234,12 @@ select {
 .main-common-heading{width:100%; float:left;}
 .main-common-heading span{width:auto; float:left;font-size:14px;color:#34d6c7;border-bottom:3px solid #34d6c7;padding-bottom:10px;padding-left:39px;margin:0px 0px 0px 0px;text-transform:uppercase;line-height:20px;font-weight:500;background: rgba(0, 0, 0, 0) url("../img/truck-icon.png") no-repeat scroll left top;}
 .main-common-heading span.map-icon{background: rgba(0, 0, 0, 0) url("../img/location-pin.png") no-repeat scroll 0px top; margin-left:0px; padding-left:32px;}
-.truck-detail-block-outer{width:100%; float:left;margin-bottom:10px;}
+.truck-detail-block ,.document-genrate-pad{
+  float: left;
+  position: relative;
+  width: 100%;
+  padding: 0 15px;
+}
 .truck-detail-block{width:100%; float:left;position: relative;}
 .truck-detail-heading{width:100%; float:left;border-bottom:4px solid #ededed;padding:10px;background:#fff;}
 .truck-detail-heading  h2 {color: #4e4e4e; font-size: 12px;font-weight: 500; line-height: 27px; margin: 0;vertical-align: middle;}
@@ -1664,10 +1680,14 @@ padding-left: 35px;
 }
 .popup-load-detail-inner {
   border-bottom: 1px solid #cccccc;
-  border-top: 1px solid #cccccc;
   float: left;
   padding: 15px 0 ;
   width: 100%;
+}
+.popup-load-detail-section .table-input-head h1 span {
+  font-weight: normal;
+  text-transform: capitalize;
+  margin-left: 5px;
 }
 .popup-load-detail-grid:first-child {
 	border-left: 1px solid transparent;
@@ -1689,7 +1709,7 @@ float: right;
 	overflow: auto !important;
 }
 .popup-input-edit-grid {
-    padding: 10px 0;
+    padding: 7px 0;
 }
 .popup-input-edit-fields .row:nth-child(even) {
 	background: #f0f0f0;
@@ -1714,14 +1734,14 @@ float: right;
 }
 .load-special-info {
    /* padding: 15px 0;*/
-       margin-top: 15px;
+       margin-top: 6px;
 }
 .load-special-info p {
   color: #2c2c2c;
   float: left;
   font-size: 12px;
   width: 100%;
-  padding: 0 4px;
+  padding: 0 ;
 }
 .popup-load-extra {
     padding: 15px 0;
@@ -1730,6 +1750,7 @@ float: right;
     width: 100%;
     float: left;
 }
+
 .popup-load-extra select {
     font-size: 14px;
     color: #000000;
@@ -1783,12 +1804,14 @@ float: right;
     float: left;
 }
 .company-detail-popup-heading h4 {
-    font-size: 19px;
-    color: #077ed0;
-    font-weight: 600;
-    margin: 0;
-    display: inline-block;
-    text-transform: uppercase;
+  color: #077ed0;
+  display: inline-block;
+  font-size: 19px;
+  font-weight: 600;
+  margin: 0;
+  text-transform: uppercase;
+  margin-top: 18px;
+  line-height: 12px;
 }
 .company-detail-popup-heading h4 span{
 		color: #6ba900;
@@ -1802,10 +1825,9 @@ float: right;
 	float: right;
 	padding-top: 2px;
 }
-.company-load-section{
-	margin: 0;
+.company-load-section {
+  margin: 0 0 7px;
 }
-
 .company-heading{
 	font-size: 14px;
 	color: #424242;
@@ -1837,7 +1859,7 @@ float: right;
     line-height: 1px
 }
 .company-autority-section {
-    margin-bottom: 20px;
+  margin-top: 15px;
 }
 .company-autority-popup .form-group.form-group-default{
     padding: 7px 12px;
@@ -1852,6 +1874,9 @@ float: right;
   display: inline-block;
   float: right;
   width: 100%;
+}
+.company-autority-section .table-input-head {
+  padding-top: 0px;
 }
 /****************************************** trip detail********************************/
 .trip-detail-cover {
@@ -2646,9 +2671,10 @@ table.dataTable thead .sorting_desc:after{
     background-color: rgba(0, 0, 0, 0);
 }
 .popup-input-edit-grid .form-group.form-group-default label {
-  font-weight: 600;
-  font-size: 13px;
   color: #5a5a5a;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 15px;
 }
  .billing-manage .popup-input-edit-grid .form-group.form-group-default label {
   font-weight: 600;
@@ -2804,7 +2830,7 @@ table.dataTable thead .sorting_desc:after{
 }
 .no-pad-outer .location-section-grid{ padding: 15px 0px;}
 .popup-inner-content-main.no-pad-outer {
-  padding: 6px;
+  padding: 0px;
 }
 .no-pad-outer .location-section-grid{ margin-bottom: 15px;}
 
@@ -3080,7 +3106,6 @@ table.dataTable thead .sorting_desc:after{
 }
 .location-load-section {
   margin-top: 15px;
-  padding-left: 9px !important;
 }
 .extra-close {
   border: medium none;
@@ -3101,7 +3126,10 @@ table.dataTable thead .sorting_desc:after{
 }
 .location-load-section {
   margin-top: 15px;
-  padding-left: 9px !important;
+}
+
+.btn-info-print {
+  background-color: #489fdf !important; border-color: #489fdf !important;
 }
 
 .extra-add-btn {
@@ -3111,7 +3139,7 @@ table.dataTable thead .sorting_desc:after{
   position: absolute;
   top: 24px;
 }
-.half-width-input .form-group.form-group-default:first-child {   float: left;  width: 72%;  border-right: 0 none;  position: relative;}
+.half-width-input .form-group.form-group-default:first-child {   float: left;  width: 67%;  border-right: 0 none;  position: relative;}
 .half-width-input.half-width-input-new .form-group.form-group-default:first-child {  width: 50%;}
 .half-width-input.weight-input .form-group.form-group-default:first-child{	width:50%;}
 .half-width-input.weight-input.input-address .form-group.form-group-default:first-child{	width:100%;}
@@ -3341,11 +3369,11 @@ top:40px;
   display: inline-block;
 }
 #loadDetailPopUp.modal-dialog.modal-lg {
+  height: 100%;
+  margin: 0 auto;
   max-width: 1025px;
   width: 97%;
-  margin: 20px auto 20px;
-  /*padding: 20px 0;*/
-  height: 100%;
+  padding: 22px 0;
 }
 .popup-inner-content-main .documents {
 /*  max-height: 550px;
@@ -3601,7 +3629,8 @@ background-color:#444444;
   padding-right: 4px;
 }
 .popup-input-edit-grid .form-group.form-group-default {
-    padding: 7px 5px 0 9px !important;
+  height: 49px;
+  padding: 4px 5px 0 9px !important;
 }
 .pickup-time-date .input-group-addon {
   font-size: 12px;
@@ -4138,13 +4167,12 @@ table.dataTable thead .broker-office{width:128px}
 }
 .truck-image img {
   float: left;
-  height: 35px;
+  height: 32px;
 }
 .extra-close img {
   width: 17px;
 }
 .company-autority-popup .form-group {
-  background-color: #eeeeee;
   padding: 7px 10px !important;
 }
 .company-autority-popup .form-group label {
@@ -4422,9 +4450,11 @@ float:none;
 .ratesheet-tripDetail-cover {
     width: 100%;
     float: left;
+    text-align: center;
 }
 .ratesheet-tripDetail-cover button.ratesheet-tripDetail {
-    float: right;
+  float: none;
+  margin: auto;
 }
 .edit-search-btnC.itenary-truck-heading.small-heading-h2.ng-binding button {
   margin-left: 8px;
@@ -5064,7 +5094,7 @@ table.lperform.table-condensed  tr td{font-size: 13px !important;}
   content: "To";
   height: 13px;
   position: absolute;
-  top: 21px;
+  top: 18px;
   z-index: 10;
   right: 1px;
   font-size: 13px;
@@ -5193,7 +5223,7 @@ label.error {
   float: left;
   position: relative;
   width: 100%;
-  padding:0 4px;
+  padding:3px 4px;
 }
 .shipper-start-new, .rel-entity:last-child {
   border-bottom: 0px;
@@ -5210,7 +5240,9 @@ label.error {
   margin-top: 7px;
 }
 .popup-content .popup-input-edit-grid .form-group span.ui-select-match-text {
-    color: #383636;
+  color: #383636!important;
+  margin-top: 5px;
+  opacity: 0.56;
 }
 .popup-content .popup-input-edit-grid .form-group{
 	color: #383636;
@@ -5345,7 +5377,7 @@ table.dataTable.dtr-inline.collapsed > tbody > tr > td:first-child, table.dataTa
 .half-width-input.weight-input.input-address .form-group.form-group-default.destination_add {
   width: 100%;
   padding-left: 10px !important;
-  border:1px solid #b6b6b6;
+  border:1px solid #d3d3d3;
 }
 .saveform .form-group.form-group-default.destination_add{
 	border:1px solid transparent !important;
@@ -5573,24 +5605,63 @@ body .split-view .split-list .list-view-wrapper .item .inline.email-check-sub .s
 .print-listing li.view-loads, li.view-lcount {cursor: pointer;}
 .edit-text .Summary-heading.no-marign-top{margin-top:0px;}
 .table-input-head {
-  padding-left: 6px;
+  float: left;
   padding-top: 11px;
   position: relative;
   text-transform: uppercase;
-  float: left;
   width: 100%;
+  border-bottom: 1px solid #dcdcdc;
+  padding-bottom: 8px;
+  margin-bottom: 7px;
+}
+.origin-destination .table-input-head h1:before ,.comp-authority-new .table-input-head h1:before {
+  background: #796bb6;
+}
+.comp-authority-new .table-input-head h1 {
+  color: #796bb6;
+}
+.load-det-main .table-input-head h1::before,.comp-authority-new  .black-bg h1::before,.load-special-info .table-input-head h1:before{
+  background: #292929;
+}
+.comp-authority-new  .black-bg h1{
+ color: #292929;
+}
+.rel-entity .table-input-head h1:before, .shipper-start-new .table-input-head h1:before {
+  background: #077dd4;
+}
+.consignee-start .table-input-head h1:before{
+ background: #63589d;
+}
+.table-input-head h1:before {
+  position: absolute;
+  content: "";
+  background: #0fcebe;
+  height: 3px;
+  bottom: -10px;
+  left: 0;
+  width: 100%;
+}
+.no-padding .pad-remove-left:first-child, .pad-remove-left,.popup-input-edit-fields .popup-input-edit-grid:first-child.pad-remove-left{
+  padding-left: 0 !important;
+}
+.pad-remove-right,.no-padding .pad-remove-right:last-child ,.popup-input-edit-fields .popup-input-edit-grid:last-child.pad-remove-right{
+  padding-right: 0 !important;
 }
 .table-input-head h1 {
   float: left;
-  font-size: 19px;
+   font-family: "Montserrat";
+    font-size: 13px;
   font-weight: bold;
   line-height: 14px;
   position: relative;
-  text-transform: uppercase;
   width: auto;
   margin-bottom: 0px;
   margin-top: 25px;
   color:#0FCEBE;
+}
+.shipper-start-new .ui-select-placeholder {
+  position: relative;
+  top: 5px;
 }
 .table-input-head .extra-add-btn {
   background: #067fd2 none repeat scroll 0 0;
@@ -5598,39 +5669,41 @@ body .split-view .split-list .list-view-wrapper .item .inline.email-check-sub .s
   color: #ffffff;
   display: inline-block;
   float: right;
-  font-family: montserrat;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: bold;
-  height: 39px;
-  min-width: 183px;
+  height: 37px;
+  min-width: 160px;
+  padding: 0 17px;
   position: static;
   right: unset;
-  text-transform: uppercase;
   top: unset;
   width: auto;
 }
 .table-input-head .extra-add-btn span {
-  font-size: 30px;
+  font-size: 18px;
+  line-height: 18px;
+  margin-right: 2px;
   position: relative;
-  top: 4px;
-  margin-right: 5px;
-  line-height: 10px;
+  top: 1px;
 }
 .rel-entity .table-input-head h1,.shipper-start-new .table-input-head h1 {
   margin-top: 4px;color:#077DD4;
 }
 .load-det-main .table-input-head h1 {
-  color: #000;
+  color: #292929;
   margin-top: 0;
 }
-.load-det-main {
-  border-top: 1px solid #b6b6b6;
-  margin-top: 12px;
-  padding-top: 10px;
+
+.rel-entity .table-input-head {
+  padding-top: 0;
+}
+.bg-orange {
+  padding: 8px 8px;
+  margin-top: 10px;
 }
 .consignee-start .table-input-head h1 {
   color: rgb(99,88,157);
-  margin-top: 7px;
+  margin-top: 0!important;
 }
 .load-special-info .table-input-head h1 {
   margin-top: 0px;color:#000;
@@ -5657,9 +5730,100 @@ padding-top: 0;
   padding: 0;
   position: relative;
   right: 6px;
-  width: 22px;
   top: 2px;
+  width: 22px;
+  font-size: 12px;
 }
+.popup-load-detail-section button {
+  margin-bottom: 0;
+  margin-left: 9px;
+  margin-right: 0;
+}
+.consignee-start {
+  float: left;
+  margin: 7px 0;
+  width: 100%;
+}
+.load-det-main {
+  float: left;
+  margin-bottom: 15px;
+  width: 100%;
+}
+.saveform .form-group label {
+  color: #5a5a5a!important;
+}
+form .form-group label {
+  color: #7c7c7c!important;
+}
+.document-genrate-pad .document-genrate-invoice button ,.ratesheet-tripDetail-cover button{
+  margin-right: 0px;
+}
+.ratesheet-tripDetail-cover{
+padding: 0 15px
+}
+.ratesheet-tripDetail {
+  margin-left: 3px;
+  margin-right: 0!important;
+}
+.company-detail-popup-heading button {
+  margin-bottom: 0px;
+}
+.popup-load-detail-section .table-input-head h1 {
+  color: #535353;
+}
+.popup-load-detail-section .table-input-head h1:before {
+  background: #535353;
+}
+.enable-disable-inputs .table-input-head {
+  margin-bottom: 20px;
+}
+.enable-disable-inputs .table-input-head h1 {
+  margin-top: 9px;
+}
+.rem-mar-btm{
+margin-bottom: 0px!important
+}
+.show-routes .table-input-head h1 {
+  margin-top: 0px;
+}
+.show-routes .table-input-head {
+  margin-bottom: 20px;
+  padding-top: 0;
+}
+.saveform .amount-section-grid .amount-section-text .form-group.form-group-default {
+  border-color: rgba(0, 0, 0, 0);
+}
+ .truck-image {
+  width: 52px;
+}
+.header-disable-inp .form-group-default {
+  padding: 0 12px !important;
+}
+.header-disable-inp p {
+margin:0px;
+}
+.header-disable-inp .amount-section-grid figure img {
+  padding-top: 0;
+  width: 33px;
+}
+.origin-destination .table-input-head h1::before, .comp-authority-new .table-input-head h1::before {
+  background: #796bb6 none repeat scroll 0 0;
+}
+.header-disable-inp .amount-section-grid .amount-section-text, .header-disable-inp .amount-section-grid figure, .header-disable-inp .amount-section-grid {
+  height: auto;
+}
+.header-disable-inp .amount-section-grid .amount-section-text p {
+  font-size: 13px !important;
+  font-weight: bold!important;
+      color: #7c7c7c;
+}
+.saveform .header-disable-inp .amount-section-grid .amount-section-text p {
+    color: #5a5a5a !important;
+}
+.comp-authority-new .black-bg h1:before {
+  background: #292929;
+}
+
 @media (min-width:2000px)
 {
 .map-load-section .dataTables_wrapper.no-footer table thead tr th.billing-origin{

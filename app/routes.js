@@ -12,7 +12,7 @@ var app = angular.module('app',['gantt','gantt.table','gantt.tooltips','signatur
     'gantt.overlap',
     'gantt.resizeSensor',*/
 	'angularUtils.directives.dirPagination','ngCookies','ui.router','ngStorage','jQueryScrollbar','ui.utils',
-    'oc.lazyLoad','datatables','ngSanitize','ui.select']);
+    'oc.lazyLoad','datatables','ngSanitize','ui.select','angular-sortable-view']);
 
 app.controller('AppCtrl', ['$scope','$rootScope', function ($scope,$rootScope) { 
 		
