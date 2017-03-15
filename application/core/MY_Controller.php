@@ -108,7 +108,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 					//~ }
 				//~ }
 					
-				if( count($data['rows']) < 200 || count($dat) >= 3000)  {
+				if( count($data['rows']) < 200 || count($dat) >= 2000)  {
 					break;
 				}
 				$pageNo++;

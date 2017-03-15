@@ -58,10 +58,8 @@
 			<div class="dropdown pull-right">
 				<button class="profile-dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
 					<span class="thumbnail-wrapper d32 circular inline m-t-5">
-						<img ng-src="assets/uploads/users/{{profileImage}}" on-error-src="pages/img/user.png" width="32" height="32">
-<!--
-						<img ng-show="{{loggedUserName !== 'Libia' && loggedUserName !== 'Valeria'}}" src="pages/img/user.png" alt="" data-src="assets/img/profiles/avatar.jpg" data-src-retina="assets/img/profiles/avatar_small2x.jpg" width="32" height="32">
--->
+						<img ng-src="assets/uploads/users/{{profileImage}}"  width="32" height="32" ng-if="profileImage != '' && profileImage != 'null'">
+						<img ng-src="pages/img/user.png"  width="32" height="32" ng-if="profileImage == '' || profileImage == 'null'">
 					</span>
 				</button>
 				<ul class="dropdown-menu profile-dropdown" role="menu">
@@ -89,7 +87,7 @@
         </div>
         <!--mail-icon block-->
         <div class="mail-icons-block pull-right">
-			<button ng-if="loggedUserRoleId != 4" ng-click="addNewGlobalLoad()" class="header-addButton btn btn-primary btn-cons m-b-10" type="button"><i class="fa fa-plus"></i> <span class="bold">Add Load</span></button>
+			<button ng-click="addNewGlobalLoad()" class="header-addButton btn btn-primary btn-cons m-b-10" type="button"><i class="fa fa-plus"></i> <span class="bold">Add Load</span></button>
 			<div class="icon mail"><img src="assets/img/mail.png"><div class="num-block">2</div></div>
 			<div class="icon list"><img src="assets/img/list.png"><div class="num-block">2</div></div>
 			<div class="icon bell"><img src="assets/img/bell.png"><div class="num-block">2</div></div>
@@ -750,7 +748,7 @@
 									<div class="col-md-3 popup-input-edit-grid pad-remove-left">
 										<div class="form-group form-group-default th-select">
 											<label>{{ languageCommonVariables.popupequipment }}</label>
-											<ui-select ng-disabled="disableTemp" name="equipment_name" ng-model="editSavedLoad.equipment" theme="bootstrap" on-select="onSelectChangeEquipmentCallback($item, $model)" >
+											<ui-select ng-disabled="disableTemp" name="equipment_name" ng-model="editSavedLoad.equipment" theme="bootstrap" on-select="onSelectChangeEquipmentCallback($item, 'addRequest')" >
 												<ui-select-match class="ui-select-match" placeholder="Select Equipment">{{equipmentValue}}</ui-select-match>
 												<ui-select-choices class="ui-select-choices" repeat="item in trailerTypes | filter: $select.search">
 													<span ng-bind-html="trustAsHtml((item.name | highlight: $select.search))"></span>
@@ -761,7 +759,7 @@
 									<div class="col-md-3 popup-input-edit-grid">
 										<div class="form-group form-group-default">
 											<label>{{ languageCommonVariables.popupequipmentoption }}</label>
-											<input type="text" ng-disabled="disableTemp" name="equipment_options" class="form-control" readonly= "readonly" ng-model="editSavedLoad.equipment_options"  />
+											<input type="text" ng-disabled="disableTemp" name="equipment_options" class="form-control" ng-readonly= "true" ng-model="editSavedLoad.equipment_options"  />
 										</div>
 									</div>
 									<div class="col-md-3 popup-input-edit-grid">

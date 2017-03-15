@@ -53,31 +53,12 @@ app.controller('truckstopController', function( dataFactory,$scope,$sce,$http ,$
     }
 	
     //----------drop-down ---------------------------
-    $rootScope.editLoads= true;
-	$rootScope.matchingTrucks = false;
-	$rootScope.showMaps  = false;
-	$rootScope.brokerDetailInfo  = false;
-	$rootScope.showhighlighted  = 'loadDetail';
-	
-	$rootScope.save_cancel_div  = false;
-	$rootScope.save_edit_div  = true;
-	$rootScope.showFormClass = true;
-	$scope.showPlusMinus = true;
-	
+  
 	$rootScope.Message = '';
 	
-	$scope.showSearchButtonText = false;
-	$scope.newSearchButtonShow = false;
-	$scope.showMatchingTrucks = false;
-	
 	$rootScope.showHeader = true;
-	$rootScope.fetchnewsearch = false;
-	
 	$scope.search_deadmile = 'all';
 	$scope.newSearch = {};
-	$scope.search_label_show = false;
-	//$rootScope.loadsData = [];
-	//~ $rootScope.tableTitle = [];
 	
 	$scope.states_data = {};
 	
@@ -165,6 +146,7 @@ app.controller('truckstopController', function( dataFactory,$scope,$sce,$http ,$
 	$scope.showMultiStatePopup = false;
 	$rootScope.autoRequest = false;
 	$scope.newChangeDriverLoads = false;
+	$scope.perPageNumber = 100;
 	
 	$scope.onSelectoriginTimeCallback = function (item, model){
 		var getOrigin=item.abbrevation+':'+item.destination_address+':'+item.state+':'+item.city+':'+item.driverName+':'+item.label;
@@ -267,6 +249,11 @@ app.controller('truckstopController', function( dataFactory,$scope,$sce,$http ,$
 			$(".modal").modal("hide");
 		});
 	}
+
+	$scope.toggleRow = function($event,index){
+		angular.element("#hblock"+index).slideToggle();
+		angular.element($event.target).toggleClass("minus-1");
+	}
 	
 	/**
 	 * 
@@ -280,24 +267,10 @@ app.controller('truckstopController', function( dataFactory,$scope,$sce,$http ,$
         modalElem.children('.modal-dialog').addClass('modal-lg');
 	}
 	
-	$scope.get_distance = function(city,state, key,key3){
-		var origin = city + ',' + state;
-		var destin = $rootScope.tableTitle[key];
-		
-		dataFactory.httpRequest(URL+'/truckstop/get_distance_ajax','POST',{},{origin:origin,destin:destin }).then(function(data) {
-			$scope.newData = data.deadmiles;			
-			$rootScope.loadsData[key][key3].deadmiles = $scope.newData;
-		});
-	}
-	
 	$scope.notInterested = function( index ) {
 		$rootScope.loadsData.splice(index,1);
 	}
-	
-	$scope.reloadCurrentState = function() {
-		$state.reload();
-	}
-	
+		
 	/**Clicking on load detail changes url withour reload state*/
 	$scope.clickMatchLoadDetail = function(truckstopId,loadId, deadmile,calPayment,totalCost,orignPickDate) {
 		if ( loadId == '' && loadId == undefined ) 
@@ -361,45 +334,6 @@ app.directive('onFinishRender', function ($timeout) {
     }
 });
 
-app.filter('capitalize', function() {
-    return function(input) {
-      return (!!input) ? input.charAt(0).toUpperCase() + input.substr(1).toLowerCase() : '';
-    }
-});
-
-app.directive('timepicker', function() {
-    return {
-        restrict: 'A',
-        require : 'ngModel',
-        link: function(scope, elem, attrs, ngModel) {
-	
-				$.fn.timepicker.defaults = {
-					defaultTime: ngModel.$viewValue,
-					disableFocus: false,
-					disableMousewheel: false,
-					isOpen: false,
-					minuteStep: 15,
-					modalBackdrop: false,
-					orientation: { x: 'auto', y: 'auto'},
-					secondStep: 15,
-					showSeconds: false,
-					showInputs: true,
-					showMeridian: true,
-					template: 'dropdown',
-					appendWidgetTo: 'body',
-					showWidgetOnAddonClick: true
-				};
-				
-            $(elem).timepicker().on('show.timepicker', function(e) {
-				$(elem).timepicker('setTime', ngModel.$viewValue);
-				var widget = $('.bootstrap-timepicker-widget');
-                widget.find('.glyphicon-chevron-up').removeClass().addClass('pg-arrow_maximize');
-                widget.find('.glyphicon-chevron-down').removeClass().addClass('pg-arrow_minimize');
-            });
-        }
-    }
-});
-
 app.directive('format', ['$filter', function ($filter) {
     return {
         require: '?ngModel',
@@ -426,4 +360,23 @@ app.directive('shouldFocus', function(){
 			});
 		}
 	};
+});
+app.directive('setClassWhenAtTop', function ($window) {
+  var $win = angular.element($window); // wrap window object as jQuery object
+
+  return {
+    restrict: 'A',
+    link: function (scope, element, attrs) {
+      var topClass = attrs.setClassWhenAtTop, // get CSS class from directive's attribute value
+          offsetTop = element.offset().top; // get element's offset top relative to document
+
+      $win.on('scroll', function (e) {
+        if ($win.scrollTop() >= offsetTop) {
+          element.addClass(topClass);
+        } else {
+          element.removeClass(topClass);
+        }
+      });
+    }
+  };
 });

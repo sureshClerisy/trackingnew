@@ -423,12 +423,10 @@ class Truckstop extends Admin_Controller{
 			} else {
 				$data['brokerData'] = $this->Job->getBrokerForLoadDetail($loadId);
 				
-				/*** In order to remove fields from loads of broker detail **/
 				if ( !empty($data['brokerData']) ) {
-					$jobRecord['MCNumber'] = ( $jobRecord['MCNumber'] != '' && $jobRecord['MCNumber'] != 0 ) ? $jobRecord['MCNumber'] : $data['brokerData']['mc_number'];
-					$jobRecord['DOTNumber'] = ( $jobRecord['DOTNumber'] != '' && $jobRecord['DOTNumber'] != 0 ) ? $jobRecord['DOTNumber'] : $data['brokerData']['dot_number'];
-					$jobRecord['TruckCompanyName'] = ( $jobRecord['TruckCompanyName'] != '' ) ? $jobRecord['TruckCompanyName'] : $data['brokerData']['TruckCompanyName'];
-					//~ $jobRecord['postingAddress'] = ( $jobRecord['postingAddress'] != '') ? $jobRecord['postingAddress'] : $data['brokerData']['postingAddress'];
+					$jobRecord['MCNumber'] = ($jobRecord['MCNumber'] != '' && $jobRecord['MCNumber'] != 0) ? $jobRecord['MCNumber'] : $data['brokerData']['mc_number'];
+					$jobRecord['DOTNumber'] = ($jobRecord['DOTNumber'] != '' && $jobRecord['DOTNumber'] != 0) ? $jobRecord['DOTNumber'] : $data['brokerData']['dot_number'];
+					$jobRecord['TruckCompanyName'] = ($jobRecord['TruckCompanyName'] != '') ? $jobRecord['TruckCompanyName'] : $data['brokerData']['TruckCompanyName'];
 				}
 			}
 			$origin = $jobRecord['OriginCity'].' '.$jobRecord['OriginState'].' '.$jobRecord['OriginCountry'];
@@ -509,7 +507,8 @@ class Truckstop extends Admin_Controller{
 				$jobRecord['Entered'] = $enteredArray[0];
 			}
 			
-			$jobRecord['PostedOn'] = $jobRecord['Entered'];
+			$jobRecord['equipment'] = $jobRecord['EquipmentTypes']['Description'];
+			$jobRecord['PostedOn']  = $jobRecord['Entered'];
 			$jobRecord['JobStatus'] = '';
 			$jobRecord['commodity'] = '';
 			
@@ -824,32 +823,34 @@ class Truckstop extends Admin_Controller{
 	}
 
 	/**
-	* Method printTripDetails
-	* @param Load ID
-	* @return NULL
-	*/
-
-	public function printTripDetails($loadid = null){
-
-		$columns 			= ['JobStatus','invoiceNo','Stops'];
-		$fetchedColumns 	= $this->Job->fetchLoadFields($loadid,$columns);
-		$data['invoceNo'] 	= $fetchedColumns[0]['invoiceNo'];
-		$data['JobStatus'] 	= ucfirst($fetchedColumns[0]['JobStatus']);
-		$data['extra_stop_charges'] = ($fetchedColumns[0]['Stops']*$this->extraStopPerStopChargeTeam);
-		$data['loadID'] 	= $loadid;
-		$data['tripDetails'] = $this->Job->getTripDetailsById($loadid);
-		$this->load->view('printTemplates/tripdetails',$data);
-	}
-
-	/**
 	* Method printLoadDetails
 	* @param Load ID
 	* @return NULL
 	*/
 
 	public function printLoadDetails($truckstopId = null,$loadid = null){
-		$data 				= $this->matchLoadDetailNew($truckstopId,$loadid);
-		$html = $this->load->view('printTemplates/loaddetail',$data);
+	
+		if ( $loadid != null && $loadid != 0 && $loadid != '' ) {
+			$data 				= $this->matchLoadDetailNew($truckstopId,$loadid);
+		} else {
+			$loadDetail = $_COOKIE['printTicket'];
+			$data['jobDetails'] = json_decode($loadDetail,true);
+			$data['brokerData'] = array(
+				'postingAddress' => $data['jobDetails']['postingAddress'],
+				'city' => isset($data['jobDetails']['city']) ? $data['jobDetails']['city'] : '',
+				'state' => isset($data['jobDetails']['state']) ? $data['jobDetails']['state'] : '',
+				'zipcode' => isset($data['jobDetails']['zipcode']) ? $data['jobDetails']['zipcode'] : '',
+				'MCNumber' => $data['jobDetails']['TMCNumber'],
+				'CarrierMC' => isset($data['jobDetails']['CarrierMC']) ? $data['jobDetails']['CarrierMC'] : '',
+				'DOTNumber' => $data['jobDetails']['DOTNumber'],
+				'TruckCompanyName' => $data['jobDetails']['TruckCompanyName'],
+				'brokerStatus' => isset($data['jobDetails']['brokerStatus']) ? $data['jobDetails']['brokerStatus'] : '',
+				);
+			$_COOKIE['printTicket'] = '';
+			delete_cookie('printTicket');
+		}
+		// pr($data['jobDetails']); 
+		$html = $this->load->view('printTemplates/loaddetail',$data); 	
 	}
 
 
@@ -1810,17 +1811,19 @@ class Truckstop extends Admin_Controller{
 		$radius = (float)$requset["radius"];
 		$finalCoords = array();
 		$i=0;
-		foreach ($coords as $key => $value) {
-			
-			$cursor = $this->Job->getNearByTruckStops($value['lat'],$value['lng'],$radius);
-			
-			if($cursor){
-				foreach ($cursor as $rkey => $rvalue) {
-				 	if(!$this->in_array_r($rvalue["store_id"], $finalCoords)){
-				 		array_push($finalCoords, $rvalue);
-				 	}
-				 	
-				 } 
+		if ( !empty($coords)) {
+			foreach ($coords as $key => $value) {
+				
+				$cursor = $this->Job->getNearByTruckStops($value['lat'],$value['lng'],$radius);
+				
+				if($cursor){
+					foreach ($cursor as $rkey => $rvalue) {
+					 	if(!$this->in_array_r($rvalue["store_id"], $finalCoords)){
+					 		array_push($finalCoords, $rvalue);
+					 	}
+					 	
+					 } 
+				}
 			}
 		}
 		echo json_encode($finalCoords);
@@ -2031,6 +2034,7 @@ class Truckstop extends Admin_Controller{
 
 							$response['data']['file_name'] 	= $this->degradePdfVersion($response['data']);
 							// $response['data']['raw_name'] 	= $response['data']['raw_name'].'_1';
+							$response['data']['raw_name']  = $response['data']['raw_name'].'_1';
 							unlink($response['data']['full_path']);
 						}
 					}
@@ -2393,14 +2397,29 @@ class Truckstop extends Admin_Controller{
 		$saveData['overallTotalProfit'] = $VehiclesArray[0]['overall_total_profit'];
 		$saveData['overallTotalProfitPercent'] = $VehiclesArray[0]['overall_total_profit_percent'];
 		
-		if(!isset($saveData['LoadType'])){
+		if(!isset($saveData['LoadType']) || $saveData['LoadType'] == '' ) {
 			$saveData['LoadType']="Full";
 		}
 		
 		if ( isset($saveData['PickupDate']) && $saveData['PickupDate'] != '' )
 			$saveData['pickDate'] = date('m/d/y',strtotime($saveData['PickupDate']));  //estimated time function and gantt chart pick the date from pickDate variable
+		
 		$saveData["driver_type"] = $driverAssignType;	
 		if( $id != '' && $id != null && $id != 0 && $loadFrom != 'ourLoad' ) {
+			if ( !isset($saveData['equipment_options']) || $saveData['equipment_options'] == '' ) {
+				if ( $saveData['EquipmentTypes']['Code'] != '' ) {
+					$equipmentResult = $this->Job->getRelatedEquipment( $saveData['EquipmentTypes']['Code']);
+					if ( $equipmentResult != '' ) 
+						$saveData['equipment'] = $equipmentResult;
+					$saveData['equipment_options'] = $saveData['EquipmentTypes']['Code'];
+				} else {
+					$equipmentResult = $this->Job->getRelatedEquipment( $saveData['equipment'], 'changeType');
+					if ( $equipmentResult != '' ) {
+						$saveData['equipment_options'] 		= $equipmentResult;
+						$saveData['EquipmentTypes']['Code'] = $equipmentResult;
+					}
+				}			
+			}
 			$result = $this->Job->update_job($id , $vehicle_id, $saveData, $extraStopsArray);
 		} else {
 			if ( $loadFrom == 'ourLoad' )
@@ -2451,7 +2470,8 @@ class Truckstop extends Admin_Controller{
 				$saveData['driverName'] = $getDriverName['driverName'];
 			}
 		}
-			
+		
+		$saveData['equipment_options'] = isset($saveData['EquipmentTypes']['Code']) ? $saveData['EquipmentTypes']['Code'] : '';
 		if ( $loadFrom == 'assignedLoads') {
 			echo json_encode(array('id' => $result,'savedData' => $saveData, 'checkVehicleDriverFlag' => $vehicleDriverFlag, 'table_title' => $table_title));	
 		} else if ( $loadFrom == 'billingLoads' ) {

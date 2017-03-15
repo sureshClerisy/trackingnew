@@ -52,33 +52,15 @@ app.controller('iterationLoadsController', ["dataFactory","$scope","$http","$roo
 	}
 	//----------drop-down ---------------------------
 	$('#headerFixed').addClass('headerFixed');  
-	$rootScope.editLoads  = true;
-	$rootScope.matchingTrucks  = false;
-	$rootScope.showMaps  = false;
-	$rootScope.showhighlighted = 'loadDetail';
-	$scope.iClass = false;
-	$rootScope.save_cancel_div  = false;
-	$rootScope.save_edit_div = true;
-	$rootScope.showFormClass = true;
-	$scope.showPlusMinus = true;
+	
 	$scope.includeDropzone = false;	
 	$scope.callDynamicFn = false;
 	$rootScope.Message = '';
-	
-	$scope.showSearchButtonText = false;
-	$scope.newSearchButtonShow = false;
-	$scope.showMatchingTrucks = false;
-	$scope.showNotCalculatedRecords = false;
-	$scope.showStartOver = false;
-	$scope.showRouteOnMap = false;
 	$scope.showGantt = false;
 	$scope.mindate = new Date();
 	
-	$rootScope.showHeader = true;
 	$rootScope.fetchnewsearch = false;
-	$rootScope.newIterationButtonShow = false;
-	$rootScope.showtdvalue = false;
-	$scope.iterationMultiStateCheck = false;
+	$rootScope.showHeader = true;
 	$scope.startOverSpin = false;
 	$scope.continueSpin = false;
 	$scope.search_label_show = false;
@@ -297,16 +279,9 @@ app.controller('iterationLoadsController', ["dataFactory","$scope","$http","$roo
 	/************* scroll down page to map -r288 *************/
 	}
 	
-	
-	$scope.removeTale = function(ad) {
-				
-	}
-
 	$scope.toChar = function(number) {
         return String.fromCharCode(number+65);
      }
-
-
 
 	$scope.fromTime = function(time) {
 	    if(time > 0){
@@ -1376,50 +1351,5 @@ app.controller('iterationLoadsController', ["dataFactory","$scope","$http","$roo
 	}
 }]);
 
-app.directive('elastic',['$timeout',function($timeout) {
-        return {
-            restrict: 'A',
-            link: function($scope, element) {
-                $scope.initialHeight = $scope.initialHeight || element[0].style.height;
-                var resize = function() {
-                    element[0].style.height = $scope.initialHeight;
-                    element[0].style.height = "" + element[0].scrollHeight + "px";
-                };
-                element.on("input change", resize);
-                $timeout(resize, 0);
-            }
-        };
-    }]);
  
-app.directive('timepicker', function() {
-    return {
-        restrict: 'A',
-        require : 'ngModel',
-        link: function(scope, elem, attrs, ngModel) {
-	
-				$.fn.timepicker.defaults = {
-					defaultTime: ngModel.$viewValue,
-					disableFocus: false,
-					disableMousewheel: false,
-					isOpen: false,
-					minuteStep: 15,
-					modalBackdrop: false,
-					orientation: { x: 'auto', y: 'auto'},
-					secondStep: 15,
-					showSeconds: false,
-					showInputs: true,
-					showMeridian: true,
-					template: 'dropdown',
-					appendWidgetTo: 'body',
-					showWidgetOnAddonClick: true
-				};
-				
-            $(elem).timepicker().on('show.timepicker', function(e) {
-				$(elem).timepicker('setTime', ngModel.$viewValue);
-				var widget = $('.bootstrap-timepicker-widget');
-                widget.find('.glyphicon-chevron-up').removeClass().addClass('pg-arrow_maximize');
-                widget.find('.glyphicon-chevron-down').removeClass().addClass('pg-arrow_minimize');
-            });
-        }
-    }
-});
+

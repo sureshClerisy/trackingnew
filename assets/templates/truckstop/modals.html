@@ -29,9 +29,8 @@
 				</div>
 			</div>
 		</div>
-	</div>  
-			<!--------table-full-width------>
-</div>	<!----modal fade-------------->
+	</div><!--table-full-width -->
+</div><!-- modal fade -->
 
 <!-- Enter w/o number -->
 <div class="modal fade stick-up" id="enterWOnumber" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" >
@@ -62,8 +61,6 @@
 									</div>
 								</div>
 							</div>
-												
-								
 							</div>
 						</div>
 					</div>
@@ -386,7 +383,7 @@
 					            </div>
 					           <!-- END PANEL -->
 					
-					<form method="POST" name="editLoad" role="form" ng-class="showFormClass == true ? 'saveform' : ''" ng-submit="editLoad.$valid &&  saveEditLoad(editSavedLoad)" novalidate>	
+					<form method="POST" name="editLoad" role="form" ng-class="showFormClass == true ? 'saveform' : ''" ng-submit="editLoad.$valid &&  saveEditLoad(editSavedLoad)" id="theForm" novalidate>	
 					<!-- end of location load section -->
 							<div class="col-xs-12">
 							<!--  Sheet ends-->
@@ -811,7 +808,7 @@
 									<div class="col-sm-3 col-md-3 popup-input-edit-grid pad-remove-left">
 										<div class="form-group form-group-default th-select">
 											<label>{{ languageCommonVariables.popupequipment }}</label>
-											<ui-select name="equipment_name" ng-model="editSavedLoad.equipment" theme="bootstrap" on-select="onSelectChangeEquipmentCallback($item, $model)" >
+											<ui-select ng-disabled="disableTemp" name="equipment_name" ng-model="editSavedLoad.equipment" theme="bootstrap" on-select="onSelectChangeEquipmentCallback($item, 'editRequest')" >
 												<ui-select-match class="ui-select-match" placeholder="Select Equipment">{{equipmentValue}}</ui-select-match>
 												<ui-select-choices class="ui-select-choices" repeat="item in trailerTypes | filter: $select.search">
 													<span ng-bind-html="trustAsHtml((item.name | highlight: $select.search))">
@@ -823,7 +820,7 @@
 									<div class="col-sm-3 col-md-3 popup-input-edit-grid">
 										<div class="form-group form-group-default">
 											<label>{{ languageCommonVariables.popupequipmentoption }}</label>
-											<input type="text" name="equipment_options" class="form-control" ng-disabled="disableTemp" ng-model="editSavedLoad.EquipmentTypes.Code" />
+											<input type="text" name="equipment_options" class="form-control" ng-disabled="disableTemp" ng-model="editSavedLoad.EquipmentTypes.Code" ng-readonly= "true" />
 										</div>
 									</div>
 									<div class="col-sm-3 col-md-3 popup-input-edit-grid">

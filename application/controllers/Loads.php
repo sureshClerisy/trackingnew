@@ -22,11 +22,7 @@ class Loads extends Admin_Controller{
 		$this->userRoleId = $this->session->role;
 		$this->userId 		= $this->session->loggedUser_id;
 		
-		$this->load->model('Vehicle');
-		$this->load->model('BrokersModel');
-		$this->load->model('Job');
-		$this->load->model('Billing');
-		$this->load->library('Htmldom');
+		$this->load->model(array('Vehicle','Driver','Job','BrokersModel','Billing'));
 		$this->load->helper('truckstop');
 		
 		$this->finalArray = array();
@@ -602,13 +598,13 @@ class Loads extends Admin_Controller{
 				$jobs = $this->getSingleVehicleLoads($this->userId,array(),"all",false,false,$params["startDate"],$params["endDate"],$params); 
 				$total = $this->Job->fetchSavedJobsTotal($this->userId,array(),"all",false,false,$params["startDate"],$params["endDate"],$params); 
 			}else if (isset($params["filterArgs"]["userType"]) && ($params["filterArgs"]["userType"] == "driver" || $params["filterArgs"]["userType"] == "team" )){ 
-				$driverInfo = $this->Driver->getInfoByDriverId($_REQUEST["userToken"]);
+				$driverInfo = $this->Driver->getInfoByDriverId($params["filterArgs"]["userToken"]);
 				//pr($driverInfo);die;
 				if(isset($driverInfo[0])){ $driverInfo = $driverInfo[0]; }
 				$gVehicleId = isset($driverInfo["vehicleId"])  ? $driverInfo["vehicleId"] : '';
 				$dispatcherId = isset($driverInfo["dispatcherId"])  ? $driverInfo["dispatcherId"] : '';
 				$statesAddress = $this->Vehicle->get_vehicles_address($this->userId,$gVehicleId);
-				$driverId = isset($_REQUEST["userToken"]) ? $_REQUEST["userToken"] : false ;
+				$driverId = isset($params["filterArgs"]["userToken"]) ? $params["filterArgs"]["userToken"] : false ;
 				$vehicleIdRepeat = $statesAddress[0]['id'];	
 				$results = $this->Vehicle->getLastLoadRecord($statesAddress[0]['id'], $statesAddress[0]['driver_id']);
 

@@ -72,7 +72,7 @@ class Job extends Parent_Model {
         					CASE loads.driver_type 
         						WHEN "team" THEN CONCAT(d.first_name," + ",team.first_name) 
         									ELSE concat(d.first_name," ",d.last_name) 
-        									END AS driverName, loads.driver_type, loads.id, loads.invoiceNo, loads.vehicle_id, loads.truckstopID,loads.Bond,broker_info.PointOfContactPhone,loads.equipment_options,loads.LoadType,loads.PickupDate,loads.DeliveryDate,loads.OriginCity,loads.OriginState,loads.DestinationCity,loads.DestinationState,loads.PickupAddress,loads.DestinationAddress,loads.PaymentAmount,loads.Mileage, (loads.PaymentAmount/loads.Mileage) as rpm, loads.deadmiles,loads.Weight,loads.Length,loads.JobStatus,loads.totalCost,loads.pickDate,loads.load_source,broker_info.TruckCompanyName as companyName');
+        									END AS driverName, loads.driver_type, loads.id, loads.invoiceNo, loads.vehicle_id, loads.truckstopID,loads.Bond,loads.PointOfContactPhone,loads.equipment_options,loads.LoadType,loads.PickupDate,loads.DeliveryDate,loads.OriginCity,loads.OriginState,loads.DestinationCity,loads.DestinationState,loads.PickupAddress,loads.DestinationAddress,loads.PaymentAmount,loads.Mileage, (loads.PaymentAmount/loads.Mileage) as rpm, loads.deadmiles,loads.Weight,loads.Length,loads.JobStatus,loads.totalCost,loads.pickDate,loads.load_source,broker_info.TruckCompanyName as companyName');
 		
 		$this->db->join("vehicles as v", "loads.vehicle_id = v.id","Left");
 		$this->db->join("drivers as d", "loads.driver_id = d.id","Left");
@@ -112,7 +112,7 @@ class Job extends Parent_Model {
 				//~ $this->db->or_where('loads.user_id',$loggedUserId);
 		//~ }
 		
-		$this->db->where('delete_status',0);
+		$this->db->where('loads.delete_status',0);
 
 		if(isset($filters["searchQuery"]) && !empty($filters["searchQuery"])){
 
@@ -120,7 +120,7 @@ class Job extends Parent_Model {
             $this->db->like('LOWER(CONCAT(d.first_name," ", d.last_name))', 		strtolower($filters['searchQuery']));
             $this->db->or_like('loads.id', $filters['searchQuery'] );
             $this->db->or_like('loads.invoiceNo', $filters['searchQuery'] );
-            $this->db->or_like('broker_info.PointOfContactPhone', $filters['searchQuery'] );
+            $this->db->or_like('loads.PointOfContactPhone', $filters['searchQuery'] );
             $this->db->or_like('LOWER(loads.equipment_options)', strtolower($filters['searchQuery']) );
             $this->db->or_like('LOWER(loads.LoadType)', strtolower($filters['searchQuery']) );
             $this->db->or_like('loads.PickupDate', $filters['searchQuery'] );
@@ -149,7 +149,7 @@ class Job extends Parent_Model {
 								     WHEN loads.driver_type  = "team" THEN CONCAT(d.first_name, " + ", team.first_name) 
 								     ELSE concat(d.first_name, " ", d.last_name) 
 								 END '.$filters["sortType"]);
-		}else if(in_array($filters["sortColumn"] ,array("PointOfContactPhone", "TruckCompanyName"))){
+		}else if(in_array($filters["sortColumn"] ,array("TruckCompanyName"))){
 			$this->db->order_by("broker_info.".$filters["sortColumn"],$filters["sortType"]);	
 		}else if($filters["sortColumn"] == "rpm"){
 			$this->db->order_by("(loads.PaymentAmount/loads.Mileage) ",$filters["sortType"]);	 
@@ -207,7 +207,7 @@ class Job extends Parent_Model {
 			$this->db->where('loads.JobStatus',$filters["status"]);
 		}
 
-		$this->db->where('delete_status',0);
+		$this->db->where('loads.delete_status',0);
 		if(isset($filters["searchQuery"]) && !empty($filters["searchQuery"])){
 
             $this->db->group_start();
@@ -216,7 +216,7 @@ class Job extends Parent_Model {
             $this->db->or_like('loads.id', $filters['searchQuery'] );
             $this->db->or_like('loads.id', $filters['searchQuery'] );
             $this->db->or_like('loads.invoiceNo', $filters['searchQuery'] );
-            $this->db->or_like('broker_info.PointOfContactPhone', $filters['searchQuery'] );
+            $this->db->or_like('loads.PointOfContactPhone', $filters['searchQuery'] );
             $this->db->or_like('LOWER(loads.equipment_options)', strtolower($filters['searchQuery']) );
             $this->db->or_like('LOWER(loads.LoadType)', strtolower($filters['searchQuery']) );
             $this->db->or_like('loads.PickupDate', $filters['searchQuery'] );
@@ -519,22 +519,6 @@ class Job extends Parent_Model {
 	}
 	
 	/**
-	* Fetching multiple field from load 
-	* Method fetchLoadFields
-	* @param Load ID, columns
-	* @return columns
-	*/
-	 
-	public function fetchLoadFields( $loadId = null , $column = '') {
-		if ( $column != '' ) {
-			return $this->db->select(implode(',',$column))
-			->where('id', $loadId)
-			->get('loads')
-			->result_array();			
-		}
-	}
-	
-	/**
 	 * find trip detail info
 	 */ 
 	 
@@ -728,25 +712,6 @@ class Job extends Parent_Model {
 	
 		$saveData['truckstopID'] = $saveData['ID'];
 		$saveData['vehicle_id'] = $vehicle_id;
-		$equipmentOption = $saveData['EquipmentTypes']['Code'];
-		$equipmentResult = $this->getRelatedEquipment( $equipmentOption);
-		if ( $equipmentResult != '' ) {
-			$saveData['equipment'] = $equipmentResult;
-		}
-		$saveData['equipment_options'] = $saveData['EquipmentTypes']['Code'];
-		if ( strpos($saveData['postingAddress'], ',') !== false ) {
-			$postAddArray = explode(',',$saveData['postingAddress']);
-		} else {
-			$postAddArray = '';
-		}
-		
-		if (is_array($postAddArray) && !empty($postAddArray) ) {
-			$saveData['TruckCompanyCity'] = $postAddArray[0];
-			$saveData['TruckCompanyState'] = trim($postAddArray[1]);
-		} else {
-			$saveData['TruckCompanyCity'] = '';
-			$saveData['TruckCompanyState'] = '';
-		}
 			
 		/** saving broker info to broker table */
 		if ( $saveData['MCNumber'] != '' && $saveData['MCNumber'] != null ) {
@@ -805,8 +770,6 @@ class Job extends Parent_Model {
 		unset($saveData['CarrierMC']);
 		unset($saveData['DOTNumber']);	
 		unset($saveData['brokerStatus']);	
-		unset($saveData['TruckCompanyCity']);	
-		unset($saveData['TruckCompanyState']);	
 		unset($saveData['DebtorKey']);	
 		unset($saveData['city']);	
 		unset($saveData['state']);	
@@ -955,9 +918,7 @@ class Job extends Parent_Model {
 		$loggedUserId = $this->session->loggedUser_id;
 		
 		$saveData['load_source'] = 'Vika Dispatch';
-		if ( isset($saveData['equipment_options']) )
-			$saveData['equipment'] = $this->getRelatedEquipment( $saveData['equipment_options']);   // for returning equipment name from abbreviation
-			
+
 		unset($saveData['totalMiles']);
 		unset($saveData['timer_distance']);
 		unset($saveData['overall_total_rate_mile']);
@@ -976,8 +937,6 @@ class Job extends Parent_Model {
 		unset($saveData['CarrierMC']);
 		unset($saveData['DOTNumber']);	
 		unset($saveData['brokerStatus']);	
-		unset($saveData['TruckCompanyCity']);	
-		unset($saveData['TruckCompanyState']);
 		unset($saveData['DebtorKey']);
 		unset($saveData['city']);
 		unset($saveData['state']);
@@ -1258,11 +1217,22 @@ class Job extends Parent_Model {
 		}
 	}
 	
-	public function getRelatedEquipment( $equipmentOption = '' ) {
-		$this->db->where('abbrevation',$equipmentOption);
+	public function getRelatedEquipment( $equipmentOption = '', $parameter = '' ) {
+		
+		if ( $parameter == 'changeType') {
+			$equipment = str_replace('or', '', $equipmentOption);
+			$this->db->where('name',$equipment);
+		}
+		else {
+			$this->db->where('abbrevation',$equipmentOption);
+		}
+
 		$result = $this->db->get('equipment_types');
 		if ($result->num_rows() > 0) {
-			return $result->row()->name;
+			if ($parameter == 'changeType') 
+				return $result->row()->abbrevation;
+			else
+				return $result->row()->name;
 		} else {
 			return false;
 		}
@@ -2028,14 +1998,6 @@ class Job extends Parent_Model {
 			$this->checkRequiredFeildsForInvoice($res['id']);
 		}
 	}
-
-	public function getTripDetailsById($load_id = null){
-		return $this->db->select('*')->from('trip_details')->where('load_id',$load_id)->get()->result_array();
-	}
-
-	public function getLoadDetailsById($load_id = null){
-		return $this->db->select('*')->from('loads')->where('id',$load_id)->get()->result_array();
-	}	
 
 	/*
 	* method  : post

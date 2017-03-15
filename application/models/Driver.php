@@ -34,8 +34,8 @@ class Driver extends Parent_Model
     //~ public function fetchAllRecords($search = '', $page = null, $userId = null,$sort=null,$order=null) {
     public function fetchAllRecords($userId = null) {
         $data = array();
-        $this->db->select('drivers.*, CONCAT(users.first_name, " ", users.last_name) AS dispatcher, vehicles.label,vehicles.id as vehicle_id');
-		$this->db->join('vehicles','vehicles.driver_id = drivers.id','LEFT');
+        $this->db->select('drivers.first_name,drivers.last_name,drivers.phone,drivers.email,drivers.driver_license_number,drivers.id,drivers.status, CONCAT(users.first_name, " ", users.last_name) AS dispatcher, vehicles.label,vehicles.id as vehicle_id');
+       	$this->db->join('vehicles','vehicles.driver_id = drivers.id','LEFT');
 		$this->db->join('users','drivers.user_id = users.id','LEFT');
 		$this->db->from('drivers');       
 		
@@ -351,5 +351,26 @@ class Driver extends Parent_Model
 			return false;
 		}
 	} 
+
+	/*
+	* method  : Get
+	* params  : driverId
+	* retrun  : driver Array
+	* comment : used for fetching single row while updating status
+	*/
+
+	public function fetchSingleUpdatedRecord( $driverId = null ) {
+		$this->db->select('drivers.first_name,drivers.last_name,drivers.phone,drivers.email,drivers.driver_license_number,drivers.id,drivers.status, CONCAT(users.first_name, " ", users.last_name) AS dispatcher, vehicles.label,vehicles.id as vehicle_id');
+		$this->db->join('vehicles','vehicles.driver_id = drivers.id','LEFT');
+		$this->db->join('users','drivers.user_id = users.id','LEFT');
+		$this->db->where('drivers.id',$driverId); 
+		$query = $this->db->get('drivers');
+		if ($query->num_rows() > 0) {
+            return $query->row_array();
+        } else {
+            return false;
+        }
+
+	}
 	
 }

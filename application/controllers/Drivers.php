@@ -297,8 +297,8 @@ class Drivers extends Admin_Controller
 			$status = false;
 		}
 		
-		$data['rows'] = $this->Driver->get_driver_data($driverId);
-			
+		$data['rows'] = $this->Driver->fetchSingleUpdatedRecord($driverId);
+					
 		echo json_encode(array('records' => $data, 'status' => $status ));
 	}
 	

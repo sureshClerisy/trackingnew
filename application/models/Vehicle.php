@@ -695,4 +695,29 @@ class Vehicle extends Parent_Model
 		else
 			return array();
 	} 
+
+    /*
+    * method  : Get
+    * params  : vehicleId
+    * retrun  : driver Array
+    * comment : used for fetching single row while updating status
+    */
+
+    public function fetchSingleUpdatedRecord( $vehicleId = null ) {
+        $this->db->DISTINCT();
+        $this->db->select('CONCAT(concat( drivers.first_name, " ", `drivers`.`last_name` )," + ", concat(team.first_name," ",team.last_name)) AS teamDriverName  , vehicles.id,vehicles.label, CONCAT(users.first_name," ",users.last_name) AS dispatcher, vehicles.vin, vehicles.model, vehicles.vehicle_type,vehicles.vehicle_status,vehicles.cargo_bay_l, vehicles.cargo_capacity,concat(drivers.first_name," ",drivers.last_name) as driverName,GROUP_CONCAT(equipment_types.name) as vehicleType',FALSE);
+        $this->db->join('drivers','drivers.id=vehicles.driver_id','LEFT');
+        $this->db->join('equipment_types',("FIND_IN_SET(equipment_types.abbrevation , vehicles.vehicle_type) > 0"), 'LEFT');
+        $this->db->join('users',("drivers.user_id = users.id"), 'LEFT');
+        $this->db->join('drivers as team','vehicles.team_driver_id = team.id','left');
+        $this->db->where('vehicles.id',$vehicleId);   
+        $this->db->Group_by('vehicles.id');
+       
+        $result = $this->db->get('vehicles'); 
+        if($result->num_rows()>0){
+            return $result->row_array();
+        } else {
+            return false;
+        }
+    }
 }

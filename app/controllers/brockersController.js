@@ -39,7 +39,7 @@ app.controller('brokersController', function(dataFactory,$scope,$http ,$rootScop
 						$scope.alertdeletemsg = true;
 						$scope.alertmsg = false;
 						$rootScope.data.splice(index,1);
-					}else{
+					} else {
 						$scope.brokerdeleteMessage = $rootScope.languageArray.brokerDeleteErrMsg;
 						$scope.alertdeletemsg = true;
 						$scope.alertmsg = false;

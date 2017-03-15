@@ -1,7 +1,8 @@
-app.controller('trucksController', function(dataFactory,$scope,$http ,$rootScope , $location , $cookies, $localStorage,getTrucksListing){
+app.controller('trucksController', function(dataFactory,$scope,$http ,$rootScope , $location , $cookies,getTrucksListing){
 	
 	if($rootScope.loggedInUser == false)
 		$location.path('login');
+
 	$scope.sortReverse = false;  // set the default sort order 
 	$scope.sortType='label';
 	$rootScope.showHeader = true;
@@ -21,12 +22,14 @@ app.controller('trucksController', function(dataFactory,$scope,$http ,$rootScope
 	}else{
 		$scope.alertmsg = false; 
 	}
+
 	$scope.errorMessage = $rootScope.truckEditErrorMessage;
 	if($scope.errorMessage!== undefined){
 		$scope.alertErrorMsg = true;
 	}else{
 		$scope.alertErrorMsg = false; 
 	}
+
 	$scope.data = getTrucksListing.rows;
 	$scope.totalItems = getTrucksListing.total_records;
 	
@@ -40,25 +43,25 @@ app.controller('trucksController', function(dataFactory,$scope,$http ,$rootScope
 	}
 
 	$scope.sortPage = function(){
-			getResultsPage(1);
-	
+		getResultsPage(1);
 	}
-  $scope.searchTruckDB = function(){
-      if($scope.searchText.length >= 3){
-          if($.isEmptyObject($scope.libraryTemp)){
-              $scope.libraryTemp = $scope.data;
-              $scope.totalItemsTemp = $scope.totalItems;
-              $scope.data = {};
-          }
-          getResultsPage(1);
-      }else{
-		  if(! $.isEmptyObject($scope.libraryTemp)){
-			  $scope.data = $scope.libraryTemp ;
-              $scope.totalItems = $scope.totalItemsTemp;
-              $scope.libraryTemp = {};
-          }
-      }
-  }
+
+  	$scope.searchTruckDB = function(){
+	    if($scope.searchText.length >= 3){
+	        if($.isEmptyObject($scope.libraryTemp)){
+	            $scope.libraryTemp = $scope.data;
+	            $scope.totalItemsTemp = $scope.totalItems;
+	            $scope.data = {};
+	        }
+	        getResultsPage(1);
+	      } else {
+			if(! $.isEmptyObject($scope.libraryTemp)){
+		        $scope.data = $scope.libraryTemp ;
+	            $scope.totalItems = $scope.totalItemsTemp;
+	            $scope.libraryTemp = {};
+	        }
+	    }
+ 	 }
 
 	$scope.hidedeletemessage = function(){
 		$scope.alertdeletemsg = false;
@@ -86,19 +89,15 @@ app.controller('trucksController', function(dataFactory,$scope,$http ,$rootScope
 						$scope.truckdeleteMessage = $rootScope.languageArray.truckDeleteSuccMsg;
 						$scope.alertdeletemsg = true;
 						$scope.data.splice(index,1);
-					}
-					else
-					{
+					} else {
 						$scope.truckdeleteMessage = $rootScope.languageArray.truckDeleteErrMsg;
 						$scope.alertdeleteErrormsg = true;
-						
 					}
 		      	});
 			}
-		}else{
+		} else {
 			angular.element("#confirm-delete").removeData("truckid");
 			angular.element("#confirm-delete").removeData("index");
-
 		}
 		angular.element("#confirm-delete").modal('hide');
 	}
@@ -126,11 +125,10 @@ app.controller('trucksController', function(dataFactory,$scope,$http ,$rootScope
 			});
 		} 
 		angular.element("#vehicle-list-status").modal('hide');
-	}   
-	
-		
+	}  		
 });
-app.controller('editTruckController', function(dataFactory,getTruckData,$sce,$scope,$http ,$rootScope , $location , $cookies, $stateParams, $localStorage){
+
+app.controller('editTruckController', function(dataFactory,getTruckData,$sce,$scope,$http ,$rootScope , $location , $cookies, $stateParams){
 	if($rootScope.loggedInUser == false)
 	$location.path('logout');	
 	
@@ -401,7 +399,7 @@ app.controller('editTruckController', function(dataFactory,getTruckData,$sce,$sc
 });
 
  
- app.controller('addTruckController', function(dataFactory,getTruckData,$sce,$scope,$http ,$rootScope , $location , $cookies, $stateParams, $localStorage){
+ app.controller('addTruckController', function(dataFactory,getTruckData,$sce,$scope,$http ,$rootScope , $location , $cookies, $stateParams){
 	if($rootScope.loggedInUser == false)
 		$location.path('logout');
 		

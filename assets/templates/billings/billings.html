@@ -26,32 +26,20 @@
 			  
 			<div class="row">
 				<div class="col-md-12 col-xlg-12">
-					<div class="commen-heading billing-page">
+					<div class="commen-heading assigned-load-page">
 						<h2 class="oprate-dashbord">{{ languageArray.billingLoadsHeading }}</h2>
-					</div>
-					
-					
-					<div class="label_select_box m-b-10">
-						<div class="input-cal-block">
-							<div class="input-prepend input-group">
-								<span class="add-on input-group-addon"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i></span>
-							   <input date-range-picker id="billingDRPicker" placeholder="Select date range"  options="opts" class="form-control date-picker customDateRange" type="text" ng-model="dateRangeSelector" />
+						<div class="label_select_box m-b-10">
+							<div class="input-cal-block">
+								<div class="input-prepend input-group">
+									<span class="add-on input-group-addon"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i></span>
+								   <input date-range-picker id="billingDRPicker" placeholder="Select date range"  options="opts" class="form-control date-picker customDateRange" type="text" ng-model="dateRangeSelector" />
+								</div>
 							</div>
+							<button ng-show = "showReadyForInvoiceLoads == true" ng-click="fetchBillableLoads('invoice')" class="edit-loadDetail edit1Load1 btn btn-info btn-cons " type="button"><i class="fa fa-paste"></i> <span class="bold">Show Invoice Ready Loads</span></button>
+							
+							<button ng-show = "showReadyForInvoiceLoads == false" ng-click="fetchBillableLoads('all')" class="edit-loadDetail edit1Load1 btn btn-info btn-cons " type="button"><i class="fa fa-paste"></i> <span class="bold">Show All Loads</span></button>
 						</div>
-						<button ng-show = "showReadyForInvoiceLoads == true" ng-click="fetchBillableLoads('invoice')" class="edit-loadDetail edit1Load1 btn btn-info btn-cons " type="button"><i class="fa fa-paste"></i> <span class="bold">Show Invoice Ready Loads</span></button>
-						
-						<button ng-show = "showReadyForInvoiceLoads == false" ng-click="fetchBillableLoads('all')" class="edit-loadDetail edit1Load1 btn btn-info btn-cons " type="button"><i class="fa fa-paste"></i> <span class="bold">Show All Loads</span></button>
 					</div>
-					<!--div class="label_select_box">
-						<div class="label-select-box-filters" ng-show = "fetchnewsearch == false">
-							<ui-select class="mdrivers" ng-model="search_label" theme="bootstrap" on-select="onSelectVehicleCallback($item, $model);" required>
-								<ui-select-match class="ui-select-match" placeholder="Select Driver">{{selectedDriver}}</ui-select-match>
-								<ui-select-choices class="ui-select-choices" repeat="item in labelArray| filter: $select.search">
-									<div ng-bind-html="trustAsHtml((item.label | highlight: $select.search))"></div>
-								</ui-select-choices>
-							</ui-select>
-						</div>
-					</div-->
 				</div>
 			</div>
 			

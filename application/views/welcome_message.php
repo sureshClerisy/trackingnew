@@ -8,7 +8,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta content="" name="description" />
     <meta content="" name="author" />
-    <title ng-bind = "pageTitle" ng-controller="AppCtrl">Vika Logistics</title>
+    <title ng-bind = "pageTitle">Vika Logistics</title>
     <link rel="apple-touch-icon" href="pages/ico/60.png">
     <link rel="apple-touch-icon" sizes="76x76" href="pages/ico/76.png">
     <link rel="apple-touch-icon" sizes="120x120" href="pages/ico/120.png">
@@ -40,7 +40,7 @@
     <link type="text/css" rel="stylesheet" href="assets/plugins/jquery-datatable/extensions/Responsive/css/responsive.dataTables.min.css">
    <!-- BEGIN VENDOR JS -->
 </head>
-<body class="fixed-header" ng-class="showBackground == true ? 'login-bg-head' : ''" ng-controller="loginCheck">
+<body class="fixed-header" ng-class="showBackground == true ? 'login-bg-head' : ''" ng-controller="mainController as mCtrl">
    
     <div ng-if="showHeader == true">
         <ng-include src="'./assets/templates/sidebar.html'"></ng-include>
@@ -61,6 +61,7 @@
 
 
     <script src="app/routes.js"></script>
+    <script src="app/mainController.js"></script>
     <script src="app/config.lazyload.js" type="text/javascript"></script>
     
     <script src="assets/js/directives/pg-sidebar.js" type="text/javascript"></script>

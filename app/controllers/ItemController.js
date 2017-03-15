@@ -544,12 +544,14 @@ $scope.topBrokersXaxis = ["one","two","three","four","five"];
             }
 
             // -------------- Stacked Chart Update ------------------
+
                 $rootScope.loadPerformance = data.chartStack.trecords;
                 if($rootScope.loadPerformance.length > 0 ){
                     $scope.haveRecords = true;
                 }else{
                     $scope.haveRecords = false;
                 }
+                $scope.totalAllArray = data.chartStack.totals;
                 $scope.typeOfData = data.chartStack.type;                 
                 switch($scope.typeOfData){
                     case "_iall"        : $scope.fColumn = $scope.languageArray.dispatcher; $scope.skipClick = true;break;
@@ -667,7 +669,7 @@ $scope.topBrokersXaxis = ["one","two","three","four","five"];
             }else{
                 $scope.haveRecords = false;
             }
-
+            $scope.totalAllArray = data.chartStack.totals;
             $scope.typeOfData = data.chartStack.type;                 
             switch($scope.typeOfData){
                 case "_all"         : $scope.fColumn = $scope.languageArray.dispatcher;break;
@@ -739,6 +741,7 @@ $scope.topBrokersXaxis = ["one","two","three","four","five"];
             }else{
                 $scope.haveRecords = false;
             }
+            $scope.totalAllArray = data.chartStack.totals;
           // -------------- Stacked Chart Update ------------------
             
             $scope.chartConfig.xAxis    = { categories: data.chartStack.xaxis };

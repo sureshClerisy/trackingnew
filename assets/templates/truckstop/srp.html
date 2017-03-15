@@ -34,8 +34,14 @@
 				<div class="col-md-12 col-xlg-12">
 				<div class="commen-heading search-result-page">
 					<h2 class="oprate-dashbord ">{{languageArray.searchResultPageHeading}}</h2>
+
+					<h2 class="edit-search-btnC itenary-truck-heading small-heading-h2">
+						<span>{{tableTitle[0]}}</span>
+						<button ng-click="editSearch()"  title="{{ languageArray.editSearch }}" class="btn btn-info btn-cons m-b-10" type="button"><i class="fa fa-paste"></i> <span class="bold">{{ languageArray.editSearch }}</span></button>
+					</h2>
 				</div>
 				
+					<!--div class="load-new-block-table" set-class-when-at-top="fix-to-top"-->
 					<div class="load-new-block-table">
 						<div class="panel-body search-position start-over search-change-right fix-page srp-search">
 							<div class="load-tabe-auto job-list truckstopJobs map-load-section textCenter" ng-show ="notShowDataTable == false">
@@ -44,216 +50,360 @@
 							
 							<div class="load-tabe-auto job-list truckstopJobs map-load-section" ng-show = "notShowDataTable == true">
 								
-								<h2 class="edit-search-btnC itenary-truck-heading small-heading-h2">{{tableTitle[0]}}<button ng-click="editSearch()"  title="{{ languageArray.editSearch }}" class="btn btn-info btn-cons m-b-10" type="button"><i class="fa fa-paste"></i> <span class="bold">{{ languageArray.editSearch }}</span>
-								</button></h2>
-								<div class="srpSearchDiv">
-									<div class="col-xs-4 srpSearch1">
-										<label for="search">{{ languageArray.searchButton }}</label>
-										<input type="text" class="form-control" ng-model="searchLoad">
-									</div>
-								</div> 
-								<div class="loadtable">
-								  <div class="dataTables_wrapper no-footer"> 
-									
-									<div class="table-scroll-custom">
-									<table id="testTable" width="100%" class="srpPage tr-hover table-hover row-click fixed-thead table table-striped" cell-padding="0" cell-spacing="0">
-									<thead>
-										<tr>
-											<th>
-												<a href="javascript:void(0)" ng-click="sortType = 'PointOfContactPhone'; sortReverse = !sortReverse">
-													{{ languageCommonVariables.commonTableThPhone }}
-													<span ng-show="sortType == 'PointOfContactPhone' && !sortReverse" class="fa fa-caret-up"></span>
-													<span ng-show="sortType == 'PointOfContactPhone' && sortReverse" class="fa fa-caret-down"></span>
-												</a>
-											</th>
-											<th>
-												<a href="javascript:void(0)" ng-click="sortType = 'CompanyName'; sortReverse = !sortReverse">
-													{{ languageArray.planthcompany }}
-													<span ng-show="sortType == 'CompanyName' && !sortReverse" class="fa fa-caret-up"></span>
-													<span ng-show="sortType == 'CompanyName' && sortReverse" class="fa fa-caret-down"></span>
-												</a>
-											</th>
-											<th>
-												<a href="javascript:void(0)" ng-click="sortType = 'Age'; sortReverse = !sortReverse">
-													{{ languageArray.planthage }}
-													<span ng-show="sortType == 'Age' && !sortReverse" class="fa fa-caret-up"></span>
-													<span ng-show="sortType == 'Age' && sortReverse" class="fa fa-caret-down"></span>
-												</a>
-											</th>
-											<th>
-												<a href="javascript:void(0)" ng-click="sortType = 'LoadType'; sortReverse = !sortReverse">
-													{{ languageArray.planthfl }}
-													<span ng-show="sortType == 'LoadType' && !sortReverse" class="fa fa-caret-up"></span>
-													<span ng-show="sortType == 'LoadType' && sortReverse" class="fa fa-caret-down"></span>
-												</a>
-											</th>
-											<th>
-												<a href="javascript:void(0)" ng-click="sortType = 'displayPickUpDate'; sortReverse = !sortReverse">
-													{{ languageArray.planthpickup }}
-													<span ng-show="sortType == 'displayPickUpDate' && !sortReverse" class="fa fa-caret-up"></span>
-													<span ng-show="sortType == 'displayPickUpDate' && sortReverse" class="fa fa-caret-down"></span>
-												</a>
-											</th>
-											<th>
-												<a href="javascript:void(0)" ng-click="sortType = 'OriginCity'; sortReverse = !sortReverse">
-													{{ languageArray.planthorigin }}
-													<span ng-show="sortType == 'OriginCity' && !sortReverse" class="fa fa-caret-up"></span>
-													<span ng-show="sortType == 'OriginCity' && sortReverse" class="fa fa-caret-down"></span>
-												</a>
-											</th>
-											<th>
-												<a href="javascript:void(0)" ng-click="sortType = 'OriginState'; sortReverse = !sortReverse">
-													{{ languageArray.planthst }}
-													<span ng-show="sortType == 'OriginState' && !sortReverse" class="fa fa-caret-up"></span>
-													<span ng-show="sortType == 'OriginState' && sortReverse" class="fa fa-caret-down"></span>
-												</a>
-											</th>
-											<th>
-												<a href="javascript:void(0)" ng-click="sortType = 'DestinationCity'; sortReverse = !sortReverse">
-													{{ languageArray.planthdesti }}
-													<span ng-show="sortType == 'DestinationCity' && !sortReverse" class="fa fa-caret-up"></span>
-													<span ng-show="sortType == 'DestinationCity' && sortReverse" class="fa fa-caret-down"></span>
-												</a>
-											</th>
-											<th>
-												<a href="javascript:void(0)" ng-click="sortType = 'DestinationState'; sortReverse = !sortReverse">
-													{{ languageArray.planthst }}
-													<span ng-show="sortType == 'DestinationState' && !sortReverse" class="fa fa-caret-up"></span>
-													<span ng-show="sortType == 'DestinationState' && sortReverse" class="fa fa-caret-down"></span>
-												</a>
-											</th>
-											<th>
-												<a href="javascript:void(0)" ng-click="sortType = 'Miles'; sortReverse = !sortReverse">
-													{{ languageArray.planthmiles }}
-													<span ng-show="sortType == 'Miles' && !sortReverse" class="fa fa-caret-up"></span>
-													<span ng-show="sortType == 'Miles' && sortReverse" class="fa fa-caret-down"></span>
-												</a>
-											</th>
-											<th>
-												<a href="javascript:void(0)" ng-click="sortType = 'deadmiles'; sortReverse = !sortReverse">
-													{{ languageArray.planthdeadmi }}
-													<span ng-show="sortType == 'deadmiles' && !sortReverse" class="fa fa-caret-up"></span>
-													<span ng-show="sortType == 'deadmiles' && sortReverse" class="fa fa-caret-down"></span>
-												</a>
-											</th>
-											<th>
-												<a href="javascript:void(0)" ng-click="sortType = 'Equipment'; sortReverse = !sortReverse">
-													{{ languageArray.trlrLoadTableThHeading }}
-													<span ng-show="sortType == 'Equipment' && !sortReverse" class="fa fa-caret-up"></span>
-													<span ng-show="sortType == 'Equipment' && sortReverse" class="fa fa-caret-down"></span>
-												</a>
-											</th>
-											<th>
-												<a href="javascript:void(0)" ng-click="sortType = 'Length'; sortReverse = !sortReverse">
-													{{ languageArray.planthlength }}
-													<span ng-show="sortType == 'Length' && !sortReverse" class="fa fa-caret-up"></span>
-													<span ng-show="sortType == 'Length' && sortReverse" class="fa fa-caret-down"></span>
-												</a>
-											</th>
-											<th>
-												<a href="javascript:void(0)" ng-click="sortType = 'Weight'; sortReverse = !sortReverse">
-													{{ languageArray.planthweight }}
-													<span ng-show="sortType == 'Weight' && !sortReverse" class="fa fa-caret-up"></span>
-													<span ng-show="sortType == 'Weight' && sortReverse" class="fa fa-caret-down"></span>
-												</a>
-											</th>
-											<th>
-												<a href="javascript:void(0)" ng-click="sortType = 'RPM'; sortReverse = !sortReverse">
-													{{ languageArray.planthrpm }}
-													<span ng-show="sortType == 'RPM' && !sortReverse" class="fa fa-caret-up"></span>
-													<span ng-show="sortType == 'RPM' && sortReverse" class="fa fa-caret-down"></span>
-												</a>
-											</th>								
-											<th>
-												<a href="javascript:void(0)" ng-click="sortType = 'Payment'; sortReverse = !sortReverse">
-													{{ languageArray.planthpayment }}
-													<span ng-show="sortType == 'Payment' && !sortReverse" class="fa fa-caret-up"></span>
-													<span ng-show="sortType == 'Payment' && sortReverse" class="fa fa-caret-down"></span>
-												</a>
-											</th>							
-											<th>
-												<a href="javascript:void(0)" ng-click="sortType = 'FuelCost'; sortReverse = !sortReverse">
-													{{ languageArray.planthfuel }}
-													<span ng-show="sortType == 'FuelCost' && !sortReverse" class="fa fa-caret-up"></span>
-													<span ng-show="sortType == 'FuelCost' && sortReverse" class="fa fa-caret-down"></span>
-												</a>
-											</th>
-											<th>
-												<a href="javascript:void(0)" ng-click="sortType = 'profitAmount'; sortReverse = !sortReverse">
-													{{ languageArray.planthprofit }}
-													<span ng-show="sortType == 'profitAmount' && !sortReverse" class="fa fa-caret-up"></span>
-													<span ng-show="sortType == 'profitAmount' && sortReverse" class="fa fa-caret-down"></span>
-												</a>
-											</th>
-											<th>
-												<a href="javascript:void(0)" ng-click="sortType = 'percent'; sortReverse = !sortReverse">
-													{{ languageArray.planthprofitper }}
-													<span ng-show="sortType == 'percent' && !sortReverse" class="fa fa-caret-up"></span>
-													<span ng-show="sortType == 'percent' && sortReverse" class="fa fa-caret-down"></span>
-												</a>
-											</th>
-											<th class="text-center">{{ languageCommonVariables.commonTableThAction }}</th>
-										</tr>
-									</thead>
-									<tbody>
-										
-										<tr ng-class="{'visited' : value.visited}" class="{{value.newClass}}" data-pickdate="{{value.pickDate}}" data-uinfo="{{value.ID}}" dir-paginate="value in filteredLoads = (loadsData | filter:searchLoad) | orderBy:sortType:sortReverse | itemsPerPage:100" pagination-id="srpPage" ng-click="clickMatchLoadDetail(value.ID,'',value.deadmiles,value.Payment,value.totalCost,value.pickDate)" >
-										<!--tr data-uinfo="{{value.ID}}" ng-repeat="(key3,value) in combined = loadsData.concat(tes)"  -->
-										
-											<td>{{value.PointOfContactPhone | bcTelephone:'format'}}</td>
-											<td class="give-size"><span>{{value.CompanyName|capitalize}}</span></td>
-											<td>{{value.Age}}</td>
-											<td>{{value.LoadType}}</td>
-											<td>{{value.displayPickUpDate}}</td>
-											<td class="give-size"><span>{{value.OriginCity|capitalize}}</span></td>
-											<td class=" state-capital">{{value.OriginState}}</td>
-											<td class="give-size ex-large-width"><span>{{value.DestinationCity|capitalize}}</span></td>
-											<td class="state-capital">{{value.DestinationState}}</td>
-											<td class="">{{value.Miles}}</td>
-											<td>{{value.deadmiles}}</td>
-											<td class="short-width">{{value.Equipment}}</td>
-											<td class="">{{value.Length}}</td>		
-											<td class="">{{value.Weight}}</td>
-											<td class="">{{ value.RPM | currency:"$":2  }}</td>
-											{{estimated = value.highlight == 1 ? 'Estimated' : ''}}
-											<td class="" ng-init="estimated = (value.highlight == 1) ? 'Estimated' : ''" ng-class="value.highlight == 1 ? 'highlight' : ''"><span  title="{{estimated}}" ui-jq="tooltip" >{{value.Payment | currency:"$":2}}</span></td>	
-											<td >{{value.FuelCost | currency:"$":2}}</td>					
-											<td>{{value.profitAmount | currency:"$":2 }}</td>
-											<td ng-init="estimated = (value.highlight == 1) ? 'Estimated' : ''" ng-class="value.highlight == 1 ? 'highlight' : ''"><span  title="{{estimated}}" ui-jq="tooltip" >{{value.percent}}%</span></td>
-											<td class="text-center action-btn-ryt" ng-click="$event.stopPropagation()"> 
-												<div class="export-options-container">
-													<div class="exportOptions">
-														<div class="DTTT btn-group">
-															<!-- <a class="btn btn-default DTTT_button_xls" title="{{languageCommonVariables.loadDetail}}" ui-jq="tooltip" ng-click="clickMatchLoadDetail(value.ID,'',value.deadmiles,value.Payment,value.totalCost,value.pickDate)">
-																<span><i class="fa fa-search" aria-hidden="true"></i></span>
-															</a> -->
-															<a class="btn btn-default DTTT_button_copy" title="{{languageCommonVariables.specialInfo}}" ui-jq="tooltip" ng-click="fetchSpecialNote(value.ID)" >
-																<span><i class="fa fa-info" aria-hidden="true"></i></span>
-															</a>
-															<a class="btn btn-default DTTT_button_copy" title="{{languageCommonVariables.notInterested}}" ui-jq="tooltip" ng-click="removeLoad(value.ID,$event,$index)">
-																<span><i class="fa fa-trash" aria-hidden="true"></i></span>
-															</a>
-															<a class="btn btn-default DTTT_button_csv" data-original-title="{{languageCommonVariables.exportCSV}}" ui-jq="tooltip" ng-click="exportCsvAPI($event)">
-																<span><i class="pg-grid"></i></span>
-															</a>
+								
+								
+								<div class="col-xs-4 srpSearch">
+									<label for="search">{{ languageArray.searchButton }}</label>
+									<input type="text" class="form-control" ng-model="searchLoad">
+								</div>
+				
+								<div class="table-structure-main-block tb-my">
+										<div class="table-res-1" id="testTable">
+											<div class="table-row-main1 tb-head">
+
+												<div class="tb-cell ld-id ph-plan stype"> 
+													<span>{{ languageCommonVariables.commonTableThPhone }}</span>
+												</div>
+
+												<div class="tb-cell company-plan stype" ng-click="sortType = 'CompanyName'; sortReverse = !sortReverse;"> 
+													<span class="lode-arrow" ng-class="sortType == 'CompanyName' && !sortReverse ? 'ASC' : (sortType == 'CompanyName' && sortReverse) ? 'DESC' : '' ">{{ languageArray.planthcompany }}</span>
+												</div>
+
+												<div class="tb-cell p-age-plan stype" ng-click="sortType = 'Age'; sortReverse = !sortReverse;" > 
+													<span class="lode-arrow " ng-class="(sortType == 'Age' && !sortReverse) ? 'ASC' : (sortType == 'Age' && sortReverse) ? 'DESC' : '' ">{{ languageArray.planthage }}</span>
+												</div>
+
+												<div class="tb-cell fl-plan stype" ng-click="sortType = 'LoadType'; sortReverse = !sortReverse"> 
+													<span class="lode-arrow" ng-class="(sortType == 'LoadType' && !sortReverse) ? 'ASC' :  (sortType == 'LoadType' && sortReverse) ? 'DESC' : ''  ">{{ languageArray.planthfl }}</span>
+												</div>
+
+												<div class="tb-cell pickup-plan stype" ng-click="sortType = 'displayPickUpDate'; sortReverse = !sortReverse"> 
+													<span class="lode-arrow" ng-class="(sortType == 'displayPickUpDate' && !sortReverse) ? 'ASC' :  (sortType == 'displayPickUpDate' && sortReverse) ? 'DESC' : '' ">{{ languageArray.planthpickup }}</span>
+												</div>
+
+												<div class="tb-cell Origin-plan stype" ng-click="sortType = 'OriginCity'; sortReverse = !sortReverse"> 
+													<span class="lode-arrow" ng-class="(sortType == 'OriginCity' && !sortReverse) ? 'ASC' : (sortType == 'OriginCity' && sortReverse) ? 'DESC' : '' ">{{ languageArray.planthorigin }}</span>
+												</div>
+
+												<div class="tb-cell st-plan stype" ng-click="sortType = 'OriginState'; sortReverse = !sortReverse"> 
+													<span class="lode-arrow" ng-class="(sortType == 'OriginState' && !sortReverse) ? 'ASC' : (sortType == 'OriginState' && sortReverse) ? 'DESC' : '' " > {{ languageArray.planthst }}</span>
+												</div>
+
+												<div class="tb-cell Destination-plan stype" ng-click="sortType = 'DestinationCity'; sortReverse = !sortReverse">
+													<span class="lode-arrow " ng-class="(sortType == 'DestinationCity' && !sortReverse) ? 'ASC' : (sortType == 'DestinationCity' && sortReverse) ? 'DESC' : '' ">{{ languageArray.planthdesti }}</span>
+												</div>
+
+												<div class="tb-cell st1-plan	stype" ng-click="sortType = 'DestinationState'; sortReverse = !sortReverse">
+													<span class="lode-arrow" ng-class="(sortType == 'DestinationState' && !sortReverse) ? 'ASC' :  (sortType == 'DestinationState' && sortReverse) ? 'DESC' : '' ">{{ languageArray.planthst }}</span>
+												</div>
+
+												<div class="tb-cell miles-plan stype" ng-click="sortType = 'Miles'; sortReverse = !sortReverse"> 
+													<span class="lode-arrow"  ng-class="(sortType == 'Miles' && !sortReverse) ? 'ASC' :   (sortType == 'Miles' && sortReverse) ? 'DESC' : ''  ">{{ languageArray.planthmiles }}</span>
+												</div>
+
+												<div class="tb-cell d-miles-plan stype" ng-click="sortType = 'deadmiles'; sortReverse = !sortReverse"> 
+													<span class="lode-arrow" ng-class="(sortType == 'deadmiles' && !sortReverse) ? 'ASC' : (sortType == 'deadmiles' && sortReverse) ? 'DESC' : '' ">{{ languageArray.planthdeadmiles }}</span>
+												</div>
+
+												<div class="tb-cell trlr-plan stype" ng-click="sortType = 'Equipment'; sortReverse = !sortReverse"  > 
+													<span class="lode-arrow" ng-class="(sortType == 'Equipment' && !sortReverse) ? 'ASC' : (sortType == 'Equipment' && sortReverse) ? 'DESC' : '' " >{{ languageArray.trlrLoadTableThHeading }}</span>
+												</div>
+
+												<div class="tb-cell length-plan stype" ng-click="sortType = 'Length'; sortReverse = !sortReverse"> 
+													<span class="lode-arrow " ng-class="(sortType == 'Length' && !sortReverse) ? 'ASC' : (sortType == 'Length' && sortReverse) ? 'DESC' : '' ">{{ languageArray.planthlength }}</span>
+												</div>
+
+												<div class="tb-cell weight-plan stype"   ng-click="sortType = 'Weight'; sortReverse = !sortReverse">  
+													<span class="lode-arrow" ng-class="(sortType == 'Weight' && !sortReverse) ? 'ASC' : (sortType == 'Weight' && sortReverse) ? 'DESC' : '' "> {{languageArray.planthweight }}</span>
+												</div>
+
+												<div class="tb-cell ppm-plan	" ng-click="sortType = 'RPM'; sortReverse = !sortReverse"> 
+													<span class="lode-arrow " ng-class="(sortType == 'RPM' && !sortReverse) ? 'ASC' : (sortType == 'RPM' && sortReverse) ? 'DESC' : '' ">{{ languageArray.planthrpm }}</span>
+												</div>
+
+												<div class="tb-cell payment-plan	stype" ng-click="sortType = 'Payment'; sortReverse = !sortReverse"> 
+													<span class="lode-arrow " ng-class="(sortType == 'Payment' && !sortReverse) ? 'ASC' : (sortType == 'Payment' && sortReverse) ? 'DESC' : '' ">{{ languageArray.planthpayment }}</span>
+												</div>
+
+												<div class="tb-cell fuel-cost-plan stype" ng-click="sortType = 'FuelCost'; sortReverse = !sortReverse"> 
+													<span class="lode-arrow " ng-class="(sortType == 'FuelCost' && !sortReverse) ? 'ASC' : (sortType == 'FuelCost' && sortReverse) ? 'DESC' : ''  ">{{ languageArray.planthfuel }}</span>
+												</div>
+
+												<div class="tb-cell profit-amount-plan stype" ng-click="sortType = 'profitAmount'; sortReverse = !sortReverse"> 
+													<span class="lode-arrow " ng-class="(sortType == 'profitAmount' && !sortReverse) ? 'ASC' : (sortType == 'profitAmount' && sortReverse) ? 'DESC' : ''  ">{{ languageArray.planthprofit }}</span>
+												</div>
+
+												<div class="tb-cell profit-prct-plan stype" ng-click="sortType = 'percent'; sortReverse = !sortReverse"> 
+													<span class="lode-arrow " ng-class="(sortType == 'percent' && !sortReverse) ? 'ASC' :  (sortType == 'percent' && sortReverse) ? 'DESC' : '' ">{{ languageArray.planthprofitper }}</span>
+												</div>
+
+												<div class="tb-cell action action-plan ">
+													<span class="wid">{{ languageCommonVariables.commonTableThAction }}</span>
+												</div>
+											</div>
+											
+
+											<div class="table-row-main1 tb-body" ng-class="{'visited' : value.visited}" data-pickdate="{{value.pickDate}}" data-uinfo="{{value.ID}}" dir-paginate="(key3,value) in filteredLoads = (loadsData | filter:searchLoad) | orderBy:sortType:sortReverse | itemsPerPage: perPageNumber" pagination-id="srpPage" ng-click="clickMatchLoadDetail(value.ID,'',value.deadmiles,value.Payment,value.totalCost,value.pickDate)">
+												
+												<div class="tb-cell export ld-id ph-plan">
+													<span>
+														<div class="plus-1" ng-click="$event.stopPropagation();toggleRow($event,$index);"></div>
+														{{value.PointOfContactPhone | bcTelephone:'format' }}
+													</span>
+												</div>
+												<div class="tb-cell export company-plan " > 
+													<span class="text-same-lower">{{value.CompanyName|capitalize}}</span>
+												</div>
+
+												<div class="tb-cell export p-age-plan" > 
+													<span>{{value.Age}}</span>
+												</div>
+
+												<div class="tb-cell export fl-plan" > 
+													<span>{{value.LoadType}}</span>
+												</div>
+
+												<div class="tb-cell export pickup-plan" > 
+													<span>{{value.displayPickUpDate}}</span>
+												</div>
+
+												<div class="tb-cell export Origin-plan" > 
+													<span class="text-same-lower">{{value.OriginCity|capitalize}}</span>
+												</div>
+
+												<div class="tb-cell export st-plan" > 
+													<span class="state-capital"> {{value.OriginState}}</span>
+												</div>
+
+												<div class="tb-cell export Destination-plan">
+													<span class="text-same-lower ex-large-width">{{value.DestinationCity|capitalize}}</span>
+												</div>
+
+												<div class="tb-cell export st1-plan">
+													<span class=" state-capital">{{value.DestinationState}}</span>
+												</div>
+
+												<div class="tb-cell export miles-plan" > 
+													<span>{{ value.Miles | number }}</span>
+												</div>
+
+												<div class="tb-cell export d-miles-plan" > 
+													<span>{{value.deadmiles | number}}</span>
+												</div>
+
+												<div class="tb-cell export trlr-plan" > 
+													<span class=" short-width">{{value.Equipment}}</span>
+												</div>
+
+												<div class="tb-cell export length-plan" > 
+													<span>{{value.Length}}</span>
+												</div>
+
+												<div class="tb-cell export weight-plan">     
+													<span> {{value.Weight}}</span>
+												</div>
+
+												<div class="tb-cell export ppm-plan	" > 
+													<span>{{ value.RPM | currency:"$":2 }}</span>
+												</div>
+
+												<div class="tb-cell  payment-plan" > 
+													<span ng-init="estimated = (value.highlight == 1) ? 'Estimated' : ''" ng-class="value.highlight == 1 ? 'highlight' : ''"><span class="export" title="{{estimated}}" ui-jq="tooltip" >{{value.Payment | currency:"$":2}}</span> </span>
+												</div>
+
+												<div class="tb-cell export fuel-cost-plan" > 
+													<span class="text-same-lower">{{value.FuelCost |  currency:"$":2}} </span>
+												</div>
+
+												<div class="tb-cell export profit-amount-plan" > 
+													<span>{{value.profitAmount | currency:"$":2}}</span>
+												</div>
+
+												<div class="tb-cell export profit-prct-plan" > 
+													<span ng-init="estimated = (value.highlight == 1) ? 'Estimated' : ''" ng-class="value.highlight == 1 ? 'highlight' : ''"><span class="export" title="{{estimated}}" ui-jq="tooltip" >{{value.percent}}%</span></span>
+												</div>
+												<div class="tb-cell action-plan action" ng-click="$event.stopPropagation()">
+													<span class="wid">
+														<a class="btn btn-default DTTT_button_copy" title="{{languageCommonVariables.specialInfo}}" ui-jq="tooltip" ng-click="fetchSpecialNote(value.ID)" >
+															<span><i class="fa fa-info" aria-hidden="true"></i></span>
+														</a>
+														<a class="btn btn-default DTTT_button_copy" title="{{languageCommonVariables.notInterested}}" ui-jq="tooltip" ng-click="removeLoad(value.ID,$event,$index)">
+															<span><i class="fa fa-trash" aria-hidden="true"></i></span>
+														</a>
+														
+														<a class="btn btn-default DTTT_button_csv" data-original-title="{{languageCommonVariables.exportCSV}}" ui-jq="tooltip" ng-click="exportCsvAPI($event)">
+															<span><i class="pg-grid"></i></span>
+														</a>
+													</span>
+												</div>
+												<!--open-block-->
+												<div class="open-block" id="hblock{{$index}}" style="display:none"> 
+														<div class="tb-cell ph-plan">
+															<span> 
+																<div class="heading"> {{ languageCommonVariables.commonTableThPhone }}  <b>:</b></div>
+																<div class="value">{{value.PointOfContactPhone | bcTelephone:'format' }} </div>
+															</span>
 														</div>
-													</div>
-												</div>	
-													
-											</td>
-										</tr>
-										
-										<tr><td colspan="22" style="text-align:center;" ng-show="loadsData.length == 0 || !filteredLoads.length">No loads found</td></tr>                                   
-									</tbody>
-								</table>
+
+														<div class="tb-cell company-plan "> 
+															<span>
+																<div class="heading" > {{languageArray.planthcompany}}<b>:</b></div>
+																<div class="value">{{value.CompanyName|capitalize}}</div>
+															</span>
+														</div>
+
+														<div class="tb-cell p-age-plan "> 
+															<span>
+																<div class="heading"> <b>{{languageArray.planthage}}:</b></div>
+																<div class="value">{{value.Age}}</div>
+															</span>
+														</div>
+
+														<div class="tb-cell fl-plan ">
+															<span>
+																<div class="heading" > {{languageArray.planthfl}}<b>:</b></div>
+																<div class="value">{{value.LoadType}}</div>
+															</span>
+														</div>
+
+														<div class="tb-cell pickup-plan ">
+															<span>
+																<div class="heading" > {{languageArray.planthpickup}}<b>:</b></div>
+																<div class="value">{{value.displayPickUpDate}}</div>
+															</span>
+														</div>
+
+														<div class="tb-cell Origin-plan ">
+															<span>
+																<div class="heading" > {{languageArray.planthorigin}}<b>:</b></div>
+																<div class="value">{{value.OriginCity|capitalize}}</div>
+															</span>
+														</div>
+
+														<div class="tb-cell st-plan ">
+															<span>
+																<div class="heading" > {{languageArray.planthst }}<b>:</b></div>
+																<div class="value">{{value.OriginState}}</div>
+															</span>
+														</div>
+
+														<div class="tb-cell Destination-plan ">
+															<span>
+																<div class="heading "> <b>{{languageArray.planthdesti}}:</b></div>
+																<div class="value">{{value.DestinationCity|capitalize}}</div>
+															</span>
+														</div>
+
+														<div class="tb-cell st1-plan">
+															<span>
+																<div class="heading" > {{languageArray.planthst}}<b>:</b></div>
+																<div class="value">{{value.DestinationState}}</div>
+															</span>
+														</div>
+
+														<div class="tb-cell miles-plan ">
+															<span>
+																<div class="heading" > {{languageArray.planthmiles}}<b>:</b></div>
+																<div class="value">{{ value.Miles | number }}</div>
+															</span>
+														</div>
+
+														<div class="tb-cell d-miles-plan ">
+															<span>
+																<div class="heading" > {{languageArray.planthdeadmi}}<b>:</b></div>
+																<div class="value">{{ value.deadmiles | number }}</div>
+															</span>
+														</div>
+
+														<div class="tb-cell trlr-plan ">
+															<span>
+																<div class="heading" > {{languageArray.trlrLoadTableThHeading}}<b>:</b></div>
+																<div class="value">{{value.Equipment}}</div>
+															</span>
+														</div>
+
+														<div class="tb-cell length-plan ">
+															<span>
+																<div class="heading "> {{languageArray.planthlength}}<b>:</b></div>
+																<div class="value">{{value.Length}}</div>
+															</span>
+														</div>
+
+														<div class="tb-cell weight-plan ">
+														<span>
+															<div class="heading" > {{languageArray.planthweight}}<b>:</b></div>
+															<div class="value">{{value.Weight }}</div>
+															</span>
+														</div>
+
+														<div class="tb-cell ppm-plan	"> 
+														<span>
+															<div class="heading "> {{languageArray.planthrpm}}<b>:</b></div>
+															<div class="value">{{ value.RPM | currency:"$":2 }}</div>
+															</span>
+														</div>
+
+														<div class="tb-cell payment-plan">
+															<span>
+															<div class="heading "> {{languageArray.planthpayment}}<b>:</b></div>
+															<div class="value">
+																<span ng-init="estimated = (value.highlight == 1) ? 'Estimated' : ''" ng-class="value.highlight == 1 ? 'highlight' : ''"><span  title="{{estimated}}" ui-jq="tooltip" >{{value.Payment | currency:"$":2}}</span> </span>
+															</div>
+															</span>
+														</div>
+
+														<div class="tb-cell fuel-cost-plan ">
+															<span>
+															<div class="heading "> {{languageArray.planthfuel}}<b>:</b></div>
+															<div class="value">{{value.FuelCost |  currency:"$":2}}</div>
+															</span>
+														</div>
+
+														<div class="tb-cell profit-amount-plan ">
+														<span>
+															<div class="heading "> {{languageArray.planthprofit}}<b>:</b></div>
+															<div class="value">{{value.profitAmount | currency:"$":2}}</div>
+															</span>
+														</div>
+
+														<div class="tb-cell profit-prct-plan ">
+														<span>
+															<div class="heading "> {{languageArray.planthprofitper}}<b>:</b></div>
+															<div class="value">
+																<span ng-init="estimated = (value.highlight == 1) ? 'Estimated' : ''" ng-class="value.highlight == 1 ? 'highlight' : ''"><span  title="{{estimated}}" ui-jq="tooltip" >{{value.percent}}%</span></span>
+															</div>
+															</span>
+														</div>
+
+														<div class="tb-cell action-plan action">
+															<span >
+																<div class="heading">{{ languageCommonVariables.commonTableThAction }} <b>:</b></div>
+																<div class="value">
+																	<a class="btn btn-default DTTT_button_copy" title="{{languageCommonVariables.specialInfo}}" ui-jq="tooltip" ng-click="fetchSpecialNote(value.ID)" >
+																		<span><i class="fa fa-info" aria-hidden="true"></i></span>
+																	</a>
+																	<a class="btn btn-default DTTT_button_copy" title="{{languageCommonVariables.notInterested}}" ui-jq="tooltip" ng-click="removeLoad(value.ID,$event,$index)">
+																		<span><i class="fa fa-trash" aria-hidden="true"></i></span>
+																	</a>
+																	<a class="btn btn-default DTTT_button_csv" data-original-title="{{languageCommonVariables.exportCSV}}" ui-jq="tooltip" ng-click="exportCsvAPI($event)">
+																		<span><i class="pg-grid"></i></span>
+																	</a>
+																</div>
+															</span>
+														</div>
+												</div>
+												<!--open-block-->
+											</div>
+										</div>
+									</div><!-- table-structure-main-block -->
+									<div class="dataTables_wrapper">
+            							<div class="dataTables_paginate">
+											<dir-pagination-controls pagination-id="srpPage" template-url="./assets/templates/dirPagination.html"  direction-links="true" undary-links="true"></dir-pagination-controls>
+										</div>
 									</div>
-								 <div class="dataTables_wrapper">
-        							<div class="dataTables_paginate">
-										<dir-pagination-controls pagination-id="srpPage" template-url="./assets/templates/dirPagination.html" on-page-change="pageChanged(newPageNumber,itemsOnPage)" direction-links="true" undary-links="true"></dir-pagination-controls>
-									</div>
-								</div>
-								</div>
-								</div>
+								
+							</div>
+							</div>
 							</div>
 						</div>
 					</div>

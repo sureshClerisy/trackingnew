@@ -77,7 +77,7 @@
             </a>
             
           </li>
-          <li ng-class="{'open active':(state=='trucks' || state=='trailers' || state=='maintenance') }">
+          <li ng-class="(state=='trucks' || state=='trailers') ? 'open active' : ''">
     				<a class="test" href="javascript:void(0)">
               <span class="title">{{ languageCommonVariables.vehicles }}</span>
               <span class=" arrow" ng-class="{'open active':(state=='trucks' || state=='trailers' || state=='maintenance') }"></span>

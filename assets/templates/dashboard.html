@@ -1,18 +1,3 @@
- <script>
-/*jQuery(function(){
-if(!window.google||!window.google.maps){
-	
-  var script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.src = 'http://maps.google.com/maps/api/js?key=AIzaSyBSPVGmxdOqe2yrxzla4iezs00zWe_p6j4&libraries=places';
-    document.body.appendChild(script);
-}
-else{
-
- //initialize();
-}});*/
-</script>
-
      <!-- START PAGE CONTENT WRAPPER -->
       <div class="page-content-wrapper ">
         <!-- START PAGE CONTENT -->
@@ -357,19 +342,32 @@ else{
 													  </tr>
 													</thead>
 													<tbody>
-													  <tr ng-repeat="loads in loadPerformance" ng-class="{'skip-click':skipClick}" ng-click="skipClick || clickMatchLoadDetail(loads.truckstopID, loads.loadid, loads.deadmiles, loads.invoice, loads.totalCost, loads.pickDate, loads.vehicle_id , $index)">
-														<td class="v-align-middle semi-bold">{{loads.fcolumn}}</td>
-														
-														<td ng-show="typeOfData == '_idriver'" class="text-center v-align-middle semi-bold">{{loads.PickupDate}}</td>
-														<td ng-show="typeOfData == '_idriver'" class="text-center v-align-middle semi-bold">{{loads.DeliveryDate}}</td>
+													  	<tr ng-repeat="loads in loadPerformance" ng-class="{'skip-click':skipClick}" ng-click="skipClick || clickMatchLoadDetail(loads.truckstopID, loads.loadid, loads.deadmiles, loads.invoice, loads.totalCost, loads.pickDate, loads.vehicle_id , $index)">
+															<td class="v-align-middle semi-bold">{{loads.fcolumn}}</td>
+															
+															<td ng-show="typeOfData == '_idriver'" class="text-center v-align-middle semi-bold">{{loads.PickupDate}}</td>
+															<td ng-show="typeOfData == '_idriver'" class="text-center v-align-middle semi-bold">{{loads.DeliveryDate}}</td>
 
-														<td  class="text-center v-align-middle semi-bold">{{loads.miles}}</td>
-														<td  class="text-center v-align-middle">{{loads.deadmiles}}</td>
-														<td  class="text-center v-align-middle semi-bold">{{loads.invoice | currency:"$":2}}</td>
-														<td  class="text-center v-align-middle">{{loads.charges | currency:"$":2}}</td>
-														<td  class="text-center v-align-middle">{{loads.profit | currency:"$":2}}</td>
-														<td  class="text-center v-align-middle">{{loads.ppercent}}%</td>
-													  </tr>
+															<td  class="text-center v-align-middle semi-bold">{{loads.miles}}</td>
+															<td  class="text-center v-align-middle">{{loads.deadmiles}}</td>
+															<td  class="text-center v-align-middle semi-bold">{{loads.invoice | currency:"$":2}}</td>
+															<td  class="text-center v-align-middle">{{loads.charges | currency:"$":2}}</td>
+															<td  class="text-center v-align-middle">{{loads.profit | currency:"$":2}}</td>
+															<td  class="text-center v-align-middle">{{loads.ppercent}}%</td>
+													 	</tr>
+													 	<tr ng-hide="!haveRecords" class="bold-content">
+														  	<td class="v-align-middle semi-bold">Total</td>
+															
+															<td ng-show="typeOfData == '_idriver'" class="text-center v-align-middle semi-bold"></td>
+															<td ng-show="typeOfData == '_idriver'" class="text-center v-align-middle semi-bold"></td>
+
+															<td  class="text-center v-align-middle semi-bold">{{totalAllArray.totMiles}}</td>
+															<td  class="text-center v-align-middle">{{totalAllArray.totDeadMiles}}</td>
+															<td  class="text-center v-align-middle semi-bold">{{totalAllArray.totInvoices | currency:"$":2}}</td>
+															<td  class="text-center v-align-middle">{{totalAllArray.totCharges | currency:"$":2}}</td>
+															<td  class="text-center v-align-middle">{{totalAllArray.totProfit | currency:"$":2}}</td>
+															<td  class="text-center v-align-middle">{{totalAllArray.totProfitPercent}}%</td>
+													 	</tr>
 													  <tr ng-show="!haveRecords"><td class="semi-bold" style="text-align: center;" colspan="9"> Oops! No Record Found</td></tr>
 													</tbody>
 												  </table>

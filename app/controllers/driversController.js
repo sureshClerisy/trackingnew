@@ -1,6 +1,5 @@
 app.controller('driversController', function(dataFactory,$scope,$http ,$rootScope , $location , $cookies, $localStorage,getDriversListing,$state){
-	if($rootScope.loggedInUser == false)
-		$location.path('login');
+	
   $rootScope.showHeader = true;
   $scope.sortReverse  = false;  // set the default sort order 
   $scope.sortType='first_name';
@@ -29,16 +28,8 @@ app.controller('driversController', function(dataFactory,$scope,$http ,$rootScop
 	}
 	
 	$scope.sortPage = function(){
-			getResultsPage(1);
-	
+		getResultsPage(1);
 	}
-
-
-
-
-
-
-
 
 	$scope.goForDashboard = function(vid){
 		$rootScope.ofDriver = vid;
@@ -62,18 +53,16 @@ app.controller('driversController', function(dataFactory,$scope,$http ,$rootScop
 	      }
 	}
 
-	$rootScope.dataTableOpts(10,5);			 //set datatable options   -r288
+	$rootScope.dataTableOpts(10,6);			 //set datatable options   -r288
 	$scope.hidedeletemessage = function(){
 		$scope.alertdeletemsg = false;
 	}
 	
-   $scope.removeDriver = function(driverid,index){
-
-   	angular.element("#confirm-delete").modal('show');
-	angular.element("#confirm-delete").data("driverid",driverid);
-	angular.element("#confirm-delete").data("index",index);
-
-  }
+  	$scope.removeDriver = function(driverid,index){
+		angular.element("#confirm-delete").modal('show');
+		angular.element("#confirm-delete").data("driverid",driverid);
+		angular.element("#confirm-delete").data("index",index);
+	}
   
   /** Change Driver Status **/
   
@@ -111,25 +100,18 @@ app.controller('driversController', function(dataFactory,$scope,$http ,$rootScop
 						$scope.driverdeleteMessage = $rootScope.languageArray.driverDeleteSuccMsg;
 						$scope.alertdeletemsg = true;
 						$scope.data.splice(index,1);
-					}
-					else
-					{
+					} else {
 						$scope.driverdeleteMessage = $rootScope.languageArray.driverDeleteErrMsg;
 						$scope.alertdeletemsg = true;
-						
 					}
 			    });
 			}
-		}else{
+		} else {
 			angular.element("#confirm-delete").removeData("driverid");
 			angular.element("#confirm-delete").removeData("index");
-
 		}
 		angular.element("#confirm-delete").modal('hide');
-	}
-
-   
-   
+	} 
 		
 });
 
@@ -194,7 +176,6 @@ app.controller('editDriversController', function(dataFactory,getDriversData, $sc
 		angular.element("#common-document-status").modal('hide');
 	}
 
-	/************ Dispatcher Dropdown -r 288 ***************/
 	$scope.dispatcherList = getDispatcherList.list;    //Dispatcher List -r 288
 	$scope.selectedDispatcher = getDispatcherList.selected;    //Selected Dispatcher -r 288
 	$scope.dispatcher = {};
@@ -204,8 +185,7 @@ app.controller('editDriversController', function(dataFactory,getDriversData, $sc
 	$scope.onSelectDispatcherCallback = function (item, model){
 		$scope.driversData.user_id = item.id;
 	};
-	/************ Dispatcher Dropdown -r 288 ***************/
-	
+		
 	$scope.saveDriver = function(){
 		$scope.driversData.address=document.getElementById('pac-input').value;
 		var file = $scope.myFile;

@@ -20,3 +20,17 @@ ERROR - 2017-03-10 12:14:13 --> Severity: Warning --> unlink(assets/uploads/docu
 ERROR - 2017-03-10 12:14:13 --> Severity: Warning --> unlink(assets/uploads/documents/thumb_rateSheet/thumb_rateSheet_1489147438_1.jpg): No such file or directory /var/www/html/trackingnew/application/controllers/Truckstop.php 2056
 ERROR - 2017-03-10 17:47:09 --> 404 Page Not Found: %7B%7BdocContent%7D%7D/index
 ERROR - 2017-03-10 12:21:51 --> Severity: Warning --> unlink(assets/uploads/documents/thumb_rateSheet/thumb_rateSheet_1489148052_1.jpg): No such file or directory /var/www/html/trackingnew/application/controllers/Truckstop.php 2056
+ERROR - 2017-03-10 12:30:47 --> Severity: Warning --> unlink(assets/uploads/documents/thumb_rateSheet/thumb_rateSheet_1489148510_1.jpg): No such file or directory /var/www/html/trackingnew/application/controllers/Truckstop.php 2053
+ERROR - 2017-03-10 12:37:59 --> Severity: Warning --> unlink(assets/uploads/documents/thumb_rateSheet/thumb_rateSheet_1489149046_1.jpg): No such file or directory /var/www/html/trackingnew/application/controllers/Truckstop.php 2060
+ERROR - 2017-03-10 12:41:44 --> Severity: Warning --> unlink(assets/uploads/documents/thumb_rateSheet/thumb_rateSheet_1489149548_1.jpg): No such file or directory /var/www/html/trackingnew/application/controllers/Truckstop.php 2061
+ERROR - 2017-03-10 12:43:24 --> Severity: Warning --> unlink(assets/uploads/documents/thumb_rateSheet/thumb_rateSheet_1489149704_1.jpg): No such file or directory /var/www/html/trackingnew/application/controllers/Truckstop.php 2061
+ERROR - 2017-03-10 12:48:07 --> Severity: Warning --> unlink(assets/uploads/documents/rateSheet/rateSheet_1489150058.pdf): No such file or directory /var/www/html/trackingnew/application/controllers/Truckstop.php 2058
+ERROR - 2017-03-10 12:48:07 --> Severity: Warning --> unlink(assets/uploads/documents/thumb_rateSheet/thumb_rateSheet_1489150058.jpg): No such file or directory /var/www/html/trackingnew/application/controllers/Truckstop.php 2061
+ERROR - 2017-03-10 12:52:15 --> Severity: Warning --> unlink(assets/uploads/documents/rateSheet/rateSheet_1489150087.pdf): No such file or directory /var/www/html/trackingnew/application/controllers/Truckstop.php 2059
+ERROR - 2017-03-10 12:52:15 --> Severity: Warning --> unlink(assets/uploads/documents/thumb_rateSheet/thumb_rateSheet_1489150087.jpg): No such file or directory /var/www/html/trackingnew/application/controllers/Truckstop.php 2062
+ERROR - 2017-03-10 12:53:32 --> Severity: Warning --> unlink(assets/uploads/documents/rateSheet/rateSheet_1489150335_1.pdf): No such file or directory /var/www/html/trackingnew/application/controllers/Truckstop.php 2059
+ERROR - 2017-03-10 12:56:42 --> Severity: Warning --> unlink(assets/uploads/documents/pod/pod_1489044399.png): No such file or directory /var/www/html/trackingnew/application/controllers/Truckstop.php 2058
+ERROR - 2017-03-10 12:56:42 --> Severity: Warning --> unlink(assets/uploads/documents/thumb_pod/thumb_pod_1489044399.jpg): No such file or directory /var/www/html/trackingnew/application/controllers/Truckstop.php 2061
+ERROR - 2017-03-10 18:50:04 --> 404 Page Not Found: %7B%7BdocContent%7D%7D/index
+ERROR - 2017-03-10 18:56:45 --> 404 Page Not Found: %7B%7BdocContent%7D%7D/index
+ERROR - 2017-03-10 19:10:22 --> 404 Page Not Found: %7B%7BdocContent%7D%7D/index

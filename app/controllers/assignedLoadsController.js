@@ -26,36 +26,14 @@ app.controller('assignedLoadsController', ["dataFactory","$scope","$http","$root
 
 	//----------drop-down ---------------------------	
 
-	$rootScope.editLoads = true;
-	$rootScope.matchingTrucks   = false;
-	$rootScope.showMaps  = false;
-	$rootScope.showhighlighted = 'loadDetail';
-	$scope.iClass = false;
-	$rootScope.save_cancel_div  = false;
-	$rootScope.save_edit_div = true;
-	$rootScope.showFormClass = true;
-	$scope.showPlusMinus = true;
-	$scope.canDocsShow = true;
-	$scope.callDynamicFn = false;
+	
 	$rootScope.Message = '';
 	$scope.siteURL = URL;
-	$scope.showSearchButtonText = false;
-	$scope.newSearchButtonShow = false;
-	$scope.showMatchingTrucks = false;
-	$scope.showNotCalculatedRecords = false;
-	$scope.showStartOver = false;
-	$scope.showRouteOnMap = false;
 	$scope.showGantt = false;
 	$scope.mindate = new Date();
 	
-	$rootScope.showHeader = true;
 	$rootScope.fetchnewsearch = false;
-	$rootScope.newIterationButtonShow = false;
-	$rootScope.showtdvalue = false;
-	$scope.iterationMultiStateCheck = false;
-	$scope.startOverSpin = false;
-	$scope.continueSpin = false;
-	$scope.search_label_show = false;
+	$rootScope.showHeader = true;
 	$scope.loadsData = [];
 	$scope.saveLoadsData = [];
 	$rootScope.tableTitle = [];
@@ -1102,17 +1080,6 @@ app.controller('assignedLoadsController', ["dataFactory","$scope","$http","$root
 	
 
 	//------------------------ Documents Upload ----------------------------------
-		$scope.signPdf = function(docid,loadid){
-			$scope.saveSign = false;
-			angular.element(".sign-error").hide();
-			angular.element(".sign-error-text").html('');
-			var signaturePad = $compile('<signature-pad accept="accept" clear="clear" height="220" width="568" dataurl="dataurl"></signature-pad>')($scope);
-			$("#signature-pad").html(signaturePad);
-			$("#signature-pad").data('id',docid);
-			$("#signature-pad").data('loadid',loadid);
-			$('#add-signature').modal('show');
-		}
-
 		$scope.printDoc = function($event){
 			angular.element('#print-me').remove();
 			var that = angular.element($event.currentTarget);
@@ -1185,16 +1152,3 @@ app.directive('timepicker', function() {
         }
     }
 });
-
-app.directive('onErrorSrc', function() {
-    return {
-        link: function(scope, element, attrs) {
-          element.bind('error', function() {
-            if (attrs.src != attrs.onErrorSrc) {
-              attrs.$set('src', attrs.onErrorSrc);
-            }
-          });
-        }
-    }
-});
-

@@ -87,6 +87,13 @@ class Dashboard extends CI_Controller {
 		$chartStack["type"] = $lPerformance;
 
 		$lPResult = empty($lPResult) ? array() : $lPResult; 
+		$totalInvoices	 	= 0;
+		$totalMiles  	    = 0;
+		$totalDeadMiles 	= 0;
+		$totalCharges 		= 0;
+		$totalProfit 		= 0;
+		$totalProfitPercent = 0;
+
 		foreach ($lPResult as $key => $value) {
 			switch ($lPerformance) {
 				case '_iall'		: array_push($chartStack["xaxis"], $value["dispatcher"]); 
@@ -129,9 +136,11 @@ class Dashboard extends CI_Controller {
 			/*$lPResult[$key]["invoice"]  = money_format('%.2n', (float)$value["invoice"]);
 			$lPResult[$key]["charges"]  = money_format('%.2n', (float)$value["charges"]);
 			$lPResult[$key]["profit"]  	= money_format('%.2n', (float)$value["profit"]);*/
-			$lPResult[$key]["invoice"]  = floatval($value["invoice"]);
-			$lPResult[$key]["charges"]  = floatval($value["charges"]);
-			$lPResult[$key]["profit"]  	= floatval($value["profit"]);
+			$lPResult[$key]["miles"]      = intval($value["miles"]);
+			$lPResult[$key]["deadmiles"]  = intval($value["deadmiles"]);
+			$lPResult[$key]["invoice"]    = floatval($value["invoice"]);
+			$lPResult[$key]["charges"]    = floatval($value["charges"]);
+			$lPResult[$key]["profit"]     = floatval($value["profit"]);
 			if(isset($value["profitPercent"]) ){
 				if($value["invoice"] > 0){
 					$lPResult[$key]["ppercent"]  = number_format((float)(($value["profit"]/$value["invoice"]) * 100),2);	
@@ -142,13 +151,23 @@ class Dashboard extends CI_Controller {
 			}else if(isset($value["overallTotalProfitPercent"])){
 				$lPResult[$key]["ppercent"] = number_format((float)$value["overallTotalProfitPercent"],2);
 			}
-			
+
+			$totalInvoices		 += $lPResult[$key]["invoice"];
+			$totalMiles 		 += $lPResult[$key]["miles"];
+			$totalDeadMiles		 += $lPResult[$key]["deadmiles"];
+			$totalCharges	     += $lPResult[$key]["charges"];
+			$totalProfit         += $lPResult[$key]["profit"];
 		}
+
 		$chartStack["trecords"] = $lPResult;
+		$totalProfitPercent = number_format((float)(($totalProfit / $totalInvoices) * 100),2);
+		$chartStack['totals']['totInvoices']      = $totalInvoices;
+		$chartStack['totals']['totMiles']         = $totalMiles;
+		$chartStack['totals']['totDeadMiles']     = $totalDeadMiles;
+		$chartStack['totals']['totCharges']       = $totalCharges;
+		$chartStack['totals']['totProfit']        = $totalProfit;
+		$chartStack['totals']['totProfitPercent'] = $totalProfitPercent;
 		
-
-
-
 		$vehicleInfo = $weatherNotFound = array();
 		$lat = $lng = '';
 		//--------------- Job Status ----------------
@@ -425,6 +444,13 @@ class Dashboard extends CI_Controller {
 		$chartStack["type"] = $lPerformance;
 
 		$lPResult = empty($lPResult) ? array() : $lPResult; 
+		$totalInvoices	 	= 0;
+		$totalMiles  	    = 0;
+		$totalDeadMiles 	= 0;
+		$totalCharges 		= 0;
+		$totalProfit 		= 0;
+		$totalProfitPercent = 0;
+
 		foreach ($lPResult as $key => $value) {
 			switch ($lPerformance) {
 				case '_iall'		: array_push($chartStack["xaxis"], $value["dispatcher"]); 
@@ -467,18 +493,32 @@ class Dashboard extends CI_Controller {
 			/*$lPResult[$key]["invoice"]  = money_format('%.2n', (float)$value["invoice"]);
 			$lPResult[$key]["charges"]  = money_format('%.2n', (float)$value["charges"]);
 			$lPResult[$key]["profit"]  	= money_format('%.2n', (float)$value["profit"]);*/
-
-			$lPResult[$key]["invoice"]  = floatval($value["invoice"]);
-			$lPResult[$key]["charges"]  = floatval($value["charges"]);
-			$lPResult[$key]["profit"]  	= floatval($value["profit"]);
+			$lPResult[$key]["miles"]      = intval($value["miles"]);
+			$lPResult[$key]["deadmiles"]  = intval($value["deadmiles"]);
+			$lPResult[$key]["invoice"] 	  = floatval($value["invoice"]);
+			$lPResult[$key]["charges"]    = floatval($value["charges"]);
+			$lPResult[$key]["profit"]  	  = floatval($value["profit"]);
 			if(isset($value["profitPercent"])){
 				$lPResult[$key]["ppercent"]  = number_format((float)(($value["profit"]/$value["invoice"]) * 100),2);
 			}else if(isset($value["overallTotalProfitPercent"])){
 				$lPResult[$key]["ppercent"] = number_format((float)$value["overallTotalProfitPercent"],2);
 			}
-			
+
+			$totalInvoices		 += $lPResult[$key]["invoice"];
+			$totalMiles 		 += $lPResult[$key]["miles"];
+			$totalDeadMiles		 += $lPResult[$key]["deadmiles"];
+			$totalCharges	     += $lPResult[$key]["charges"];
+			$totalProfit         += $lPResult[$key]["profit"];
 		}
+		
 		$chartStack["trecords"] = $lPResult;
+		$totalProfitPercent = number_format((float)(($totalProfit / $totalInvoices) * 100),2);
+		$chartStack['totals']['totInvoices']      = $totalInvoices;
+		$chartStack['totals']['totMiles']         = $totalMiles;
+		$chartStack['totals']['totDeadMiles']     = $totalDeadMiles;
+		$chartStack['totals']['totCharges']       = $totalCharges;
+		$chartStack['totals']['totProfit']        = $totalProfit;
+		$chartStack['totals']['totProfitPercent'] = $totalProfitPercent;
 
 		$vehicleInfo = $weatherNotFound = array();
 		$lat = $lng = '';

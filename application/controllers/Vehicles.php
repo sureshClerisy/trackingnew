@@ -218,7 +218,7 @@ class Vehicles extends Admin_Controller {
 			$status = false;
 		}
 		
-		$data['rows'] = $this->vehicle->get_row($vehicleId);
+		$data['rows'] = $this->vehicle->fetchSingleUpdatedRecord($vehicleId);
 		$vehicleTypeArray = array();
 		if ( $data['rows']['vehicle_type'] != '' ) {
 			$vehicleTypes = explode(',',$data['rows']['vehicle_type']);

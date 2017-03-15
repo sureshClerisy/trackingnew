@@ -4815,6 +4815,28 @@ float:left;width:100%;overflow:auto;
   position: absolute !important;
   top: 18px;
 }
+.col-xs-4.srpSearch {
+    float: left !important;margin-bottom:20px;
+}
+.small-heading-h2 > span {
+    line-height: 18px;
+    font-size: 14px;
+    color: #535353;
+    display: inline-block;
+    vertical-align: middle;
+    padding-right: 10px;
+    min-width: 100px;
+    max-width: 550px;
+}
+.commen-heading h2.small-heading-h2 {
+    text-transform: unset;
+    float: right;
+    border-bottom: 0; 
+}
+.fix-to-top {
+  position: fixed;
+  top: 0;
+}
 .srch-btn > label {
   color: #333;
 }
@@ -5604,6 +5626,7 @@ body .split-view .split-list .list-view-wrapper .item .inline.email-check-sub .s
 .no-record-found{ float: left; width: 100%; text-align: center; margin-top: 10px; font-size: 15px; margin-bottom: 0; }
 .print-listing li.view-loads, li.view-lcount {cursor: pointer;}
 .edit-text .Summary-heading.no-marign-top{margin-top:0px;}
+
 .table-input-head {
   float: left;
   padding-top: 11px;
@@ -5824,6 +5847,11 @@ margin:0px;
   background: #292929;
 }
 
+span.lode-arrow.DESC, span.lode-arrow.ASC { color: #06af8f;}
+th.sorting_desc, th.sorting_asc { color: #06af8f !important;}
+th a.sorted {color: #06af8f !important;}
+.srpPage th a span {color: #000 !important;}
+tr.bold-content td {  font-weight: bold !important;}
 @media (min-width:2000px)
 {
 .map-load-section .dataTables_wrapper.no-footer table thead tr th.billing-origin{
