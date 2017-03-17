@@ -10,38 +10,60 @@
                 <div class="panel panel-default" ng-repeat="(reportName, reports) in reportList">
                     <div class="panel-heading ac-heading" role="tab" id="headingOne">
                         <h4 class="ac-title panel-title">
-                        <a ng-class="{collapsed:!collapseOne}" ng-click="collapseOne=!collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                         <i class="fa fa-folder-open"></i> {{reportName}}
-                        </a>
-                      </h4>
-                    </div>
-                    <div class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne" ng-class="{in:collapseOne}" ng-repeat="report in reports">
-                        <div class="panel-body no-padding">
-                            <ul class="ac-li">
-                              <li ng-click="toggleReportOpen(report)">
-                                <div class="report-type">
-                                  <i class="fa fa-file-text"></i>
-                                  <h2>{{report.title}}</h2>
-                                  <p>{{report.context}}</p>
-                                </div>
-                              </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Report Filters -->
-            <div class="report-filter-section" ng-show="reportOpen"> 
-              <h2 ng-click="toggleReportOpen('back')"><i class="fa fa-arrow-left"></i> Back to report list</h2>
-              <div class="repf-title">
-                <h2>{{reportTitle}}</h2>
-                <p>{{reportContext}}</p>
+                            <a ng-class="{collapsed:!collapseOne}" ng-click="collapseOne=!collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                               <i class="fa fa-folder-open"></i> {{reportName}}
+                           </a>
+                       </h4>
+                   </div>
+                   <div class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne" ng-class="{in:collapseOne}" ng-repeat="report in reports">
+                    <div class="panel-body no-padding">
+                        <ul class="ac-li">
+                          <li ng-click="toggleReportOpen(report)">
+                            <div class="report-type">
+                              <i class="fa fa-file-text"></i>
+                              <h2>{{report.title}}</h2>
+                              <p>{{report.context}}</p>
+                          </div>
+                      </li>
+                  </ul>
               </div>
+<<<<<<< .mine
+          </div>
+      </div>
+  </div>
+  <!-- Report Filters -->
+  <div class="report-filter-section" ng-show="reportOpen"> 
+      <h2 ng-click="toggleReportOpen('back')"><i class="fa fa-arrow-left"></i> Back to report list</h2>
+      <div class="repf-title">
+        <h2>{{reportTitle}}</h2>
+        <p>{{reportContext}}</p>
+    </div>
+    <!-- Breadcrumb Detail Report Form Start-->
+    <form ng-show="report.name == 'breadcrumb_detail'"> 
+        <div class="report-filter">
+          <h2>Scope</h2>
+          <div class="drange-block">
+            <div class="data-range filter-range">
+              <span>Select Vehicles: </span>
+              <div class="date-wrapper">
+                <button type="button" ng-click="toggleSelectVehicles('none')" class="btn btn-info">Select None</button>
+                <button type="button" ng-click="toggleSelectVehicles('all')" class="btn btn-info">Select All</button>
+                <ui-select multiple ng-model="formFilter.vehicles" class="multiSelect multi-select" theme="select2" required>
+                  <ui-select-match class="ui-select-match" placeholder="Select vehicles...">{{$item.truck}}</ui-select-match>
+                  <ui-select-choices class="ui-select-choices" repeat="vehicle in vehicles | filter: $select.search">
+                      {{vehicle.truck}}
+                  </ui-select-choices>
+              </ui-select>
+          </div>
+      </div>
+  </div>
+</div>
+=======
               <!-- Breadcrumb Detail Report Form Start-->
               <form ng-show="report.name == 'breadcrumb_detail'"> 
                 <div class="report-filter">
                   <h2>Scope</h2>
-                  <div class="drange-block">
+                  <div class="drange-block" style="position:relative;z-index:999">
                     <div class="data-range filter-range">
                       <span>Select Vehicles: </span>
                       <div class="date-wrapper">
@@ -57,61 +79,64 @@
                     </div>
                   </div>
                 </div>
+>>>>>>> .r213
 
-                <div class="report-filter">
-                  <h2>Date Range</h2>
-                  <div class="drange-block">
-                    <div class="data-range">
-                      <span>Report On : </span>
-                      <select ng-model="formFilter.forDate" class=" report-for cs-select cs-skin-slide" cs-select ng-change="toggleCustomDate(formFilter.forDate)">
-                          <option value="today">Today</option>
-                          <option value="yesterday">Yesterday</option>
-                          <option value="custom">Custom Date</option>
-                      </select>
-                    </div>
-                    <div class="data-range" ng-show="showCustomDate">
-                      <span>&nbsp; </span>
-                      <div class="date-wrapper">
-                        <div class="input-group date"  ui-jq="datepicker" ui-options='{format: "yyyy-mm-dd"}'>
-                          <input type="text" ng-click = "refreshDatepicker($event)" ng-model="formFilter.customDate"  class="form-control" >
-                          <span class="input-group-addon align-icon"><i class="fa fa-calendar"></i></span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+<div class="report-filter">
+  <h2>Date Range</h2>
+  <div class="drange-block">
+    <div class="data-range">
+      <span>Report On : </span>
+      <select ng-model="formFilter.forDate" class=" report-for cs-select cs-skin-slide" cs-select ng-change="toggleCustomDate(formFilter.forDate)">
+          <option value="today">Today</option>
+          <option value="yesterday">Yesterday</option>
+          <option value="custom">Custom Date</option>
+      </select>
+  </div>
+  <div class="data-range" ng-show="showCustomDate">
+      <span>&nbsp; </span>
+      <div class="date-wrapper">
+          <div class="input-prepend input-group">
+           <span class="add-on input-group-addon"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i></span>
+           <input date-range-picker id="reportsBreadCrumDRPicker" placeholder="Select date range"  options="optsReportsBreadcrum" class="form-control date-picker customDateRange" type="text" ng-model="dateRangeValueBreadcrum" />
+       </div>
+   </div>
+</div>
+</div>
+</div>
 
 
-                <div class="report-filter">
-                  <h2>Filters and Options</h2>
-                  <div class="drange-block">
-                    <div class="data-range filter-range">
-                      <span>Filters On Status: </span>
-                      <div class="date-wrapper">
-                        <button type="button" ng-click="toggleSelectStatus('none',report.name)" class="btn btn-info">Select None</button>
-                        <button type="button" ng-click="toggleSelectStatus('all', report.name)" class="btn btn-info">Select All</button>
-                        <ui-select multiple ng-model="formFilter.vStatus" class="multiSelect multi-select" theme="select2" required>
-                          <ui-select-match class="ui-select-match" placeholder="Select status...">{{$item.label}}</ui-select-match>
-                            <ui-select-choices class="ui-select-choices" repeat="status in vStatus | filter: $select.search">
-                              {{status.label}}
-                            </ui-select-choices>
-                        </ui-select>
-                      </div>
-                    </div>
-                    <div class="checkbox check-success latlng-check "   >
-                      <input id = "includeLatLng" ng-model="formFilter.includeLatLong" type="checkbox">
-                      <label for="includeLatLng">Include Latitude/Longitude</label>
-                    </div>
-                  </div>
-                </div>
-                <div class="report-filter filter-action">
-                  <h2>Report Actions</h2>
-                  <button ng-click="generateReport(report)" ng-disable="isQueued" class="btn btn-success" type="button"><i class="fa fa-file"></i> <span class="bold">Generate</span>
-                    </button>
-<!--
-                  <button type="button" ng-disable="isQueued" ng-click="generateReport(report)" class="btn btn-success">Generate</button>
--->
-                  <!-- <button type="button" class="btn btn-danger">Save</button> -->
+<div class="report-filter">
+  <h2>Filters and Options</h2>
+  <div class="drange-block">
+    <div class="data-range filter-range">
+      <span>Filters On Status: </span>
+      <div class="date-wrapper">
+        <button type="button" ng-click="toggleSelectStatus('none',report.name)" class="btn btn-info">Select None</button>
+        <button type="button" ng-click="toggleSelectStatus('all', report.name)" class="btn btn-info">Select All</button>
+        <ui-select multiple ng-model="formFilter.vStatus" class="multiSelect multi-select" theme="select2" required>
+          <ui-select-match class="ui-select-match" placeholder="Select status...">{{$item.label}}</ui-select-match>
+          <ui-select-choices class="ui-select-choices" repeat="status in vStatus | filter: $select.search">
+              {{status.label}}
+          </ui-select-choices>
+      </ui-select>
+  </div>
+</div>
+<div class="checkbox check-success latlng-check "   >
+  <input id = "includeLatLng" ng-model="formFilter.includeLatLong" type="checkbox">
+  <label for="includeLatLng">Include Latitude/Longitude</label>
+</div>
+</div>
+</div>
+<div class="report-filter filter-action">
+  <h2>Report Actions</h2>
+  <button ng-click="generateReport(report)" ng-disable="isQueued" class="btn btn-success" type="button"><i class="fa fa-file"></i> <span class="bold">Generate</span>
+  </button>
+
+<<<<<<< .mine
+</div>
+</form>
+<!-- Breadcrumb Detail Report Form End -->
+=======
                 </div>
               </form>
               <!-- Breadcrumb Detail Report Form End -->
@@ -120,85 +145,341 @@
               <form ng-show="report.name == 'loads_performance'"> 
                 <div class="report-filter">
                   <h2>Scope</h2>
-                  <div class="drange-block">
-                    <div class="data-range filter-range">
-                      <span>Select Scope </span>
-                      <div class="date-wrapper">
-                        <div class="dashbord-select-dropdown">
-                          <ui-select class="mdrivers" ng-model="selectedScope" theme="bootstrap" on-select="onSelectVehicleCallback($item, $model);">
+                  <div class=" dat-sec-1 form-group form-group-default">
+					<label>select scope</label>
+					 <div class="dashbord-select-dropdown">
+					 <ui-select class="mdrivers" ng-model="selectedScope" theme="bootstrap" on-select="onSelectVehicleCallback($item, $model);">
                             <ui-select-match class="ui-select-match" placeholder="Select Scope">{{$select.selected.label == "_idispatcher" ? "Dispatcher : " + $select.selected.username : $select.selected.driverName}}</ui-select-match>
                             <ui-select-choices class="ui-select-choices" group-by="groupFind" repeat="item in vDriversList | propsFilter: {driverName: $select.search, username: $select.search}">
                               <span ng-bind-html="trustAsHtml((item.driverName | highlight: $select.search))"></span>
                             </ui-select-choices>
                           </ui-select> <!-- dashboard-select-dropdown -->
                         </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+					</div>
+                  
+                  
+               </div>
+>>>>>>> .r213
 
+<<<<<<< .mine
+<!-- Loads Performance Report Start -->
+<form ng-show="report.name == 'loads_performance'"> 
+    <div class="report-filter">
+      <h2>Scope</h2>
+      <div class="drange-block">
+        <div class="data-range filter-range">
+          <span>Select Scope </span>
+          <div class="date-wrapper">
+            <div class="dashbord-select-dropdown">
+              <ui-select class="mdrivers" ng-model="selectedScope" theme="bootstrap" on-select="onSelectVehicleCallback($item, $model);">
+                <ui-select-match class="ui-select-match" placeholder="Select Scope">{{$select.selected.label == "_idispatcher" ? "Dispatcher : " + $select.selected.username : $select.selected.driverName}}</ui-select-match>
+                <ui-select-choices class="ui-select-choices" group-by="groupFind" repeat="item in vDriversList | propsFilter: {driverName: $select.search, username: $select.search}">
+                  <span ng-bind-html="trustAsHtml((item.driverName | highlight: $select.search))"></span>
+              </ui-select-choices>
+          </ui-select> <!-- dashboard-select-dropdown -->
+      </div>
+  </div>
+</div>
+</div>
+</div>
+=======
                 <div class="report-filter">
                   <h2>Filters and Options</h2>
-                  <div class="drange-block">
-                    <div class="data-range filter-range">
-                      <span>Report Type: </span>
-                      <div class="date-wrapper">
+                  <div class=" dat-sec-1 form-group form-group-default">
+					<label>Report Type: </label>
+					 <div class="date-wrapper">
                         <select ng-model="formFilter.reportType" class=" report-for cs-select cs-skin-slide" cs-select >
                             <option value="individual">Individual</option>
                             <option value="performance">Performance</option>
                         </select>
                       </div>
-                    </div>
-                  </div>
+				 </div>
+                
                 </div>
-                <div class="report-filter filter-action">
-                  <h2>Report Actions</h2>
-                  <button type="button" ng-disable="isQueued" ng-click="generateReport(report)" class="btn btn-success">Generate</button>
-                  <!-- <button type="button" class="btn btn-danger">Save</button> -->
-                </div>
-             </form>
-            <!-- Loads Performance Report End -->
+>>>>>>> .r213
+
+<<<<<<< .mine
+<div class="report-filter">
+  <h2>Filters and Options</h2>
+  <div class="drange-block">
+    <div class="data-range filter-range">
+      <span>Report Type: </span>
+      <div class="date-wrapper">
+        <select ng-model="formFilter.reportType" class=" report-for cs-select cs-skin-slide" cs-select >
+            <option value="individual">Individual</option>
+            <option value="performance">Performance</option>
+        </select>
+    </div>
+</div>
+</div>
+</div>
+
+<div class="report-filter">
+    <h2>Date Range Picker</h2>
+    <div class="drange-block">
+        <div class="data-range filter-range">
+            <span>Date Range: </span>
+            <div class="date-wrapper">
+              <div class="input-prepend input-group">
+               <span class="add-on input-group-addon"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i></span>
+               <input date-range-picker id="reportsDRPicker" placeholder="Select date range"  options="opts" class="form-control date-picker customDateRange" type="text" ng-model="dateRangeValue" />
+           </div>
+       </div>
+   </div>
+</div>
+</div>
+
+<div class="report-filter filter-action">
+  <h2>Report Actions</h2>
+  <button type="button" ng-disable="isQueued" ng-click="generateReport(report)" class="btn btn-success">Generate</button>
+  <!-- <button type="button" class="btn btn-danger">Save</button> -->
+</div>
+</form>
+<!-- Loads Performance Report End -->
 
 
 
 
-              <!-- Report Filters -->
-            </div>
-            <!-- Report Filters end-->
-          </div>
-        </div>
-        <div class="col-sm-8 col-lg-9 col-md-8 no-padding">
-          <div class="padding-15 report-right" ng-show="noFilterYet">
-          </div>
-          <div class="col-middle loader-outer" ng-show="isQueued">
-            <!-- START PANEL -->
-            <div class="loader-inner">
-              <div class="full-height">
-                <div class="panel-body text-center">
-                  <img class="image-responsive-height demo-mw-50" src="assets/img/demo/progress.svg" alt="Progress">
-                </div>
+<!-- Report Filters -->
+</div>
+<!-- Report Filters end-->
+</div>
+</div>
+<div class="col-sm-8 col-lg-9 col-md-8 no-padding">
+  <div class="padding-15 report-right" ng-show="noFilterYet">
+  </div>
+  <div class="col-middle loader-outer" ng-show="isQueued">
+    <!-- START PANEL -->
+    <div class="loader-inner">
+      <div class="full-height">
+        <div class="panel-body text-center">
+          <img class="image-responsive-height demo-mw-50" src="assets/img/demo/progress.svg" alt="Progress">
+      </div>
+  </div>
+</div>
+<!-- END PANEL -->
+</div>
+<div class="padding-15 report-right remove-bkg" ng-show="filteredResults" >
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse  report-header" id="sub-nav">
+        <div class="row">
+            <div class="col-sm-12 col-md-6 col-lg-8">
+                <div class="report-thead">
+                  <h2>{{reportTitle}}</h2>
+                  <p>{{reportContext}}</p>
               </div>
-            </div>
-            <!-- END PANEL -->
+              <ul class="nav navbar-nav navbar-center">
+
+              </ul>
           </div>
+          <div class="col-sm-12 col-md-6 col-lg-4">
+            <ul class="nav navbar-nav navbar-right">
+                <li style="margin-right: 40px; border-right: 1px solid #dedede;" ng-if="showLoadWOPagination == true">
+                    <div class="srpSearch1" style="margin-right:25px;">
+                        <input type="text" class="form-control" ng-model="searchFilter" placeholder="search" ng-model-options="{ updateOn: 'default blur', debounce: { default: 300, blur: 0 } }" ng-change="callSearchFilter(searchFilter);" />
+                    </div>
+=======
+                <div class="report-filter">
+                    <h2>Date Range Picker</h2>
+                     <div class=" dat-sec-1 form-group form-group-default">
+						<label>Report Type: </label>
+						<div class="date-wrapper">
+						  <div class="input-prepend input-group">
+							 <span class="add-on input-group-addon"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i></span>
+							 <input date-range-picker id="reportsDRPicker" placeholder="Select date range"  options="opts" class="form-control date-picker customDateRange" type="text" ng-model="dateRangeValue" />
+						  </div>
+						</div>
+						
+					 </div>
+                  
+>>>>>>> .r213
+                </li>
+                <li><a href=""  ng-click="exportToHTML(report,true)"  ><i class="fa fa-print " ui-jq="tooltip" title="Print"></i></a>
+                </li>
+                <li>
+                    <a href=""   ng-click="exportToPDF(report)" class="p-r-10">
+                       <img ui-jq="tooltip" title="Export as PDF" alt="" class="icon-pdf" ui-jq="unveil" data-src-retina="assets/img/invoice/pdf2x.png" data-src="assets/img/invoice/pdf.png" src="assets/img/invoice/pdf.png" width="25" height="25">
+                   </a>
+               </li>
+               <li>
+                <a href=""  ng-click="exportToHTML(report,false)"  class="p-r-10">
+                   <img ui-jq="tooltip" title="View as HTML" alt="" class="icon-image" ui-jq="unveil" data-src-retina="assets/img/invoice/image2x.png" data-src="assets/img/invoice/image.png" src="assets/img/invoice/image.png" width="25" height="25">
+               </a>
+           </li>
+           <li>
+            <a href=""  ng-click="exportToCSV(report)" class="p-r-10">
+               <img title="Export as CSV"  alt="" ui-jq="tooltip" class="icon-doc" ui-jq="unveil" data-src-retina="assets/img/invoice/doc2x.png" data-src="assets/img/invoice/doc.png" src="assets/img/invoice/doc.png" width="25" height="25">
+           </a>
+       </li>
+   </ul>
+</div>
+</div>
+<!-- /.navbar-collapse -->
+</div>
+<div class="loadtable rtable" id="report-table" ng-if="showLoadWOPagination == false">
+  <div class="table-scroll-custom">
+    <table width="100%" class=" report-table fixed-thead table table-striped" cell-padding="0" cell-spacing="0" ng-show="report.name == 'breadcrumb_detail'">
+      <thead>
+        <tr>
+          <th>
+            <a href="javascript:void(0)" ng-click="sortType = 'label'; sortReverse = !sortReverse"> Vehicle ID </a>
+            <span ng-show="sortType == 'label' && !sortReverse" class="fa fa-caret-down"></span>
+            <span ng-show="sortType == 'label' && sortReverse" class="fa fa-caret-up"></span>
+        </th>
+        <th>
+            <a href="javascript:void(0)" ng-click="sortType = 'deviceID'; sortReverse = !sortReverse"> Truck No </a>
+            <span ng-show="sortType == 'deviceID' && !sortReverse" class="fa fa-caret-down"></span>
+            <span ng-show="sortType == 'deviceID' && sortReverse" class="fa fa-caret-up"></span>
+        </th>
+        <th>
+            <a href="javascript:void(0)" ng-click="sortType = 'driverName'; sortReverse = !sortReverse"> Driver Name </a>
+            <span ng-show="sortType == 'driverName' && !sortReverse" class="fa fa-caret-down"></span>
+            <span ng-show="sortType == 'driverName' && sortReverse" class="fa fa-caret-up"></span>
+        </th>
+        <th>
+            <a href="javascript:void(0)" ng-click="sortType = 'GMTTime'; sortReverse = !sortReverse"> Timestamp </a>
+            <span ng-show="sortType == 'GMTTime' && !sortReverse" class="fa fa-caret-down"></span>
+            <span ng-show="sortType == 'GMTTime' && sortReverse" class="fa fa-caret-up"></span>
+        </th>
+        <th>
+            <a href="javascript:void(0)" ng-click="sortType = 'eventType'; sortReverse = !sortReverse"> Event  </a>
+            <span ng-show="sortType == 'eventType' && !sortReverse" class="fa fa-caret-down"></span>
+            <span ng-show="sortType == 'eventType' && sortReverse" class="fa fa-caret-up"></span>
+        </th>
+        <th ng-show="formFilter.includeLatLong">
+            <a href="javascript:void(0)" ng-click="sortType = 'latitude'; sortReverse = !sortReverse"> Latitude </a>
+            <span ng-show="sortType == 'latitude' && !sortReverse" class="fa fa-caret-down"></span>
+            <span ng-show="sortType == 'latitude' && sortReverse" class="fa fa-caret-up"></span>
+        </th>
+        <th ng-show="formFilter.includeLatLong">
+            <a href="javascript:void(0)" ng-click="sortType = 'longitude'; sortReverse = !sortReverse"> Longitude </a>
+            <span ng-show="sortType == 'longitude' && !sortReverse" class="fa fa-caret-down"></span>
+            <span ng-show="sortType == 'longitude' && sortReverse" class="fa fa-caret-up"></span>
+        </th>
+        <th>
+            <a href="javascript:void(0)" ng-click="sortType = 'location'; sortReverse = !sortReverse"> Location </a>
+            <span ng-show="sortType == 'location' && !sortReverse" class="fa fa-caret-down"></span>
+            <span ng-show="sortType == 'location' && sortReverse" class="fa fa-caret-up"></span>
+        </th>
+        <th>
+            <a href="javascript:void(0)" ng-click="sortType = 'vehicleSpeed'; sortReverse = !sortReverse"> Speed (MPH) </a>
+            <span ng-show="sortType == 'vehicleSpeed' && !sortReverse" class="fa fa-caret-down"></span>
+            <span ng-show="sortType == 'vehicleSpeed' && sortReverse" class="fa fa-caret-up"></span>
+        </th><th>
+        <a href="javascript:void(0)" ng-click="sortType = 'odometer'; sortReverse = !sortReverse"> Odometer (Mi) </a>
+        <span ng-show="sortType == 'odometer' && !sortReverse" class="fa fa-caret-down"></span>
+        <span ng-show="sortType == 'odometer' && sortReverse" class="fa fa-caret-up"></span>
+    </th>
+
+</tr>
+</thead>
+<tbody>
+    <tr dir-paginate="row in records | orderBy:sortType:sortReverse | itemsPerPage:50">
+      <td>{{row.deviceID}}</td>
+      <td>{{row.label}}</td>
+      <td>{{row.driverName}}</td>
+      <td>{{row.GMTTime}}</td>
+      <td>{{row.eventType}}<span ng-show="{{row.eventType == 'MOVING'}}"> {{row.hdirection}}:{{row.vehicleSpeed}}mph</span></td>
+      <td ng-show="formFilter.includeLatLong">{{row.latitude}}</td>
+      <td ng-show="formFilter.includeLatLong">{{row.longitude}}</td>
+      <td>{{row.location}}</td>
+      <td>{{row.vehicleSpeed}}</td>
+      <td>{{row.odometer}}</td>
+  </tr>
+  <tr ng-show="noRecords">
+      <td colspan="8">There is no record for seletect filters</td>
+  </tr>
+</tbody>
+</table>
+
+
+
+<table width="100%" class=" report-table fixed-thead table table-striped" cell-padding="0" cell-spacing="0" ng-show="report.name == 'loads_performance'">
+  <thead>
+    <tr class="{{formFilter.reportType}}">
+      <th class="{{formFilter.reportType+'_'+$index}}" ng-repeat="(class,heading) in columnMappings">
+        <a href="javascript:void(0)" > {{heading}} </a>
+    </th>
+</tr>
+</thead>
+<tbody>
+    <tr class="{{formFilter.reportType}}" dir-paginate="row in lpRecords | itemsPerPage:50">
+      <td class="{{formFilter.reportType+'_'+$index}}" ng-repeat= "(k,cols) in row">
+          <div> {{cols}} {{ k == "overallTotalProfitPercent" ? "%" : ""}}</div>
+      </td>
+
+
+  </tr>
+
+  <tr ng-if="showTotals == true" class="tr-bold">
+    <td>Total</td>
+    <td ng-if="showSecondTd == true"> </td>
+
+    <td ng-class="showSecondTd == true  ? 'text-center-td' : ''">{{overAllTotal.totInvoices}}</td>
+    <td class="text-center-td">{{overAllTotal.totCharges}}</td>
+    <td class="text-center-td">{{overAllTotal.totMiles}}</td>
+    <td class="text-center-td">{{overAllTotal.totDeadMiles}}</td>
+    <td class="text-center-td">{{overAllTotal.totProfit}}</td>
+    <td class="text-center-td">{{overAllTotal.totProfitPercent}}</td>
+
+</tr>
+<tr ng-show="noRecords">
+  <td colspan="8">There is no record for seletect filters</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+<div class="dataTables_wrapper">
+    <div class="dataTables_paginate">
+    <dir-pagination-controls template-url = "./assets/templates/dirPagination.html" on-page-change = "breadcrumbPageChanged(newPageNumber,itemsOnPage)" direction-links="true" undary-links="true"></dir-pagination-controls>  12345656
+  </div>
+  <div id="downloadLink"></div>
+</div>
+
+</div>
+
+<div class="loadtable rtable" ng-if="showLoadWOPagination == true">
+    <div class="table-scroll-custom">
+
+     <div class="table-structure-main-block tb-my">
+      <div class="table-res-1" >
+        <div class="table-row-main1 tb-head">
+
+            <div class="tb-cell ld-id stype" ng-click="sortCustom('id', idSortType)"> 
+              <span class="lode-arrow {{idSortType}}">{{ languageCommonVariables.popupLoadId }}</span>
+          </div>
+
+          <div class="tb-cell pickup stype" ng-click="sortCustom('dispatcher', dispatcherSortType)"> 
+              <span class="lode-arrow {{dispatcherSortType}}">Dispatcher</span>
+          </div>
+
+          <div class="tb-cell delivery stype" ng-click="sortCustom('driver', driverSortType)"> 
+              <span class="lode-arrow {{driverSortType}}">{{ languageCommonVariables.driver }}</span>
+          </div>
+<<<<<<< .mine
+=======
           <div class="padding-15 report-right remove-bkg" ng-show="filteredResults" >
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse  report-header" id="sub-nav">
                 <div class="row">
-                    <div class="col-sm-12 col-md-6 col-lg-8">
+                    <div class="col-sm-12 col-md-12 col-lg-4">
                         <div class="report-thead">
                           <h2>{{reportTitle}}</h2>
                           <p>{{reportContext}}</p>
                         </div>
                         <ul class="nav navbar-nav navbar-center">
-                            
-                            <!-- <li><a href="" data-toggle="tooltip" data-placement="bottom" title="Download"><i class="fa fa-download"></i></a>
-                            </li> -->
+                           
                         </ul>
                     </div>
-                    <div class="col-sm-12 col-md-6 col-lg-4">
+                    <div class="col-sm-12 col-md-12 col-lg-8">
                         <ul class="nav navbar-nav navbar-right">
-                            <li style="margin-right: 40px; border-right: 1px solid #dedede;"><a href=""  ng-click="exportToHTML(report,true)"  ><i class="fa fa-print " ui-jq="tooltip" title="Print"></i></a>
+                        <li style="margin-right: 25px; border-right: 1px solid #dedede;" ng-if="showLoadWOPagination == true">
+                            <div class="srpSearch1" style="margin-right:25px;">
+                            <input type="text" class="form-control" ng-model="searchFilter" placeholder="search" ng-model-options="{ updateOn: 'default blur', debounce: { default: 300, blur: 0 } }" ng-change="callSearchFilter(searchFilter);" />
+                          </div>
+                        </li>
+                            <li><a href=""  ng-click="exportToHTML(report,true)"  ><i class="fa fa-print " ui-jq="tooltip" title="Print"></i></a>
                             </li>
                             <li>
                                 <a href=""   ng-click="exportToPDF(report)" class="p-r-10">
@@ -220,9 +501,12 @@
                 </div>
                 <!-- /.navbar-collapse -->
             </div>
-            <div class="loadtable rtable" id="report-table">
+            <div class="loadtable rtable" id="report-table" ng-if="showLoadWOPagination == false">
               <div class="table-scroll-custom">
-                <table width="100%" class=" report-table fixed-thead table table-striped" cell-padding="0" cell-spacing="0" ng-show="report.name == 'breadcrumb_detail'">
+                <table width="100%" class=" report-table fixed-thead table table-striped" cell-padding="0" cell-spacing="0" ng-show="report.name == 'breadcrumb_detail'" style="
+    z-index: 999;
+    position: relative;
+">
                   <thead>
                     <tr>
                       <th>
@@ -274,30 +558,21 @@
                         <span ng-show="sortType == 'odometer' && !sortReverse" class="fa fa-caret-down"></span>
                         <span ng-show="sortType == 'odometer' && sortReverse" class="fa fa-caret-up"></span>
                       </th>
+>>>>>>> .r213
 
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr dir-paginate="row in records | orderBy:sortType:sortReverse | itemsPerPage:50">
-                      <td>{{row.deviceID}}</td>
-                      <td>{{row.label}}</td>
-                      <td>{{row.driverName}}</td>
-                      <td>{{row.GMTTime}}</td>
-                      <td>{{row.eventType}}<span ng-show="{{row.eventType == 'MOVING'}}"> {{row.hdirection}}:{{row.vehicleSpeed}}mph</span></td>
-                      <td ng-show="formFilter.includeLatLong">{{row.latitude}}</td>
-                      <td ng-show="formFilter.includeLatLong">{{row.longitude}}</td>
-                      <td>{{row.location}}</td>
-                      <td>{{row.vehicleSpeed}}</td>
-                      <td>{{row.odometer}}</td>
-                    </tr>
-                    <tr ng-show="noRecords">
-                      <td colspan="8">There is no record for seletect filters</td>
-                    </tr>
-                  </tbody>
-                </table>
+          <div class="tb-cell Origin stype" ng-click="sortCustom('broker', brokerSortType)"> 
+              <span class="lode-arrow {{brokerSortType}}">Broker</span>
+          </div>
 
-                
+          <div class="tb-cell Invoice-No stype" ng-click="sortCustom('PaymentAmount', paymentAmountSortType)" >
+              <span class="lode-arrow {{paymentAmountSortType}}">INVOICED</span>
+          </div>
 
+<<<<<<< .mine
+          <div class="tb-cell Invoice-No stype" ng-click="sortCustom('totalCost', totalCostSortType)" >
+              <span class="lode-arrow {{totalCostSortType}}">CHARGES</span>
+          </div>
+=======
                 <table width="100%" class=" report-table fixed-thead table table-striped" cell-padding="0" cell-spacing="0" ng-show="report.name == 'loads_performance'">
                   <thead>
                     <tr class="{{formFilter.reportType}}">
@@ -311,26 +586,21 @@
                       <td class="{{formFilter.reportType+'_'+$index}}" ng-repeat= "(k,cols) in row">
                           <div> {{cols}} {{ k == "overallTotalProfitPercent" ? "%" : ""}}</div>
                       </td>
-                      <!-- <td colspan="{{tCols}}">
-                        <h2><span>Dispatcher : </span>{{dname}}</h2>
-                        <table>
-                          <tr ng-repeat="(driver, driverList) in dlist">
-                            <td colspan="{{tCols}}">
-                              <h3><span>Driver : </span>{{driver}}</h3>
-                              <table>
-                                  <tr class="{{formFilter.reportType}}" ng-repeat="row in driverList">
-                                    <td class="fixw_{{$index}}" ng-repeat= "cols in row">
-                                        {{cols}}
-                                    </td>
-                                  </tr>
-                              </table>
-                            </td>
-                          </tr>
-                        </table>
-                      </td> -->
-
+                    
                       
+                    </tr>
+                   
+                    <tr ng-if="showTotals == true" class="tr-bold">
+                        <td>Total</td>
+                        <td ng-if="showSecondTd == true"> </td>
                       
+                        <td ng-class="showSecondTd == true  ? 'text-center-td' : ''">{{overAllTotal.totInvoices}}</td>
+                        <td class="text-center-td">{{overAllTotal.totCharges}}</td>
+                        <td class="text-center-td">{{overAllTotal.totMiles}}</td>
+                        <td class="text-center-td">{{overAllTotal.totDeadMiles}}</td>
+                        <td class="text-center-td">{{overAllTotal.totProfit}}</td>
+                        <td class="text-center-td">{{overAllTotal.totProfitPercent}}</td>
+                        
                     </tr>
                     <tr ng-show="noRecords">
                       <td colspan="8">There is no record for seletect filters</td>
@@ -341,16 +611,197 @@
               </div>
               <div class="dataTables_wrapper">
                 <div class="dataTables_paginate">
-                  <dir-pagination-controls template-url="./assets/templates/dirPagination.html" on-page-change="pageChanged(newPageNumber,itemsOnPage)" direction-links="true" undary-links="true"></dir-pagination-controls>  
+                  <dir-pagination-controls template-url="./assets/templates/dirPagination.html" on-page-change="pageChangeddd(newPageNumber,itemsOnPage)" direction-links="true" undary-links="true"></dir-pagination-controls>  
                 </div>
                 <div id="downloadLink"></div>
               </div>
               
             </div>
+      
+          <div class="loadtable rtable" ng-if="showLoadWOPagination == true">
+            <div class="table-scroll-custom">
+               
+               <div class="table-structure-main-block tb-my">
+                  <div class="table-res-1" >
+                    <div class="table-row-main1 tb-head">
+                      
+                        <div class="tb-cell ld-id stype" ng-click="sortCustom('id', idSortType)"> 
+                          <span class="lode-arrow {{idSortType}}">{{ languageCommonVariables.popupLoadId }}</span>
+                        </div>
+                      
+                        <div class="tb-cell pickup stype" ng-click="sortCustom('dispatcher', dispatcherSortType)"> 
+                          <span class="lode-arrow {{dispatcherSortType}}">Dispatcher</span>
+                        </div>
+>>>>>>> .r213
+
+          <div class="tb-cell Invoice-No stype" ng-click="sortCustom('overallTotalProfit', overallTotalProfitSortType)" >
+              <span class="lode-arrow {{overallTotalProfitSortType}}">{{ languageCommonVariables.planthprofit }}</span>
           </div>
-        </div> <!-- col-sm-9 -->
+
+          <div class="tb-cell Invoice-No stype" ng-click="sortCustom('overallTotalProfitPercent', overallTotalProfitPercentSortType)" >
+              <span class="lode-arrow {{overallTotalProfitPercentSortType}}"> Profit %</span>
+          </div>
+
+          <div class="tb-cell miles stype" ng-click="sortCustom('Mileage', MileageSortType)"> 
+              <span class="lode-arrow {{MileageSortType}}">Miles</span>
+          </div>
+
+          <div class="tb-cell d-miles stype" ng-click="sortCustom('deadmiles', deadmilesSortType)"> 
+              <span class="lode-arrow {{deadmilesSortType}}">Deadmiles</span>
+          </div>
+
+          <div class="tb-cell ppm stype" ng-click="sortCustom('rpm', RpmSortType)"> 
+              <span class="lode-arrow {{RpmSortType}}">RPM</span>
+          </div>
+
+          <div class="tb-cell st stype" ng-click="sortCustom('PickupDate', pickupDateSortType)"> 
+              <span class="lode-arrow {{pickupDateSortType}}">Pickup </span>
+          </div>
+
+          <div class="tb-cell st stype" ng-click="sortCustom('OriginState', OriginCitySortType)"> 
+              <span class="lode-arrow {{OriginCitySortType}}">Origin</span>
+          </div>
+
+          <div class="tb-cell st stype" ng-click="sortCustom('OriginState', OriginStateSortType)"> 
+              <span class="lode-arrow {{OriginStateSortType}}">ST</span>
+          </div>
+
+          <div class="tb-cell Destination stype" ng-click="sortCustom('DeliveryDate', DeliveryDateSortType)">
+              <span class="lode-arrow {{DeliveryDateSortType}}">Del Date</span>
+          </div>
+
+          <div class="tb-cell st1 stype" ng-click="sortCustom('DestinationCity', DestinationCitySortType)">
+              <span class="lode-arrow {{DestinationCitySortType}}">Delivery</span>
+          </div>
+
+          <div class="tb-cell st1 stype" ng-click="sortCustom('DestinationState', DestinationStateSortType)">
+              <span class="lode-arrow {{DestinationStateSortType}}">ST</span>
+          </div>
       </div>
-    </div>
+
+      <div class="table-row-main1 tb-body" dir-paginate="value in loadsListing | itemsPerPage: 20"  total-items="loadsCount" current-page="currentPage" pagination-id="reportsPage" >
+
+          <div class="tb-cell ld-id"> 
+              <span> <div class="plus-1" ng-click="$event.stopPropagation();toggleRow($event,$index);"></div>{{ value.loadid }}</span>
+          </div>
+          <div class="tb-cell Origin"> <span>{{ value.dispatcher}}</span></div>
+          <div class="tb-cell Origin"> <span>{{ value.driver}}</span></div>
+          <div class="tb-cell Origin"> <span>{{ value.broker}}</span></div>
+          <div class="tb-cell payment "> <span>{{ value.invoice | currency:"$":2 }}</span></div>
+          <div class="tb-cell payment "> <span>{{ value.charges | currency:"$":2 }}</span></div>
+          <div class="tb-cell payment "> <span>{{ value.profit | currency:"$":2 }}</span></div>
+          <div class="tb-cell Origin"> <span>{{ value.overallTotalProfitPercent}}</span></div>
+          <div class="tb-cell Origin"> <span>{{ value.miles}}</span></div>
+          <div class="tb-cell Origin"> <span>{{ value.deadmiles}}</span></div>
+          <div class="tb-cell ppm "> <span>{{ value.miles != 0 ? (value.invoice / value.miles | currency:"$":2) : '' }}</span>
+          </div>
+          <div class="tb-cell pickup"> <span>{{ (value.PickupDate != '0000-00-00' && value.PickupDate != '' ) ? value.PickupDate : ''}}</span>
+          </div>
+          <div class="tb-cell Origin"> <span>{{ value.OriginCity|capitalize}}</span></div>
+          <div class="tb-cell Origin"> <span>{{ value.OriginState|uppercase}}</span></div>
+          <div class="tb-cell delivery"> <span>{{ (value.DeliveryDate != '0000-00-00' && value.DeliveryDate != '' ) ? value.DeliveryDate : ''}}</span>
+          </div>
+          <div class="tb-cell Origin"> <span>{{ value.DestinationCity|capitalize}}</span></div>
+          <div class="tb-cell Origin"> <span>{{ value.DestinationState|uppercase}}</span></div>
+
+          <!--open-block-->
+          <div class="open-block" id="hblock{{$index}}" style="display:none"> 
+            <div class="tb-cell ld-id">
+              <span> 
+                <div class="heading"> LoadId  <b>:</b></div>
+                <div class="value">{{ value.loadid }} </div>
+            </span>
+        </div>
+
+        <div class="tb-cell Driver  ">
+          <span><div class="heading"> Dispatcher <b>:</b></div><div class="value">{{ value.dispatcher }} </div></span>
+      </div>
+
+      <div class="tb-cell Driver  ">
+          <span><div class="heading"> Driver <b>:</b></div><div class="value">{{ value.driver }} </div></span>
+      </div>
+
+      <div class="tb-cell Driver  ">
+          <span><div class="heading"> broker <b>:</b></div><div class="value">{{ value.broker }} </div></span>
+      </div>
+
+      <div class="tb-cell payment ">
+          <span><div class="heading">Amount Inv<b>:</b></div><div class="value">{{ value.invoice | currency:"$":2 }}</div></span>
+      </div>
+
+      <div class="tb-cell payment ">
+          <span><div class="heading">Total Charges<b>:</b></div><div class="value">{{ value.charges | currency:"$":2 }}</div></span>
+      </div>
+
+      <div class="tb-cell payment ">
+          <span><div class="heading">Profit<b>:</b></div><div class="value">{{ value.profit | currency:"$":2 }}</div></span>
+      </div>
+
+      <div class="tb-cell Driver  ">
+          <span><div class="heading"> Profit Percent <b>:</b></div><div class="value">{{ value.overallTotalProfitPercent }} </div></span>
+      </div>
+
+      <div class="tb-cell Driver  ">
+          <span><div class="heading"> Miles <b>:</b></div><div class="value">{{ value.miles }} </div></span>
+      </div>
+
+      <div class="tb-cell Driver  ">
+          <span><div class="heading"> DeadMiles <b>:</b></div><div class="value">{{ value.deadmiles }} </div></span>
+      </div>
+
+      <div class="tb-cell ppm ">
+          <span><div class="heading">RPM<b>:</b></div><div class="value">{{ value.miles != 0 ? (value.invoice / value.miles | currency:"$":2) : '' }}</div></span>
+      </div>
+
+      <div class="tb-cell pickup">
+          <span><div class="heading">Pickup <b>:</b></div><div class="value">{{ (value.PickupDate != '0000-00-00' && value.PickupDate != '' ) ? value.PickupDate : ''}}</div></span>
+      </div>
+
+      <div class="tb-cell Origin">
+          <span><div class="heading">Origin <b>:</b></div><div class="value">{{ value.OriginCity|capitalize}}</div></span>
+      </div>
+
+      <div class="tb-cell Origin">
+          <span><div class="heading">ST <b>:</b></div><div class="value">{{ value.OriginState|capitalize}}</div></span>
+      </div>
+
+      <div class="tb-cell delivery">
+          <span><div class="heading">Del Date<b>:</b></div><div class="value">{{ (value.DeliveryDate != '0000-00-00' && value.DeliveryDate != '' ) ? value.DeliveryDate : ''}}</div></span>
+      </div>
+
+      <div class="tb-cell Destination ">
+          <span><div class="heading"> Destination <b>:</b></div><div class="value">{{ value.DestinationCity|capitalize}}</div></span>
+      </div>
+
+      <div class="tb-cell Destination ">
+          <span><div class="heading"> ST <b>:</b></div><div class="value">{{ value.DestinationState|uppercase}}</div></span>
+      </div>
+
   </div>
+  <!--open-block-->
+</div>
+<div ng-show="haveRecords" class="no-record-found">Oops! No record found</div>
+
+<<<<<<< .mine
+</div>
+</div><!-- table-structure-main-block -->
+
+</div>
+<div class="dataTables_wrapper">
+    <div class="dataTables_paginate">
+     <dir-pagination-controls template-url="./assets/templates/dirPagination.html" on-page-change="pageChanged(newPageNumber)" pagination-id="reportsPage"  direction-links="true" undary-links="true"></dir-pagination-controls> 
+ </div>
 </div>
 
+
+</div>
+
+</div> <!-- col-sm-9 -->
+</div>
+</div>
+</div>
+</div>
+
+=======
+<ng-include src="'./assets/templates/truckstop/modals.html'"></ng-include>
+>>>>>>> .r213

@@ -66,7 +66,7 @@
 							<ul class="no-padding">
 								<li ng-repeat="value in SendLoads track by value.id" class="item padding-15" ng-click="showLoad(value.id,$index)" ng-class="{selectedLi: $index == selectedIndex}"> 
 									<div class="thumbnail-wrapper d32 circular bordered {{item.color}}"> 
-										<img width="40" height="40" alt="" ng-src="./assets/uploads/drivers/thumbnail/{{value.profile_image}}" on-error-src="./pages/img/user.png" />
+										<img width="40" height="40" alt="" ng-src="./assets/uploads/drivers/thumbnail/{{value.profile_image}}" fallback-src="./pages/img/user.png" />
 									</div> 
 									
 									<div class="checkbox  no-margin p-l-10"> 
@@ -123,10 +123,10 @@
 												<h3 class="company-heading">
 													<span>{{ languageArray.popuploaddetails }}</span>
 													<div class="pdf-cover" ng-if="showLoadDetail.doc_name != ''" ng-click="perviewDocBilling(showLoadDetail.doc_type,showLoadDetail.doc_name,showLoadDetail.documentID)">
-														<img ui-jq="tooltip" title="Preview Bundle Document" ng-src="assets/uploads/documents/thumb_bundle/{{showLoadDetail.thumbBundle}}" on-error-src="pages/img/pdf.png" />
+														<img ui-jq="tooltip" title="Preview Bundle Document" ng-src="assets/uploads/documents/thumb_bundle/{{showLoadDetail.thumbBundle}}" fallback-src="pages/img/pdf.png" />
 													</div>
 													<div class="pdf-cover" ng-if="showLoadDetail.doc_name == ''" >
-														<img ui-jq="tooltip" title="Preview Bundle Document" ng-src="assets/uploads/documents/thumb_bundle/{{showLoadDetail.thumbBundle}}" on-error-src="pages/img/pdf.png" />
+														<img ui-jq="tooltip" title="Preview Bundle Document" ng-src="assets/uploads/documents/thumb_bundle/{{showLoadDetail.thumbBundle}}" fallback-src="pages/img/pdf.png" />
 													</div>
 												</h3>
 												<div class="row">

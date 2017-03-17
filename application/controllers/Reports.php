@@ -8,6 +8,7 @@
 class Reports extends Admin_Controller{
 
 	public $userId;
+	private $paginationLimit = 5;
 	
 	function __construct(){
 		parent::__construct();
@@ -20,10 +21,11 @@ class Reports extends Admin_Controller{
 		$vehicles = $this->Report->getAllVehicles();
 
 		//List of all dispatchers with their drivers
-		$allVehicles = $this->Driver->getDriversList(false,false,true);
-		$teamList = $this->Driver->getDriversListAsTeam(false,false,true);
+		$allVehicles 	= $this->Driver->getDriversList(false,false,true);
+		$teamList 		= $this->Driver->getDriversListAsTeam(false,false,true);
 		$dispatcherList = $this->Driver->getDispatcherList();
-		$vDriversList = array();
+		$vDriversList 	= array();
+
 		if(!empty($allVehicles) && is_array($allVehicles)){	
 			$vDriversList = $allVehicles;
 			if(is_array($teamList) && count($teamList) > 0){
@@ -44,16 +46,26 @@ class Reports extends Admin_Controller{
 	}
 	
 	public function irp_breadcrumb_detail($args = false){
+		
 		if($args){
 			$filters = $args;
 		}else{
 			$filters = json_decode(file_get_contents('php://input'),true);	
 		}
-		
+
+
 		$filterArgs = array();
-		$filterArgs['customDate'] = date('Y-m-d');
-		$filterArgs['includeLatLong'] = isset($filters['args']['includeLatLong']) ?$filters['args']['includeLatLong'] : false ;
-		if(isset($filters['args']['customDate'])){
+		if ( isset($filters['args']['startDate']) && $filters['args']['startDate']  != '' ) {
+			$filterArgs['startDate'] = date('Y-m-d',strtotime($filters['args']['startDate']));
+			$filterArgs['endDate']   = date('Y-m-d',strtotime($filters['args']['endDate']));
+		} else {
+			$filterArgs['startDate'] = '';
+			$filterArgs['endDate']   = '';
+		}
+
+		// $filterArgs['customDate'] = date('Y-m-d');
+		$filterArgs['includeLatLong'] = isset($filters['args']['includeLatLong']) ? $filters['args']['includeLatLong'] : false ;
+		if(isset($filters['args']['customDate']) && $filters['args']['customDate'] != '' ){
 			$filterArgs['customDate'] = !empty($filters['args']['customDate']) ? date('Y-m-d',strtotime($filters['args']['customDate'])) : $filterArgs['customDate']; 
 		}
 
@@ -82,33 +94,43 @@ class Reports extends Admin_Controller{
 			}
 		}
 		$response['column_mappings'] = array("Vehicle ID", "Truck No", "Driver Name", "Timestamp", "Event");
+		
 		if($filterArgs['includeLatLong']){
 			$response['column_mappings'] = array_merge($response['column_mappings'], array("Latitude", "Longitude"));
 		}
+
 		$response['column_mappings'] = array_merge($response['column_mappings'], array("Location", "Speed (MPH)", "Odometer(Mi)"));
-		$result = $this->Report->getBreadcrumbsDetail($filterArgs);
-		$response['result'] = $result;
-		$response['args'] = $filterArgs;
-		$response['eventType'] = $filters['args']['vStatus'];
+
+
+		$result 					 = $this->Report->getBreadcrumbsDetail($filterArgs , $this->paginationLimit);
+		
+		$totalRows 					 = $this->Report->getBreadcrumbsDetail($filterArgs , NULL, NULL,TRUE);
+		
+		$response['result'] 		 = $result;
+		$response['total'] 		 	 = $totalRows[0]['totalRows'];
+		$response['args'] 			 = $filterArgs;
+		$response['eventType'] 		 = $filters['args']['vStatus'];
 		if($args){
 			return $response;
 		}
 		echo json_encode($response);
-
 	}
 
 	public function export_pdf_irp_breadcrumb_detail(){
-		$filters = json_decode(file_get_contents('php://input'),true);
-		$response = $this->irp_breadcrumb_detail($filters);
+		
+		$filters 			= json_decode(file_get_contents('php://input'),true);
+		$response 			= $this->irp_breadcrumb_detail($filters);
 		$response['report'] = $filters['report'];
 		$response['byuser'] = $this->session->loggedUser_username;
-		$html = $this->load->view('report', $response, true); 
-		$pathGen = str_replace('application/', '', APPPATH);
-		$fileName = $filters['report']['name'].'.pdf';
-		$pdfFilePath = $pathGen."assets/uploads/reports/".$fileName;
+		$html 				= $this->load->view('report', $response, true); 
+		$pathGen 			= str_replace('application/', '', APPPATH);
+		$fileName 			= $filters['report']['name'].'.pdf';
+		$pdfFilePath 		= $pathGen."assets/uploads/reports/".$fileName;
+
 		if(file_exists($pdfFilePath)){
 			unlink($pdfFilePath);
 		}
+ 		
  		$pdf = $this->load->library('m_pdf');
 		$pdf = new mPDF('', array(250,236),5, '', 5, 5, 5, 5, 5, 5);
 		
@@ -122,8 +144,8 @@ class Reports extends Admin_Controller{
 
 
 	public function export_html_irp_breadcrumb_detail(){
-		$filters = $_REQUEST;
-		$response = $this->irp_breadcrumb_detail($filters);
+		$filters 			= $_REQUEST;
+		$response 			= $this->irp_breadcrumb_detail($filters);
 		$response['report'] = $filters['report'];
 		$response['byuser'] = $this->session->loggedUser_username;
 		//echo date('Y-m-d H:i:s'); 
@@ -133,8 +155,8 @@ class Reports extends Admin_Controller{
 
 
 	public function export_csv_irp_breadcrumb_detail(){
-		$filters = json_decode(file_get_contents('php://input'),true);
-		$response = $this->irp_breadcrumb_detail($filters);
+		$filters 			= json_decode(file_get_contents('php://input'),true);
+		$response 			= $this->irp_breadcrumb_detail($filters);
 		$response['report'] = $filters['report'];
 		$response['byuser'] = $this->session->loggedUser_username;
 		echo json_encode($response);
@@ -143,16 +165,24 @@ class Reports extends Admin_Controller{
 
 
 	// Load Performance/Tracking Report Functions Begin
-	public function irp_loads_performance($args = false,$csv=false){
+	public function irp_loads_performance( $args = false, $csv = false){
+
 		$result = array();
 		if($args){
 			$filters = $args;
 		}else{
 			$filters = json_decode(file_get_contents('php://input'),true);	
 		}
-		
+
 		$filterArgs = array();
 
+		if ( isset($filters['args']['startDate']) && $filters['args']['startDate']  != '' ) {
+			$filterArgs['startDate'] = date('Y-m-d',strtotime($filters['args']['startDate']));
+			$filterArgs['endDate']   = date('Y-m-d',strtotime($filters['args']['endDate']));
+		} else {
+			$filterArgs['startDate'] = '';
+			$filterArgs['endDate']   = '';
+		}
 		$filterArgs["selScope"] = false;
 		if(isset($filters["args"]["selScope"]) && count($filters) > 0){
 			$filterArgs["selScope"] = $filters["args"]["selScope"]; 
@@ -182,16 +212,18 @@ class Reports extends Admin_Controller{
 
 			switch ($filters["args"]["reportType"]) {
 				case 'individual': if($args){
-										$response['column_mappings'] = array( "LOAD #", "DISPATCHER", "DRIVER", "BROKER",  "INVOICED AMT", "TOTAL CHARGES", "PROFIT", "PROFIT %", "MILES", "DEAD MILES", "RPM", "PICKUP DATE", "ORIGIN", "DEL. DATE", "DESTINATION");	
+									$response['column_mappings'] = array( "LOAD #", "DISPATCHER", "DRIVER", "BROKER",  "INVOICED AMT", "TOTAL CHARGES", "PROFIT", "PROFIT %", "MILES", "DEAD MILES", "RPM", "PICKUP DATE", "ORIGIN", "DEL. DATE", "DESTINATION");	
 										$result = $this->Report->getLoadsTrackingIndividual($filterArgs,'export');
-									}else{
+									} else {
 										$response['column_mappings'] = array( "LOAD #", "DISPATCHER", "DRIVER", "BROKER",  "INVOICED AMT", "TOTAL CHARGES", "PROFIT", "PROFIT %", "MILES", "DEAD MILES", "RPM", "PICKUP DATE", "ORIGIN", "DEL. DATE", "DESTINATION");		
-										
-										$result = $this->Report->getLoadsTrackingIndividual($filterArgs,$iscope);
+									
+										// $result = $this->Report->getLoadsTrackingIndividual($filterArgs,$iscope);
+										$this->sortPaginationListing($filterArgs, $iscope);
 									}
 									
 									 break;
 				case 'performance': $response['column_mappings'] = array("DISPATCHER");
+
 									if($filterArgs["scope"] != "all" && !empty($filterArgs["scope"])  ){
 										array_push($response["column_mappings"],"DRIVER");
 									}
@@ -201,54 +233,118 @@ class Reports extends Admin_Controller{
 			}
 			$filterArgs["reportType"] = $filters["args"]["reportType"];
 		}
+
 		$response['args'] = $filterArgs;
 		if($args && !$csv){
 			$result_f = array();
-			foreach ($result as $key => $value) {
-				$dispatcher = $value["dispatcher"];
-				unset($value["dispatcher"]);
-				if(isset($value["rmile"])){
-					$rmile = number_format((float)($value["invoice"] / $value["miles"]),2);
-					$value["rmile"] = money_format('%.2n', (float)$rmile);
+			if( !empty($result)) {
+				foreach ($result as $key => $value) {
+					$dispatcher = $value["dispatcher"];
+
+					unset($value["dispatcher"]);
+					
+					if(isset($value["rmile"]) && $value["miles"] != 0){
+						$rmile = number_format((float)($value["invoice"] / $value["miles"]),2);
+						$value["rmile"] = money_format('%.2n', (float)$rmile);
+					}
+
+					if(isset($value["profitPercent"])){
+						$value["profitPercent"] = number_format((float)(($value["profit"]/$value["invoice"]) * 100),2);
+					}
+
+					$value["invoice"] = money_format("%.2n", $value["invoice"]);
+					$value["charges"] = money_format("%.2n", $value["charges"]);
+					$value["profit"] = money_format("%.2n", $value["profit"]);
+
+					if ( isset($result[$key]['PickupAddress'])) {
+						$value['PickupAddress']		 = trim($value['PickupAddress'].','.$value['OriginCity'].','.$value['OriginState'].','.$value['OriginCountry'],',');
+						$value['DestinationAddress']  = trim($value['DestinationAddress'].','.$value['DestinationCity'].','.$value['DestinationState'].','.$value['DestinationCountry'],',');
+						unset($value['OriginCity']);
+						unset($value['OriginState']);
+						unset($value['OriginCountry']);
+						unset($value['DestinationCity']);
+						unset($value['DestinationState']);
+						unset($value['DestinationCountry']);
+						$result_f[$dispatcher][$value["driver"]][$key] = $value;
+					} else {
+						if ( isset($args['args']['reportType']) && $args['args']['reportType'] == 'performance' && $args['args']['scope'] == 'all' ) {
+							$result_f[$dispatcher][] = $value;
+						} else {
+							$result_f[$dispatcher][$value["driver"]][$key] = $value;
+						}						
+					}
+					
 				}
-
-				if(isset($value["profitPercent"])){
-					$value["profitPercent"] = number_format((float)(($value["profit"]/$value["invoice"]) * 100),2);
-				}
-
-				$value["invoice"] = money_format("%.2n", $value["invoice"]);
-				$value["charges"] = money_format("%.2n", $value["charges"]);
-				$value["profit"] = money_format("%.2n", $value["profit"]);
-
-				$result_f[$dispatcher][$value["driver"]][$key] = $value;
 			}
 			$response['result_t'] = $result_f;
-			//pr($response);die;
 			return $response;
 		}
 
 		
-		
-		foreach ($result as $key => $value) {
-			if(isset($value["rmile"])){
-				$rmile = 0;
-				if($value["miles"] > 0){
-					$rmile = number_format(($value["invoice"] / $value["miles"]),2);
+		if ( !empty($result)) {
+			$totalInvoices	 	= 0;
+			$totalMiles  	    = 0;
+			$totalDeadMiles 	= 0;
+			$totalCharges 		= 0;
+			$totalProfit 		= 0;
+			$totalProfitPercent = 0;
+			foreach ($result as $key => $value) {
+				if(isset($value["rmile"])){
+					$rmile = 0;
+					if($value["miles"] > 0){
+						$rmile = number_format(($value["invoice"] / $value["miles"]),2);
+					}
+					$result[$key]["rmile"] = money_format('%.2n', (float)$rmile);
 				}
-				$result[$key]["rmile"] = money_format('%.2n', (float)$rmile);
-			}
-			if(isset($value["profitPercent"])){
-				$result[$key]["profitPercent"] = number_format((float)(($value["profit"]/$value["invoice"]) * 100),2);
-			}
-			$result[$key]["invoice"] = money_format("%.2n", $value["invoice"]);
-			$result[$key]["charges"] = money_format("%.2n", $value["charges"]);
-			$result[$key]["profit"] = money_format("%.2n", $value["profit"]);
-		}
-		
+				if(isset($value["profitPercent"])){
+					$result[$key]["profitPercent"] = number_format((float)(($value["profit"]/$value["invoice"]) * 100),2);
+				}
 
-		
-		$response['result'] = $result;
-		$response['eventType'] = $filters['args']['vStatus'];
+				if ( isset($result[$key]['PickupAddress'])) {
+					$result[$key]['PickupAddress']		 = trim($value['PickupAddress'].','.$value['OriginCity'].','.$value['OriginState'].','.$value['OriginCountry'],',');
+					$result[$key]['DestinationAddress']  = trim($value['DestinationAddress'].','.$value['DestinationCity'].','.$value['DestinationState'].','.$value['DestinationCountry'],',');
+					unset($result[$key]['OriginCity']);
+					unset($result[$key]['OriginState']);
+					unset($result[$key]['OriginCountry']);
+					unset($result[$key]['DestinationCity']);
+					unset($result[$key]['DestinationState']);
+					unset($result[$key]['DestinationCountry']);
+				}
+				
+				if ( $filters["args"]["reportType"] == 'performance') {
+					$totalInvoices		 += $value["invoice"];
+					$totalMiles 		 += $value["miles"];
+					$totalDeadMiles		 += $value["deadmiles"];
+					$totalCharges	     += $value["charges"];
+					$totalProfit         += $value["profit"];
+				}
+
+				$result[$key]["invoice"] 	= money_format("%.2n", $value["invoice"]);
+				$result[$key]["charges"] 	= money_format("%.2n", $value["charges"]);
+				$result[$key]["profit"] 	= money_format("%.2n", $value["profit"]);
+
+				
+			}
+		} else {
+			$result = array();
+		}
+
+		if ( $filters["args"]["reportType"] == 'performance') {
+			if ( $totalInvoices != 0 )
+				$totalProfitPercent = number_format((float)(($totalProfit / $totalInvoices) * 100),2);
+			else
+				$totalProfitPercent = 0;
+			
+			$response['totals']['totInvoices']      = money_format("%.2n", $totalInvoices);
+			$response['totals']['totMiles']         = $totalMiles;
+			$response['totals']['totDeadMiles']     = $totalDeadMiles;
+			$response['totals']['totCharges']       = money_format("%.2n", $totalCharges);
+			$response['totals']['totProfit']        = money_format("%.2n", $totalProfit);
+			$response['totals']['totProfitPercent'] = $totalProfitPercent;
+		}
+
+		$response['result'] 	= $result;
+		$response['eventType'] 	= $filters['args']['vStatus'];
 		echo json_encode($response);
 		exit(0);
 
@@ -256,35 +352,36 @@ class Reports extends Admin_Controller{
 
 
 	public function export_html_irp_loads_performance(){
-		$filters = $_REQUEST;
-		$response = $this->irp_loads_performance($filters);
+		$filters 			= $_REQUEST;
+		$response 			= $this->irp_loads_performance($filters);
 		$response['report'] = $filters['report'];
 		$response['byuser'] = $this->session->loggedUser_username;
 		//echo date('Y-m-d H:i:s'); 
-		$html = $this->load->view('report_load_tracking', $response, true); 
+		$html 				= $this->load->view('report_load_tracking', $response, true); 
 		echo $html;
 	}
 
 	public function export_pdf_irp_loads_performance(){
-		$filters = json_decode(file_get_contents('php://input'),true);
-		$response = $this->irp_loads_performance($filters);
+		set_time_limit(500);
+		$filters 			= json_decode(file_get_contents('php://input'),true);
+		$response 			= $this->irp_loads_performance($filters);
 		$response['report'] = $filters['report'];
 		$response['byuser'] = $this->session->loggedUser_username;
-		$html = $this->load->view('report_load_tracking_pdf', $response, true); 
-		//echo $html;die;
-		$pathGen = str_replace('application/', '', APPPATH);
-		$fileName = $filters['report']['name'].'.pdf';
-		$pdfFilePath = $pathGen."assets/uploads/reports/".$fileName;
+		$html 				= $this->load->view('report_load_tracking_pdf', $response, true); 
+		$pathGen 			= str_replace('application/', '', APPPATH);
+		$fileName 			= $filters['report']['name'].'.pdf';
+		$pdfFilePath 		= $pathGen."assets/uploads/reports/".$fileName;
+
 		if(file_exists($pdfFilePath)){
 			unlink($pdfFilePath);
 		}
  		$pdf = $this->load->library('m_pdf');
 		$pdf = new mPDF('', array(250,236),5, '', 5, 5, 5, 5, 5, 5);
 		$pdf->shrink_tables_to_fit=1;
-		$pdf->use_kwt = true;
-		$pdf->cacheTables = true;
-		$pdf->simpleTables=true;
-		$pdf->packTableData=true;
+		$pdf->use_kwt 		= true;
+		$pdf->cacheTables 	= true;
+		$pdf->simpleTables 	= true;
+		$pdf->packTableData = true;
 		$pdf->WriteHTML($html);
 		$output = $pdf->Output($pdfFilePath, "F");    
 		echo json_encode(array("output"=>$fileName));
@@ -301,7 +398,81 @@ class Reports extends Admin_Controller{
 	}
 	// Load Performance/Tracking Report Functions End
 
+	/*
+	* method  : Get
+	* Params  : parameter, columns
+	* return  : results array
+	* Comment : For implementing pagination on load perfromance rresults
+	*/
 
-
+	public function sortPaginationListing($filterArgs = array(), $iscope = '' , $pageNumber = 0, $search = '', $sortColumn = '', $lastSortType = '' ) {
+		$data = array();
 		
-}
+		$filterArgs['itemsPerPage'] = 20;
+		$filterArgs['limitStart']   = 1;
+		$filterArgs['sortColumn']   = "DeliveryDate";
+		$filterArgs['sortType']     = "DESC";
+		 
+		$data['loads'] = $this->Report->getTrackingIndividualLoadsPagination( $filterArgs, $iscope, false );
+		$total = $this->Report->getTrackingIndividualLoadsPagination( $filterArgs, $iscope, true );
+		$data['total'] =  $total[0]['count'];
+
+		echo json_encode(array('wPagination' => $data));
+		exit();
+	}
+
+	public function getReportRecords() {
+
+		$params = json_decode(file_get_contents('php://input'),true);
+		$data 	= array();
+		$filter["limitStart"] = ( $params["pageNo"] * $params["itemsPerPage"] + 1 );
+
+		$filter['sortColumn'] 	= ((isset($params["sortColumn"]) && !empty($params["sortColumn"]))) ? $params["sortColumn"]  : "DeliveryDate"; 
+		$filter['sortType']   	= ((isset($params["sortType"]) && !empty($params["sortType"]))) ? $params["sortType"]  : "DESC"; 
+		$filter['itemsPerPage'] = ((isset($params["itemsPerPage"]) && !empty($params["itemsPerPage"]))) ? $params["itemsPerPage"]  : "20"; 
+		$filter['searchQuery']  = ((isset($params["searchQuery"]) && !empty($params["searchQuery"]))) ? $params["searchQuery"]  : "20"; 
+		$filter['scope']      = ((isset($params['formValue']['scope'])) && !empty($params['formValue']['scope']) ) ? $params['formValue']['scope'] : '';
+		$filter['selScope']   = ((isset($params['formValue']['selScope'])) && !empty($params['formValue']['selScope']) ) ? $params['formValue']['selScope'] : '';
+		$filter['dispId']     = ((isset($params['formValue']['dispId'])) && !empty($params['formValue']['dispId']) ) ? $params['formValue']['dispId'] : '';
+		$filter['driverId']   = ((isset($params['formValue']['driverId'])) && !empty($params['formValue']['driverId']) ) ? $params['formValue']['driverId'] : '';
+		$filter['startDate']  = ((isset($params['formValue']["startDate"]) && !empty($params['formValue']["startDate"]))) ? $params['formValue']["startDate"]  : ""; 
+		$filter['endDate']    = ((isset($params['formValue']["endDate"]) && !empty($params['formValue']["endDate"]))) ? $params['formValue']["endDate"]  : ""; 
+		
+		$data['loads'] = $this->Report->getTrackingIndividualLoadsPagination( $filter, 'report', false );
+		$total = $this->Report->getTrackingIndividualLoadsPagination( $filter, 'report', true );
+		$data['total'] =  $total[0]['count'];
+
+		echo json_encode(array('wPagination' => $data));
+	}
+
+	/**
+	* Method getBreadcrumbReportRecords
+	* @param POST
+	* @return JSON
+	*/
+
+	public function getBreadcrumbReportRecords(){
+
+		$params = json_decode(file_get_contents('php://input'),true);
+
+		$data 					= array();
+		$filter["limitStart"] 	= ( $params["pageNo"] * $params["itemsPerPage"] + 1 );
+
+		$filter['sortColumn'] 	= (!empty($params["sortColumn"]))) ? $params["sortColumn"]  : "DeliveryDate"; 
+		$filter['sortType']   	= (!empty($params["sortType"]))) ? $params["sortType"]  : "DESC"; 
+		$filter['itemsPerPage'] = (!empty($params["itemsPerPage"]))) ? $params["itemsPerPage"]  : "20"; 
+		$filter['searchQuery']  = (!empty($params["searchQuery"]))) ? $params["searchQuery"]  : "20"; 
+		$filter['scope']      	= (!empty($params['formValue']['scope']) ) ? $params['formValue']['scope'] : '';
+		$filter['selScope']   	= (!empty($params['formValue']['selScope']) ) ? $params['formValue']['selScope'] : '';
+		$filter['dispId']     	= (!empty($params['formValue']['dispId']) ) ? $params['formValue']['dispId'] : '';
+		$filter['driverId']   	= (!empty($params['formValue']['driverId']) ) ? $params['formValue']['driverId'] : '';
+		$filter['startDate']  	= (!empty($params['formValue']["startDate"]))) ? $params['formValue']["startDate"]  : ""; 
+		$filter['endDate']    	= (!empty($params['formValue']["endDate"]))) ? $params['formValue']["endDate"]  : ""; 
+		
+		$data['loads'] = $this->Report->getTrackingIndividualLoadsPagination( $filter, 'report', false );
+		$data['total'] = $this->Report->getTrackingIndividualLoadsPagination( $filter, 'report', true );
+
+		echo json_encode(array('wPagination' => $data));
+	}	
+ }
+ 

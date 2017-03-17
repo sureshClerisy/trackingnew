@@ -12,7 +12,7 @@ var app = angular.module('app',['gantt','gantt.table','gantt.tooltips','signatur
     'gantt.overlap',
     'gantt.resizeSensor',*/
 	'angularUtils.directives.dirPagination','ngCookies','ui.router','ngStorage','jQueryScrollbar','ui.utils',
-    'oc.lazyLoad','datatables','ngSanitize','ui.select','angular-sortable-view']);
+    'oc.lazyLoad','datatables','ngSanitize','ui.select','angular-sortable-view','dcbImgFallback']);
     
 app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$ocLazyLoadProvider','$provide',
     function($stateProvider, $urlRouterProvider, $localStorageProvider,$ocLazyLoadProvider,$provide) {
@@ -100,6 +100,7 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
 					deps: ['$ocLazyLoad', function($ocLazyLoad) {
 	                    return $ocLazyLoad.load([
 								'select',
+								'daterangepicker'
 	                            ], {
 	                            insertBefore: '#lazyload_placeholder'
 	                        })

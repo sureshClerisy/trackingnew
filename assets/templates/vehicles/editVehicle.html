@@ -187,7 +187,7 @@
 											</div>
 											</div>
 											<div class="col-sm-4 img-cont image-size" >
-												<img class="center-me" on-error-src="pages/img/truck-dummy.jpeg" ng-src="./assets/uploads/vehicles/thumbnail/{{truckData.vehicle_image}}" ng-show = "showimage == true" height="40px">
+												<img class="center-me" fallback-src="pages/img/truck-dummy.jpeg" ng-src="./assets/uploads/vehicles/thumbnail/{{truckData.vehicle_image}}" ng-show = "showimage == true" height="40px">
 											</div>
 										</div>
 									</div>
@@ -351,7 +351,7 @@
 														<div class="row1">
 															<button class="btn btn-danger" type="button" ng-click="deleteDocument(docs.id,docs.document_name, $index);">X</button>
 															<div class="pdf-cover" data-url="assets/uploads/documents/truck/{{docs.document_name}}" ng-click="perviewDoc($event)">
-																<img ng-src="assets/uploads/documents/thumb_truck/thumb_{{docs.document_name | filetoimg}} " on-error-src="pages/img/pdf.png" />
+																<img ng-src="assets/uploads/documents/thumb_truck/thumb_{{docs.document_name | filetoimg}} " fallback-src="pages/img/pdf.png" />
 															</div>
 														</div>
 													</div>

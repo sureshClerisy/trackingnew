@@ -178,7 +178,7 @@
 										<p style="padding: 0px;width: 100%;margin: 0px 0px;float: left;text-transform: uppercase;font-size: 13px;color: #030101;"><?php echo isset($jobDetails['OriginZip']) ? $jobDetails['OriginZip'] : ''; ?></p>
 									</td>
 									<td style="padding: 20px 23px;text-align: left;border-top:1px solid #9f9f9f;">
-										<b style="font-size:13px;width: 100%;color: #6c6c6c;text-transform: uppercase;float: left;margin-bottom: 13px;">Counatry</b>
+										<b style="font-size:13px;width: 100%;color: #6c6c6c;text-transform: uppercase;float: left;margin-bottom: 13px;">Country</b>
 										<p style="padding: 0px;width: 100%;margin: 0px 0px;float: left;text-transform: uppercase;font-size: 13px;color: #030101;"><?php echo isset($jobDetails['OriginCountry']) ? $jobDetails['OriginCountry'] : '';  ?></p>
 									</td>
 								</tr>
@@ -261,17 +261,17 @@
 															<p style="padding: 0px;width: 100%;margin: 0px 0px;float: left;text-transform: uppercase;font-size: 13px;color: #030101;"><?php echo isset($jobDetails['consignee_phone']) ? $jobDetails['consignee_phone'] : ''; ?></p>
 														</td>
 														<td style="text-align: left; border-right: 1px solid rgb(159, 159, 159); padding: 20px 26px;">
-															<b style="font-size:13px;width: 100%;color: #6c6c6c;text-transform: uppercase;float: left;margin-bottom: 13px;">Pickup date</b>
+															<b style="font-size:13px;width: 100%;color: #6c6c6c;text-transform: uppercase;float: left;margin-bottom: 13px;">Drop off date</b>
 															<p style="padding: 0px;width: 100%;margin: 0px 0px;float: left;text-transform: uppercase;font-size: 13px;color: #030101;"><?php echo (isset($jobDetails['DeliveryDate']) && $jobDetails['DeliveryDate'] != '0000-00-00') ? $jobDetails['DeliveryDate'] : ''; ?></p>
 														</td>
 														<td style="padding: 20px 23px;text-align: left;">
-															<b style="font-size:13px;width: 100%;color: #6c6c6c;text-transform: uppercase;float: left;margin-bottom: 13px;">Pickup Time</b>
+															<b style="font-size:13px;width: 100%;color: #6c6c6c;text-transform: uppercase;float: left;margin-bottom: 13px;">Drop off Time</b>
 															<p style="padding: 0px;width: 100%;margin: 0px 0px;float: left;text-transform: uppercase;font-size: 13px;color: #030101;"><?php echo (isset($jobDetails['DeliveryTime']) && $jobDetails['DeliveryTime'] != '') ? $jobDetails['DeliveryTime'].' TO ' : ''; ?><?php echo $jobDetails['DeliveryTimeRangeEnd']; ?></p>
 														</td>
 													</tr>
 													<tr>
 														<td style="text-align: left; border-right: 1px solid rgb(159, 159, 159); padding: 20px 26px;border-top:1px solid #9f9f9f;">
-															<b style="font-size:13px;width: 100%;color: #6c6c6c;text-transform: uppercase;float: left;margin-bottom: 13px;">Pickup Address</b>
+															<b style="font-size:13px;width: 100%;color: #6c6c6c;text-transform: uppercase;float: left;margin-bottom: 13px;">Delivery Address</b>
 															<p style="padding: 0px;width: 100%;margin: 0px 0px;float: left;text-transform: uppercase;font-size: 13px;color: #030101;"><?php echo isset($jobDetails['DestinationAddress']) ? $jobDetails['DestinationAddress'] : ''; ?></p>
 														</td>
 														<td style="text-align: left; border-right: 1px solid rgb(159, 159, 159); padding: 20px 26px;border-top:1px solid #9f9f9f;">
@@ -287,7 +287,7 @@
 															<p style="padding: 0px;width: 100%;margin: 0px 0px;float: left;text-transform: uppercase;font-size: 13px;color: #030101;"><?php echo isset($jobDetails['DestinationZip']) ? $jobDetails['DestinationZip'] : ''; ?></p>
 														</td>
 														<td style="padding: 20px 23px;text-align: left;border-top:1px solid #9f9f9f;">
-															<b style="font-size:13px;width: 100%;color: #6c6c6c;text-transform: uppercase;float: left;margin-bottom: 13px;">Counatry</b>
+															<b style="font-size:13px;width: 100%;color: #6c6c6c;text-transform: uppercase;float: left;margin-bottom: 13px;">Country</b>
 															<p style="padding: 0px;width: 100%;margin: 0px 0px;float: left;text-transform: uppercase;font-size: 13px;color: #030101;"><?php echo isset($jobDetails['DestinationCountry']) ? $jobDetails['DestinationCountry'] : '';  ?></p>
 														</td>
 													</tr>

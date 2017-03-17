@@ -160,14 +160,18 @@ class Dashboard extends CI_Controller {
 		}
 
 		$chartStack["trecords"] = $lPResult;
-		$totalProfitPercent = number_format((float)(($totalProfit / $totalInvoices) * 100),2);
+		if ( $totalInvoices != 0 )
+			$totalProfitPercent = number_format((float)(($totalProfit / $totalInvoices) * 100),2);
+		else
+			$totalProfitPercent = 0;
+
 		$chartStack['totals']['totInvoices']      = $totalInvoices;
 		$chartStack['totals']['totMiles']         = $totalMiles;
 		$chartStack['totals']['totDeadMiles']     = $totalDeadMiles;
 		$chartStack['totals']['totCharges']       = $totalCharges;
 		$chartStack['totals']['totProfit']        = $totalProfit;
 		$chartStack['totals']['totProfitPercent'] = $totalProfitPercent;
-		
+	
 		$vehicleInfo = $weatherNotFound = array();
 		$lat = $lng = '';
 		//--------------- Job Status ----------------
@@ -510,9 +514,13 @@ class Dashboard extends CI_Controller {
 			$totalCharges	     += $lPResult[$key]["charges"];
 			$totalProfit         += $lPResult[$key]["profit"];
 		}
-		
+
 		$chartStack["trecords"] = $lPResult;
-		$totalProfitPercent = number_format((float)(($totalProfit / $totalInvoices) * 100),2);
+		if ( $totalInvoices != 0 )
+			$totalProfitPercent = number_format((float)(($totalProfit / $totalInvoices) * 100),2);
+		else
+			$totalProfitPercent = 0;
+		
 		$chartStack['totals']['totInvoices']      = $totalInvoices;
 		$chartStack['totals']['totMiles']         = $totalMiles;
 		$chartStack['totals']['totDeadMiles']     = $totalDeadMiles;

@@ -3369,11 +3369,10 @@ top:40px;
   display: inline-block;
 }
 #loadDetailPopUp.modal-dialog.modal-lg {
-  height: 100%;
-  margin: 0 auto;
-  max-width: 1025px;
-  width: 97%;
-  padding: 22px 0;
+    height: 96%;
+    margin: 12px auto auto;
+    max-width: 1025px;
+    width: 97%;
 }
 .popup-inner-content-main .documents {
 /*  max-height: 550px;
@@ -4927,7 +4926,7 @@ float:left;width:100%;overflow:auto;
 .report-for.cs-select.cs-skin-slide { float: right; width: 100%; }
 .date-wrapper { float: right; width: 70%; }
 .date-wrapper .date .input-group-addon { height: 35px; position: absolute; right: 0; top: 0; width: 40px; z-index: 2; } 
-.data-range .cs-wrapper{width: 70%; float: right;}
+.data-range .cs-wrapper{width: 80%; float: right;}
 .report-filter > h2 {   font-family: "Montserrat"; font-size: 14px; font-weight: 600; line-height: 14px; margin: 0; padding-bottom: 10px; text-transform: uppercase; }
 .vlist { float: left; padding-right: 90px; position: relative; width: 100%; }
 .vlabel { color: #2f2f2f; font-size: 12px; line-height: 15px; margin: 0; padding-bottom: 5px; }
@@ -5015,7 +5014,7 @@ table tr td.no-pad-report {
 .report-filter .dashbord-select-dropdown {
   display: inline-block;
   float: right;
-  width: 70%;
+  width: 80%;
 }
 .report-filter .dashbord-select-dropdown .btn.btn-default.form-control.ui-select-toggle {
   padding: 7px 10px;
@@ -5852,6 +5851,26 @@ th.sorting_desc, th.sorting_asc { color: #06af8f !important;}
 th a.sorted {color: #06af8f !important;}
 .srpPage th a span {color: #000 !important;}
 tr.bold-content td {  font-weight: bold !important;}
+.drange-block .input-group-addon {
+    right: 1px;
+    width: 45px;
+    top: 0;
+    z-index: 99;
+    bottom: 0;
+    height: 34px;
+    padding: 4px 0!important;
+}
+.drange-block .input-group {
+    float: right;
+    width: 80%;
+}
+td.text-center-td.ng-binding {
+    text-align: center;
+}
+tr.tr-bold td {
+    font-weight: bold;
+}
+
 @media (min-width:2000px)
 {
 .map-load-section .dataTables_wrapper.no-footer table thead tr th.billing-origin{

@@ -78,6 +78,7 @@
     <script src="assets/js/directives/pg-tab-dropdownfx.js" type="text/javascript"></script>
     <script src="assets/plugins/angular-signature/src/signature.js"></script>
     <script src="assets/plugins/angular/angular-sortable-view.min.js"></script>
+    <script src="assets/plugins/angular/angular.dcb-img-fallback.min.js"></script>
     
     <script src="assets/js/directives/skycons.js"></script>
     <script src='assets/plugins/bootstrap-datepicker/js/bootstrap-datepicker.js'></script>
@@ -150,6 +151,6 @@
             });
         }  
     </script>
-    <script src="https://maps.google.com/maps/api/js?key=<?php echo $key; ?>&libraries=places,geometry"></script>
+    <script src="//maps.google.com/maps/api/js?key=<?php echo $key; ?>&libraries=places,geometry"></script>
 </body>
 </html>

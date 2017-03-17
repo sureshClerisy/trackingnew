@@ -17,11 +17,16 @@ class Report extends CI_Model {
 		}
 	}
 
-	public function getBreadcrumbsDetail($args){
+	public function getBreadcrumbsDetail( $args, $page = 0, $limit = NULL, $total = NULL ){
+		
 		$includeLatLong = '';
+
 		if(isset($args['includeLatLong']) && $args['includeLatLong']){
 			$includeLatLong = 'ae.`latitude` , ae.`longitude`';
 		}
+
+		if(!$total){
+
 		$this->db->select("ae.`deviceID`,  CONCAT(DATE_FORMAT(GMTTime,'%d-%b-%Y %r'),' GMT') AS GMTTime , ae.`eventType` , ".$includeLatLong." , CONCAT( ae.`street` , ', ', ae.`crossStreet` , ', ', ae.`city` , ', ', ae.`state` , ', ', ae.`zip` ) AS location, ae.`vehicleSpeed` , ae.`odometer`, v.label, CONCAT(d.first_name, ' ', d.last_name) as driverName,
 			CASE
 				WHEN FLOOR(ae.heading/45) = 0 THEN 'N' 
@@ -35,12 +40,12 @@ class Report extends CI_Model {
 			END as hdirection
 
 			");
+		}else{
+			$this->db->select("count(ae.deviceID) as totalRows");
+		}
 
 		$this->db->join('vehicles as v', 'ae.deviceID = v.tracker_id','Left');
 		$this->db->join('drivers as d', 'd.id = v.driver_id','Left');
-
-
-
 		
 		if(isset($args['deviceID'])){
 			$this->db->where_in('ae.deviceID',$args['deviceID']);
@@ -53,11 +58,18 @@ class Report extends CI_Model {
 		$this->db->where('ae.eventType !=','INFORMATION');
 		$this->db->where('ae.eventType !=','BATTERY POWER ON');
 
-		$this->db->where('DATE(ae.GMTTime) =',$args['customDate']);
+		if ( isset($args['customDate']) && $args['customDate'] != '' )
+			$this->db->where('DATE(ae.GMTTime) =',$args['customDate']);
+
+		if ( isset($args['startDate']) && $args['startDate'] != '') {
+			$this->db->where('DATE(ae.GMTTime) >=',$args['startDate']);
+			$this->db->where('DATE(ae.GMTTime) <=',$args['endDate']);
+		}
+
 		$this->db->order_by('ae.GMTTime','asc');
+		$this->db->limit($limit);
 		$query = $this->db->get('avl_events as ae');
 
-		//echo $this->db->last_query();die;
 		if ($query->num_rows() > 0) {
 			return $query->result_array();
 		} else {
@@ -76,7 +88,7 @@ class Report extends CI_Model {
 			$extraFields = ", l.totalCost,l.pickDate, l.truckstopID, l.vehicle_id";
 		}
 
-		$this->db->select("l.id as loadid, CONCAT( `u`.`first_name` , ' ', u.last_name ) AS dispatcher,  case l.driver_type when 'team' then concat(d.first_name,' + ',team.first_name) ELSE concat(d.first_name,' ',d.last_name) end as driver, CONCAT(UCASE(LEFT(b.TruckCompanyName, 1)), LCASE(SUBSTRING(b.TruckCompanyName, 2))) AS broker,  l.paymentAmount as invoice, l.totalCost as charges, l.overallTotalProfit AS profit, l.overallTotalProfitPercent,  l.Mileage as miles, l.deadmiles, l.deadmiles as rmile, l.PickupDate, l.PickupAddress, l.DeliveryDate, l.DestinationAddress ".$extraFields);	
+		$this->db->select("l.id as loadid, CONCAT( `u`.`first_name` , ' ', u.last_name ) AS dispatcher,  case l.driver_type when 'team' then concat(d.first_name,' + ',team.first_name) ELSE concat(d.first_name,' ',d.last_name) end as driver, CONCAT(UCASE(LEFT(b.TruckCompanyName, 1)), LCASE(SUBSTRING(b.TruckCompanyName, 2))) AS broker,  l.paymentAmount as invoice, l.totalCost as charges, l.overallTotalProfit AS profit, l.overallTotalProfitPercent,  l.Mileage as miles, l.deadmiles, l.deadmiles as rmile, l.PickupDate, l.PickupAddress, l.OriginCity, l.OriginState, l.OriginCountry, l.DeliveryDate, l.DestinationAddress, l.DestinationCity, l.DestinationState, l.DestinationCountry ".$extraFields);	
 		//}
 		$this->db->join("vehicles as v", "l.vehicle_id = v.id","Left");
 		$this->db->join("drivers as d", "l.driver_id = d.id","Left");
@@ -84,12 +96,12 @@ class Report extends CI_Model {
 		$this->db->join("broker_info as b", "l.broker_id = b.id","Left");
 		$this->db->join('drivers as team','team.id = l.second_driver_id','LEFT');
 		
-		if( (isset($args["scope"]) && $args["scope"] != "dispatcher" && $args["scope"] != "") && isset($args["selScope"]) && $args["selScope"] != ""  || ($type != "export" && $type != "drivers" && $args["selScope"] && $args["selScope"] !="" )  ){
+		if( (isset($args["scope"]) && $args["scope"] != "" && $args["scope"] != "all"  ) && (isset($args["selScope"]) && !empty($args["selScope"]) ) || ( ($type != "export" && $type != "drivers" && !empty($args["selScope"]) )  ) ){
 
 			$this->db->where_in("l.vehicle_id",$args["selScope"]);
 		}
 
-		if(isset($args["driverId"])){
+		if(isset($args["driverId"]) && !empty($args['driverId'])){
 			$driverId = $args["driverId"];
 			if(!is_array($args["driverId"])){
 				$driverId = array($args["driverId"]);
@@ -120,7 +132,7 @@ class Report extends CI_Model {
 		$this->db->where('delete_status',0);
 		$this->db->order_by("l.DeliveryDate");
 		$query = $this->db->get('loads as l');
-		//echo $this->db->last_query();die;
+		// echo $this->db->last_query();die;
 		if ($query->num_rows() > 0) {
 			return $query->result_array();
 		} else {
@@ -169,6 +181,113 @@ class Report extends CI_Model {
 		$this->db->order_by("u.first_name");
 		$query = $this->db->get('loads as l');
 		//echo $this->db->last_query();die;
+		if ($query->num_rows() > 0) {
+			return $query->result_array();
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	* method  : Get
+	* params  : arguments
+	* return  : results array
+	* comment : fetch records using pagination and sorting
+	*/
+
+	public function getTrackingIndividualLoadsPagination($args = array(), $type = 'website', $total = false){
+		
+		if(!$total) {
+			$this->db->select("l.id as loadid, CONCAT( `u`.`first_name` , ' ', u.last_name ) AS dispatcher,  case l.driver_type when 'team' then concat(d.first_name,' + ',team.first_name) ELSE concat(d.first_name,' ',d.last_name) end as driver, CONCAT(UCASE(LEFT(b.TruckCompanyName, 1)), LCASE(SUBSTRING(b.TruckCompanyName, 2))) AS broker,  l.paymentAmount as invoice, l.totalCost as charges, l.overallTotalProfit AS profit, l.overallTotalProfitPercent,  l.Mileage as miles, l.deadmiles, l.deadmiles as rmile, l.PickupDate, l.PickupAddress, l.OriginCity, l.OriginState, l.OriginCountry, l.DeliveryDate, l.DestinationAddress, l.DestinationCity, l.DestinationState, l.DestinationCountry");	
+		} else {
+			$this->db->select("count(l.id) as count");
+		}	
+
+		$this->db->join("vehicles as v", "l.vehicle_id = v.id","Left");
+		$this->db->join("drivers as d", "l.driver_id = d.id","Left");
+		$this->db->join("users as u", "d.user_id = u.id","Left");
+		$this->db->join("broker_info as b", "l.broker_id = b.id","Left");
+		$this->db->join('drivers as team','team.id = l.second_driver_id','LEFT');
+		
+		if( (isset($args["scope"]) && $args["scope"] != "" && $args["scope"] != "all"  ) && (isset($args["selScope"]) && !empty($args["selScope"]) ) ){
+			$this->db->where_in("l.vehicle_id",$args["selScope"]);
+		}
+
+		if(isset($args["driverId"]) && !empty($args['driverId'])){
+			$driverId = $args["driverId"];
+			if(!is_array($args["driverId"])){
+				$driverId = array($args["driverId"]);
+			}
+			$this->db->where_in("l.driver_id",$driverId);
+		}
+
+		if((isset($args["scope"]) && $args["scope"] == "dispatcher" || $type=="loads") && isset($args["dispId"]) && $args["dispId"] != ""){
+			$this->db->where("l.dispatcher_id",$args["dispId"]);
+		}
+
+		if($type == "team")
+			$this->db->where("l.driver_type = ","team");
+
+		if(isset($args["startDate"]) && !empty($args["startDate"])){
+			$this->db->where("DATE(l.PickupDate) >= ",date("Y-m-d",strtotime($args["startDate"])));
+		}
+
+		if(isset($args["endDate"]) && !empty($args["endDate"])){
+			$this->db->where("DATE(l.PickupDate) <= ",date("Y-m-d",strtotime($args["endDate"])));
+		}
+
+		if(isset($args["searchQuery"]) && !empty($args["searchQuery"])){
+            $this->db->group_start();
+            $this->db->like('LOWER(CONCAT(d.first_name," ", d.last_name))', strtolower($args['searchQuery']));
+            $this->db->or_like('l.id', $args['searchQuery'] );
+            $this->db->or_like('l.invoiceNo', $args['searchQuery'] );
+            $this->db->or_like('LOWER(l.LoadType)', strtolower($args['searchQuery']) );
+            $this->db->or_like('l.PickupDate', $args['searchQuery'] );
+            $this->db->or_like('l.DeliveryDate', $args['searchQuery'] );
+            $this->db->or_like('LOWER(l.OriginCity)', strtolower($args['searchQuery']) );
+            $this->db->or_like('LOWER(l.OriginState)', strtolower($args['searchQuery']) );
+            $this->db->or_like('LOWER(l.DestinationCity)', strtolower($args['searchQuery']) );
+            $this->db->or_like('LOWER(l.DestinationState)', strtolower($args['searchQuery']) );
+            $this->db->or_like('LOWER(l.PickupAddress)', strtolower($args['searchQuery']) );
+            $this->db->or_like('LOWER(l.DestinationAddress)', strtolower($args['searchQuery']) );
+            $this->db->or_like('l.PaymentAmount', $args['searchQuery']);
+            $this->db->or_like('l.Mileage', $args['searchQuery']);
+            $this->db->or_like('l.deadmiles', $args['searchQuery']);
+            $this->db->or_like('LOWER(l.JobStatus)', strtolower($args['searchQuery']) );
+            $this->db->or_like('LOWER(l.load_source)', strtolower($args['searchQuery']) );
+            $this->db->or_like('LOWER(b.TruckCompanyName)', strtolower($args['searchQuery']) );
+            $this->db->group_end();
+		}
+		
+		if(isset($args["sortColumn"]) && $args["sortColumn"] == "driver"){
+			$this->db->order_by('CASE 
+								     WHEN l.driver_type  = "team" THEN CONCAT(d.first_name, " + ", team.first_name) 
+								     ELSE concat(d.first_name, " ", d.last_name) 
+								 END '.$args["sortType"]);
+		} else if( isset($args["sortColumn"]) && $args["sortColumn"] == "broker") {
+			$this->db->order_by("b.TruckCompanyName",$args["sortType"]);	
+		} else if( isset($args["sortColumn"]) && $args["sortColumn"] == "dispatcher") {
+			$this->db->order_by("u.first_name",$args["sortType"]);	
+		} else if(isset($args["sortColumn"]) && $args["sortColumn"] == "rpm"){
+			$this->db->order_by("(l.PaymentAmount/l.Mileage) ",$args["sortType"]);	 
+		}else{ 
+			$this->db->order_by("l.".$args["sortColumn"],$args["sortType"]);	
+		}
+
+		$this->db->where('delete_status',0);
+		if(!$total){
+			$args["limitStart"] = $args["limitStart"] == 1 ? 0 : $args["limitStart"];
+			$this->db->limit($args["itemsPerPage"],$args["limitStart"]);
+		}
+			
+		
+		$query = $this->db->get('loads as l');
+
+		/*if($total){
+			return $query->
+			return $query->num_rows();
+		}*/
+		// echo $this->db->last_query();die;
 		if ($query->num_rows() > 0) {
 			return $query->result_array();
 		} else {

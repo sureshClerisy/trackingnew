@@ -3390,24 +3390,25 @@ $rootScope.logoutmessage=false;
 			
 			$rootScope.extraStop = [];						// empty the extra stops count
 			for( var k = 0, m = 0; k < parseInt($rootScope.editSavedLoad.Stops); k++ ) {
+
 				if ( k >= parseInt(newIndex) ) {
 					if ( k == parseInt($rootScope.editSavedLoad.Stops - 1) ) {		// delete always last extra stop
-						delete $rootScope.extraStops['extraStopAddress_'+k];				// deleting added extra stop address
-						delete $rootScope.extraStops['extraStopCity_'+k];				// deleting added extra stop address
-						delete $rootScope.extraStops['extraStopState_'+k];				// deleting added extra stop address
-						delete $rootScope.extraStops['extraStopCountry_'+k];				// deleting added extra stop address
-						delete $rootScope.extraStops['extraStopTime_'+k];					// deleting added extra stop time
-						delete $rootScope.extraStops['extraStopTimeRange_'+k];				// deleting added extra stop time range
-						delete $rootScope.extraStops['extraStopDate_'+k];					// deleting added extra stop date
-						delete $rootScope.extraStops['extraStopZipCode_'+k];				// deleting added extra stop zip code
-						delete $rootScope.extraStops['extraStopPhone_'+k];					// deleting added extra stop Phone
-						delete $rootScope.extraStops['extraStopName_'+k];					// deleting added extra stop zip code
-						delete $rootScope.extraStops['extraStopEntity_'+k];	
+						delete $rootScope.extraStops['extraStopAddress_'+k];		// deleting added extra stop address
+						delete $rootScope.extraStops['extraStopCity_'+k];			// deleting added extra stop address
+						delete $rootScope.extraStops['extraStopState_'+k];			// deleting added extra stop address
+						delete $rootScope.extraStops['extraStopCountry_'+k];		// deleting added extra stop address
+						delete $rootScope.extraStops['extraStopTime_'+k];			// deleting added extra stop time
+						delete $rootScope.extraStops['extraStopTimeRange_'+k];		// deleting added extra stop time range
+						delete $rootScope.extraStops['extraStopDate_'+k];			// deleting added extra stop date
+						delete $rootScope.extraStops['extraStopZipCode_'+k];		// deleting added extra stop zip code
+						delete $rootScope.extraStops['extraStopPhone_'+k];			// deleting added extra stop Phone
+						delete $rootScope.extraStops['extraStopName_'+k];			// deleting added extra stop zip code
+						delete $rootScope.extraStops['extraStopEntity_'+k];
 					} else {
 						var n = parseInt(k + 1);
 						$rootScope.extraStops['extraStopAddress_'+k]	=	$rootScope.extraStops['extraStopAddress_'+n];	// assigning next extra stop value to previous
-						$rootScope.extraStops['extraStopCity_'+k]		=	$rootScope.extraStops['extraStopCity_'+n];	// assigning next extra stop value to previous
-						$rootScope.extraStops['extraStopState_'+k]		=	$rootScope.extraStops['extraStopState_'+n];	// assigning next extra stop value to previous
+						$rootScope.extraStops['extraStopCity_'+k]		=	$rootScope.extraStops['extraStopCity_'+n];		// assigning next extra stop value to previous
+						$rootScope.extraStops['extraStopState_'+k]		=	$rootScope.extraStops['extraStopState_'+n];		// assigning next extra stop value to previous
 						$rootScope.extraStops['extraStopCountry_'+k]	=	$rootScope.extraStops['extraStopCountry_'+n];	// assigning next extra stop value to previous
 						$rootScope.extraStops['extraStopTime_'+k]		=	$rootScope.extraStops['extraStopTime_'+n];	
 						$rootScope.extraStops['extraStopTimeRange_'+k]	=	$rootScope.extraStops['extraStopTimeRange_'+n];
@@ -3417,7 +3418,7 @@ $rootScope.logoutmessage=false;
 						$rootScope.extraStops['extraStopName_'+k]		=	$rootScope.extraStops['extraStopName_'+n];	
 						$rootScope.extraStops['extraStopEntity_'+k]		=  	$rootScope.extraStops['extraStopEntity_'+n];
 						
-						$rootScope.extraStop.push(k);			// push the count in array
+						$rootScope.extraStop.push(k);					// push the count in array
 					}	
 					
 				} else {
@@ -3425,6 +3426,11 @@ $rootScope.logoutmessage=false;
 				}
 			}
 			
+			if($rootScope.extraStop.length ==0 ){
+				$rootScope.extraStopTotLength = false;
+			}
+
+
 			if ( ~newIndex) {	
 				var newExtraStopsValue = parseInt($rootScope.editSavedLoad.Stops - 1 );
 				$rootScope.editSavedLoad.Stops = newExtraStopsValue;

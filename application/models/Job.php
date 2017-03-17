@@ -766,6 +766,8 @@ class Job extends Parent_Model {
 		unset($saveData['assignedDriverName']);	
 		
 		unset($saveData['TruckCompanyName']);
+		unset($saveData['TruckCompanyCity']);
+		unset($saveData['TruckCompanyState']);
 		unset($saveData['MCNumber']);
 		unset($saveData['CarrierMC']);
 		unset($saveData['DOTNumber']);	

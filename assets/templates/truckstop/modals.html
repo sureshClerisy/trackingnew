@@ -427,17 +427,17 @@
 											<span>
 											<figure class="driver-image">
 													<!--img ng-src="./pages/images/user.png" ng-if="defaultDriverImage == true"-->
-													<img ng-src="./assets/uploads/drivers/thumbnail/{{vehicleInfo.profile_image}}" on-error-src="./pages/img/user.png">
+													<img ng-src="./assets/uploads/drivers/thumbnail/{{vehicleInfo.profile_image}}" fallback-src="./pages/img/user.png">
 												 </figure>{{ languageCommonVariables.truckdrivername }}</span>
 											<p>{{ driverPlaceholder }} </p>
-											
-										</div>
+											</div>
 										<div class="popup-load-detail-grid select-driver-name truck-number">
-											
-											<span><figure class="truck-image">
-												<!--img ng-src="./pages/images/map-truck.png" ng-if="defaultVehicleImage == true"-->
-												<img ng-src="./assets/uploads/vehicles/thumbnail/{{vehicleInfo.vehicle_image}}" on-error-src="pages/img/map-truck.png" >
-												</figure>{{ languageCommonVariables.truckNumber }} </span>
+											<span>
+												<figure class="truck-image">
+													<img ng-src="./assets/uploads/vehicles/thumbnail/{{vehicleInfo.vehicle_image}}" fallback-src="pages/img/map-truck.png" >
+												</figure>
+												{{ languageCommonVariables.truckNumber }} 
+											</span>
 											<p>{{ vehicleInfo.label }}</p>
 										</div>
 										<div class="popup-load-detail-grid">
@@ -467,12 +467,10 @@
 												<p>{{ vehicleInfo.cargo_capacity }}{{ languageCommonVariables.weightunit }}</p>
 											</div>										
 										</div>
-										
 									</div>
 									
 										<div class="form-group driverds-p first-child">
 											<label>{{ driverAssignValue }}</label>
-											
 											<ui-select ng-disabled="disablePerm" ng-model="editSavedLoad.driver_id" theme="bootstrap" on-select="onSelectChangeDriverCallback($item, $model,'editRequest')">
 												<ui-select-match class="ui-select-match" placeholder="Select Driver">{{driverPlaceholder}}</ui-select-match>
 												<ui-select-choices class="ui-select-choices" group-by="'username'" repeat="item in listDrivers | propsFilter: {driverName: $select.search, username: $select.search}">
@@ -510,9 +508,7 @@
 												<span ng-bind-html="trustAsHtml((item.vehicleLabel | highlight: $select.search))"></span>
 											</ui-select-choices>
 										</ui-select>
-								   </div>
-					                
-														                
+								   </div>				                
 								</div>
 								</div>
 							</div>
@@ -523,7 +519,7 @@
 								<div class="row row-float shipper-start bg-blue"> 
 								<div class="table-input-head">
 									<h1>ORIGIN DETAIL</h1>
-									<button ng-click="addingNewExtraStop(editSavedLoad.Stops,'EditRequest')" ng-if="notShowPlusIcon == true" href="javascript:void(0)" type="button" class="extra-add-btn disable-anchor" ng-disabled="disablePerm"  title="Add Extra Stop"><span>+</span>Add Extra Stop</button>
+									<button ng-click="addingNewExtraStop(editSavedLoad.Stops,'EditRequest')" ng-hide="disablePerm" href="javascript:void(0)" type="button" class="extra-add-btn disable-anchor" ng-disabled="disablePerm"  title="Add Extra Stop"><span>+</span>Add Extra Stop</button>
 								</div>
 									
 										<div class="col-sm-4 col-md-4 popup-input-edit-grid pad-remove-left">
@@ -608,19 +604,20 @@
 											</div>
 									</div>
 								</div>
-								
-								<div class="row bg-orange shipper-start-new" ng-show="extraStopTotLength == true">  
-									<div class="rel-entity" ng-repeat="i in extraStop">
+
+								<div class="row bg-orange shipper-start-new" ng-show="extraStopTotLength == true" sv-root sv-part="extraStop" sv-on-sort = "testSortView($item, $partFrom, $partTo, $indexFrom, $indexTo)">
+									<div class="rel-entity" ng-repeat="i in extraStop" sv-element>
 										<div class="table-input-head">
 											<h1>EXTRA STOP({{$index+1}})</h1>
-											<button class="extra-close" ng-disabled="disablePerm" ng-click="closeExtraStopFields($index,primaryLoadId,extraStops['id_'+ $index])" title="Remove Stop" type="button">
+
+											<button class="extra-close" ng-hide="disablePerm" ng-click="closeExtraStopFields($index,primaryLoadId,extraStops['id_'+ i])" title="Remove Stop" type="button">
 												<span>X</span>
 											</button>	
 										</div>
 										<div class="col-md-4 popup-input-edit-grid pad-remove-left">
 											<div class="form-group form-group-default th-select new-select-th">
 												<label>Entity</label> 
-												<ui-select ng-disabled="disableTemp" name="extraStopEntity_{{$index}}" ng-model="extraStops['extraStopEntity_' + $index]" theme="bootstrap" on-select="onSelectChangeExtraEntityCallback($item, $model,$index)" >
+												<ui-select ng-disabled="disableTemp" name="extraStopEntity_{{i}}" ng-model="extraStops['extraStopEntity_' + i]" theme="bootstrap" on-select="onSelectChangeExtraEntityCallback($item, $model,$index)" >
 													<ui-select-match class="ui-select-match" placeholder="Select Entity">{{$select.selected.val}}</ui-select-match>
 													<ui-select-choices class="ui-select-choices" repeat="item in entityType | filter: $select.search">
 														<span ng-bind-html="trustAsHtml((item.val | highlight: $select.search))"></span>
@@ -631,13 +628,13 @@
 										<div class="col-sm-4 col-md-4 popup-input-edit-grid">
 											<div class=" dat-sec-1 form-group form-group-default">
 												<label>{{ languageCommonVariables.name }}</label>
-												<input type="text" ng-disabled="disableTemp" name="extraStopName_{{$index}}" id ="extraStopName_{{$index}}" ng-model="extraStops['extraStopName_' + $index]"  class="form-control" />
+												<input type="text" ng-disabled="disableTemp" name="extraStopName_{{i}}" id ="extraStopName_{{i}}" ng-model="extraStops['extraStopName_' + i]"  class="form-control" />
 											</div>
 										</div>	
 										<div class="col-sm-4 col-md-4 popup-input-edit-grid pad-remove-right">
 											<div class=" dat-sec-1 form-group form-group-default">
 												<label>{{ languageCommonVariables.telephone }}</label>
-												<input type="text" ng-disabled="disableTemp" name="extraStopPhone_{{$index}}" id="extraStopPhone_{{$index}}" ui-jq="mask" ui-options="'(999) 999-9999'" ng-model="extraStops['extraStopPhone_' + $index]" class="form-control" />
+												<input type="text" ng-disabled="disableTemp" name="extraStopPhone_{{i}}" id="extraStopPhone_{{i}}" ui-jq="mask" ui-options="'(999) 999-9999'" ng-model="extraStops['extraStopPhone_' + i]" class="form-control" />
 											</div>
 										</div>	
 																			
@@ -645,8 +642,8 @@
 											<div class="half-width-input weight-input weight-a weight-add-on">
 												<div class="dat-sec-1 form-group form-group-default">
 													<label> {{ languageCommonVariables.date }}</label>
-													<div class="input-group date" id="extraStopDateId_{{$index}}" ui-jq="datepicker" ui-options='{format: "yyyy-mm-dd",autoclose: true}'>
-														<input ng-disabled="disableTemp" ng-click="refreshDatepicker($event)" class="form-control" type="text" name="extraStopDate_{{$index}}" ng-model="extraStops['extraStopDate_' + $index]" ng-change="onPickupDateChangeExtraStop($index,'extraStop')" />
+													<div class="input-group date" id="extraStopDateId_{{i}}" ui-jq="datepicker" ui-options='{format: "yyyy-mm-dd",autoclose: true}'>
+														<input ng-disabled="disableTemp" ng-click="refreshDatepicker($event)" class="form-control" type="text" name="extraStopDate_{{i}}" ng-model="extraStops['extraStopDate_' + i]" ng-change="onPickupDateChangeExtraStop(i,'extraStop')" />
 															<span class="input-group-addon align-icon">
 																<i class="fa fa-calendar"></i>
 															</span>
@@ -655,11 +652,11 @@
 												<div class=" dat-sec-2 form-group form-group-default date ">
 													<div class="time-range">
 														<label>{{ languageCommonVariables.time }}</label>
-														<input ng-disabled="disableTemp" ng-click="refreshTimepicker($event)"  autocomplete = "off" type="text" id="extraStopTime_{{$index}}" name="extraStopTime_{{$index}}" class="form-control " ng-model="extraStops['extraStopTime_' + $index]"  timepicker/>
+														<input ng-disabled="disableTemp" ng-click="refreshTimepicker($event)"  autocomplete = "off" type="text" id="extraStopTime_{{i}}" name="extraStopTime_{{i}}" class="form-control " ng-model="extraStops['extraStopTime_' + i]"  timepicker/>
 													</div>
 													<div class="time-range">
 														<label>&nbsp;</label>
-														<input ng-disabled="disableTemp" ng-click="refreshTimepicker($event)"  autocomplete = "off" type="text" id="extraStopTimeRange_{{$index}}" name="extraStopTimeRange_{{$index}}" class="form-control " ng-model="extraStops['extraStopTimeRange_' + $index]"  timepicker/>
+														<input ng-disabled="disableTemp" ng-click="refreshTimepicker($event)"  autocomplete = "off" type="text" id="extraStopTimeRange_{{i}}" name="extraStopTimeRange_{{i}}" class="form-control " ng-model="extraStops['extraStopTimeRange_' + i]"  timepicker/>
 													</div>
 												</div>
 											</div>
@@ -668,7 +665,7 @@
 											<div class="half-width-input weight-input input-address google-places">
 												<div class="form-group form-group-default noBackground">
 													<label>{{ languageCommonVariables.address }}</label>
-													<input type="text" ng-disabled="disablePerm" id="extraStopEditAddress_{{$index}}" class="form-control" ng-model="extraStops['extraStopAddress_' + $index]" name="extraStopEditAddress_{{$index}}" />
+													<input type="text" ng-disabled="disablePerm" id="extraStopEditAddress_{{i}}" class="form-control" ng-model="extraStops['extraStopAddress_' + i]" name="extraStopEditAddress_{{i}}" />
 												</div>
 											</div>
 										</div>
@@ -678,31 +675,31 @@
 											<div class="col-md-3 popup-input-edit-grid pad-remove-left">
 												<div class="form-group form-group-default noBackground">
 													<label>City</label>
-													<input type="text" ng-disabled="disablePerm" class="form-control" id="DestinationCity" ng-blur="changeExtraStopsMilesDistance($index)" ng-model="extraStops['extraStopCity_' + $index]" name="extraStopCity_{{$index}}"  />
+													<input type="text" ng-disabled="disablePerm" class="form-control" id="DestinationCity" ng-blur="changeExtraStopsMilesDistance(i)" ng-model="extraStops['extraStopCity_' + i]" name="extraStopCity_{{i}}"/>
 												</div>
 											</div>
 											<div class="col-md-3 popup-input-edit-grid">
 												<div class="form-group form-group-default noBackground">
 													<label>State</label>
-													<input type="text"  ng-disabled="disablePerm" class="form-control" id="DestinationState" ng-blur="changeExtraStopsMilesDistance($index)" ng-model="extraStops['extraStopState_' + $index]" name="extraStopState_{{$index}}" />
+													<input type="text"  ng-disabled="disablePerm" class="form-control" id="DestinationState" ng-blur="changeExtraStopsMilesDistance(i)" ng-model="extraStops['extraStopState_' + i]" name="extraStopState_{{i}}" />
 												</div>
 											</div>
 											<div class="col-md-3 popup-input-edit-grid">
 												<div class="form-group form-group-default">
 													<label>Zip Code</label>
-													<input type="text"  ng-disabled="disablePerm" name="extraStopZipCode_{{$index}}" class="form-control" ng-model="extraStops['extraStopZipCode_' + $index]"  />
+													<input type="text"  ng-disabled="disablePerm" name="extraStopZipCode_{{i}}" class="form-control" ng-model="extraStops['extraStopZipCode_' + i]"  />
 												</div>
 											</div>
 											<div class="col-md-3 popup-input-edit-grid pad-remove-right">
 												<div class="form-group form-group-default noBackground">
 													<label>Country</label>
-													<input type="text" class="form-control"  ng-disabled="disablePerm" id="DestinationCountry" ng-blur="changeExtraStopsMilesDistance($index)" ng-model="extraStops['extraStopCountry_' + $index]" name="extraStopCountry_{{$index}}" />
+													<input type="text" class="form-control"  ng-disabled="disablePerm" id="DestinationCountry" ng-blur="changeExtraStopsMilesDistance(i)" ng-model="extraStops['extraStopCountry_' + i]" name="extraStopCountry_{{i}}" />
 												</div>
 											</div>
 																					
 										</div>
 										
-										<input type="hidden" id ="extraStopAddPrimaryId_{{$index}}"  class="form-control" ng-model="extraStops['id_'+ $index]">
+										<input type="hidden" id ="extraStopAddPrimaryId_{{i}}"  class="form-control" ng-model="extraStops['id_'+ i]">
 										
 									</div>									
 								</div>
@@ -1134,7 +1131,7 @@
 							<div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 truck-load-pdf-left">
 								<div class="row">
 									<div class="pdf-cover" data-id="{{brokerDoc.id}}" data-loadid="{{brokerDoc.load_id}}" data-url="assets/uploads/documents/broker/{{brokerDoc.doc_name}}" ng-click="perviewDoc($event)">
-										<img ng-class="{'text-success': docs.thumb.includes('.doc') > -1}" ng-src="assets/uploads/documents/thumb_broker/{{brokerDoc.thumb_doc_name}}" on-error-src="pages/img/pdf.png" />
+										<img ng-class="{'text-success': docs.thumb.includes('.doc') > -1}" ng-src="assets/uploads/documents/thumb_broker/{{brokerDoc.thumb_doc_name}}" fallback-src="pages/img/pdf.png" />
 									</div>
 								</div>
 							</div>
@@ -1664,7 +1661,7 @@
 												<div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 truck-load-pdf-left">
 													<div class="row">
 														<div class="pdf-cover" data-id="{{docs.id}}" data-loadid="{{docs.load_id}}" data-url="assets/uploads/documents/{{docs.doc_type}}/{{docs.doc_name}}" ng-click="perviewDoc($event)">
-															<img ng-class="{'text-success': docs.thumb.includes('.doc') > -1}" ng-src="assets/uploads/documents/thumb_{{docs.doc_type}}/{{docs.thumb}}" on-error-src="pages/img/pdf.png" />
+															<img ng-class="{'text-success': docs.thumb.includes('.doc') > -1}" ng-src="assets/uploads/documents/thumb_{{docs.doc_type}}/{{docs.thumb}}" fallback-src="pages/img/pdf.png" />
 														</div>
 													</div>
 												</div>
@@ -1804,3 +1801,4 @@ $(document).on("click", function(event){
 });
 </script>
 <!------------------------Load Details end--------------------------->
+

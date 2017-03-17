@@ -2826,7 +2826,7 @@ hr.dotted {
 }
 /* For Windows : Fixes 
 ------------------------------------
-*/
+*
 .windows body,
 .windows p {
   font-size: 13px;
@@ -2870,7 +2870,7 @@ hr.dotted {
 .windows small,
 .windows .small {
   font-size: 89%;
-}
+}*/
 /*------------------------------------------------------------------
 [6. Buttons]
 */

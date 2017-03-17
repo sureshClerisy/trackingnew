@@ -118,7 +118,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="col-sm-4 img-cont">
-                                                        <img class="center-me" on-error-src="pages/img/user.png" ng-src="./assets/uploads/drivers/thumbnail/{{driversData.profile_image}}" width="70" height="50">
+                                                        <img class="center-me" fallback-src="pages/img/user.png" ng-src="./assets/uploads/drivers/thumbnail/{{driversData.profile_image}}" width="70" height="50">
                                                     </div>
                                                 </div>
                                                 <div pg-form-group class="form-group form-group-default  "  >
@@ -133,7 +133,7 @@
                                                         <div class="row1">
                                                             <button class="btn btn-danger" type="button" ng-click="deleteDoc(docs.id,docs.document_name, $index);">X</button>
                                                             <div class="pdf-cover" data-url="assets/uploads/documents/driver/{{docs.document_name}}" ng-click="perviewDoc($event)">
-																<img ng-src="assets/uploads/documents/thumb_driver/thumb_{{docs.document_name | filetoimg}} " on-error-src="pages/img/pdf.png" />
+																<img ng-src="assets/uploads/documents/thumb_driver/thumb_{{docs.document_name | filetoimg}} " fallback-src="pages/img/pdf.png" />
 															</div>
                                                         </div>
                                                     </div>

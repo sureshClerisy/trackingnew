@@ -1955,10 +1955,10 @@ class Truckstop extends Admin_Controller{
 				}
 				$fileName = 'thumb_'.$fileName.'.jpg';
 				
-				$docs_list['brokerDocuments'][$i]['doc_name'] 		= $result[$i]['document_name'];
+				$docs_list['brokerDocuments'][$i]['doc_name'] = $result[$i]['document_name'];
 				$docs_list['brokerDocuments'][$i]['thumb_doc_name'] = $fileName;
-				$docs_list['brokerDocuments'][$i]['id'] 			= $result[$i]['id'];
-				$docs_list['brokerDocuments'][$i]['BrokerId'] 		= $brokerId;
+				$docs_list['brokerDocuments'][$i]['id'] = $result[$i]['id'];
+				$docs_list['brokerDocuments'][$i]['BrokerId'] = $brokerId;
 			}
 		}
 		
@@ -2031,13 +2031,16 @@ class Truckstop extends Admin_Controller{
 						$fileCheck = $this->CheckPdfNotCompressed($response['data']['file_name'], $parameter);		// code to check uploaded pdf file is compressed or not
 						
 						if ( $fileCheck == 'pdfCompression' ) {
-
-							$response['data']['file_name'] 	= $this->degradePdfVersion($response['data']);
-							// $response['data']['raw_name'] 	= $response['data']['raw_name'].'_1';
+							// $degradedFileName = $this->degradePdfVersion($response['data']);
+							$response['data']['file_name'] = $this->degradePdfVersion($response['data']);
 							$response['data']['raw_name']  = $response['data']['raw_name'].'_1';
 							unlink($response['data']['full_path']);
+							// $response['compressionError'] = 1;
+							// $response['compressionError'] = 0;
+							// return $response;					// return error response if file is compressed
 						}
 					}
+					
 					if (substr(php_uname(), 0, 7) == "Windows"){ 
 				        //pclose(popen("start /B ". $cmd, "r"));  
 				        $response['data']['cmd'] = 'Windows';
@@ -3190,9 +3193,9 @@ class Truckstop extends Admin_Controller{
         try
         {
 	        while(true){
-	            $response =  file_get_contents("https://maps.googleapis.com/maps/api/place/search/json?location=-33.8670522,151.1957362&radius=500&sensor=false&key=".$gKeys[$keyIndex]);
-	            $response =  file_get_contents("https://maps.googleapis.com/maps/api/place/search/json?location=-33.8670522,151.1957362&radius=500&sensor=false&key=".$gKeys[$keyIndex]);
-	            $response =  file_get_contents("https://maps.googleapis.com/maps/api/place/search/json?location=-33.8670522,151.1957362&radius=500&sensor=false&key=".$gKeys[$keyIndex]);
+	            $response =  file_get_contents("//maps.googleapis.com/maps/api/place/search/json?location=-33.8670522,151.1957362&radius=500&sensor=false&key=".$gKeys[$keyIndex]);
+	            $response =  file_get_contents("//maps.googleapis.com/maps/api/place/search/json?location=-33.8670522,151.1957362&radius=500&sensor=false&key=".$gKeys[$keyIndex]);
+	            $response =  file_get_contents("//maps.googleapis.com/maps/api/place/search/json?location=-33.8670522,151.1957362&radius=500&sensor=false&key=".$gKeys[$keyIndex]);
 	            
 	            $response = json_decode($response,true);
 	            if(in_array($response["status"], array("OVER_QUERY_LIMIT","REQUEST_DENIED"))){

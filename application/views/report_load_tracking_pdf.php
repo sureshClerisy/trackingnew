@@ -146,6 +146,40 @@ table .driver-table td table td, table .driver-table td  table th{
 									<div style="width:100%;float:left;">
 										
 										<div style="width:100%;float:left;margin-bottom:20px;">
+										<?php if ( $args['scope'] == 'all' && $args['reportType'] == 'performance'){ ?>
+
+											<table class="inner-thead" cellpadding="0" cellspacing="0" style="   width: 100%;">
+												<thead>
+													<tr style=" background: #077ed0">
+													  <?php 
+														$i=1;
+														foreach ($column_mappings as $key => $value) { 
+														  if(strtolower($value) == "dispatcher"){
+															  continue;
+														  }
+															$class = "twf_".$i++;
+														?>
+															<th style="white-space: nowrap;border:none;  color: #fff; text-transform: uppercase;font-size:11px;padding: 13px 10px;" class="text-center <?php echo $class; ?>" ><?php echo $value; ?></th>
+													  <?php	} ?>
+													</tr>
+												</thead>
+												<tbody>
+											  		<tr>
+													<?php 
+														foreach($driverList as $rkey => $row){
+														$j = 1;?>
+														<td style=" none repeat scroll 0 0;   color: rgb(85, 85, 85); text-transform: uppercase;font-size:11px;padding: 13px 10px;" class="twf_<?php echo $j++; ?>">
+															<?php echo $row; ?>
+															<?php echo $rkey == "overallTotalProfitPercent" ? "%" : ""; ?>
+														</td>
+													<?php } ?>
+													 </tr>
+												</tbody>
+											</table>
+
+
+
+										<?php } else { ?>
 										  	<table class="inner-thead" cellpadding="0" cellspacing="0" style="   width: 100%;">
 										  	<caption style="text-align: left;width: 100%;padding: 0;margin: 0;"><h3 style="color: rgb(85, 85, 85);margin-bottom: 10px;width:100%;float:left;font-size:14px;"><span>Driver : </span><?php echo $dlkey; ?></h3></caption>
 												<thead>
@@ -178,10 +212,13 @@ table .driver-table td table td, table .driver-table td  table th{
 												<?php } ?>
 												</tbody>	
 											</table>
+
+										<?php } ?>
+
 										</div>
 									</div><!-- block-repeat-->
 									<?php }?>
-									<pagebreak />
+									
 								</div>
 							<?php } 
 						}?>

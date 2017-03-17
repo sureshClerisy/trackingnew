@@ -13,15 +13,90 @@ app.controller('truckstopController', function( dataFactory,$scope,$sce,$http ,$
     $scope.canDocsShow = false;
     $rootScope.extraStops='';
     $scope.duplicatejobstatus='';
+	
 	$scope.trustAsHtml = function(value) {
-            return $sce.trustAsHtml(value);
+    	return $sce.trustAsHtml(value);
     };
 
     $scope.onSelectCallback = function (item, model){
 		$rootScope.form.destination_state = item.code;
 		$("#select_state").val(item.code);
 	};
-    $scope.onSelectpostedTimeCallback = function (item, model){
+
+
+
+
+	$scope.testSortView = function ($item, $partFrom, $partTo, $indexFrom, $indexTo){
+
+		//$item, $partFrom, $partTo, $indexFrom, $indexTo
+		
+		// alert('$item = '+$item +' /$index = '+ $index +' /$part = '+$part);
+		//$item, $partFrom, $partTo, $indexFrom, $indexTo
+
+		alert('$item = '+$item +' / $partFrom = '+ $partFrom +' / $partTo = '+$partTo+'/ $indexFrom = '+$indexFrom +'/ $indexTo = '+$indexTo);
+		
+		//$scope.extraStop = [2,1,0];
+		
+		//Creatting tem variable 
+		
+		// $extraStopAddress 	= $rootScope.extraStops['extraStopAddress_'+$indexFrom];
+		// $extraStopCity   	= $rootScope.extraStops['extraStopCity_'+$indexFrom];
+		// $extraStopState  	= $rootScope.extraStops['extraStopState_'+$indexFrom];
+		// $extraStopCountry 	= $rootScope.extraStops['extraStopCountry_'+$indexFrom];
+		// $extraStopTime 	 	= $rootScope.extraStops['extraStopTime_'+$indexFrom];
+		// $extraStopTimeRange 	= $rootScope.extraStops['extraStopTimeRange_'+$indexFrom];
+		// $extraStopDate 		= $rootScope.extraStops['extraStopDate_'+$indexFrom];
+		// $extraStopZipCode 	= $rootScope.extraStops['extraStopZipCode_'+$indexFrom];
+		// $extraStopPhone 		= $rootScope.extraStops['extraStopPhone_'+$indexFrom];
+		// $extraStopName 		= $rootScope.extraStops['extraStopName_'+$indexFrom];
+		// $extraStopEntity 	= $rootScope.extraStops['extraStopEntity_'+$indexFrom];
+
+
+		// //Assigning value
+		// $rootScope.extraStops['extraStopAddress_'+$indexFrom] 	= $rootScope.extraStops['extraStopAddress_'+$indexTo];
+		// $rootScope.extraStops['extraStopCity_'+$indexFrom] 		= $rootScope.extraStops['extraStopCity_'+$indexTo];
+		// $rootScope.extraStops['extraStopState_'+$indexFrom] 	= $rootScope.extraStops['extraStopState_'+$indexTo];
+		// $rootScope.extraStops['extraStopCountry_'+$indexFrom] 	= $rootScope.extraStops['extraStopCountry_'+$indexTo];
+		// $rootScope.extraStops['extraStopTime_'+$indexFrom] 		= $rootScope.extraStops['extraStopTime_'+$indexTo];
+		// $rootScope.extraStops['extraStopTimeRange_'+$indexFrom] = $rootScope.extraStops['extraStopTimeRange_'+$indexTo];
+		// $rootScope.extraStops['extraStopDate_'+$indexFrom] 		= $rootScope.extraStops['extraStopDate_'+$indexTo];
+		// $rootScope.extraStops['extraStopZipCode_'+$indexFrom] 	= $rootScope.extraStops['extraStopZipCode_'+$indexTo];
+		// $rootScope.extraStops['extraStopPhone_'+$indexFrom] 	= $rootScope.extraStops['extraStopPhone_'+$indexTo];
+		// $rootScope.extraStops['extraStopName_'+$indexFrom] 		= $rootScope.extraStops['extraStopName_'+$indexTo];
+		// $rootScope.extraStops['extraStopEntity_'+$indexFrom] 	= $rootScope.extraStops['extraStopEntity_'+$indexTo];
+		
+		// $rootScope.extraStops['extraStopAddress_'+$indexTo] 	= $extraStopAddress;
+		// $rootScope.extraStops['extraStopCity_'+$indexTo] 		= $extraStopCity;
+		// $rootScope.extraStops['extraStopState_'+$indexTo] 		= $extraStopState;
+		// $rootScope.extraStops['extraStopCountry_'+$indexTo] 	= $extraStopCountry;
+		// $rootScope.extraStops['extraStopTime_'+$indexTo] 		= $extraStopTime;
+		// $rootScope.extraStops['extraStopTimeRange_'+$indexTo] 	= $extraStopTimeRange;
+		// $rootScope.extraStops['extraStopDate_'+$indexTo] 		= $extraStopDate;
+		// $rootScope.extraStops['extraStopZipCode_'+$indexTo] 	= $extraStopZipCode;
+		// $rootScope.extraStops['extraStopPhone_'+$indexTo] 		= $extraStopPhone;
+		// $rootScope.extraStops['extraStopName_'+$indexTo] 		= $extraStopName;
+		// $rootScope.extraStops['extraStopEntity_'+$indexTo] 		= $extraStopEntity;
+		
+		// alert($rootScope.extraStops['extraStopAddress_'+$indexTo]);
+
+		// alert($rootScope.extraStops['extraStopEntity_'+$indexFrom]);
+
+		$scope.$apply();
+	};
+
+	/*
+	//added listener per @homerjam per https://github.com/angular-ui/ui-select/issues/974
+	$scope.$on('uiSelectSort:change', function(event, args) {
+	    console.log('uiSelectSort:change', args);
+		$scope.multipleDemo.selectedPeople = args.array;
+	    if (!$scope.$$phase) { //http://stackoverflow.com/questions/20263118/what-is-phase-in-angularjs
+	        $scope.$apply();
+	    }
+	});*/
+
+
+    
+	$scope.onSelectpostedTimeCallback = function (item, model){
 		$rootScope.form.posted_time = item.key;
 	    $("#select_postedTime").val(item.key);
 	};
