@@ -55,6 +55,12 @@ if (!function_exists('logEvent')){
 	}
 }
 
+if (!function_exists('logActivityEvent')){
+	function logActivityEvent($entityId, $entityType, $eventType, $message ,  $jobModel, $srcPage=''){
+		$jobModel->logActivityEvent($entityId, $entityType, $eventType, $message, $srcPage);
+	}
+}
+
 
 if (!function_exists('getProfitPercent'))
 {

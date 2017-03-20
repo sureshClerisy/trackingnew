@@ -18,7 +18,7 @@ input.header-serach-input.header-serach-input { background: #fafafa;  border: no
 .icon { display: inline-block;margin: 20px 18px 0px 0px; position: relative;cursor:pointer;}
 .num-block { position: absolute; right: -14px; top: -7px; font-size: 12px; width: 20px; height: 20px; border-radius: 20px; line-height: 17px; border: 1px solid #000; text-align: center;  background: #fff;  box-shadow: 0px 0px 0px 2px #fff;-moz-box-shadow: 0px 0px 0px 2px #fff;-webkit-box-shadow: 0px 0px 0px 2px #fff;-o-box-shadow: 0px 0px 0px 2px #fff;-ms-box-shadow: 0px 0px 0px 2px #fff;
 }
-
+.highlighted { background: yellow }
 .mail-icons-block{padding-right:30px;}
 .icon.mail .num-block{border-color:#34d6c7;;color:#34d6c7;}
 .icon.list .num-block{border-color:#077ed0;color:#077ed0;}

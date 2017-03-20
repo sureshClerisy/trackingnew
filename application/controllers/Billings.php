@@ -14,11 +14,13 @@ class Billings extends Admin_Controller{
 	public $userId;
 	public $finalArray;
 	public $triumphToken;
+	public  $userName;
 
 	function __construct(){
 		parent::__construct();
 		
 		$this->userId 		= $this->session->loggedUser_id;
+		$this->userName   	= $this->session->loggedUser_username;
 		$this->load->model('Vehicle');
 		$this->load->model('Job');
 		$this->load->model('Billing');
@@ -38,8 +40,6 @@ class Billings extends Admin_Controller{
 			$this->triumphUrl  	 		= $this->config->item('triumph_url_test');
 			$this->triumphUrlRequest   	= $this->config->item('triumph_url_request_test');
 		}
-		
-				
     }
 	
 	public function index( $parameter = '' ) {
@@ -115,102 +115,118 @@ class Billings extends Admin_Controller{
 	 * creating schedule and send for payment
 	 */ 
 	 
-	public function creatingSchedule() {
-	
-		$objPost = json_decode(file_get_contents('php://input'),true);
-		//~ $objPost['selectedIds'] = array(10554,10572,10575,10591,10594,10595,10596,10596,10601,10602,10606,10608,10611,10613,10621,10622,10623,10630,10631,10634,10636,10640,10642,10643,10644,10646,10648,10650,10652,10654,10655,10661,10674,10676,10677,10678,10680,10682,10683,10684,10685,10687,10688,10689,10696,10699,10700,10702,10703,10717);	
-		//~ pr($objPost); die; 
-		$genDocs = array();
-		$createDocument = array();
-		$createErrorFile = array();
-		$inputIdsForFinal = array();
-		$saveIds = array();
-		$resultReturnedArray = $this->createMultipleInputs($objPost['selectedIds']);
-		$resultReturnedIds = $resultReturnedArray[0];
-		$this->triumphToken = $resultReturnedArray[1];
-		
-		$docTypesArray = $this->getApiMethodValue('/v1List/DocTypes','', $this->triumphToken);
-		$docTypes = $docTypesArray[0];
-		$this->triumphToken = $docTypesArray[1];
-		
-		$docArray = array();
-		if( !empty($docTypes) ) {
-			$i = 0;
-			$documentType = '';
-			foreach( $docTypes as $docs ) {
-				if( $docs['name'] == 'Invoice' || $docs['name'] == 'Rate Confirmation' || $docs['name'] == 'Bill of Lading' ) {
-					$documentType .= 'docType['.$i.']='.$docs['documentTypeId'].'&';
-				} 
-				$i++; 
-			}
-			$documentType = rtrim($documentType,'&');
-		} else {
-			$documentType = 'docType[0]=1&docType[1]=2&docType[2]=3';
-		}		
-					
-		for ( $i = 0; $i < count($resultReturnedIds); $i++ ) {
-			$genDocs[$i]['inputId'] = urlencode($resultReturnedIds[$i]);
-			$genDocs[$i]['filename'] = urlencode($this->Billing->getBundleFileName( $objPost['selectedIds'][$i] ));
-			$genDocs[$i]['fileData'] = $this->convertByte( $genDocs[$i]['filename'] );
-			$genDocs[$i]['docType'] = $documentType;
+	public function creatingSchedule() 
+	{
+		try{	
+			$objPost = json_decode(file_get_contents('php://input'),true);
+			//~ $objPost['selectedIds'] = array(10554,10572,10575,10591,10594,10595,10596,10596,10601,10602,10606,10608,10611,10613,10621,10622,10623,10630,10631,10634,10636,10640,10642,10643,10644,10646,10648,10650,10652,10654,10655,10661,10674,10676,10677,10678,10680,10682,10683,10684,10685,10687,10688,10689,10696,10699,10700,10702,10703,10717);	
+			//~ pr($objPost); die; 
+
+			$genDocs = array();
+			$createDocument = array();
+			$createErrorFile = array();
+			$inputIdsForFinal = array();
+			$saveIds = array();
+			$resultReturnedArray = $this->createMultipleInputs($objPost['selectedIds']);
+			$resultReturnedIds = $resultReturnedArray[0];
+			$this->triumphToken = $resultReturnedArray[1];
 			
-			$docsResultArray = $this->createDocument($genDocs[$i], $this->triumphToken);
+			$docTypesArray = $this->getApiMethodValue('/v1List/DocTypes','', $this->triumphToken);
+			$docTypes = $docTypesArray[0];
+			$this->triumphToken = $docTypesArray[1];
 			
-			$docsResult = $docsResultArray[0];
-			$this->triumphToken = $docsResultArray[1];
-			
-			if ( $docsResult[0] != '' && is_numeric($docsResult[0]) )
-				$createDocument[$i]['documentId'] = $docsResult[0];
-			else
-				$createErrorFile[$i]['error'] = $docsResult[0];
-			
-			$inputIdsForFinal[$i] = $genDocs[$i]['inputId'];
-			$saveIds[$i] = "'".$genDocs[$i]['inputId']."+".$objPost['selectedIds'][$i];
-			$this->Billing->updatePaymentSent( $objPost['selectedIds'][$i] );
-		}
-	
-		$idsVar = '';
-		foreach ( $saveIds as $saveId ) {
-			$newIds = explode('+',$saveId);
-			$idsVar .= $newIds[1].',';
-		}
-		$idsVar = rtrim($idsVar,',');
-		
-		$fundingOptionsArray = $this->getApiMethodValue('/v1List/FundingOptions','funding',$this->triumphToken);
-		$fundingOptions = $fundingOptionsArray[0];
-		$this->triumphToken = $fundingOptionsArray[1];
-		$funding = 'Fund using WIRE *9995';
-			
-		if (!empty( $fundingOptions) ) {
-			foreach( $fundingOptions as $funds ) {
-				if ( $funds['isDefault'] == 1 ) 
-					$funding = $funds['name'];
-			}
-		} 
-	
-		$errorMessage = '';
-		if ( !empty($inputIdsForFinal) ) {
-			$finalizeInputArray = $this->createFinalizeInputArray($inputIdsForFinal, $funding,$this->triumphToken);
-			$finalizeInput = $finalizeInputArray[0];
-			$this->triumphToken = $finalizeInputArray[1];
-			if ( $finalizeInput != '' && strpos($finalizeInput, 'Id:') === false ) {
-				$this->Billing->saveConfirmationCode($idsVar,$finalizeInput);
+			$docArray = array();
+			if( !empty($docTypes) ) {
+				$i = 0;
+				$documentType = '';
+				foreach( $docTypes as $docs ) {
+					if( $docs['name'] == 'Invoice' || $docs['name'] == 'Rate Confirmation' || $docs['name'] == 'Bill of Lading' ) {
+						$documentType .= 'docType['.$i.']='.$docs['documentTypeId'].'&';
+					} 
+					$i++; 
+				}
+				$documentType = rtrim($documentType,'&');
 			} else {
-				$invalidIdArray = explode('Id:',$finalizeInput);
-				$invalidId = $invalidIdArray[1];
+				$documentType = 'docType[0]=1&docType[1]=2&docType[2]=3';
+			}		
+						
+			for ( $i = 0; $i < count($resultReturnedIds); $i++ ) {
+				$genDocs[$i]['inputId'] = urlencode($resultReturnedIds[$i]);
+				$genDocs[$i]['filename'] = urlencode($this->Billing->getBundleFileName( $objPost['selectedIds'][$i] ));
+				$genDocs[$i]['fileData'] = $this->convertByte( $genDocs[$i]['filename'] );
+				$genDocs[$i]['docType'] = $documentType;
 				
-				foreach ( $saveIds as $saveId ) {
-					if ( strpos($saveId, $invalidId) !== false ) {
-						$loadIdArr = explode('+',$saveId);
-						$laodId = $loadIdArr[1];
-					}
-				}				
-				$errorMessage = 'Error !: Some error occured while submiting documents to triumph';
+				$docsResultArray = $this->createDocument($genDocs[$i], $this->triumphToken);
+				
+				$docsResult = $docsResultArray[0];
+				$this->triumphToken = $docsResultArray[1];
+				
+				if ( $docsResult[0] != '' && is_numeric($docsResult[0]) )
+					$createDocument[$i]['documentId'] = $docsResult[0];
+				else
+					$createErrorFile[$i]['error'] = $docsResult[0];
+				
+				$inputIdsForFinal[$i] = $genDocs[$i]['inputId'];
+				$saveIds[$i] = "'".$genDocs[$i]['inputId']."+".$objPost['selectedIds'][$i];
+				$this->Billing->updatePaymentSent( $objPost['selectedIds'][$i] );
 			}
+		
+			$idsVar = '';
+			foreach ( $saveIds as $saveId ) {
+				$newIds = explode('+',$saveId);
+				$idsVar .= $newIds[1].',';
+			}
+			$idsVar = rtrim($idsVar,',');
+			
+			$fundingOptionsArray = $this->getApiMethodValue('/v1List/FundingOptions','funding',$this->triumphToken);
+			$fundingOptions = $fundingOptionsArray[0];
+			$this->triumphToken = $fundingOptionsArray[1];
+			$funding = 'Fund using WIRE *9995';
+				
+			if (!empty( $fundingOptions) ) {
+				foreach( $fundingOptions as $funds ) {
+					if ( $funds['isDefault'] == 1 ) 
+						$funding = $funds['name'];
+				}
+			} 
+		
+			$errorMessage = '';
+			if ( !empty($inputIdsForFinal) ) {
+				$finalizeInputArray = $this->createFinalizeInputArray($inputIdsForFinal, $funding,$this->triumphToken);
+				$finalizeInput = $finalizeInputArray[0];
+				$this->triumphToken = $finalizeInputArray[1];
+				if ( $finalizeInput != '' && strpos($finalizeInput, 'Id:') === false ) {
+					$this->Billing->saveConfirmationCode($idsVar,$finalizeInput);
+					$ticketsThatHasBeenSent = explode(',', $idsVar);
+					if(count($ticketsThatHasBeenSent) > 0){
+						$loadsSent = array();
+						$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> sent a batch of <i class="ticket-batch">'.count($ticketsThatHasBeenSent).'</i> job ticket(s)';
+						foreach ($ticketsThatHasBeenSent as $key => $value) {
+							$loadsSent[]  = '<a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$value.',\'\',\'\',\'\',\'\',0,\'\')">#'.$value.'</a>';
+						}
+						$message.=' ('.implode(",", $loadsSent).') to triumph with confirmation code #'.$finalizeInput.'.';
+						logActivityEvent($finalizeInput, $this->entity["truimph"], $this->event["sent_for_payment"], $message, $this->Job,'Send For Payment');
+					}
+				} else {
+					$invalidIdArray = explode('Id:',$finalizeInput);
+					$invalidId = $invalidIdArray[1];
+					
+					foreach ( $saveIds as $saveId ) {
+						if ( strpos($saveId, $invalidId) !== false ) {
+							$loadIdArr = explode('+',$saveId);
+							$laodId = $loadIdArr[1];
+						}
+					}				
+					$errorMessage = 'Error !: Some error occured while submiting documents to triumph';
+				}
+			}
+		
+			$data = $this->fetchingSentPaymentsInfo();
+			echo json_encode(array('success' => true,'loadsInfo' => $data, 'errorMessage' => $errorMessage));
+		}catch(Exception $e){
+			log_message("error","SENT_FOR_PAYMENT".$e->getMessage());
+			echo json_encode(array('success' => false,'loadsInfo' => array(), 'errorMessage' => "Got an exception"));
 		}
-	
-		$data = $this->fetchingSentPaymentsInfo();
-		echo json_encode(array('success' => true,'loadsInfo' => $data, 'errorMessage' => $errorMessage));
 	}
 	
 	/**
@@ -373,15 +389,31 @@ class Billings extends Admin_Controller{
 		echo json_encode($result);
 	} 
 	
-	/**
-	 * Flag or unflag the load for payment
-	 */
+	/*
+	* Request URI : http://siteurl/billings/flagLoad
+	* Method : post
+	* Params : status, loadId
+	* Return : null
+	* Comment: Used for flag a load for sent for payment
+	*/
 	
-	public function flagLoad( $status = '', $loadId = null ) {
-		$result = $this->Billing->flagUnflagLoad( $status, $loadId );
-		$data = $this->fetchingSentPaymentsInfo();
-		$data['flaggedLoads'] = $this->Billing->fetchFlaggedPaymentLoads();
-		echo json_encode(array('success' => true,'loadsInfo' => $data));	
+	public function flagLoad( $status = '', $loadId = null,$srcPage = '' ) {
+		try{
+			$result = $this->Billing->flagUnflagLoad( $status, $loadId );
+			if($status == "flag"){
+				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> added the job ticket <a 	href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$loadId.',\'\',\'\',\'\',\'\',0,\'\')">#'.$loadId.'</a> to queue.';		
+				logActivityEvent($loadId, $this->entity["ticket"], $this->event["add_to_queue"], $message, $this->Job,$srcPage);
+			}else{
+				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> removed the job ticket <a 	href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$loadId.',\'\',\'\',\'\',\'\',0,\'\')">#'.$loadId.'</a> from queue.';	
+				logActivityEvent($loadId, $this->entity["ticket"], $this->event["remove_from_queue"], $message, $this->Job,$srcPage);
+			}
+			$data = $this->fetchingSentPaymentsInfo();
+			$data['flaggedLoads'] = $this->Billing->fetchFlaggedPaymentLoads();
+			echo json_encode(array('success' => true,'loadsInfo' => $data));	
+		}catch(Exception $e){
+			log_message("error","ADD_REMOVE_QUEUE".$e->getMessage());
+			echo json_encode(array('success' => false,'loadsInfo' => array()));	
+		}
 	} 
 	
 	

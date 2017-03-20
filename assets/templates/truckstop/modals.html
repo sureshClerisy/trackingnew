@@ -1487,10 +1487,11 @@
 						
 						<div class="popup-inner-content-main" ng-show="showhighlighted == 'timeline'">
 							<div class="col-xs-12">
+								<input ng-show="haveActivities == 'yes'" type="text" placeholder="Search" ng-model="search.text"><br><br>
 								<div class="timeline-tab bg-master-lighter"  ng-show="haveActivities == 'yes'" data-jquery-scrollbar="jqueryScrollbarOptions">
 								    <div class="timeline-container top-circle">
 								        <section class="timeline">
-								            <div class="timeline-block" ng-repeat="activity in ticketActivity">
+								            <div class="timeline-block" ng-repeat="activity in ticketActivity | filter:search.text">
 								                <div class="timeline-point {{activity.event_color}}">
 								                    <i class="fa {{activity.action_type}}"></i>
 								                </div>
@@ -1506,10 +1507,10 @@
 																
 								                            </div>
 								                            <h5 class="text-{{activity.event_color}}" >{{activity.userName}}</h5>
-								                             <h6>{{activity.title}}</h6> 
+								                             <h6 ng-bind-html="activity.title | thighlight:search.text">{{activity.title}}</h6> 
 								                        </div>
 								                        <div class="card-description">
-								                            <p dynamic="activity.event_msg"></p>
+								                            <p ng-bind-html="activity.event_msg | thighlight:search.text"></p>
 								                        </div>
 								                    </div>
 								                    <div class="event-date">

@@ -2588,7 +2588,7 @@ class Truckstop extends Admin_Controller{
 												  break;
 						}
 
-						if(in_array($key, array("second_driver_id","trailer_id","driver_type","PickupAddress","updated","updated_record","created","PickDate"))){continue;}
+						if(in_array($key, array("second_driver_id","trailer_id","driver_type","PickupAddress","updated","updated_record","created","PickDate","ready_for_invoice"))){continue;}
 
 						if($key == "stops"){
 							$key = "extra stop(s)";

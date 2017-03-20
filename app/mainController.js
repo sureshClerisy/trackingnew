@@ -34,13 +34,13 @@ $rootScope.logoutmessage=false;
         setTimeout(function() {
             $('#modalSlideLeft').modal('show');
         }, 50);
-        if($scope.ureadCount > 0){
+        //if($scope.ureadCount > 0){
 	        dataFactory.httpRequest(URL + '/login/flagAsRead').then(function(data) {
 	        	$scope.ureadCount = data.ureadCount;
 				$scope.notificationsList = [];
 	            $scope.notificationsList = data.notifications;
 	        });
-	    }
+	    //}
     };
 		
 	/**Fetching content from common file*/
@@ -4114,4 +4114,19 @@ $rootScope.logoutmessage=false;
 			}	
 		}
 	}); 
+});
+
+app.filter('thighlight', function($sce) {
+    return function(text, phrase) {
+      if(phrase){
+        phrase = phrase.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");  
+        if(phrase.indexOf('>') == -1){
+	    	//if (phrase) text = text.replace(new RegExp('(!<i[^>]*>)(!<span[^>]*>)(?!<a[^>]*>)('+phrase+')(?![^<]*<\/a>)(?!<span[^>]*>)(?!<i[^>]*>)', 'gi'),'<span class="highlighted">$1</span>')
+	     	 text = text.replace(new RegExp('('+phrase+')(?![^<]*>|[^<>]*\/)', 'gi'),'<span class="highlighted">$1</span>') 	;
+	    }else{
+	      	text = text.replace(new RegExp('()(?![^<]*>|[^<>]*\/)', 'gi'),'<span class="highlighted">$1</span>') 	;
+	    }
+      }
+	return $sce.trustAsHtml(text)
+    }
 });

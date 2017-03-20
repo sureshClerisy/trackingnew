@@ -2097,8 +2097,10 @@ class Job extends Parent_Model {
 			CASE
 				WHEN log.event_type = 'edit'              THEN   'fa-pencil'
 				WHEN log.event_type = 'add'               THEN   'fa-plus'
+				WHEN log.event_type = 'add_to_queue'      THEN   'fa-plus'
 				WHEN log.event_type = 'delete'            THEN   'fa-trash'
 				WHEN log.event_type = 'upload_doc'        THEN   'fa-upload'
+				WHEN log.event_type = 'remove_from_queue' THEN   'fa-trash'
 				WHEN log.event_type = 'remove_doc'        THEN   'fa-trash'
 				WHEN log.event_type = 'overwrite_doc'     THEN   'fa-trash'
 				WHEN log.event_type = 'status_change'     THEN   'fa-exchange'

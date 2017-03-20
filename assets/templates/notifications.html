@@ -1,0 +1,30 @@
+<!--START PAGE CONTENT -->
+<div class="page-content-wrapper" >
+  <div class="content sm-gutter">
+    <div class="container-fluid  padding-25 sm-padding-10">
+    	<div class="row">
+			<div class="col-md-12 col-xlg-12">
+				<div class="commen-heading notification-page">
+					<h2 class="oprate-dashbord">All Notifications </h2>
+				</div>
+		    	<div class="notification-block-lt">
+					<ul>
+						<li ng-repeat="notification in notifications">
+							<div class="img-lt-block-noti">
+								<span>{{notification.userIntial}}</span>
+							</div>
+							<p dynamic="notification.event_msg"></p>
+							<p class="small">{{notification.created_at | date: 'medium' : -0500}}</p>
+						</li>
+					</ul>
+				</div>
+				<div class="load-cont">
+					<div ng-show="showLoadMore" ng-click="loadMoreNotifications();" class="header-addButton btn btn-primary btn-cons m-b-10">Load More Notifications</div>
+				</div>
+			</div>
+		</div>
+    </div>
+  </div>
+</div>
+<ng-include src="'./assets/templates/truckstop/modals.html'"></ng-include>
+

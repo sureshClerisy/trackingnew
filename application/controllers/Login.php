@@ -112,6 +112,13 @@ class Login extends CI_Controller {
 				$result[$key]["title"] = "Added a ticket.";
 				$result[$key]["event_color"] = "primary";
 			}
+
+			if($value["event_type"] == "add_to_queue" && $value["entity_name"] == "ticket"){
+				$result[$key]["title"] = "Added a ticket to queue.";
+				$result[$key]["event_color"] = "primary";
+			}
+
+
 			if($value["event_type"] == "edit" && $value["entity_name"] == "ticket"){
 				$result[$key]["title"]        = "Edited the ticket.";
 				$result[$key]["event_color"] = "warning";
@@ -126,6 +133,10 @@ class Login extends CI_Controller {
 			}
 			if(($value["event_type"] == "remove_doc" || $value["event_type"] == "overwrite_doc") && $value["entity_name"] == "ticket"){
 				$result[$key]["title"] = "Deleted a document.";
+				$result[$key]["event_color"] = "danger";
+			}
+			if($value["event_type"] == "remove_from_queue" && $value["entity_name"] == "ticket"){
+				$result[$key]["title"] = "Remove ticket from queue.";
 				$result[$key]["event_color"] = "danger";
 			}
 			if($value["event_type"] == "bundle_document" && $value["entity_name"] == "ticket"){

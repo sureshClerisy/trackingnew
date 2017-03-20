@@ -51,7 +51,7 @@
 							<div class="srpSearchDiv searchinput search-list-fix">
 									<div class="srpSearch1">
 										<label for="search" class="ng-binding">Search</label>
-										<input type="text" class="form-control" ng-model="searchFilter" ng-change="callSearchFilter(searchFilter);" />
+										<input type="text" ng-model-options="{ updateOn: 'default blur', debounce: { default: 300, blur: 0 } }" class="form-control" ng-model="searchFilter" ng-change="callSearchFilter(searchFilter);" />
 									</div>
 								</div>
 								<div class="table-structure-main-block tb-my">

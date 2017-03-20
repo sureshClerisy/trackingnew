@@ -211,7 +211,7 @@ app.controller('sendPaymentController', ["dataFactory","$scope","$http","$rootSc
 		
 		$scope.flagUnflagLoad = function(flagStatus, loadId) {
 			$scope.autoFetchLoads = true;
-			dataFactory.httpRequest(URL+'/billings/flagLoad/'+flagStatus+'/'+loadId).then(function(data){
+			dataFactory.httpRequest(URL+'/billings/flagLoad/'+flagStatus+'/'+loadId+'/'+$rootScope.srcPage).then(function(data){
 				if ( flagStatus == 'flag' ) {
 					$scope.showLoadDetail.flag = 1;
 				} else  {
