@@ -17,7 +17,7 @@ class Report extends CI_Model {
 		}
 	}
 
-	public function getBreadcrumbsDetail( $args, $page = 0, $limit = NULL, $total = NULL ){
+	public function getBreadcrumbsDetail( $args = array(), $total = false , $parameter = ''){
 		
 		$includeLatLong = '';
 
@@ -40,7 +40,7 @@ class Report extends CI_Model {
 			END as hdirection
 
 			");
-		}else{
+		} else {
 			$this->db->select("count(ae.deviceID) as totalRows");
 		}
 
@@ -66,8 +66,25 @@ class Report extends CI_Model {
 			$this->db->where('DATE(ae.GMTTime) <=',$args['endDate']);
 		}
 
-		$this->db->order_by('ae.GMTTime','asc');
-		$this->db->limit($limit);
+		if(isset($args["searchQuery"]) && !empty($args["searchQuery"])){
+            $this->db->group_start();
+            $this->db->like('ae.deviceID', $args['searchQuery'] );
+            $this->db->or_like('ae.eventType', $args['searchQuery'] );
+            $this->db->or_like('ae.vehicleSpeed', $args['searchQuery'] );
+            $this->db->or_like('ae.odometer', $args['searchQuery'] );
+            $this->db->or_like("LOWER(CONCAT( ae.`street` , ', ', ae.`crossStreet` , ', ', ae.`city` , ', ', ae.`state` , ', ', ae.`zip` ))", strtolower($args['searchQuery']));
+            $this->db->or_like("CONCAT(DATE_FORMAT(GMTTime,'%d-%b-%Y %r'),' GMT') ", $args['searchQuery'] );
+            $this->db->or_like('v.label', $args['searchQuery']);
+            $this->db->or_like("LOWER(CONCAT(d.first_name, ' ', d.last_name))", strtolower($args['searchQuery']) );
+            $this->db->group_end();
+		}
+
+		$this->db->order_by('ae.'.$args['sortColumn'],$args['sortType']);
+		if(!$total && $parameter != 'others'){
+			$args["limitStart"] = $args["limitStart"] == 1 ? 0 : $args["limitStart"];
+			$this->db->limit($args["itemsPerPage"],$args["limitStart"]);
+		}
+
 		$query = $this->db->get('avl_events as ae');
 
 		if ($query->num_rows() > 0) {
@@ -239,8 +256,7 @@ class Report extends CI_Model {
 		if(isset($args["searchQuery"]) && !empty($args["searchQuery"])){
             $this->db->group_start();
             $this->db->like('LOWER(CONCAT(d.first_name," ", d.last_name))', strtolower($args['searchQuery']));
-            $this->db->or_like('l.id', $args['searchQuery'] );
-            $this->db->or_like('l.invoiceNo', $args['searchQuery'] );
+            $this->db->or_like('LOWER(CONCAT(u.first_name," ", u.last_name))', strtolower($args['searchQuery']));
             $this->db->or_like('LOWER(l.LoadType)', strtolower($args['searchQuery']) );
             $this->db->or_like('l.PickupDate', $args['searchQuery'] );
             $this->db->or_like('l.DeliveryDate', $args['searchQuery'] );
@@ -248,13 +264,12 @@ class Report extends CI_Model {
             $this->db->or_like('LOWER(l.OriginState)', strtolower($args['searchQuery']) );
             $this->db->or_like('LOWER(l.DestinationCity)', strtolower($args['searchQuery']) );
             $this->db->or_like('LOWER(l.DestinationState)', strtolower($args['searchQuery']) );
-            $this->db->or_like('LOWER(l.PickupAddress)', strtolower($args['searchQuery']) );
-            $this->db->or_like('LOWER(l.DestinationAddress)', strtolower($args['searchQuery']) );
             $this->db->or_like('l.PaymentAmount', $args['searchQuery']);
             $this->db->or_like('l.Mileage', $args['searchQuery']);
             $this->db->or_like('l.deadmiles', $args['searchQuery']);
-            $this->db->or_like('LOWER(l.JobStatus)', strtolower($args['searchQuery']) );
-            $this->db->or_like('LOWER(l.load_source)', strtolower($args['searchQuery']) );
+            $this->db->or_like('l.totalCost', $args['searchQuery'] );
+            $this->db->or_like('l.overallTotalProfit', $args['searchQuery'] );
+            $this->db->or_like('l.overallTotalProfitPercent', $args['searchQuery'] );
             $this->db->or_like('LOWER(b.TruckCompanyName)', strtolower($args['searchQuery']) );
             $this->db->group_end();
 		}

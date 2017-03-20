@@ -83,6 +83,90 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 			$this->db->delete('contract_docs');
 			return true;
 		}
+
+
+		/*
+		* Request URL: 
+		* Method: get
+		* Params: docId,entityType
+		* Return: array or false
+		* Comment: Used for getting entity info by document id
+		*/
+		public function getEntityInfoByDocId($docId,$entityType) {
+			$table = "drivers";
+			switch ($entityType) {
+				case 'driver' : $this->db->select("drivers.id,contract_docs.document_name, drivers.first_name, drivers.last_name");
+							    $this->db->join("contract_docs","contract_docs.entity_id = drivers.id","inner"); 	$table = "drivers"; break;
+				case 'truck'  : $this->db->select("vehicles.id,contract_docs.document_name, vehicles.label");
+							    $this->db->join("contract_docs","contract_docs.entity_id = vehicles.id","inner"); 	$table = "vehicles"; break;
+				case 'trailer': $this->db->select("trailers.id, contract_docs.document_name, trailers.unit_id");
+							    $this->db->join("contract_docs","contract_docs.entity_id = trailers.id","inner"); 	$table = "trailers"; break;
+				case 'broker' : $this->db->select("broker_info.id, contract_docs.document_name, broker_info.TruckCompanyName");
+							    $this->db->join("contract_docs","contract_docs.entity_id = broker_info.id","inner"); 	$table = "broker_info"; break;
+			}
+			$this->db->where('contract_docs.id', $docId);
+			$this->db->where('contract_docs.entity_type', $entityType);
+			$result = $this->db->get($table);
+			if( $result->num_rows() > 0 ) {
+				return $result->row_array();
+			} else {
+				return false;
+			}
+		}
+
+
+		/*
+		* Request URL: 
+		* Method: get
+		* Params: docId,entityType
+		* Return: array or false
+		* Comment: Used for getting entity info by document id
+		*/
+		public function getEntityInfoById($id,$entityType) {
+			$table = "drivers";
+			switch ($entityType) {
+				case 'dispatcher'  : $this->db->select("users.id, users.first_name, users.last_name"); $table = "users"; break;
+				case 'driver'  	   : $this->db->select('drivers.id, case loads.driver_type
+															when "team" then concat(drivers.first_name," + ",team.first_name)
+															ELSE concat(drivers.first_name," ",drivers.last_name) end as driverName'); 
+									 $this->db->join('drivers','drivers.id = loads.driver_id','LEFT');
+									 $this->db->join('drivers as team','team.id = loads.second_driver_id','LEFT');
+									 $table = "loads"; break;
+				case 'truck'	   : $this->db->select("vehicles.id, vehicles.label"); $table = "vehicles";  break;
+				case 'broker'	   : $this->db->select("broker_info.TruckCompanyName"); $table = "broker_info";  break;
+			}
+			$this->db->where($table.'.id', $id);
+			$result = $this->db->get($table);
+			//if($entityType == "driver"){ echo $this->db->last_query();die;}
+			if( $result->num_rows() > 0 ) {
+				return $result->row_array();
+			} else {
+				return false;
+			}
+		}
+
+
+		/*
+		* Request URL: 
+		* Method: get
+		* Params: userID, fields = array()
+		* Return: array or false
+		* Comment: Used for getting user info from user tabl
+		*/
+		public function getUserInfo($userId,$fields = array()) {
+			if(count($fields) > 0){
+				$this->db->select(implode(",", $fields));
+			}else{
+				$this->db->select('*');	
+			}
+			$this->db->where('id', $userId);
+			$result = $this->db->get('users');
+			if( $result->num_rows() > 0 ) {
+				return $result->row_array();
+			} else {
+				return false;
+			}
+		}
 		
 		
 	}

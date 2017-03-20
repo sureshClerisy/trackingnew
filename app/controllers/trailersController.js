@@ -193,7 +193,7 @@ app.controller('addEditTrailerController', function(dataFactory, getAddTrailerDa
 	
 	
 	$scope.saveTrailer = function(submitType){
-		dataFactory.httpRequest(URL+'/trailers/addEditTrailer/','POST',{},$scope.trailerData).then(function(data) {
+		dataFactory.httpRequest(URL+'/trailers/addEditTrailer/'+submitType,'POST',{},$scope.trailerData).then(function(data) {
 			if ( data.success == true ) {
 				if ( submitType == 'add') {
 

@@ -572,7 +572,7 @@ class Loads extends Admin_Controller{
 		$params = json_decode(file_get_contents('php://input'),true);
 		$total = 0;
 		$jobs = array();
-		if($params["pageNo"] > 1){
+		if($params["pageNo"] <= 1){
 			$params["limitStart"] = ($params["pageNo"] * $params["itemsPerPage"] + 1);	
 		}else{
 			$params["limitStart"] = ($params["pageNo"] * $params["itemsPerPage"] );	

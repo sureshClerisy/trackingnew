@@ -13,6 +13,7 @@ class BrokersModel extends Parent_Model
     public function get_brokers()
     {
         $this->db->select('*')->from('broker_info');
+        $this->db->where("delete_broker",0);
         $result = $this->db->get(); 
         if($result->num_rows()>0){
 			return $result->result_array();
@@ -51,13 +52,16 @@ class BrokersModel extends Parent_Model
 	}
 
 	public function deleteBrocker($id=null){
-        $this->db->where('id',$id);
-		$result = $this->db->delete('broker_info');
-        if ($result) {
-            return true;
-        } else {
-            return false;
-        }
+
+		$this->db->where('id', $id);
+		$data = array(
+			'delete_broker' => 1
+		);
+		$this->db->update('broker_info',$data);
+
+  		//  $this->db->where('id',$id);
+		// $result = $this->db->delete('broker_info');
+        return true;
     }
 	
 	public function getRelatedBroker($broker_id = null){
@@ -109,6 +113,11 @@ class BrokersModel extends Parent_Model
 	public function getBrokerInfo( $brokerId = null ) {
 		//~ return $this->db->select('*')->where('broker_info.id',$brokerId)->get('broker_info')->row_array();
 		return $this->db->select('id,MCNumber,TruckCompanyName,postingAddress,city,state,zipcode,CarrierMC,DOTNumber,brokerStatus,DebtorKey,black_list,rating')->where('broker_info.id',$brokerId)->get('broker_info')->row_array();
+	}
+
+	public function getBrokerInfoByMCNumber( $mcNumber = null ) {
+		//~ return $this->db->select('*')->where('broker_info.id',$brokerId)->get('broker_info')->row_array();
+		return $this->db->select('id,MCNumber,TruckCompanyName,TruckCompanyPhone, postingAddress,city,state,zipcode,CarrierMC,DOTNumber,brokerStatus,DebtorKey,black_list,rating')->where('broker_info.MCNumber',$mcNumber)->get('broker_info')->row_array();
 	}
 	
 	/**

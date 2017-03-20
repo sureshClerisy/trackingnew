@@ -367,6 +367,93 @@ body .dataTables_paginate ul {
 
 /********************plan end********************************/
 
+
+
+.tb-cell.dis-report {
+  width: 200px;
+}
+.tb-cell.driver-report {
+  width: 160px;
+}
+.tb-cell.broker-report {
+  width: 288px;
+}
+.tb-cell.invoice-report {
+  width: 100px;
+}
+.tb-cell.charges-report {
+  width: 100px;
+}
+.tb-cell.profit-report {
+  width: 95px;
+}
+.tb-cell.profirper-report {
+  width: 94px;
+}
+.tb-cell.miles-report {
+  width: 77px;
+}
+.tb-cell.dmiles-report {
+  width: 119px;
+}
+.tb-cell.rpm-report {
+  width: 70px;
+}
+.tb-cell.pickup-report {
+  width: 112px;
+}
+.tb-cell.origin-report {
+  width: 116px;
+}
+.tb-cell.originst-report {
+  width: 50px;
+}
+.tb-cell.del-report {
+  width: 110px;
+}
+.tb-cell.delivery-report {
+  width: 110px;
+}
+.tb-cell.destst-report {
+  width: 50px;
+}
+.tb-cell.ld-id,
+.tb-cell.dis-report,
+.tb-cell.driver-report,
+.tb-cell.broker-report,
+.tb-cell.invoice-report,
+.tb-cell.charges-report,
+.tb-cell.profit-report,
+.tb-cell.profirper-report,
+.tb-cell.miles-report,
+.tb-cell.dmiles-report,
+.tb-cell.rpm-report,
+.tb-cell.pickup-report,
+.tb-cell.origin-report,
+.tb-cell.originst-report,
+.tb-cell.del-report,
+.tb-cell.delivery-report,
+.tb-cell.destst-report  
+{float:left;}
+
+.open-block .tb-cell.ld-id,
+.open-block .tb-cell.dis-report,
+.open-block .tb-cell.driver-report,
+.open-block .tb-cell.broker-report,
+.open-block .tb-cell.invoice-report,
+.open-block .tb-cell.charges-report,
+.open-block .tb-cell.profit-report,
+.open-block .tb-cell.profirper-report,
+.open-block .tb-cell.miles-report,
+.open-block .tb-cell.dmiles-report,
+.open-block .tb-cell.rpm-report,
+.open-block .tb-cell.pickup-report,
+.open-block .tb-cell.origin-report,
+.open-block .tb-cell.originst-report,
+.open-block .tb-cell.del-report,
+.open-block .tb-cell.delivery-report,
+.open-block .tb-cell.destst-report  
+{display:none;}
 @media (min-width:2500px){
 .tb-my .tb-cell {
   display: table-cell;
@@ -383,7 +470,38 @@ body .dataTables_paginate ul {
 }
 .add-new-data{width:100%;max-width:100%;}
 }
-
+@media (min-width:2200px){
+.report-section.tb-my .tb-cell {
+  display: table-cell;
+    float: none !important;
+    width: auto !important;
+}
+.report-section.tb-my .table-row-main1 {
+  display: table-row;
+  float: none;
+}
+.report-section.tb-my .table-res-1 {
+  display: table;
+  width: 100%;
+}
+}
+@media (max-width:2200px){
+.report-section.tb-my .tb-cell {
+  display: table-cell;
+    float: none !important;
+    width: auto !important;
+}
+.report-section.tb-my .table-row-main1 {
+  display: table-row;
+  float: none;
+}
+.report-section.tb-my .table-res-1 {
+  display: table;
+  width: 2200px;
+}
+.report-section.tb-my{width:100%;overflow:auto;}
+.report-section.tb-my .ld-id span{padding-left:0px;}
+}
 /*
 @media (min-width:2530px){
 .tb-cell.Driver { width: 130px;}
@@ -404,6 +522,7 @@ body .dataTables_paginate ul {
 .tb-cell.Driver { width: 132px;}
 }
 */
+
 
 
 @media (min-width:2400px){

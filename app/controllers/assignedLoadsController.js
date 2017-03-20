@@ -500,7 +500,7 @@ app.controller('assignedLoadsController', ["dataFactory","$scope","$http","$root
 			var loadId = angular.element("#confirm-delete").data("loadId");
 			var index  = angular.element("#confirm-delete").data("index");
 			if ( loadId != '' && loadId != undefined ) {
-				dataFactory.httpRequest('assignedloads/deleteAssignedLoad/'+loadId).then(function(data) {
+				dataFactory.httpRequest('assignedloads/deleteAssignedLoad/'+loadId+'/'+$rootScope.srcPage).then(function(data) {
 					if ( data.success == true ) {
 						$rootScope.alertdeletemsg = true;
 						$rootScope.Message = $rootScope.languageArray.LoadDeleteSuccMsg;
@@ -645,6 +645,7 @@ app.controller('assignedLoadsController', ["dataFactory","$scope","$http","$root
 	
 	/**Clicking on load detail changes url withour reload state*/
 	$scope.clickMatchLoadDetail = function(truckstopId,loadId, deadmile,calPayment,totalCost,orignPickDate,vehicleID, index) {
+		
 		$rootScope.alertdeletemsg = false;
 		if ( loadId == '' && loadId == undefined ) 
 			loadId = '';

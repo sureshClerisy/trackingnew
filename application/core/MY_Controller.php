@@ -16,7 +16,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 		public $id;
 		public $accountID;
 		public $wsdl_url;
-		
+		public $entity;
+		public $event;
+		public $serverAddr;
+		public $protocol;
+
 		function __construct() {
 
 		  	parent::__construct();
@@ -24,7 +28,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 			$loggedUser_username 	= $this->session->userdata('loggedUser_username');
 			$loggedUser_id 			= $this->session->userdata('loggedUser_id');
 			$user_logged_in 		= $this->session->userdata('loggedUser_loggedin');
-		
+
+			$this->entity     = $this->config->item('entity');
+			$this->event      = $this->config->item('event');
+			$this->protocol   = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+			$this->serverAddr = base_url();
+
 			if( (isset($loggedUser_username) && $loggedUser_username != '') && (isset($loggedUser_id) && $loggedUser_id != '') && (isset($user_logged_in) && $user_logged_in == true) ) {
 			
 			} else {

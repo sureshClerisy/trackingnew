@@ -1,10 +1,16 @@
 <?php
 class Login extends CI_Controller {
 
+	private $entity;
+	private $event;
 	function __construct()
 	{ 
 		parent::__construct();	
 		$this->load->model('User');
+		$this->load->model("Job");
+		$this->entity = $this->config->item('entity');
+		$this->event = $this->config->item('event');
+		$this->load->helper("truckstop");
 	}
 	
 	function index()
@@ -16,6 +22,8 @@ class Login extends CI_Controller {
 		if( $this->User->check_admin_credentials($username, $password) == true ) {
 			$profile_img = $this->User->user_Profile($this->session->userdata('loggedUser_id'));
 			echo json_encode(array('success'=>true,'loggedUser_email' => $this->session->userdata('loggedUser_email'),'loggedUser_username' => $this->session->userdata('loggedUser_username'),'loggedUser_fname' => $this->session->userdata('loggedUser_fname'),'loggedUser_id' => $this->session->userdata('loggedUser_id'),'loggedUserRole_id' => $this->session->userdata('role'),'profile_img' => $profile_img));
+			$message = '<span class="blue-color uname">'.ucfirst($this->session->userdata('loggedUser_username'))."</span> logged in from ip : <b>".$_SERVER['REMOTE_ADDR']."</b>";
+			logActivityEvent($this->session->userdata('loggedUser_id'),$this->entity["user"], $this->event["login"], $message, $this->Job);
 		} else { 
 			echo json_encode(array('success'=>false));
 		}
@@ -23,12 +31,16 @@ class Login extends CI_Controller {
 
 	public function logout()
 	{
+		if($this->session->userdata('loggedUser_id')){
+			$message = '<span class="blue-color uname">'.ucfirst($this->session->userdata('loggedUser_username'))."</span> logged out from ip : <b>".$_SERVER['REMOTE_ADDR']."</b>";
+			logActivityEvent($this->session->userdata('loggedUser_id'), $this->entity["user"], $this->event["logout"], $message, $this->Job);	
+		}
 		$this->session->unset_userdata('role');
 		$this->session->unset_userdata('loggedUser_email');
 		$this->session->unset_userdata('loggedUser_username');
 		$this->session->unset_userdata('loggedUser_id');
 		$this->session->unset_userdata('loggedUser_loggedin');
-		echo json_encode(array('success' => true));
+		echo json_encode(array('success' => true ));
 	}
 	
 	public function checkLogin() {
@@ -44,6 +56,112 @@ class Login extends CI_Controller {
 		}
 		
 	}
+
+	/*
+	* Request URI : http://siteurl/Login/getNotifications
+	* Method : post
+	* Params : null
+	* Return : null
+	* Comment: used for fetch notifications
+	*/
+	public function getNotifications(){
+		$userId = $this->session->userdata('loggedUser_id');
+		$response = array();
+		$response["ureadCount"]    = $this->Job->getUnreadNotificationsCount($userId);
+		$response["notifications"] = $this->Job->getNotifications($userId);
+		echo json_encode($response);
+	}
+
+	/*
+	* Request URI : http://siteurl/Login/getNotifications
+	* Method : post
+	* Params : null
+	* Return : null
+	* Comment: used for fetch notifications
+	*/
+	public function notifications(){
+		$userId = $this->session->userdata('loggedUser_id');
+		$filters = json_decode(file_get_contents('php://input'),true);
+		
+		if(isset($filters["pageNo"]) && $filters["pageNo"] > 0){
+			$filters["itemsPerPage"] = 15;
+			$filters["limitStart"] = (($filters["pageNo"] -1) * $filters["itemsPerPage"]);
+		}
+		$response = array();
+		$response["total"]    = $this->Job->getNotificationsTotal($userId);
+		$response["notifications"] = $this->Job->getNotifications($userId,$filters);
+
+		echo json_encode($response);
+	}
+
+	/*
+	* Request URI : http://siteurl/Login/ticketActivity
+	* Method : post
+	* Params : null
+	* Return : null
+	* Comment: used for fetch notifications
+	*/
+	public function ticketActivity($loadId){
+		//$userId = $this->session->userdata('loggedUser_id');
+		//$filters = json_decode(file_get_contents('php://input'),true);
+		
+		$response = array();
+		$result = $this->Job->getTicketActivity($loadId);
+		foreach ($result as $key => $value) {
+			if($value["event_type"] == "add" && $value["entity_name"] == "ticket"){
+				$result[$key]["title"] = "Added a ticket.";
+				$result[$key]["event_color"] = "primary";
+			}
+			if($value["event_type"] == "edit" && $value["entity_name"] == "ticket"){
+				$result[$key]["title"]        = "Edited the ticket.";
+				$result[$key]["event_color"] = "warning";
+			}
+			if($value["event_type"] == "delete" && $value["entity_name"] == "ticket"){
+				$result[$key]["title"] = "Deleted the ticket.";
+				$result[$key]["event_color"] = "danger";
+			}
+			if($value["event_type"] == "upload_doc" && $value["entity_name"] == "ticket"){
+				$result[$key]["title"] = "Uploaded a document.";
+				$result[$key]["event_color"] = "info";
+			}
+			if(($value["event_type"] == "remove_doc" || $value["event_type"] == "overwrite_doc") && $value["entity_name"] == "ticket"){
+				$result[$key]["title"] = "Deleted a document.";
+				$result[$key]["event_color"] = "danger";
+			}
+			if($value["event_type"] == "bundle_document" && $value["entity_name"] == "ticket"){
+				$result[$key]["title"] = "Generated a bundle document.";
+				$result[$key]["event_color"] = "success";
+			}
+			if($value["event_type"] == "generate_invoice" && $value["entity_name"] == "ticket"){
+				$result[$key]["title"] = "Generated an invoice.";
+				$result[$key]["event_color"] = "success";
+			}if($value["event_type"] == "add_to_queue" && $value["entity_name"] == "ticket"){
+				$result[$key]["title"] = "Added to the queue.";
+				$result[$key]["event_color"] = "primary";
+			}
+			$result[$key]["event_type"] = str_replace("_", " ", $result[$key]["event_type"]);
+		}
+
+		$response["notifications"]    = $result;
+		echo json_encode($response);
+	}
+
+	/*
+	* Request URI : http://siteurl/Login/flagAsRead
+	* Method : post
+	* Params : null
+	* Return : null
+	* Comment: used for fetch notifications
+	*/
+	public function flagAsRead(){
+		$userId = $this->session->userdata('loggedUser_id');
+		$this->Job->flagNotificationsAsRead($userId);
+		$response = array();
+		$response["ureadCount"]    = $this->Job->getUnreadNotificationsCount($userId);
+		$response["notifications"] = $this->Job->getNotifications($userId);
+		echo json_encode($response);
+	}
+
 	
 	/**
 	 * changing the language files according to module

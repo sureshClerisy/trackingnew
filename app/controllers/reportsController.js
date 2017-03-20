@@ -123,7 +123,7 @@ app.controller('reportsController', function(dataFactory,$scope,$http ,$rootScop
 		switch(args){
 			case 'today' 	: $scope.showCustomDate = false; $scope.formFilter.customDate = $filter('date')(new Date(), 'yyyy-MM-dd'); break;
 			case 'yesterday': $scope.showCustomDate = false; $scope.formFilter.customDate = $filter('date')(today, 'yyyy-MM-dd'); break;
-			case 'custom' 	: $scope.showCustomDate = true; $scope.dateRangeValueBreadcrum = {startDate: moment().subtract(2, 'days'), endDate: moment()}; break;
+			case 'custom' 	: $scope.showCustomDate = true; $scope.dateRangeValueBreadcrum = {startDate: moment().subtract(1, 'days'), endDate: moment()}; break;
 		}
 	}
 
@@ -142,6 +142,7 @@ app.controller('reportsController', function(dataFactory,$scope,$http ,$rootScop
 			$scope.formFilter.endDate 	= '';
 		}
 
+			$scope.searchFilter = '';
 			$scope.isQueued = true; //Disable generate report btn
 			dataFactory.httpRequest(URL+'/reports/irp_'+report.name,'POST',{},{args:$scope.formFilter}).then(function(data){
 				$scope.isQueued = false; //Re-enable generate report btn
@@ -160,7 +161,8 @@ app.controller('reportsController', function(dataFactory,$scope,$http ,$rootScop
 					
 					if(data.result){
 						if(report.name == "breadcrumb_detail"){
-							$scope.records = data.result;
+							$scope.records 			= data.result;
+							$scope.totalBreadcrum	= data.total;
 							
 						} else if(report.name == "loads_performance") {
 							$scope.lpRecords  =data.result;
@@ -190,10 +192,7 @@ app.controller('reportsController', function(dataFactory,$scope,$http ,$rootScop
 				$scope.filteredResults = true;
 				
 			});
-		//}else if(report.name == "loads_performance"){
-		//	$scope.noFilterYet = false;
-		//	$scope.filteredResults = true;
-		//}
+	
 
 	}
 
@@ -221,24 +220,30 @@ app.controller('reportsController', function(dataFactory,$scope,$http ,$rootScop
     };
 
     $scope.breadcrumbPageChanged = function(newPage){
-    	
-    	$scope.action = '/reports/getBreadcrumbReportRecords/';
+    	$scope.action = '/reports/irp_breadcrumb_detail/';
 		$scope.currentPage = newPage;
-        $scope.loadNextPage(($scope.currentPage - 1),$scope.searchFilter,$scope.lastSortedColumn,$scope.lastSortType);
+        $scope.loadNextPage(($scope.currentPage - 1),$scope.searchFilter,'','');
     };
 
     $scope.loadNextPage = function(pageNumber,search,sortColumn,sortType){
     	
     	$scope.autoFetchLoads = true;
-        dataFactory.httpRequest(URL+$scope.action,'Post',{} ,{ pageNo:pageNumber, itemsPerPage:$scope.itemsPerPage,searchQuery: search, sortColumn:sortColumn, sortType:sortType,formValue : $scope.formFilter }).then(function(data){
-        	$scope.autoFetchLoads 	= false;
-           	$scope.loadsListing 	= data.wPagination.loads;
-			$scope.loadsCount   	= data.wPagination.total;
-        	if(Object.keys($scope.loadsListing).length <= 0){
-				$scope.haveRecords = true;
-			}else{
-				$scope.haveRecords = false;
+        dataFactory.httpRequest(URL+$scope.action,'Post',{} ,{ pageNo:pageNumber, itemsPerPage:$scope.itemsPerPage,searchQuery: search, sortColumn:sortColumn, sortType:sortType,formValue : $scope.formFilter, changeVariable : 1 }).then(function(data){
+        	
+        	if ( data.wPagination != undefined ) {
+	           	$scope.loadsListing 	= data.wPagination.loads;
+				$scope.loadsCount   	= data.wPagination.total;
+	        	if(Object.keys($scope.loadsListing).length <= 0){
+					$scope.haveRecords = true;
+				}else{
+					$scope.haveRecords = false;
+				}
+			} else {
+				$scope.records 			= data.result;
+				$scope.totalBreadcrum	= data.total;
 			}
+
+			$scope.autoFetchLoads 	= false;
         });
 	};
 
@@ -268,13 +273,19 @@ app.controller('reportsController', function(dataFactory,$scope,$http ,$rootScop
     		case 'DestinationCity'	 			: $scope.DestinationCitySortType = type; break;
     		case 'DestinationState' 			: $scope.DestinationStateSortType = type; break;
     	}
-
+    	$scope.action = '/reports/getReportRecords/';
     	$scope.loadNextPage(($scope.currentPage - 1), $scope.searchFilter, sortColumn, type);
     }
 
-    $scope.callSearchFilter = function(query){
+    $scope.callSearchFilter = function(query, actionName){
     	$scope.searchFilter = query;
-    	$scope.loadNextPage(($scope.currentPage - 1), query, $scope.lastSortedColumn,$scope.lastSortType);
+
+		if ( actionName == 'breadcrumb_detail') 
+			$scope.action = '/reports/irp_breadcrumb_detail/';
+		else
+			$scope.action = '/reports/getReportRecords/';
+
+    	$scope.loadNextPage(($scope.currentPage - 1), query, '','');
     };
 
 	$scope.exportToPDF = function(report){

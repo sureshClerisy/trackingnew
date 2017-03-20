@@ -9909,7 +9909,7 @@ Main components
   left: 18px;
   height: 100%;
   width: 2px;
-  background: #000;
+  background: #fff;
 }
 @media only screen and (min-width: 1170px) {
   .timeline-container:not(.left) .timeline {
@@ -9955,7 +9955,7 @@ Main components
   border-radius: 50%;
   text-align: center;
   background: #b3b3b3;
-  border: 2px solid #000;
+  border: 2px solid #fff;
 }
 .timeline-point.small {
   height: 12px;
@@ -9964,7 +9964,7 @@ Main components
   width: 12px;
 }
 .timeline-point i {
-  color: #000;
+  color: #fff;
   font-size: 14px;
   left: 50%;
   margin-left: -7px;

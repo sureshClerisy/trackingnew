@@ -5,9 +5,10 @@ $rootScope.logoutmessage=false;
 	$scope.trustAsHtml = function(value) {
         return $sce.trustAsHtml(value);
     };
+
    
     /**Fetching language values*/
-   
+	$scope.ticketActivity   = []; 	//For activities in timeline tab of job ticket
 	$rootScope.languageArray = [];
 	$rootScope.languageCommonVariables = [];
 	$rootScope.LangArr = [];
@@ -28,6 +29,19 @@ $rootScope.logoutmessage=false;
 		}
 		/******************for solving prb at load detail popup heading*************/
 	}
+
+	$scope.modalSlideLeft = function() {
+        setTimeout(function() {
+            $('#modalSlideLeft').modal('show');
+        }, 50);
+        if($scope.ureadCount > 0){
+	        dataFactory.httpRequest(URL + '/login/flagAsRead').then(function(data) {
+	        	$scope.ureadCount = data.ureadCount;
+				$scope.notificationsList = [];
+	            $scope.notificationsList = data.notifications;
+	        });
+	    }
+    };
 		
 	/**Fetching content from common file*/
 	$rootScope.setInitialCommonLang($cookies.get('setLanguageGlobalVariable'),'common');
@@ -36,6 +50,7 @@ $rootScope.logoutmessage=false;
 		//~ if ( $cookies.get('userIsLoggedIn') == 1 ) {
 		dataFactory.httpRequest(URL + '/login/checkLogin').then(function(data) {
 			if ( data.success == true ) {
+				$rootScope.getNotifications();
 				$rootScope.loggedInUser = true;
 				$rootScope.showHeader = true;
 				$rootScope.showBackground = false;
@@ -64,6 +79,50 @@ $rootScope.logoutmessage=false;
 			}
 		});
 	}
+
+	$rootScope.getNotifications = function(){
+		dataFactory.httpRequest(URL + '/login/getNotifications').then(function(data) {
+			$scope.ureadCount = data.ureadCount;
+			$scope.notificationsList = [];
+            $scope.notificationsList = data.notifications;
+            $scope.haveNotifications = data.notifications.length;
+		});
+
+	}
+
+	
+
+	/**Clicking on load detail changes url withour reload state*/
+	$scope.clickMatchLoadDetail = function(truckstopId,loadId, deadmile,calPayment,totalCost,orignPickDate,vehicleID, index) {
+		$rootScope.alertdeletemsg = false;
+		if ( loadId == '' && loadId == undefined ) 
+			loadId = '';
+			
+		$rootScope.globalListingIndex = index;			// set index to update the particular record from list
+		encodedUrl = btoa(truckstopId+'-'+loadId+'-'+deadmile+'-'+calPayment+'-'+totalCost+'-'+orignPickDate+'-'+vehicleID);
+		$state.go('search.popup', {staticId:2,encodedurl:encodedUrl}, {notify: false,reloadOnSearch: false});
+	}	
+		
+	$scope.hideLoadDetailPopup = function() {
+		$rootScope.firstTimeClick = true;
+		if ( $rootScope.statesArr[0] != '' && $rootScope.statesArr[0] != undefined ) {
+			$state.go($rootScope.statesArr[0], {'type':false}, {notify: false,reload: true});
+		} else {
+			$state.transitionTo('myLoad', {'type': false}, {notify: false,reload: false});
+		}
+	}
+	
+	/*Changing url on outer click of popup*/
+	$(document).off('click','#edit-fetched-load').on("click",'#edit-fetched-load', function(event){
+		var $trigger1 = $(".popup-container-wid1");
+		if($trigger1 !== event.target && !$trigger1.has(event.target).length){
+			if ( $rootScope.statesArr[0] != '' && $rootScope.statesArr[0] != undefined ) {
+				$state.go($rootScope.statesArr[0], {'type':false}, {notify: false,reload: true});
+			} else {
+				$state.transitionTo('myLoad', {'type': false}, {notify: false,reload: false});
+			}
+		}
+	});
 				
 	/**Changing the language**/
 	$rootScope.setLanguageGlobal = function( language ) {
@@ -189,6 +248,7 @@ $rootScope.logoutmessage=false;
 			$rootScope.alertExceedMsg = false;
 			$rootScope.dataNotFound = false;
 			$rootScope.showErrorMessage = false;
+			$scope.haveActivities = 'hide';
 		}
 		
 		/**
@@ -2655,7 +2715,7 @@ $rootScope.logoutmessage=false;
 		$scope.changeAddTruckDetailFields = function( loadId, tripDetailId, value ) {
 			$scope.autoFetchLoads = true;
 			if ( loadId != '' && loadId != undefined ) {
-				dataFactory.httpRequest(URL+'/truckstop/save_trip_details/'+0+'/'+loadId+'/'+tripDetailId,'POST',{},{jobRecords: $rootScope.editSavedLoad, jobPrimary: loadId, vehicleId : $rootScope.editSavedLoad.vehicle_id, truckDetailsInfo: $scope.matchedTruckData ,extraStops : $rootScope.extraStops, loadRequest : 'addRequest',driverAssignType:$rootScope.driverAssignType  }).then(function(data) {
+				dataFactory.httpRequest(URL+'/truckstop/save_trip_details/'+0+'/'+loadId+'/'+tripDetailId,'POST',{},{jobRecords: $rootScope.editSavedLoad, jobPrimary: loadId, vehicleId : $rootScope.editSavedLoad.vehicle_id, truckDetailsInfo: $scope.matchedTruckData ,extraStops : $rootScope.extraStops, loadRequest : 'addRequest',driverAssignType:$rootScope.driverAssignType,srcPage:$rootScope.srcPage  }).then(function(data) {
 					$rootScope.Message = $rootScope.languageCommonVariables.LoadSavedSuccMsg;
 					$rootScope.alertloadmsg = true;
 					$rootScope.alertExceedMsg = false;
@@ -2817,10 +2877,13 @@ $rootScope.logoutmessage=false;
 		
 		$rootScope.saveEditLoad = function(editSavedLoad, status,from,old , saveParameter) {
 			
+			var srcPage = "";
 			if ( saveParameter == 'addRequest' ) {
+				srcPage = $state.current.name;
 				$rootScope.editSavedLoad.PickupAddress = document.getElementById('autocompleteAddPickupAddress').value;
 				$rootScope.editSavedLoad.DestinationAddress = document.getElementById('autoCompleteDestAddress').value;
 			} else {
+				srcPage = $rootScope.srcPage;
 				$rootScope.editSavedLoad.PickupAddress = document.getElementById('autocompleteAdd').value;
 				$rootScope.editSavedLoad.DestinationAddress = document.getElementById('destinationAddress').value;
 			}			
@@ -2841,7 +2904,7 @@ $rootScope.logoutmessage=false;
 				}
 			}
 		
-			$scope.autoFetchLoads = true;
+			//$scope.autoFetchLoads = true;
 			
 			if ( saveParameter == 'addRequest' ) {
 				$rootScope.primaryLoadId = 0;
@@ -2856,7 +2919,7 @@ $rootScope.logoutmessage=false;
 			}
 			
 			$rootScope.editedItem = {};
-			dataFactory.httpRequest(URL+'/truckstop/edit_live/'+$rootScope.primaryLoadId+'/'+saveType,'POST',{},{jobRecords: $rootScope.editSavedLoad, jobPrimary: $rootScope.primaryLoadId, jobDistance: $rootScope.editSavedDist, vehicleId : $rootScope.vehicleIdRepeat, extraStops : $rootScope.extraStops, timeStorage : $rootScope.tempstorage,  loadSource : $scope.loadSource,driverAssignType : $rootScope.driverAssignType, vehicleDriverFlag : $rootScope.setVehicleIdFlag}).then(function(data){
+			dataFactory.httpRequest(URL+'/truckstop/edit_live/'+$rootScope.primaryLoadId+'/'+saveType,'POST',{},{jobRecords: $rootScope.editSavedLoad, jobPrimary: $rootScope.primaryLoadId, jobDistance: $rootScope.editSavedDist, vehicleId : $rootScope.vehicleIdRepeat, extraStops : $rootScope.extraStops, timeStorage : $rootScope.tempstorage,  loadSource : $scope.loadSource,driverAssignType : $rootScope.driverAssignType, vehicleDriverFlag : $rootScope.setVehicleIdFlag, srcPage: srcPage}).then(function(data){
 			
 				$rootScope.alertloadmsg = false;
 				if ( data.refStatus != undefined && data.refStatus == false ) {
@@ -3052,7 +3115,7 @@ $rootScope.logoutmessage=false;
 					
 			$scope.autoFetchLoads = true;
 			if ( truckstopId != '' && truckstopId != undefined ) {
-				dataFactory.httpRequest(URL+'/truckstop/save_trip_details/'+truckstopId+'/'+loadId+'/'+tripDetailId,'POST',{},{jobRecords: $rootScope.editSavedLoad, jobPrimary: $rootScope.primaryLoadId,  vehicleId : $rootScope.vehicleIdRepeat, truckDetailsInfo: $scope.matchedTruckData ,extraStops : $rootScope.extraStops,driverAssignType:$rootScope.driverAssignType }).then(function(data) {
+				dataFactory.httpRequest(URL+'/truckstop/save_trip_details/'+truckstopId+'/'+loadId+'/'+tripDetailId,'POST',{},{jobRecords: $rootScope.editSavedLoad, jobPrimary: $rootScope.primaryLoadId,  vehicleId : $rootScope.vehicleIdRepeat, truckDetailsInfo: $scope.matchedTruckData ,extraStops : $rootScope.extraStops,driverAssignType:$rootScope.driverAssignType,srcPage:$rootScope.srcPage }).then(function(data) {
 					$rootScope.Message = $rootScope.languageCommonVariables.LoadSavedSuccMsg;
 					$rootScope.alertloadmsg = true;
 					$rootScope.alertExceedMsg = false;
@@ -3390,7 +3453,6 @@ $rootScope.logoutmessage=false;
 			
 			$rootScope.extraStop = [];						// empty the extra stops count
 			for( var k = 0, m = 0; k < parseInt($rootScope.editSavedLoad.Stops); k++ ) {
-
 				if ( k >= parseInt(newIndex) ) {
 					if ( k == parseInt($rootScope.editSavedLoad.Stops - 1) ) {		// delete always last extra stop
 						delete $rootScope.extraStops['extraStopAddress_'+k];		// deleting added extra stop address
@@ -3403,12 +3465,12 @@ $rootScope.logoutmessage=false;
 						delete $rootScope.extraStops['extraStopZipCode_'+k];		// deleting added extra stop zip code
 						delete $rootScope.extraStops['extraStopPhone_'+k];			// deleting added extra stop Phone
 						delete $rootScope.extraStops['extraStopName_'+k];			// deleting added extra stop zip code
-						delete $rootScope.extraStops['extraStopEntity_'+k];
+						delete $rootScope.extraStops['extraStopEntity_'+k];	
 					} else {
 						var n = parseInt(k + 1);
 						$rootScope.extraStops['extraStopAddress_'+k]	=	$rootScope.extraStops['extraStopAddress_'+n];	// assigning next extra stop value to previous
-						$rootScope.extraStops['extraStopCity_'+k]		=	$rootScope.extraStops['extraStopCity_'+n];		// assigning next extra stop value to previous
-						$rootScope.extraStops['extraStopState_'+k]		=	$rootScope.extraStops['extraStopState_'+n];		// assigning next extra stop value to previous
+						$rootScope.extraStops['extraStopCity_'+k]		=	$rootScope.extraStops['extraStopCity_'+n];	// assigning next extra stop value to previous
+						$rootScope.extraStops['extraStopState_'+k]		=	$rootScope.extraStops['extraStopState_'+n];	// assigning next extra stop value to previous
 						$rootScope.extraStops['extraStopCountry_'+k]	=	$rootScope.extraStops['extraStopCountry_'+n];	// assigning next extra stop value to previous
 						$rootScope.extraStops['extraStopTime_'+k]		=	$rootScope.extraStops['extraStopTime_'+n];	
 						$rootScope.extraStops['extraStopTimeRange_'+k]	=	$rootScope.extraStops['extraStopTimeRange_'+n];
@@ -3418,7 +3480,7 @@ $rootScope.logoutmessage=false;
 						$rootScope.extraStops['extraStopName_'+k]		=	$rootScope.extraStops['extraStopName_'+n];	
 						$rootScope.extraStops['extraStopEntity_'+k]		=  	$rootScope.extraStops['extraStopEntity_'+n];
 						
-						$rootScope.extraStop.push(k);					// push the count in array
+						$rootScope.extraStop.push(k);			// push the count in array
 					}	
 					
 				} else {
@@ -3484,6 +3546,7 @@ $rootScope.logoutmessage=false;
 		},
 		sending:function(file, xhr, formData){
 			formData.append("loadId", $rootScope.primaryLoadId);
+			formData.append("srcPage", $rootScope.srcPage);
 		},
 		success:function(file,response){
 			file.previewElement.classList.add("dz-success");
@@ -3602,7 +3665,7 @@ $rootScope.logoutmessage=false;
 			var assignedBrokerId  = angular.element("#confirm-delete").data("saveBrokerId");
 			
 			if ( loadId != '' && loadId != undefined ) {
-				dataFactory.httpRequest(URL+'/truckstop/deleteDocument','POST',{},{loadId:loadId,docId:id,filename:filename,doc_type:doc_type,assignedBrokeId : assignedBrokerId}).then(function(data){
+				dataFactory.httpRequest(URL+'/truckstop/deleteDocument','POST',{},{loadId:loadId,docId:id,filename:filename,doc_type:doc_type,assignedBrokeId : assignedBrokerId,srcPage:$rootScope.srcPage,bloadId:$rootScope.primaryLoadId}).then(function(data){
 					$rootScope.alertExceedMsg = false;
 					if ( doc_type == 'broker' ) {
 						$scope.brokerDocuments = data.result.brokerDocuments;
@@ -3681,6 +3744,24 @@ $rootScope.logoutmessage=false;
 		}		
 	}	
 	
+	$scope.fetchActivityForTicket = function(loadId){
+		
+		$scope.selectTab('timeline');
+		$rootScope.autoFetchLoads =true;
+		dataFactory.httpRequest(URL+'/Login/ticketActivity/'+loadId).then(function(data){
+			$rootScope.autoFetchLoads =false;
+			$scope.ticketActivity = data.notifications;
+			if($scope.ticketActivity.length > 0){
+				$scope.haveActivities = 'yes';	
+			}else{
+				$scope.haveActivities = 'no';
+			}
+			
+		});
+
+
+	}
+
 	$scope.selectTab = function(label){
 		$rootScope.editLoads = $rootScope.showMaps  = $rootScope.matchingTrucks   = $rootScope.brokerDetailInfo  = $rootScope.alertloadmsg = $rootScope.alertExceedMsg = $rootScope.billingDetailsInfo = false;	
 		$rootScope.showhighlighted = label;
@@ -3761,7 +3842,7 @@ $rootScope.logoutmessage=false;
 		}
 		
 		$scope.autoFetchLoads = true;
-		dataFactory.httpRequest(URL+'/assignedloads/generateInvoice/'+loadId+'/'+$rootScope.saveTypeLoad).then(function(data){
+		dataFactory.httpRequest(URL+'/assignedloads/generateInvoice/'+loadId+'/'+$rootScope.saveTypeLoad+'/'+$rootScope.srcPage).then(function(data){
 			if ( data.showError == 1 && data.showError != undefined ) {
 				$rootScope.alertloadmsg = false;
 				$rootScope.alertExceedMsg = true;
@@ -3793,6 +3874,7 @@ $rootScope.logoutmessage=false;
 		},
 		sending:function(file, xhr, formData){
 			formData.append("loadId", $rootScope.primaryLoadId);
+			formData.append("srcPage", $rootScope.srcPage);
 		},
 		success:function(file,response){
 			$rootScope.alertloadmsg = true;
@@ -3833,6 +3915,7 @@ $rootScope.logoutmessage=false;
 		},
 		sending:function(file, xhr, formData){
 			formData.append("loadId", $rootScope.primaryLoadId);
+			formData.append("srcPage", $rootScope.srcPage);
 		},
 		success:function(file,response){
 			$rootScope.alertloadmsg = true;
@@ -3874,6 +3957,7 @@ $rootScope.logoutmessage=false;
 		sending:function(file, xhr, formData){
 			formData.append("loadId", $rootScope.primaryLoadId);
 			formData.append("brokerId", $rootScope.editSavedLoad.broker_id);
+			formData.append("srcPage", $rootScope.srcPage);
 		},
 		success:function(file,response){
 			$rootScope.alertloadmsg = true;

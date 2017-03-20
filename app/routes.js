@@ -71,7 +71,15 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
                 templateUrl: 'assets/templates/login.html',
                 controller: 'authCtrl',
                 moduleName: 'login',
-                showHeader : false
+                showHeader : false,
+                 deps: ['$ocLazyLoad', function($ocLazyLoad) {
+                        return $ocLazyLoad.load([
+                        		'datepicker',
+                                'bubbleAnimation'
+                                ], {
+                                insertBefore: '#lazyload_placeholder'
+                            })
+					}]
             })
             .state('trucks', {
 				url: '/trucks',
@@ -591,29 +599,30 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
 					}
 				}
 			})
+			.state('notifications', {
+							url: '/notifications',
+							title: 'Notifications',
+							templateUrl: 'assets/templates/notifications.html',
+			                controller: 'notificationsController',
+			                moduleName: 'loads',
+			                resolve:{            
+								allNotifications: function(dataFactory, $stateParams) {
+									return dataFactory.httpRequest(URL+'/Login/notifications');
+								}
+							}
+						})
             
 
 }]);
 
 app.run(function ($rootScope,$location,$state,$cookies,dataFactory, $document) {
 	 
-	$rootScope.$on( '$stateChangeStart', function(e, toState  , toParams , fromState, fromParams) {
-		//~ var check = $rootScope.loginCheck();
-		//~ if ( check === 'false' ) {
-			//~ var isLogin = toState.name === "login";
-			//~ $rootScope.originalUrl = $location.absUrl();
-			//~ if(isLogin){
-			   //~ return; // no need to redirect 
-			//~ } else {
-				//~ e.preventDefault();
-				//~ $state.go('login');
-			//~ }
-		//~ } else {
-			//~ if ( toState.name === 'login' ) {
-				//~ $state.go('dashboard');
-			//~ }			
-		//~ }
+/*	$rootScope.$on( '$locationChangeStart', function(e, newUrl  , oldUrl , newState, oldState) {
+			alert(oldState);
+	});*/
 
+	$rootScope.$on( '$stateChangeStart', function(e, toState  , toParams , fromState, fromParams) {
+		$rootScope.srcPage = fromState.name;
 		$rootScope.changeState = toState.name;
 		$rootScope.loginCheck($rootScope.changeState);
 		$rootScope.languageArray = $rootScope.LangArr[toState.moduleName];
@@ -625,6 +634,7 @@ app.run(function ($rootScope,$location,$state,$cookies,dataFactory, $document) {
 	});
 	
 	$rootScope.$on('$stateChangeSuccess', function (event,data) {
+		
 		$rootScope.absUrl = $location.search();
 		$('#headerFixed').removeClass('headerFixed');
         $rootScope.pageTitle = data.title;
@@ -697,6 +707,9 @@ app.filter('titleCase', function() {
 	};
 });
 
+
+
+
 app.directive('closeOnClickOutside', function($document){
 	return {
 		restrict: 'A',
@@ -735,5 +748,19 @@ app.filter('propsFilter', function() {
               out = items;
         }
         return out;
+  };
+});
+
+
+app.directive('dynamic', function ($compile) {
+  return {
+    restrict: 'A',
+    replace: true,
+    link: function (scope, ele, attrs) {
+      scope.$watch(attrs.dynamic, function(html) {
+        ele.html(html);
+        $compile(ele.contents())(scope);
+      });
+    }
   };
 });

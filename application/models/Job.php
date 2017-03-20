@@ -107,13 +107,7 @@ class Job extends Parent_Model {
 			$this->db->where('loads.JobStatus',$filters["status"]);
 		}
 		
-		//~ if ( $this->session->userdata('role') != 3 && $this->session->userdata('role') != 1 ) {
-			//~ if( !empty($loggedUserId) && $scopeType == 'dispatcher') 
-				//~ $this->db->or_where('loads.user_id',$loggedUserId);
-		//~ }
-		
 		$this->db->where('loads.delete_status',0);
-
 		if(isset($filters["searchQuery"]) && !empty($filters["searchQuery"])){
 
             $this->db->group_start();
@@ -239,6 +233,7 @@ class Job extends Parent_Model {
 		}
 		
 		$query = $this->db->get('loads');
+
 		if ($query->num_rows() > 0) {
 			return $query->row_array()["total"];
 		} else {
@@ -1146,6 +1141,7 @@ class Job extends Parent_Model {
 		$savedata['detention_time_actual'] = str_replace('$','',@$data['detention_time_actual']);
 		$savedata['tolls_actual'] = str_replace('$','',@$data['tolls_actual']);*/
 		
+		$updateFlag = false;
 		if ( $tripDetailId  != null && $tripDetailId != '' && $tripDetailId  != 'undefined' ) {
 			$this->db->where('id', $tripDetailId);
 			$res = $this->db->update('trip_details',$savedata);
@@ -1180,6 +1176,24 @@ class Job extends Parent_Model {
 			
 	}
 	
+
+	public function findTripDetailsId($truckstopID,$loadId){
+		$this->db->select('id');
+			if ( $truckstopID != '' && $truckstopID != null && $truckstopID != 'undefined' )
+				$condition = array('truckstopID' => $truckstopID,'load_id' => $loadId);
+			else
+				$condition = array('load_id' => $loadId);
+				
+			$this->db->where($condition);
+			$result = $this->db->get('trip_details');
+			if( $result->num_rows() > 0 ) {
+				$finalResult = $result->row_array();
+				$primary_key = $finalResult['id'];
+				return $primary_key;
+			}else{
+				return false;
+			}
+	}
 	
 	public function getAllStates( $country = '' ) {
 		
@@ -1631,6 +1645,17 @@ class Job extends Parent_Model {
 		//$doc['upload_by'] = $this->session->loggedUser_id;
 		$result = $this->db->insert('events_log',$doc);
 	}	
+
+	public function logActivityEvent($entityId, $entityType, $eventType, $message, $srcPage){
+		$logs = array();
+		$logs['user_id']  	 = $this->session->loggedUser_id;
+		$logs['entity_id'] 	 = $entityId;
+		$logs['entity_name'] = $entityType;
+		$logs['event_type']	 = $eventType;
+		$logs['event_msg'] 	 = $message;
+		$logs['src_page'] 	 = $srcPage;
+		$result = $this->db->insert('activity_log',$logs);
+	}	
 	
 	public function getDocsList($loadId = null , $docType = ''){
 		$this->db->select("*, CASE
@@ -2028,6 +2053,83 @@ class Job extends Parent_Model {
 		$this->db->select('TruckCompanyName, postingAddress, city, state, zipcode, MCNumber, CarrierMC, DOTNumber, brokerStatus');
 		$this->db->where('broker_info.id', $brokerId);
 		return $this->db->get('broker_info')->row_array();
+	}
+
+	/*
+	* method  : post
+	* params  : loadId
+	* return  : load detail array
+	* comment : for fetching load unread Notifications count
+	*/
+
+	public function getUnreadNotificationsCount($userId) {
+		$this->db->select('count(activity_log.id) as unreadCount');
+		$this->db->where("activity_log.user_id != ", $userId);
+		$this->db->where("not find_in_set(".$userId.", activity_log.read_users)");
+		$this->db->where("activity_log.event_type != 'login' AND activity_log.event_type != 'logout'");
+
+		return $this->db->get('activity_log')->row_array()["unreadCount"];
+	}
+
+	public function flagNotificationsAsRead($userId) {
+		$this->db->query("UPDATE `activity_log` SET `read_users` = TRIM(BOTH ',' FROM concat(read_users,',',".$userId.")) WHERE `activity_log`.`user_id` != ".$userId." AND not find_in_set(".$userId.", activity_log.read_users) AND activity_log.event_type != 'login' AND activity_log.event_type != 'logout'");
+	}
+
+	public function getNotifications($userId,$filters=array()) {
+		if(count($filters) <= 0){
+			$filters = array("itemsPerPage"=>15, "limitStart"=>1);
+		}
+
+		$this->db->select('CONCAT(SUBSTRING(u.first_name, 1, 1),SUBSTRING(u.last_name, 1, 1)) as userIntial, u.profile_image,  log.event_msg, CONCAT(DATE_FORMAT( CONVERT_TZ( log.created_at, "+00:00", "-05:00" ) , "%d-%b-%Y %r" )," ","EST") AS created_at');
+		$this->db->Join("users as u","log.user_id = u.id","inner");
+		$this->db->where("log.user_id != ", $userId);
+		$this->db->where("log.event_type != 'login' AND log.event_type != 'logout'");
+		$this->db->order_by("created_at",'DESC');
+		$filters["limitStart"] = $filters["limitStart"] == 1 ? 0 : $filters["limitStart"];
+		$this->db->limit($filters["itemsPerPage"],$filters["limitStart"]);
+		return $this->db->get('activity_log as log')->result_array();
+
+	}
+
+
+	public function getTicketActivity( $loadId ) {
+		$this->db->select("CONCAT(SUBSTRING(u.first_name, 1, 1),SUBSTRING(u.last_name, 1, 1)) as userIntial, log.entity_name, u.profile_image, log.event_type, CONCAT(u.first_name, ' ', u.last_name) as userName, log.event_msg, CONCAT(DATE_FORMAT( CONVERT_TZ( log.created_at, '+00:00', '-05:00' ) , '%d-%b-%Y %r' ),' ','EST') AS created_at,
+			CASE
+				WHEN log.event_type = 'edit'              THEN   'fa-pencil'
+				WHEN log.event_type = 'add'               THEN   'fa-plus'
+				WHEN log.event_type = 'delete'            THEN   'fa-trash'
+				WHEN log.event_type = 'upload_doc'        THEN   'fa-upload'
+				WHEN log.event_type = 'remove_doc'        THEN   'fa-trash'
+				WHEN log.event_type = 'overwrite_doc'     THEN   'fa-trash'
+				WHEN log.event_type = 'status_change'     THEN   'fa-exchange'
+				WHEN log.event_type = 'generate_invoice'  THEN   'fa-file-text-o'
+				WHEN log.event_type = 'bundle_document'   THEN   'fa-file-text-o'
+			END as action_type"
+			);
+		$this->db->Join("users as u","log.user_id = u.id","inner");
+		$this->db->where("log.entity_name",'ticket');
+		$this->db->where("log.entity_id",$loadId);
+		$this->db->order_by("created_at",'DESC');
+		return $this->db->get('activity_log as log')->result_array();
+		
+	}
+
+	public function getNotificationsTotal($userId,$filters=array()) {
+
+		$this->db->select('count(log.id) as total');
+		$this->db->Join("users as u","log.user_id = u.id","inner");
+		$this->db->where("log.user_id != ", $userId);
+		$this->db->where("log.event_type != 'login' AND log.event_type != 'logout'");
+		$this->db->order_by("created_at",'DESC');
+		return $this->db->get('activity_log as log')->row_array()["total"];
+	}
+
+	public function getTripDetailsById($id = null){
+		return $this->db->select('*')->from('trip_details')->where('id',$id)->get()->row_array();
+	}
+
+	public function getLoadDetailsById($load_id = null){
+		return $this->db->select('*')->from('loads')->where('id',$load_id)->get()->row_array();
 	}
 
 	

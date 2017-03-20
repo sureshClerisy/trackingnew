@@ -4,19 +4,23 @@ class Drivers extends Admin_Controller
 	public $userId;
 	public $roleId;
 	public $pathGen;
+	public $userName;
+	// private $entity;
+	// private $event;
 	function __construct()
 	{ 
 		parent::__construct();	
-		
-		$this->load->model('Driver');
-		$this->load->model('Job');
-		$this->load->helper('truckstop_helper');		
 		$this->userName = $this->session->loggedUser_username;
+		// $this->entity = $this->config->item('entity');
+		// $this->event = $this->config->item('event');
 		$this->pathGen = str_replace('application/', '', APPPATH);
-		if($this->session->role != 1){
+		$this->load->model(array('Driver',"Job"));
+		$this->load->helper('truckstop_helper');		
+		$this->roleId = $this->session->role;
+		if($this->roleId != 1){
 			$this->userId = $this->session->loggedUser_id;
 		}
-		$this->roleId = $this->session->role;
+		
 	}
 
 	public function index()
@@ -43,27 +47,37 @@ class Drivers extends Admin_Controller
 	*/
 	public function deleteContractDocs($docId = null, $docName = '')
 	{
-		$fileNameArray = explode('.',$docName);
-		$ext = end($fileNameArray);
-		$extArray = array( 'pdf','xls','xlsx','txt', 'bmp', 'ico','jpeg' );
-		$fileName = '';
-		for ( $i = 0; $i < count($fileNameArray) - 1; $i++ ) {
-			$fileName .= $fileNameArray[$i];
-		}
-		$fileName = $fileName.'.jpg';
-		$thumbFile =  $this->pathGen.'assets/uploads/documents/thumb_driver/thumb_'.$fileName;
-		$filePath =  $this->pathGen.'assets/uploads/documents/driver/'.$docName;
+		try{
+			$fileNameArray = explode('.',$docName);
+			$ext = end($fileNameArray);
+			$extArray = array( 'pdf','xls','xlsx','txt', 'bmp', 'ico','jpeg' );
+			$fileName = '';
+			for ( $i = 0; $i < count($fileNameArray) - 1; $i++ ) {
+				$fileName .= $fileNameArray[$i];
+			}
+			$fileName = $fileName.'.jpg';
+			$thumbFile =  $this->pathGen.'assets/uploads/documents/thumb_driver/thumb_'.$fileName;
+			$filePath =  $this->pathGen.'assets/uploads/documents/driver/'.$docName;
 
-		if(file_exists($filePath)){
-			unlink($filePath); 	
+			if(file_exists($filePath)){
+				unlink($filePath); 	
+			}
+			
+			if(file_exists($thumbFile)){
+				unlink($thumbFile); 	
+			}
+			
+			$driverInfo = $this->Driver->getEntityInfoByDocId($docId,$this->entity["driver"]);
+			$this->Driver->removeContractDocs($docId);
+			
+			$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> deleted a document ('.$driverInfo["document_name"].') from driver <a class="notify-link" href="'.$this->serverAddr.'#/editDrivers/'.$driverInfo["id"].'">'.ucfirst($driverInfo["first_name"])." ".ucfirst($driverInfo["last_name"])."</a>";
+			logActivityEvent($driverInfo['id'], $this->entity["driver"], $this->event["remove_doc"], $message, $this->Job);	
+			echo json_encode(array("success" => true));
+
+		}catch(Exception $e){
+			log_message('error','DELETE_DRIVER_DOC'.$e->getMessage());
+			echo json_encode(array("success" => false));
 		}
-		
-		if(file_exists($thumbFile)){
-			unlink($thumbFile); 	
-		}
-		
-		$this->Driver->removeContractDocs($docId);
-		echo json_encode(array("success" => true));
 	}
 
 	/*
@@ -86,16 +100,36 @@ class Drivers extends Admin_Controller
 						'entity_id' => $_POST['driverId']
 					);
 				
-				$this->Driver->insertContractDocument($docs);
-				$response['docList'] = $this->Driver->fetchContractDocuments($_POST['driverId'], 'driver');
+				try{
+					$this->Driver->insertContractDocument($docs);
+					$response['docList'] = $this->Driver->fetchContractDocuments($_POST['driverId'], 'driver');	
+					
+					$driverInfo = $this->Driver->get_driver_data($_POST['driverId'],array("drivers.first_name","drivers.last_name"));
+					$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> uploaded a new document ('.$docs["document_name"].') for driver <a class="notify-link" href="'.$this->serverAddr.'#/editDrivers/'.$_POST['driverId'].'">'.ucfirst($driverInfo["first_name"])." ".ucfirst($driverInfo["last_name"]).'</a>';
+					logActivityEvent($_POST['driverId'], $this->entity["driver"], $this->event["upload_doc"], $message, $this->Job);	
+
+				}catch(Exception $e){
+					log_message('error','UPLOAD_DRIVER_DOC'.$e->getMessage());
+				}
 			}
 		}
 
 		echo json_encode($response);
 	}
+
+
+
+	/*
+	* Request URL: http://domain/drivers/add
+	* Method: POST
+	* Params: null
+	* Return: array 
+	* Comment: Used for add new driver
+	*/
 	
 	public function add()
 	{	
+		try{
 			$file_name = '';		
 			if(!empty($_FILES) && $_FILES['profile_image']['name'] != ''){
 				$str = $_FILES['profile_image']['name'];
@@ -106,10 +140,9 @@ class Drivers extends Admin_Controller
 				$config['max_size']             = 100;
 				$config['max_width']            = 1024;
 				$config['max_height']           = 768;
-
 				$this->load->library('upload', $config);
+
 				if($this->upload->do_upload('profile_image')) {
-					
 					$config['image_library'] = 'gd2';
 					$config['source_image'] = 'assets/uploads/drivers/'.$file_name;	
 					$config['new_image'] = './assets/uploads/drivers/thumbnail/';
@@ -120,24 +153,30 @@ class Drivers extends Admin_Controller
 					$this->load->library('image_lib',$config);
 					$this->image_lib->resize();
 				}	
+
 				$file_path = 'assets/uploads/drivers/'.$file_name;
 				$file_path_thumb = 'assets/uploads/drivers/thumbnail/'.$file_name;
-				chmod($file_path,0777);
-				chmod($file_path_thumb,0777);
+				if(file_exists($file_path)) { chmod($file_path,0777); }
+				if(file_exists($file_path_thumb)){ chmod($file_path_thumb,0777); }
 			}
 			
-			//$data = json_decode(file_get_contents('php://input'), true);
 			$array = $this->input->post('posted_data');
 			$data = json_decode($array, true);
 			$data['created'] = date('Y-m-d h:m:s');
-			if(!empty($file_name))
-			{
-			$data['profile_image'] = $file_name;
+
+			if(!empty($file_name)){
+				$data['profile_image'] = $file_name;
 			}
-			$message = "$this->userName added a new driver";
-			logEvent('insert',$message,$this->Job);
+
 			$result = $this->Driver->addDrivers($data,$this->userId);
+			$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> added a new driver <a class="notify-link" href="'.$this->serverAddr.'#/editDrivers/'.$result.'">'.ucfirst($data["first_name"])." ".ucfirst($data["last_name"]).'</a>';
+			logActivityEvent($result, $this->entity["driver"], $this->event["add"], $message, $this->Job);	
 			echo json_encode(array('success' => true,'lastAddedDriver'=>$result));
+
+		}catch(Exception $e){
+			log_message('error','ADD_DRIVER'.$e->getMessage());
+			echo json_encode(array('success' => false));
+		}
 	}
 	
 	/*
@@ -156,65 +195,83 @@ class Drivers extends Admin_Controller
 	
 	public function update() 
 	{
-		$file_name = '';		
-		if(!empty($_FILES) && $_FILES['profile_image']['name'] != ''){
-			$str = $_FILES['profile_image']['name'];
-			$ext =  substr($str, strrpos($str, '.') + 1);
-			$config['file_name'] = $file_name = date('Ymdhis').'.'.$ext;
-			$config['upload_path'] = './assets/uploads/drivers/';
-			$config['allowed_types'] = 'gif|jpg|png|jpeg';
-			$config['max_size']             = 100;
-			$config['max_width']            = 1024;
-			$config['max_height']           = 768;
+		try{
+			$file_name = '';		
+			if(!empty($_FILES) && $_FILES['profile_image']['name'] != ''){
+				$str = $_FILES['profile_image']['name'];
+				$ext =  substr($str, strrpos($str, '.') + 1);
+				$config['file_name'] = $file_name = date('Ymdhis').'.'.$ext;
+				$config['upload_path'] = './assets/uploads/drivers/';
+				$config['allowed_types'] = 'gif|jpg|png|jpeg';
+				$config['max_size']             = 100;
+				$config['max_width']            = 1024;
+				$config['max_height']           = 768;
 
-			$this->load->library('upload', $config);
-			if($this->upload->do_upload('profile_image')) {
+				$this->load->library('upload', $config);
+				if($this->upload->do_upload('profile_image')) {
+					$config['image_library'] = 'gd2';
+					$config['source_image'] = 'assets/uploads/drivers/'.$file_name;	
+					$config['new_image'] = './assets/uploads/drivers/thumbnail/';
+					$config['maintain_ratio'] = TRUE;
+					$config['width']         = 200;
+					$config['height']       = 200;	
+					$this->load->library('image_lib',$config);
+					$this->image_lib->resize();
+				}	
+
+				$file_path = 'assets/uploads/drivers/'.$file_name;
+				$file_path_thumb = 'assets/uploads/drivers/thumbnail/'.$file_name;
+				if(file_exists($file_path)) { chmod($file_path,0777); }
+				if(file_exists($file_path_thumb)){ chmod($file_path_thumb,0777); }
 				
-				$config['image_library'] = 'gd2';
-				$config['source_image'] = 'assets/uploads/drivers/'.$file_name;	
-				$config['new_image'] = './assets/uploads/drivers/thumbnail/';
-					//~ $config['create_thumb'] = TRUE;
-				$config['maintain_ratio'] = TRUE;
-				$config['width']         = 200;
-				$config['height']       = 200;	
-				$this->load->library('image_lib',$config);
-				$this->image_lib->resize();
-			}	
-			$file_path = 'assets/uploads/drivers/'.$file_name;
-			$file_path_thumb = 'assets/uploads/drivers/thumbnail/'.$file_name;
-			chmod($file_path,0777);
-			chmod($file_path_thumb,0777);
+			}
+			$array = $this->input->post('posted_data');
+			$data = json_decode($array, true);
+			$data['updated'] = date('Y-m-d h:i:s');
+			if(!empty($file_name)){
+				$data['profile_image'] = $file_name;
+			}
+			$id = $_POST['id'];
+			$previous = array();
+			$previous = $this->Driver->get_driver_data($id);
+			$editedFields = array_diff_assoc($data,$previous);
+			unset($editedFields['created']);
+			unset($editedFields['updated']);
+
+			if(count($editedFields) > 0){
+				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> edited the driver <a class="notify-link" href="'.$this->serverAddr.'#/editDrivers/'.$previous["id"].'">'.ucfirst($previous["first_name"])." ".ucfirst($previous["last_name"])."</a>";
+				foreach ($editedFields as $key => $value) {
+					$prevField = isset($previous[$key]) ? $previous[$key] : "" ;
+					$key = ($key == "driver_license_cats") ? "driver_license_class" : $key;
+					if( $key == "user_id" ){
+						$dispatcherInfo =  $this->Driver->getUserInfo($value);
+						$key = "dispatcher";
+						$prevField = $previous["uFirstName"]." ".$previous["uLastName"];
+						$value = $dispatcherInfo["first_name"]." ".$dispatcherInfo["last_name"];
+					} 
+
+					if(!empty($prevField)){
+						$message.= "<br/> - Changed ".ucwords(str_replace("_"," ",$key))." from <i>".$prevField."</i> to <i>".$value."</i>";
+					}else{
+						$message.= "<br/> - Added  <i>".$value."</i> to ".ucwords(str_replace("_"," ",$key));
+					}
+				}
+			}else{
+				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> edited the driver <a class="notify-link" href="'.$this->serverAddr.'#/editDrivers/'.$previous["id"].'">'.ucfirst($previous["first_name"])." ".ucfirst($previous["last_name"])."</a>, but changed nothing.";
+			}
+			unset($data['uFirstName']); unset($data['uLastName']);
+			$result = $this->Driver->update($data, $id);
+			logActivityEvent($previous["id"], $this->entity["driver"], $this->event["edit"], $message, $this->Job);	
+			echo json_encode(array('success' => true));
+		}catch(Exception $e){
+			log_message('error','EDIT_DRIVER'.$e->getMessage());
+			echo json_encode(array('success' => false));
 		}
-		
-		//$data = json_decode(file_get_contents('php://input'), true);
-		$array = $this->input->post('posted_data');
-		$data = json_decode($array, true);
-		$data['created'] = date('Y-m-d h:m:s');
-		if(!empty($file_name))
-		{
-		$data['profile_image'] = $file_name;
-		}
-		$id = $_POST['id'];
-		
-		$previous = array();
-		$previous = $this->Driver->get_driver_data($id);
-		$changed = array_diff_assoc($data,$previous);
-		unset($changed['created']);
-		$fields = array();
-		foreach($changed as $key => $changed){
-			array_push($fields,ucwords(str_replace("_"," ",$key)));
-		}
-		$changed_fields = implode(",",$fields);
-		$message = "$this->userName edited $changed_fields of a driver";
-		logEvent('edit',$message,$this->Job);	
-		$result = $this->Driver->update($data, $id);
-		echo json_encode(array('success' => true));
 	}
 	
 	public function delete($driverID=null)
 	{
 		$result = $this->Driver->delete( $driverID );
-		
 		if ( $result ) {
 			$message = "$this->userName deleted a driver";
 			logEvent('delete',$message,$this->Job);
@@ -283,23 +340,38 @@ class Drivers extends Admin_Controller
 	}
 	/********* Dispatcher List - r288 ****************/
 	
-	/**
-	 * Changing driver Status
-	 */ 
+	
+	/*
+	* Request URL: http://domain/drivers/changeStatus
+	* Method: get
+	* Params: driverId, status
+	* Return: array 
+	* Comment: Used for change driver status
+	*/
 	public function changeStatus( $driverId = null, $status = null )
 	{
-		$result = $this->Driver->changeDriverStatus($driverId, $status);
-		if ( $result ) {
-			$message = "$this->userName changed status of a driver";
-			logEvent('status',$message,$this->Job);
-			$status = true;
-		} else {
-			$status = false;
+		try{
+			
+			$requestedStatus = ($status == 1) ? "Deactivated" : "Activated";
+			$result = $this->Driver->changeDriverStatus($driverId, $status);
+			
+			if ( $result ) { 
+				$status = true; 
+			} else { 
+				$status = false; 
+			}
+
+			$data['rows'] = $driverInfo = $this->Driver->fetchSingleUpdatedRecord($driverId);
+			$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> changed the status to <i>'.$requestedStatus.'</i> of driver  <a class="notify-link" href="'.$this->serverAddr.'#/editDrivers/'.$driverId.'">'.ucfirst($driverInfo["first_name"]).' '.ucfirst($driverInfo["last_name"]).'</a>.';
+			logActivityEvent($driverId, $this->entity["driver"], $this->event["status_change"], $message, $this->Job);	
+			
+			echo json_encode(array('records' => $data, 'status' => $status ));	
+		}catch(Exception $e){
+			log_message('error','CHANGE_DRIVER_STATUS'.$e->getMessage());
+			echo json_encode(array('success' => false));
 		}
-		
-		$data['rows'] = $this->Driver->fetchSingleUpdatedRecord($driverId);
-					
-		echo json_encode(array('records' => $data, 'status' => $status ));
 	}
 	
 }
+
+

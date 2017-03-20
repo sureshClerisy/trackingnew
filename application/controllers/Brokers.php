@@ -5,18 +5,23 @@ class Brokers extends Admin_Controller {
 	public $userId;
 	public $roleId;
 	public $data;
+	public $userName;
 
 	function __construct()
 	{ 
 		parent::__construct();	
 		$this->load->library('user_agent');
-		$this->load->model('BrokersModel');
-		
+		$this->load->model(array('BrokersModel',"Job"));
+		$this->load->helper('truckstop_helper');
+
+		$this->roleId   = $this->session->role;	
+		$this->data 	= array();
+		$this->userName = $this->session->loggedUser_username;
+
 		if($this->session->role != 1){
 			$this->userId = $this->session->loggedUser_id;
 		}
-		$this->roleId = $this->session->role;	
-		$this->data = array();
+		
 	}
 
 	/*
@@ -58,38 +63,125 @@ class Brokers extends Admin_Controller {
 		$this->data['brokerDocuments'] = $this->BrokersModel->fetchContractDocuments($broker_id, 'broker');
 		echo json_encode($this->data);
 	}
+
+
+	/*
+	* Request URL: http://domain/brokers/update
+	* Method: post
+	* Params: null
+	* Return: array
+	* Comment: Used for update broker
+	*/
 	
-	public function update() {
-		$_POST = json_decode(file_get_contents('php://input'), true);
-		$id = $_POST['id'];
-       	$result = $this->BrokersModel->add_update_broker($_POST, $id);
-		if($result){
+	public function update() 
+	{
+		try{
+
+			$_POST = json_decode(file_get_contents('php://input'), true);
+			$id = $_POST['id'];
+			$brockerOldData = $this->BrokersModel->getBrokerInfo($id);
+	       	$result = $this->BrokersModel->add_update_broker($_POST, $id);
+			$editedFields = array_diff_assoc($_POST,$brockerOldData);
+			
+			if(count($editedFields) > 0){
+				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> edited a broker <a class="notify-link" href="'.$this->serverAddr.'#/editbroker/'.$id.'">'.$brockerOldData["TruckCompanyName"]."</a>.";
+				foreach ($editedFields as $key => $value) {
+					$prevField = isset($brockerOldData[$key]) ? $brockerOldData[$key] : "" ;
+					if(in_array($key, array("PointOfContact","PointOfContactPhone","TruckCompanyEmail","TruckCompanyPhone","TruckCompanyFax"))){
+						continue;
+					}
+					if(!empty($prevField)){
+						$message.= "<br/> - Changed ".ucwords(str_replace("_"," ",$key))." from <i>".$prevField."</i> to <i>".$value."</i>";
+					}else{
+						$message.= "<br/> - Added  <i>".$value."</i> to ".ucwords(str_replace("_"," ",$key));
+					}
+				}
+			}else{
+				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> edited a broker <a class="notify-link" href="'.$this->serverAddr.'#/editbroker/'.$id.'">'.$brockerOldData["TruckCompanyName"].'</a>, But changed nothing.';
+			}
+			logActivityEvent($brockerOldData["id"], $this->entity["broker"], $this->event["edit"], $message, $this->Job);	
 			echo json_encode(array('success' => true));
-		}
-		else{
+
+		}catch(Exception $e){
+			log_message('error','EDIT_VEHICLE'.$e->getMessage());
 			echo json_encode(array('success' => false));
 		}
 	}
 	
-	public function addBroker() {
-		$_POST = json_decode(file_get_contents('php://input'), true);
-		
-		$result = $this->BrokersModel->add_update_broker($_POST);
-		
-		if(!empty($result) && $result[0] =='yes' ){
-			echo json_encode(array('success' => true,'update'=>true, 'lastInsertId' => $result[1]));
-		} else {
-			echo json_encode(array('success' => true,'update'=>false, 'lastInsertId' => $result[1]));
+
+	/*
+	* Request URL: http://domain/brokers/addBroker
+	* Method: post
+	* Params: null
+	* Return: array
+	* Comment: Used for add/edit broker
+	*/
+
+	public function addBroker() 
+	{
+		try{
+
+			$_POST = json_decode(file_get_contents('php://input'), true);
+			$srcPage = $_POST["srcPage"];
+			$_POST = $_POST["data"];
+			$brockerOldData = $this->BrokersModel->getBrokerInfoByMCNumber($_POST["MCNumber"]);
+			$result = $this->BrokersModel->add_update_broker($_POST);
+			$type = "add";
+			if(!empty($result) && $result[0] =='yes' ){
+				$editedFields = array_diff_assoc($_POST,$brockerOldData);
+				$type = "edit";
+				if(count($editedFields) > 0){
+					$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> edited a broker <a class="notify-link" href="'.$this->serverAddr.'#/editbroker/'.$result[1].'">'.$_POST["TruckCompanyName"]."</a>.";
+					foreach ($editedFields as $key => $value) {
+						$prevField = isset($brockerOldData[$key]) ? $brockerOldData[$key] : "" ;
+						if(in_array($key, array("PointOfContact","PointOfContactPhone","TruckCompanyEmail","TruckCompanyPhone","TruckCompanyFax"))){
+							continue;
+						}
+						if(!empty($prevField)){
+							$message.= "<br/> - Changed ".ucwords(str_replace("_"," ",$key))." from <i>".$prevField."</i> to <i>".$value."</i>";
+						}else{
+							$message.= "<br/> - Added  <i>".$value."</i> to ".ucwords(str_replace("_"," ",$key));
+						}
+					}
+				}else{
+					$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> edited a broker <a class="notify-link" href="'.$this->serverAddr.'#/editbroker/'.$result[1].'">'.$_POST["TruckCompanyName"].'</a>, But changed nothing.';
+				}
+				logActivityEvent($result[1], $this->entity["broker"], $this->event["edit"], $message,  $this->Job, $srcPage);	
+				echo json_encode(array('success' => true,'update'=>true, 'lastInsertId' => $result[1]));
+			} else {
+				$type = "add";
+				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> added a new broker <a class="notify-link" href="'.$this->serverAddr.'#/editbroker/'.$result[1].'">'.$_POST["TruckCompanyName"]."</a>";
+				logActivityEvent($result[1], $this->entity["broker"], $this->event["add"], $message, $this->Job, $srcPage);	
+				echo json_encode(array('success' => true,'update'=>false, 'lastInsertId' => $result[1]));
+			}
+		}catch(Exception $e){
+			log_message('error', strtoupper($type).'_BROKER'.$e->getMessage());
+			echo json_encode(array("success" => false));
 		}
 	}
 	
+	/*
+	* Request URL: http://domain/brokers/delete
+	* Method: post
+	* Params: brokerID
+	* Return: array
+	* Comment: Used for delete broker info
+	*/
+
 	public function delete($brokerID=null){
-		$result = $this->BrokersModel->deleteBrocker($brokerID);
-		if ( $result ) {
+		try{
+
+			$brockerOldData = $this->BrokersModel->getBrokerInfo($brokerID);
+			$result = $this->BrokersModel->deleteBrocker($brokerID);
+			$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> deleted the broker <a class="notify-link" href="'.$this->serverAddr.'#/editbroker/'.$brokerID.'">'.$brockerOldData["TruckCompanyName"]."</a>";
+			logActivityEvent($brokerID, $this->entity["broker"], $this->event["delete"], $message, $this->Job);		
 			echo json_encode(array('success' => true));
-		} else {
-			echo json_encode(array('success' => false));
+
+		}catch(Exception $e){
+			log_message('error', 'DELETE_BROKER'.$e->getMessage());
+			echo json_encode(array("success" => false));
 		}
+
 		
 	}
 	
@@ -101,25 +193,32 @@ class Brokers extends Admin_Controller {
 	* Comment: Used for blacklist broker
 	*/
 	public function blackListBroker( $brokerId = null, $status = null ) {
-		$result = $this->BrokersModel->changeBlackListStatus( $brokerId, $status );
-		if ( $result ) {
-			$status = true;
-		} else {
-			$status = false;
+		try{
+			$requestedStatus = ($status == 0) ? "Blacklisted" : "Whitelisted";
+			$result = $this->BrokersModel->changeBlackListStatus( $brokerId, $status );
+			
+			if ( $result ) { $status = true; } else { $status = false; }
+
+			
+			$this->data['brokerData'] = $this->BrokersModel->getRelatedBroker($brokerId);
+			if($this->data['brokerData']['CarrierMC'] == 0){
+				$this->data['brokerData']['CarrierMC'] = '';
+			}
+			if($this->data['brokerData']['DOTNumber'] == 0){
+				$this->data['brokerData']['DOTNumber'] = '';
+			}
+			if($this->data['brokerData']['MCNumber'] == 0){
+				$this->data['brokerData']['MCNumber'] = '';
+			}
+
+			$message = '<span class="blue-color uname">'.ucfirst($this->userName)."</span> changed the status to <i>".$requestedStatus.'</i> of  broker <a class="notify-link" href="'.$this->serverAddr.'#/editbroker/'.$brokerId.'"> '.$this->data['brokerData']["TruckCompanyName"].'</a>';
+			logActivityEvent($brokerId, $this->entity["broker"], $this->event["status_change"], $message, $this->Job);
+			echo json_encode(array('records' => $this->data, 'status' => $status ));
+
+		}catch(Exception $e){
+			log_message('error','CHANGE_BROKER_STATUS'.$e->getMessage());
+			echo json_encode(array('success' => false));
 		}
-		
-		$this->data['brokerData'] = $this->BrokersModel->getRelatedBroker($brokerId);
-		if($this->data['brokerData']['CarrierMC'] == 0){
-			$this->data['brokerData']['CarrierMC'] = '';
-		}
-		if($this->data['brokerData']['DOTNumber'] == 0){
-			$this->data['brokerData']['DOTNumber'] = '';
-		}
-		if($this->data['brokerData']['MCNumber'] == 0){
-			$this->data['brokerData']['MCNumber'] = '';
-		}
-		
-		echo json_encode(array('records' => $this->data, 'status' => $status ));
 	} 
 	
 	
@@ -159,6 +258,7 @@ class Brokers extends Admin_Controller {
 	{
 		$prefix = "broker"; 
 	    $response  = array();
+	    
 	    if(isset($_POST["brokerId"]) && $_POST["brokerId"] != ""){
 			$response = $this->uploadContractDocsToServer($_FILES, $prefix, $prefix);	
 			if(isset($response["error"]) && !$response["error"]){
@@ -167,13 +267,19 @@ class Brokers extends Admin_Controller {
 						'entity_type' => $prefix,
 						'entity_id' => $_POST['brokerId']
 					);
-				
-				$this->BrokersModel->insertContractDocument($docs);
-				$response['docList'] = $this->BrokersModel->fetchContractDocuments($_POST['brokerId'], 'broker');
+				try{
+					$this->BrokersModel->insertContractDocument($docs);
+					$response['docList'] = $this->BrokersModel->fetchContractDocuments($_POST['brokerId'], 'broker');
+
+					$brokerInfo = $this->BrokersModel->getBrokerInfo($_POST['brokerId']);
+					$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> uploaded a new document ('.$docs["document_name"].') for broker <a class="notify-link" href="'.$this->serverAddr.'#/editbroker/'.$brokerInfo["id"].'">'.ucfirst($brokerInfo["TruckCompanyName"]).'</a>';
+					logActivityEvent($brokerInfo['id'], $this->entity["broker"], $this->event["upload_doc"], $message, $this->Job);
+				}catch(Exception $e){
+					log_message('error','UPLOAD_BROKER_DOC'.$e->getMessage());
+				}
 			}
 		}
 		echo json_encode($response);
-
 	}
 	
 	/*
@@ -185,27 +291,37 @@ class Brokers extends Admin_Controller {
 	*/
 	public function deleteContractDocs($docId = null, $docName = '')
 	{
-		$pathGen = str_replace('application/', '', APPPATH);
-		$fileNameArray = explode('.',$docName);
-		$ext = end($fileNameArray);
-		$extArray = array( 'pdf','xls','xlsx','txt', 'bmp', 'ico','jpeg' );
-		$fileName = '';
-		for ( $i = 0; $i < count($fileNameArray) - 1; $i++ ) {
-			$fileName .= $fileNameArray[$i];
-		}
-		$fileName = $fileName.'.jpg';
-		$thumbFile	 =  $pathGen.'assets/uploads/documents/thumb_broker/thumb_'.$fileName;
-		$filePath	 =  $pathGen.'assets/uploads/documents/broker/'.$docName;
+		try{
 
-		if(file_exists($filePath)){
-			unlink($filePath); 	
+			$pathGen = str_replace('application/', '', APPPATH);
+			$fileNameArray = explode('.',$docName);
+			$ext = end($fileNameArray);
+			$extArray = array( 'pdf','xls','xlsx','txt', 'bmp', 'ico','jpeg' );
+			$fileName = '';
+			for ( $i = 0; $i < count($fileNameArray) - 1; $i++ ) {
+				$fileName .= $fileNameArray[$i];
+			}
+			$fileName = $fileName.'.jpg';
+			$thumbFile	 =  $pathGen.'assets/uploads/documents/thumb_broker/thumb_'.$fileName;
+			$filePath	 =  $pathGen.'assets/uploads/documents/broker/'.$docName;
+
+			if(file_exists($filePath)){
+				unlink($filePath); 	
+			}
+			
+			if(file_exists($thumbFile)){
+				unlink($thumbFile); 	
+			}
+
+			$brokerInfo = $this->BrokersModel->getEntityInfoByDocId($docId,$this->entity["broker"]);
+			$this->BrokersModel->removeContractDocs($docId);
+			$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> deleted a document ('.$brokerInfo["document_name"].') from broker <a class="notify-link" href="'.$this->serverAddr.'#/editbroker/'.$brokerInfo["id"].'"> '.$brokerInfo["TruckCompanyName"].'</a>';
+			logActivityEvent($brokerInfo['id'], $this->entity["broker"], $this->event["remove_doc"], $message, $this->Job);	
+			echo json_encode(array("success" => true));
+
+		}catch(Exception $e){
+			log_message('error','DELETE_BROKER_DOC'.$e->getMessage());
+			echo json_encode(array("success" => false));
 		}
-		
-		if(file_exists($thumbFile)){
-			unlink($thumbFile); 	
-		}
-		
-		$this->BrokersModel->removeContractDocs($docId);
-		echo json_encode(array("success" => true));
 	}
 }

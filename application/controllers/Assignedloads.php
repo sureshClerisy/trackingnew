@@ -7,20 +7,25 @@
 
 class Assignedloads extends Admin_Controller{
 
-	public $rows;
+	
 	private $userId;
 	private $orign_city;
 	private $orign_state;
 	private $saveCalPayment;
-	public $finalArray;
-	public $data;
+	public  $rows;
+	public  $finalArray;
+	public  $data;
+	public  $userName;
 	
 	function __construct(){
 
 		parent::__construct();
 		
-		$this->userRoleId = $this->session->role;
-		$this->userId 		= $this->session->loggedUser_id;
+		$this->userRoleId  = $this->session->role;
+		$this->userId 	   = $this->session->loggedUser_id;
+		$this->userName    = $this->session->loggedUser_username;
+		$this->finalArray  = array();
+		$this->data        = array();
 		
 		$this->load->model('Vehicle');
 		$this->load->model('BrokersModel');
@@ -29,8 +34,7 @@ class Assignedloads extends Admin_Controller{
 		$this->load->library('Htmldom');
 		$this->load->helper('truckstop');
 		
-		$this->finalArray = array();
-		$this->data = array();
+		
 	}
 	
 	public function index() {
@@ -214,12 +218,18 @@ class Assignedloads extends Admin_Controller{
 	 *  Deleting the assigned load
 	 */ 
 	 
-	public function deleteAssignedLoad( $loadId = null ) {
-		$result = $this->Job->deleteAssignedLoad( $loadId );
-		if ( $result ) {
-			echo json_encode(array('success' =>  true ));
-		} else {
-			echo json_encode(array('success' =>  false ));
+	public function deleteAssignedLoad( $loadId = null, $srcPage = '' ) {
+		try{
+			$result = $this->Job->deleteAssignedLoad( $loadId );
+			$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> deleted the job ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$loadId.',\'\',\'\',\'\',\'\',0,\'\')">#'.$loadId.'</a>.';
+			logActivityEvent($loadId, $this->entity["ticket"], $this->event["delete"], $message, $this->Job, $srcPage);
+			if ( $result ) {
+				echo json_encode(array('success' =>  true ));
+			} else {
+				echo json_encode(array('success' =>  false ));
+			}
+		}catch(Exception $e){
+			log_message('error','DELETE_JOB_TICKET'.$e->getMessage());
 		}
 	}
 	
@@ -227,7 +237,7 @@ class Assignedloads extends Admin_Controller{
 	 * Generating the invoice 
 	 */ 
 	 
-	public function generateInvoice( $loadId = null , $parameter = '' ) {
+	public function generateInvoice( $loadId = null , $parameter = '' ,$srcPage = "") {
 		$pathGen = str_replace('application/', '', APPPATH);
 		$data = array();
 		$extraStopsArray = array();
@@ -411,8 +421,13 @@ class Assignedloads extends Admin_Controller{
 				} 
 				
 				$this->Job->insertDocumentEntry($fileName, $loadId, 'invoice', $docPrimaryId);
+
+
+				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> generated an invoice for job ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$loadId.',\'\',\'\',\'\',\'\',0,\'\')">#'.$loadId.'</a>.';
+				logActivityEvent($loadId, $this->entity["ticket"], $this->event["generate_invoice"], $message, $this->Job,$srcPage);
+
 				
-				$this->mergingPdf($loadId);
+				$this->mergingPdf($loadId,$srcPage);
 				if ( isset($parameter) && $parameter == 'readyForInvoice' ) 
 					$billingLoads = $this->Billing->getInProgressLoads('invoice');
 				else
@@ -429,7 +444,7 @@ class Assignedloads extends Admin_Controller{
 	 * Merging PDF files
 	 */
 	 
-	public function mergingPdf( $loadId = null ) {
+	public function mergingPdf( $loadId = null, $srcPage = "" ) {
 		$pdf = $this->load->library('m_pdf');
 		$pdf = new mPDF();
 		$pdf->SetImportUse();
@@ -499,6 +514,8 @@ class Assignedloads extends Admin_Controller{
 			} 
 			
 			$this->Job->insertDocumentEntry($fileName, $loadId, 'bundle', $docPrimaryId); 
+			$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> created a bundle document for job ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$loadId.',\'\',\'\',\'\',\'\',0,\'\')">#'.$loadId.'</a>.';
+			logActivityEvent($loadId, $this->entity["ticket"], $this->event["bundle_document"], $message, $this->Job, $srcPage);
 		}
 		return true;
 	} 
@@ -760,7 +777,11 @@ function pdfExtractText($psData){
 		$params = json_decode(file_get_contents('php://input'),true);
 		$total = 0;
 		$jobs = array();
-		$params["limitStart"] = ($params["pageNo"] * $params["itemsPerPage"] + 1);
+		if($params["pageNo"] <= 1){
+			$params["limitStart"] = ($params["pageNo"] * $params["itemsPerPage"] + 1);	
+		}else{
+			$params["limitStart"] = ($params["pageNo"] * $params["itemsPerPage"] );	
+		}
 
 		if((isset($params["sortColumn"]) && empty($params["sortColumn"])) || !isset($params["sortColumn"])){ $params["sortColumn"] = "PickupDate"; }
 		if((isset($params["sortType"]) && empty($params["sortType"])) || !isset($params["sortType"])){ $params["sortType"] = "ASC"; }

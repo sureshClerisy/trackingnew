@@ -8,7 +8,7 @@
 class Reports extends Admin_Controller{
 
 	public $userId;
-	private $paginationLimit = 5;
+	private $paginationLimit = 20;
 	
 	function __construct(){
 		parent::__construct();
@@ -51,8 +51,11 @@ class Reports extends Admin_Controller{
 			$filters = $args;
 		}else{
 			$filters = json_decode(file_get_contents('php://input'),true);	
+			if ( isset($filters['changeVariable']) && $filters['changeVariable'] == 1 ) {
+				$filters['args'] = $filters['formValue'];
+				unset($filters['formValue']);
+			}
 		}
-
 
 		$filterArgs = array();
 		if ( isset($filters['args']['startDate']) && $filters['args']['startDate']  != '' ) {
@@ -100,14 +103,27 @@ class Reports extends Admin_Controller{
 		}
 
 		$response['column_mappings'] = array_merge($response['column_mappings'], array("Location", "Speed (MPH)", "Odometer(Mi)"));
-
-
-		$result 					 = $this->Report->getBreadcrumbsDetail($filterArgs , $this->paginationLimit);
 		
-		$totalRows 					 = $this->Report->getBreadcrumbsDetail($filterArgs , NULL, NULL,TRUE);
+		if($args) {
+			$filterArgs['sortColumn']   = "GMTTime";
+			$filterArgs['sortType']     = "ASC";
+			$result 					 = $this->Report->getBreadcrumbsDetail($filterArgs , false, 'others');		
+		} else {
+			
+			$filterArgs['itemsPerPage'] = (isset($filters['itemsPerPage']) && !empty($filters['itemsPerPage']) ) ? $filters['itemsPerPage'] : $this->paginationLimit;
+			$filterArgs['pageNo'] 		= (isset($filters['pageNo']) && !empty($filters['pageNo'])) ? $filters['pageNo'] : 0;
+			$filterArgs['searchQuery'] 	= (isset($filters['searchQuery']) && !empty($filters['searchQuery']) ) ? $filters['searchQuery'] : '';
+			$filterArgs['sortColumn'] 	= (isset($filters['sortColumn']) && !empty($filters['sortColumn']) ) ? $filters['sortColumn'] : 'GMTTime';
+			$filterArgs['sortType'] 	= (isset($filters['sortType']) && !empty($filters['sortType']) ) ? $filters['sortType'] : 'ASC';
+			$filterArgs["limitStart"] 	= ( $filterArgs["pageNo"] * $filterArgs["itemsPerPage"] + 1 );
+
+			$result 					 = $this->Report->getBreadcrumbsDetail($filterArgs , false);		
+			$totalRows 					 = $this->Report->getBreadcrumbsDetail($filterArgs , TRUE);
+			$response['total'] 		 	 = $totalRows[0]['totalRows'];
+		}
+		
 		
 		$response['result'] 		 = $result;
-		$response['total'] 		 	 = $totalRows[0]['totalRows'];
 		$response['args'] 			 = $filterArgs;
 		$response['eventType'] 		 = $filters['args']['vStatus'];
 		if($args){
@@ -408,7 +424,7 @@ class Reports extends Admin_Controller{
 	public function sortPaginationListing($filterArgs = array(), $iscope = '' , $pageNumber = 0, $search = '', $sortColumn = '', $lastSortType = '' ) {
 		$data = array();
 		
-		$filterArgs['itemsPerPage'] = 20;
+		$filterArgs['itemsPerPage'] = $this->paginationLimit;
 		$filterArgs['limitStart']   = 1;
 		$filterArgs['sortColumn']   = "DeliveryDate";
 		$filterArgs['sortType']     = "DESC";
@@ -430,7 +446,7 @@ class Reports extends Admin_Controller{
 		$filter['sortColumn'] 	= ((isset($params["sortColumn"]) && !empty($params["sortColumn"]))) ? $params["sortColumn"]  : "DeliveryDate"; 
 		$filter['sortType']   	= ((isset($params["sortType"]) && !empty($params["sortType"]))) ? $params["sortType"]  : "DESC"; 
 		$filter['itemsPerPage'] = ((isset($params["itemsPerPage"]) && !empty($params["itemsPerPage"]))) ? $params["itemsPerPage"]  : "20"; 
-		$filter['searchQuery']  = ((isset($params["searchQuery"]) && !empty($params["searchQuery"]))) ? $params["searchQuery"]  : "20"; 
+		$filter['searchQuery']  = ((isset($params["searchQuery"]) && !empty($params["searchQuery"]))) ? $params["searchQuery"]  : ""; 
 		$filter['scope']      = ((isset($params['formValue']['scope'])) && !empty($params['formValue']['scope']) ) ? $params['formValue']['scope'] : '';
 		$filter['selScope']   = ((isset($params['formValue']['selScope'])) && !empty($params['formValue']['selScope']) ) ? $params['formValue']['selScope'] : '';
 		$filter['dispId']     = ((isset($params['formValue']['dispId'])) && !empty($params['formValue']['dispId']) ) ? $params['formValue']['dispId'] : '';
@@ -455,24 +471,53 @@ class Reports extends Admin_Controller{
 
 		$params = json_decode(file_get_contents('php://input'),true);
 
+		$filterArgs['deviceID']  = array();
+		$filterArgs['eventType']  = array();
+
+		if(isset($params['formValue']['vehicles'])){
+			if( is_array($params['formValue']['vehicles']) && count($params['formValue']['vehicles']) > 0){
+				foreach ($params['formValue']['vehicles'] as $key => $value) {
+					array_push($filterArgs['deviceID'], $value['tracker_id']);
+				}
+			}
+		}
+	
+		if(isset($params['formValue']['vStatus'])){	
+			if( is_array($params['formValue']['vStatus']) && count($params['formValue']['vStatus']) > 0){
+				foreach ($params['formValue']['vStatus'] as $key => $value) {
+					switch ($value['key']) {
+						case 'IDLE'		: 	$filterArgs['eventType'] = array_merge($filterArgs['eventType'], array('IGON','STOP')); break;
+						case 'SPEED'	: 	$filterArgs['eventType'] = array_merge($filterArgs['eventType'], array('')); break;
+						case 'TRAVEL'	: 	$filterArgs['eventType'] = array_merge($filterArgs['eventType'], array('START','MOVING')); break;
+						case 'IGOFF'	: 	$filterArgs['eventType'] = array_merge($filterArgs['eventType'], array('IGOFF')); break;
+						case 'PTO_OFF'	: 	$filterArgs['eventType'] = array_merge($filterArgs['eventType'], array('DEVICEIO')); break; //IN4HI, IN4LO
+						case 'PTO_ON'	: 	$filterArgs['eventType'] = array_merge($filterArgs['eventType'], array('')); break;
+					}
+				}
+			} 
+		}
+
+		
 		$data 					= array();
 		$filter["limitStart"] 	= ( $params["pageNo"] * $params["itemsPerPage"] + 1 );
-
-		$filter['sortColumn'] 	= (!empty($params["sortColumn"]))) ? $params["sortColumn"]  : "DeliveryDate"; 
-		$filter['sortType']   	= (!empty($params["sortType"]))) ? $params["sortType"]  : "DESC"; 
-		$filter['itemsPerPage'] = (!empty($params["itemsPerPage"]))) ? $params["itemsPerPage"]  : "20"; 
-		$filter['searchQuery']  = (!empty($params["searchQuery"]))) ? $params["searchQuery"]  : "20"; 
+		$filter['sortColumn'] 	= (!empty($params["sortColumn"])) ? $params["sortColumn"]  : "GMTTime"; 
+		$filter['sortType']   	= (!empty($params["sortType"])) ? $params["sortType"]  : "ASC"; 
+		$filter['itemsPerPage'] = (!empty($params["itemsPerPage"])) ? $params["itemsPerPage"]  : "20"; 
+		$filter['searchQuery']  = (!empty($params["searchQuery"])) ? $params["searchQuery"]  : ""; 
 		$filter['scope']      	= (!empty($params['formValue']['scope']) ) ? $params['formValue']['scope'] : '';
 		$filter['selScope']   	= (!empty($params['formValue']['selScope']) ) ? $params['formValue']['selScope'] : '';
 		$filter['dispId']     	= (!empty($params['formValue']['dispId']) ) ? $params['formValue']['dispId'] : '';
 		$filter['driverId']   	= (!empty($params['formValue']['driverId']) ) ? $params['formValue']['driverId'] : '';
-		$filter['startDate']  	= (!empty($params['formValue']["startDate"]))) ? $params['formValue']["startDate"]  : ""; 
-		$filter['endDate']    	= (!empty($params['formValue']["endDate"]))) ? $params['formValue']["endDate"]  : ""; 
+		$filter['startDate']  	= (!empty($params['formValue']["startDate"])) ? $params['formValue']["startDate"]  : ""; 
+		$filter['endDate']    	= (!empty($params['formValue']["endDate"])) ? $params['formValue']["endDate"]  : ""; 
+		$filter['deviceID']    	= $filterArgs["deviceID"]; 
+		$filter['eventType']    = $filterArgs["eventType"]; 
 		
-		$data['loads'] = $this->Report->getTrackingIndividualLoadsPagination( $filter, 'report', false );
-		$data['total'] = $this->Report->getTrackingIndividualLoadsPagination( $filter, 'report', true );
+		$data['result'] 			= $this->Report->getBreadcrumbsDetail( $filter, false );
+		$totalRows				= $this->Report->getBreadcrumbsDetail( $filter, true );
+		$data['total'] 		= $totalRows[0]['totalRows'];
 
-		echo json_encode(array('wPagination' => $data));
+		echo json_encode(array('breadCrumbPage' => $data));
 	}	
  }
  

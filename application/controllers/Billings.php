@@ -410,7 +410,11 @@ class Billings extends Admin_Controller{
 		$params = json_decode(file_get_contents('php://input'),true);
 		$total = 0;
 		$jobs = array();
-		$params["limitStart"] = ($params["pageNo"] * $params["itemsPerPage"] + 1);
+		if($params["pageNo"] <= 1){
+			$params["limitStart"] = ($params["pageNo"] * $params["itemsPerPage"] + 1);	
+		}else{
+			$params["limitStart"] = ($params["pageNo"] * $params["itemsPerPage"] );	
+		}
 
 		if((isset($params["sortColumn"]) && empty($params["sortColumn"])) || !isset($params["sortColumn"])){ $params["sortColumn"] = "PickupDate"; }
 		if((isset($params["sortType"]) && empty($params["sortType"])) || !isset($params["sortType"])){ $params["sortType"] = "ASC"; }

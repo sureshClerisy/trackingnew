@@ -4,16 +4,19 @@ class Trailers extends Admin_Controller {
 	public $search;
 	public $userId;
 	public $roleId;
+	public $userName;
 	public $data;
 	
 	function __construct()
 	{ 
 		parent::__construct();	
-		$this->load->model('Vehicle');		
-		$this->load->model('Trailer');		
+		$this->load->model(array('Trailer','Vehicle',"Job"));
+
 		
 		$this->userId = $this->session->loggedUser_id;
 		$this->roleId = $this->session->role;	
+		$this->userName = $this->session->loggedUser_username;
+		$this->load->helper('truckstop_helper');		
 		$this->data = array();
 	}
 	
@@ -57,26 +60,74 @@ class Trailers extends Admin_Controller {
 		echo json_encode($this->data);
 	} 
 	
-	/**
-	 * Saving and updating Trailer to db
-	 */
-	 
-	public function addEditTrailer(){
-		$_POST = json_decode(file_get_contents('php://input'), true);
-		
-		$postData = $this->input->post();
+
+
+	/*
+	* Request URL: http://domain/trailers/addEditTrailer
+	* Method: post
+	* Params: submitType
+	* Return: array
+	* Comment: Used for add or edit the trailer record
+	*/
+
+	public function addEditTrailer($submitType = 'add')
+	{
+		try{
+
+			$_POST = json_decode(file_get_contents('php://input'), true);
+			$postData = $this->input->post(); $message = "";
+
+			if( isset($postData) && !empty($postData) ){
 				
-		if( isset($postData) && !empty($postData) ){
-			$result = $this->Trailer->addEditTrailer();
-			if ( $result ) 
-				$success = true;
-			else 
-				$success = false;
-				
-			$this->data['success'] = $success;
-			$this->data['lastInsertedId'] = $result;
-		} 
-		echo json_encode($this->data);
+				if($submitType == "add"){
+					$result = $this->Trailer->addEditTrailer();
+					$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> added a new trailer <a class="notify-link" href="'.$this->serverAddr.'#/editTrailer/'.$result.'"> Trailer - '.$postData["unit_id"].'</a>';
+					logActivityEvent($result, $this->entity["trailer"], $this->event["add"], $message, $this->Job);	
+				}else{
+
+					$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> edited a trailer <a class="notify-link" href="'.$this->serverAddr.'#/editTrailer/'.$postData["id"].'"> Trailer - '.$postData["unit_id"].'</a>';
+					$trailerOldData = $this->Trailer->getTrailerInfo($postData["id"]);
+					$trailerOldData["monthly_payment"] = money_format('%.2n', (float)$trailerOldData["monthly_payment"]);
+					$trailerOldData["purchase_price"] = money_format('%.2n', (float)$trailerOldData["purchase_price"]);
+					$editedFields = array_diff_assoc($postData,$trailerOldData);
+
+					if(count($editedFields) > 0){
+						$skipFlag = false;
+						foreach ($editedFields as $key => $value) {
+							$prevField = isset($trailerOldData[$key]) ? $trailerOldData[$key] : "" ;
+
+							if($key == "truck_id"){
+								$key = "truck_number";
+								$prevField = $trailerOldData["truckName"];
+								$value = $editedFields["truckName"];
+							}
+							if($key == "truckName"){ continue; }
+
+							if(!empty($prevField)){
+								$message.= "<br/> - Changed ".ucwords(str_replace("_"," ",$key))." from <i>".$prevField."</i> to <i>".$value."</i>";
+							}else{
+								$message.= "<br/> - Added  <i>".$value."</i> to ".ucwords(str_replace("_"," ",$key));
+							}
+							
+						}
+					}else{
+						$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> edited a trailer <a class="notify-link" href="'.$this->serverAddr.'#/editTrailer/'.$postData["id"].'"> Trailer - '.$postData["unit_id"].'</a>, But changed nothing.';
+					}
+
+					$result = $this->Trailer->addEditTrailer();
+					logActivityEvent($result, $this->entity["trailer"], $this->event["edit"], $message, $this->Job);
+				}
+
+				if ( $result )  { $success = true; } else { $success = false; }
+				$this->data['success'] = $success;
+				$this->data['lastInsertedId'] = $result;
+			} 
+
+			echo json_encode($this->data);
+		}catch(Exception $e){
+			log_message('error', strtoupper($submitType).'_TRAILER'.$e->getMessage());
+			echo json_encode(array("success" => false));
+		}
 	} 
 	
 	/*
@@ -112,19 +163,34 @@ class Trailers extends Admin_Controller {
 		echo json_encode(array('result' => $res, 'trailerUnit' => $trailerUnit));
 	}
 	
-	/**
-	 * Changing trailer Status
-	 */ 
+	/*
+	* Request URL: http://domain/trailers/changeStatus
+	* Method: Post
+	* Params: $trailerId , $status 
+	* Return: array
+	* Comment: Used for uploading trailers documents
+	*/
+	
 	public function changeStatus( $trailerId = null, $status = null ){
-		$result = $this->Trailer->changeTrailerStatus($trailerId, $status);
-		if ( $result ) {
-			$this->data['status'] = true;
-		} else {
-			$this->data['status'] = false;
+		try{
+			$requestedStatus = ($status == 1) ? "Deactivated" : "Activated";
+			$result = $this->Trailer->changeTrailerStatus($trailerId, $status);
+			if ( $result ) {
+				$this->data['status'] = true;
+			} else {
+				$this->data['status'] = false;
+			}
+			
+			$this->data['rows'] = $this->Trailer->getTrailerInfo( $trailerId );
+
+			$message = '<span class="blue-color uname">'.ucfirst($this->userName)."</span> changed the status to <i>".$requestedStatus.'</i> of  <a class="notify-link" href="'.$this->serverAddr.'#/editTrailer/'.$trailerId.'"> Trailer - '.$this->data['rows']["unit_id"].'</a>';
+			logActivityEvent($trailerId, $this->entity["trailer"], $this->event["status_change"], $message, $this->Job);	
+			echo json_encode($this->data);
+
+		}catch(Exception $e){
+			log_message('error','CHANGE_TRAILER_STATUS'.$e->getMessage());
+			echo json_encode(array('success' => false,"rows"=>array()));
 		}
-		
-		$this->data['rows'] = $this->Trailer->getTrailerInfo( $trailerId );
-		echo json_encode($this->data);
 	}
 	
 	/**
@@ -165,8 +231,17 @@ class Trailers extends Admin_Controller {
 						'entity_type' => $prefix,
 						'entity_id' => $_POST['trailerId']
 					);
-				$this->Trailer->insertContractDocument($docs);
-				$response['trailerDocuments'] = $this->Trailer->fetchContractDocuments($_POST['trailerId'], 'trailer');
+				try{
+					
+					$this->Trailer->insertContractDocument($docs);
+					$response['trailerDocuments'] = $this->Trailer->fetchContractDocuments($_POST['trailerId'], 'trailer');
+					$trailerInfo = $this->Trailer->getTrailerInfo($_POST['trailerId']);
+					$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> uploaded a new document ('.$docs["document_name"].') for <a class="notify-link" href="'.$this->serverAddr.'#/editTrailer/'.$trailerInfo["id"].'"> Trailer - '.$trailerInfo["unit_id"].'</a>';
+					logActivityEvent($trailerInfo['id'], $this->entity["trailer"], $this->event["upload_doc"], $message, $this->Job);
+
+				}catch(Exception $e){
+					log_message('error','UPLOAD_TRAILER_DOC'.$e->getMessage());
+				}
 			}
 		}
 		echo json_encode($response);
@@ -182,28 +257,37 @@ class Trailers extends Admin_Controller {
 	*/
 	public function deleteContractDocs($docId = null, $docName = '')
 	{
-		$pathGen = str_replace('application/', '', APPPATH);
-		$fileNameArray = explode('.',$docName);
-		$ext = end($fileNameArray);
-		$extArray = array( 'pdf','xls','xlsx','txt', 'bmp', 'ico','jpeg' );
-		$fileName = '';
-		for ( $i = 0; $i < count($fileNameArray) - 1; $i++ ) {
-			$fileName .= $fileNameArray[$i];
-		}
-		$fileName = $fileName.'.jpg';
-		$thumbFile	 =  $pathGen.'assets/uploads/documents/thumb_trailer/thumb_'.$fileName;
-		$filePath	 =  $pathGen.'assets/uploads/documents/trailer/'.$docName;
+		try{
+			$pathGen = str_replace('application/', '', APPPATH);
+			$fileNameArray = explode('.',$docName);
+			$ext = end($fileNameArray);
+			$extArray = array( 'pdf','xls','xlsx','txt', 'bmp', 'ico','jpeg' );
+			$fileName = '';
+			for ( $i = 0; $i < count($fileNameArray) - 1; $i++ ) {
+				$fileName .= $fileNameArray[$i];
+			}
+			$fileName = $fileName.'.jpg';
+			$thumbFile	 =  $pathGen.'assets/uploads/documents/thumb_trailer/thumb_'.$fileName;
+			$filePath	 =  $pathGen.'assets/uploads/documents/trailer/'.$docName;
 
-		if(file_exists($filePath)){
-			unlink($filePath); 	
+			if(file_exists($filePath)){
+				unlink($filePath); 	
+			}
+			
+			if(file_exists($thumbFile)){
+				unlink($thumbFile); 	
+			}
+			
+			$trailerInfo = $this->Trailer->getEntityInfoByDocId($docId,$this->entity["trailer"]);
+			$this->Trailer->removeContractDocs($docId);
+			$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> deleted a document ('.$trailerInfo["document_name"].') from <a class="notify-link" href="'.$this->serverAddr.'#/editTrailer/'.$trailerInfo["id"].'"> Trailer - '.$trailerInfo["unit_id"].'</a>';
+			logActivityEvent($trailerInfo['id'], $this->entity["trailer"], $this->event["remove_doc"], $message, $this->Job);	
+
+			echo json_encode(array("success" => true));
+		}catch(Exception $e){
+			log_message('error','DELETE_TRAILER_DOC'.$e->getMessage());
+			echo json_encode(array("success" => false));
 		}
-		
-		if(file_exists($thumbFile)){
-			unlink($thumbFile); 	
-		}
-		
-		$this->Trailer->removeContractDocs($docId);
-		echo json_encode(array("success" => true));
 	}
 	
 	

@@ -196,6 +196,7 @@ app.controller('addBrokersController', function(dataFactory,$scope,$http ,$rootS
 		},
 		sending:function(file, xhr, formData){
 			formData.append("brokerId", $scope.lastBrokerId);
+			formData.append("srcPage", $rootScope.srcPage);
 		},
 		success:function(file,response){
 			file.previewElement.classList.add("dz-success");
@@ -215,7 +216,7 @@ app.controller('addBrokersController', function(dataFactory,$scope,$http ,$rootS
 	};
 	
 	$scope.addBroker = function(){
-		dataFactory.httpRequest(URL + '/brokers/addBroker/','POST',{},$scope.addBrokersData).then(function(data) {
+		dataFactory.httpRequest(URL + '/brokers/addBroker/','POST',{},{data:$scope.addBrokersData,srcPage:$rootScope.srcPage}).then(function(data) {
 			if ( data.success == true ) {
 				if(data.update == true){
 					$rootScope.brokerEditMessage = $rootScope.languageArray.brokerExistingSuccMsg;	

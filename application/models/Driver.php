@@ -77,9 +77,14 @@ class Driver extends Parent_Model
 		}
 	}
 	
-	public function get_driver_data( $driver_id = Null ) {
-		$this->db->select('*');
-		$this->db->where('id', $driver_id);
+	public function get_driver_data($driver_id = Null,  $fields = array() ) {
+		if(count($fields) > 0){
+			$this->db->select(implode(",", $fields));
+		}else{
+			$this->db->select('drivers.*, users.first_name as uFirstName, users.last_name as uLastName');	
+		}
+		$this->db->join("users","drivers.user_id = users.id","Left");
+		$this->db->where('drivers.id', $driver_id);
 		$result = $this->db->get('drivers');
 		if( $result->num_rows() > 0 ) {
 			return $result->row_array();
@@ -87,6 +92,8 @@ class Driver extends Parent_Model
 			return false;
 		}
 	}
+
+	
 
 	public function getDocs($driverId){
 		$this->db->select('documents');

@@ -537,6 +537,37 @@ define("_DISPATCHER", 2);
 // http://testws.truckstop.com:8080/V13/Searching/LoadSearch.svc?wsdl  (Test url)
 // http://webservices.truckstop.com/V13/Searching/LoadSearch.svc  (Live url)
 
+
+$config["entity"] = array("user"	=> "user", 
+						  "truck" 	=> "truck" , 
+						  "driver" 	=> "driver", 
+						  "trailer" => "trailer", 
+						  "broker" 	=> "broker", 
+						  "ticket" 	=> "ticket", 
+						  "truimph" => "truimph");
+
+$config["event"]  = array("login"				=> "login", 
+						  "logout"  		 	=> "logout", 
+						  "widget_order_change" => "widget_order_change", 
+						  "add" 			 	=> "add", 
+						  "edit"  			 	=> "edit", 
+						  "status_change"	 	=> "status_change", 
+						  "delete"  		 	=> "delete", 
+						  "upload_doc"  	 	=> "upload_doc",
+						  "remove_doc"  	 	=> "remove_doc",
+						  "overwrite_doc"  	 	=> "overwrite_doc",
+						  "activate" 		 	=> "activate",
+						  "deactivate" 		 	=> "deactivate",
+						  "blacklist_on"	 	=> "blacklist_on",	
+						  "blacklist_off" 	 	=> "blacklist_off",
+						  "generate_invoice" 	=> "generate_invoice",
+						  "bundle_document"		=> "bundle_document",
+						  "add_to_queue" 	 	=> "add_to_queue",
+						  "remove_from_queue"	=> "remove_from_queue",
+						  "sent_for_payment"	=> "sent_for_payment",
+						);
+
+
 // Test Mode
 $config['truck_url'] 		= 'http://testws.truckstop.com:8080/V13/Searching/LoadSearch.svc?wsdl';
 

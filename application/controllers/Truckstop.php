@@ -36,6 +36,7 @@ class Truckstop extends Admin_Controller{
 	public $deadMilesActual;
 	public $defaultTruckAvg;
 	public $load_source;
+	public  $userName;
 	
 	function __construct()
 	{
@@ -48,7 +49,7 @@ class Truckstop extends Admin_Controller{
 		$this->userRoleId 	= $this->session->role;
 		$this->userId 		= $this->session->loggedUser_id;
 		$this->origin_state = $this->Vehicle->get_vehicles_state($this->session->admin_id);
-		
+		$this->userName   	= $this->session->loggedUser_username;
 		
 		$this->Rpm_value 	= 0;
 		$this->saveDead 	= '';
@@ -425,6 +426,7 @@ class Truckstop extends Admin_Controller{
 				
 				if ( !empty($data['brokerData']) ) {
 					$jobRecord['MCNumber'] = ($jobRecord['MCNumber'] != '' && $jobRecord['MCNumber'] != 0) ? $jobRecord['MCNumber'] : $data['brokerData']['mc_number'];
+					$jobRecord['CarrierMC'] = ($jobRecord['CarrierMC'] != '' && $jobRecord['CarrierMC'] != 0) ? $jobRecord['CarrierMC'] : $data['brokerData']['CarrierMC'];
 					$jobRecord['DOTNumber'] = ($jobRecord['DOTNumber'] != '' && $jobRecord['DOTNumber'] != 0) ? $jobRecord['DOTNumber'] : $data['brokerData']['dot_number'];
 					$jobRecord['TruckCompanyName'] = ($jobRecord['TruckCompanyName'] != '') ? $jobRecord['TruckCompanyName'] : $data['brokerData']['TruckCompanyName'];
 				}
@@ -1033,13 +1035,53 @@ class Truckstop extends Admin_Controller{
 		$saveData['overallTotalProfit'] = $VehiclesArray[0]['overall_total_profit'];
 		$saveData['overallTotalProfitPercent'] = $VehiclesArray[0]['overall_total_profit_percent'];
 		
-		if ( $loadRequest == 'addRequest' )				// for custom added loads
+		if ( $loadRequest == 'addRequest' ){				// for custom added loads
 			$result = $this->Job->save_job( $saveData, $extraStopsArray, $id , $vehicle_id );
-		else
+		}else{
 			$result = $this->Job->update_job($id , $vehicle_id, $saveData, $extraStopsArray);
+		}
 			
+			$foundId = $this->Job->findTripDetailsId($truckstopId,$result);
+			if($foundId){
+				$tripDetailId = $foundId;
+			}
 		if ( $result ) {
-			$truckResult = $this->Job->updateTripDetail($tripDetailId , $result, $truckstopId, $truckInfo);
+			
+			if ( $tripDetailId  != null && $tripDetailId != '' && $tripDetailId  != 'undefined' ) {
+				$tripDetailOldInfo = $this->Job->getTripDetailsById($tripDetailId);
+				$truckResult = $this->Job->updateTripDetail($tripDetailId , $result, $truckstopId, $truckInfo);
+				$tripDetailUpdatedInfo = $this->Job->getTripDetailsById($tripDetailId);
+	
+				$editedFields = array_diff_assoc($tripDetailUpdatedInfo,$tripDetailOldInfo);
+				$totalsBuffer = array();
+				if(count($editedFields) > 0){
+					$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> edited the trip detail info for job ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$result.',\'\',\'\',\'\',\'\',0,\'\')">#'.$result.'</a>';
+					foreach ($editedFields as $key => $value) {
+						$prevField = isset($tripDetailOldInfo[$key]) ? $tripDetailOldInfo[$key] : "" ;
+						
+						$bufferedInfo = array();
+						if(!empty(trim($prevField)) && !empty(trim($value))){
+							$message.= "<br/> - Changed ".ucwords(str_replace("_"," ",$key))." from <i>".$prevField."</i> to <i>".$value."</i>";
+						}else if(!empty(trim($value))){
+							$message.= "<br/> - Added  <i>".$value."</i> to ".ucwords(str_replace("_"," ",$key));
+						}else if (empty(trim($value))){
+							$message.= "<br/> - Removed  <i>".$prevField."</i> from ".ucwords(str_replace("_"," ",$key));
+						}
+					}
+					logActivityEvent($result, $this->entity["ticket"], $this->event["edit"], $message, $this->Job,$_POST["srcPage"]);
+				}else{
+					$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> edited the job ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$result.',\'\',\'\',\'\',\'\',0,\'\')">#'.$result.'</a>, but changed nothing.';
+					logActivityEvent($result, $this->entity["ticket"], $this->event["edit"], $message, $this->Job,$_POST["srcPage"]);
+				}
+			}else{
+				$truckResult = $this->Job->updateTripDetail($tripDetailId , $result, $truckstopId, $truckInfo);
+				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> added the trip detail info for job ticket <a 	href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$result.',\'\',\'\',\'\',\'\',0,\'\')">#'.$result.'</a>';	
+				logActivityEvent($result, $this->entity["ticket"], $this->event["add"], $message, $this->Job,$_POST["srcPage"]);
+			}
+
+
+
+			
 		}
 				
 		echo json_encode(array('loadid' => $result,'tripDetailId' => $truckResult,'vehicles_Available' => $VehiclesArray));
@@ -1920,10 +1962,17 @@ class Truckstop extends Admin_Controller{
 			}
 			
 			if ( $parameter == 'broker' ) {			// saving data to broker table
-				$this->BrokersModel->uploadBrokerDocument($response['data']['file_name'], $_REQUEST['brokerId']);
-				$this->fetchBrokerDocuments($_REQUEST['brokerId']);
+				try{
+					$brokerInfo = $this->BrokersModel->getBrokerInfo($_REQUEST['brokerId']);
+					$this->BrokersModel->uploadBrokerDocument($response['data']['file_name'], $_REQUEST['brokerId']);
+					$this->fetchBrokerDocuments($_REQUEST['brokerId']);
+					$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> uploaded a new document ('.$response['data']['file_name'].') for broker <a class="notify-link" href="'.$this->serverAddr.'#/editbroker/'.$brokerInfo["id"].'">'.ucfirst($brokerInfo["TruckCompanyName"]).'</a> from ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$_REQUEST['loadId'].',\'\',\'\',\'\',\'\',0,\'\')">#'.$_REQUEST['loadId'].'</a>';
+					logActivityEvent($brokerInfo['id'], $this->entity["broker"], $this->event["upload_doc"], $message, $this->Job, $_REQUEST['srcPage']);
+				}catch(Exception $e){
+					log_message('error','UPLOAD_BROKER_DOC_FROM_TICKET'.$e->getMessage());
+				}
 			} else {
-				$this->updateDocumentTable($response['data']['file_name'],$_REQUEST['loadId'],$parameter, $docPrimaryId);
+				$this->updateDocumentTable($response['data']['file_name'],$_REQUEST['loadId'],$parameter, $docPrimaryId,$_REQUEST['srcPage']);
 			}
 		} else {
 			if ( $parameter == 'broker' ) {
@@ -1934,9 +1983,30 @@ class Truckstop extends Admin_Controller{
 		}
 	}
 	
-	private function updateDocumentTable($fileName, $loadId, $parameter = '' ,$docPrimaryId = null ){
-		$this->Job->insertDocumentEntry($fileName, $loadId, $parameter, $docPrimaryId);
-		$this->fetchDocuments($loadId);
+	private function updateDocumentTable($fileName, $loadId, $parameter = '' ,$docPrimaryId = null,$srcPage = '' ){
+		$metaKey = "";
+		switch ($parameter) {
+			case 'pod':  $metaKey = "POD"; break;
+			case 'rateSheet': $metaKey = "Rate Sheet"; break;
+			case 'docs': $metaKey = "Document"; break;
+		}
+
+		try{
+			if($docPrimaryId){
+				$docInfo = $this->Job->getDocDetail($docPrimaryId);
+				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> deleted/overwrite the '.$metaKey.'('.$docInfo["doc_name"].') from ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$loadId.',\'\',\'\',\'\',\'\',0,\'\')">#'.$loadId.'</a>';
+				logActivityEvent($loadId, $this->entity["ticket"], $this->event["overwrite_doc"], $message, $this->Job, $srcPage);
+			}
+
+			$this->Job->insertDocumentEntry($fileName, $loadId, $parameter, $docPrimaryId);	
+			
+			
+			$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> uploaded a new '.$metaKey.'('.$fileName.') for ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$loadId.',\'\',\'\',\'\',\'\',0,\'\')">#'.$loadId.'</a>';
+			logActivityEvent($loadId, $this->entity["ticket"], $this->event["upload_doc"], $message, $this->Job, $srcPage);
+			$this->fetchDocuments($loadId);
+		}catch(Exception $e){
+			log_message('error',$metaKey.'-UPLOAD_DOCS_TICKET'.$e->getMessage());
+		}
 	}
 
 	/**
@@ -2181,18 +2251,45 @@ class Truckstop extends Admin_Controller{
 				
 				if (file_exists($bundleFile) ) 
 					unlink($bundleFile);
-					
+				$docInfo = $this->Job->getDocDetail($bundleDocArray['id']);
 				$this->Job->deleteDocument($bundleDocArray['id']);
+				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> deleted the bundle document('.$docInfo["doc_name"].') from ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$_POST['loadId'].',\'\',\'\',\'\',\'\',0,\'\')">#'.$_POST['loadId'].'</a>';
+				logActivityEvent($_POST['loadId'], $this->entity["ticket"], $this->event["remove_doc"], $message, $this->Job,$_POST["srcPage"]);
 			}
 		}
 		
 		if ( $_POST['doc_type'] == 'broker' ) {
-			$brokerId =  isset($_POST['assignedBrokeId']) ? $_POST['assignedBrokeId'] : 0;
-			$this->BrokersModel->removeContractDocs($_POST['docId']);
-			$this->fetchBrokerDocuments($brokerId);
+			try{
+				$brokerId =  isset($_POST['assignedBrokeId']) ? $_POST['assignedBrokeId'] : 0;
+				$brokerInfo = $this->BrokersModel->getEntityInfoByDocId($_POST['docId'], $this->entity["broker"]);
+
+				$this->BrokersModel->removeContractDocs($_POST['docId']);
+				$this->fetchBrokerDocuments($brokerId);
+
+				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> deleted a document ('.$brokerInfo["document_name"].') of broker <a class="notify-link" href="'.$this->serverAddr.'#/editbroker/'.$brokerInfo["id"].'"> '.$brokerInfo["TruckCompanyName"].'</a>  from ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$_POST['bloadId'].',\'\',\'\',\'\',\'\',0,\'\')">#'.$_POST['bloadId'].'</a>';
+				logActivityEvent($brokerInfo['id'], $this->entity["broker"], $this->event["remove_doc"], $message, $this->Job);	
+			}catch(Exception $e){
+				log_message('error','DELETE_BROKER_DOCS_TICKET'.$e->getMessage());
+			}
+
 		} else  {
-			$this->Job->deleteDocument($_POST['docId'], $_POST['loadId'], $_POST['doc_type']);
-			$this->fetchDocuments(false, array(), $_POST['doc_type']);
+			switch ($_POST['doc_type']) {
+				case 'pod':  $metaKey = "POD"; break;
+				case 'rateSheet': $metaKey = "Rate Sheet"; break;
+				case 'docs': $metaKey = "Document"; break;
+			}
+
+			$metaKey = ucwords(str_replace("_"," ", $_POST['doc_type']));
+			try{
+				$docInfo = $this->Job->getDocDetail($_POST['docId']);
+				$this->Job->deleteDocument($_POST['docId'], $_POST['loadId'], $_POST['doc_type']);
+				
+				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> deleted the '.$metaKey.'('.$docInfo["doc_name"].') from ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$_POST['loadId'].',\'\',\'\',\'\',\'\',0,\'\')">#'.$_POST['loadId'].'</a>';
+				logActivityEvent($_POST['loadId'], $this->entity["ticket"], $this->event["remove_doc"], $message, $this->Job,$_POST["srcPage"]);
+				$this->fetchDocuments(false, array(), $_POST['doc_type']);
+			}catch(Exception $e){
+				log_message('error',$metaKey.'-DELETE_DOCS_TICKET'.$e->getMessage());
+			}
 		}	
 	}
 
@@ -2242,7 +2339,6 @@ class Truckstop extends Admin_Controller{
 		$_POST = json_decode(file_get_contents('php://input'), true);
 		$driverAssignType = isset($_POST["driverAssignType"]) && $_POST["driverAssignType"] == "team" ? $_POST["driverAssignType"] : "driver";
 		$id = $_POST['jobPrimary'];
-		
 		$vehicle_id = isset($_POST['jobRecords']['vehicle_id'])  ? $_POST['jobRecords']['vehicle_id'] : 0;
 		$extraStopsArray = $_POST['extraStops'];
 		$vehicleDriverFlag = isset($_POST['vehicleDriverFlag']) ? $_POST['vehicleDriverFlag'] : 0;
@@ -2408,29 +2504,144 @@ class Truckstop extends Admin_Controller{
 			$saveData['pickDate'] = date('m/d/y',strtotime($saveData['PickupDate']));  //estimated time function and gantt chart pick the date from pickDate variable
 		
 		$saveData["driver_type"] = $driverAssignType;	
-		if( $id != '' && $id != null && $id != 0 && $loadFrom != 'ourLoad' ) {
-			if ( !isset($saveData['equipment_options']) || $saveData['equipment_options'] == '' ) {
-				if ( $saveData['EquipmentTypes']['Code'] != '' ) {
-					$equipmentResult = $this->Job->getRelatedEquipment( $saveData['EquipmentTypes']['Code']);
-					if ( $equipmentResult != '' ) 
-						$saveData['equipment'] = $equipmentResult;
-					$saveData['equipment_options'] = $saveData['EquipmentTypes']['Code'];
-				} else {
-					$equipmentResult = $this->Job->getRelatedEquipment( $saveData['equipment'], 'changeType');
-					if ( $equipmentResult != '' ) {
-						$saveData['equipment_options'] 		= $equipmentResult;
-						$saveData['EquipmentTypes']['Code'] = $equipmentResult;
-					}
-				}			
-			}
-			$result = $this->Job->update_job($id , $vehicle_id, $saveData, $extraStopsArray);
-		} else {
-			if ( $loadFrom == 'ourLoad' )
-				$result = $this->Job->save_Job($saveData,$extraStopsArray, $id);
-			else
+
+		try{
+
+			if( $id != '' && $id != null && $id != 0 && $loadFrom != 'ourLoad' ) {
+				if ( !isset($saveData['equipment_options']) || $saveData['equipment_options'] == '' ) {
+					if ( $saveData['EquipmentTypes']['Code'] != '' ) {
+						$equipmentResult = $this->Job->getRelatedEquipment( $saveData['EquipmentTypes']['Code']);
+						if ( $equipmentResult != '' ) 
+							$saveData['equipment'] = $equipmentResult;
+						$saveData['equipment_options'] = $saveData['EquipmentTypes']['Code'];
+					} else {
+						$equipmentResult = $this->Job->getRelatedEquipment( $saveData['equipment'], 'changeType');
+						if ( $equipmentResult != '' ) {
+							$saveData['equipment_options'] 		= $equipmentResult;
+							$saveData['EquipmentTypes']['Code'] = $equipmentResult;
+						}
+					}			
+				}
+				$jobOldData = $this->Job->getLoadDetailsById($id);
+
+				$oldDriverName  = $this->Job->getEntityInfoById($id,"driver");
+				
 				$result = $this->Job->update_job($id , $vehicle_id, $saveData, $extraStopsArray);
+				$jobUpdatedData = $this->Job->getLoadDetailsById($id);
+				$editedFields = array_diff_assoc($jobUpdatedData,$jobOldData);
+				$totalsBuffer = array();
+				if(count($editedFields) > 0){
+					
+					if(isset($editedFields["totalCost"])){
+						$totalsBuffer["totalCost"] = $editedFields["totalCost"];
+						unset($editedFields["totalCost"]);
+					}
+					
+					if(isset($editedFields["overallTotalProfit"])){
+						$totalsBuffer["overallTotalProfit"] = $editedFields["overallTotalProfit"];
+						unset($editedFields["overallTotalProfit"]);
+					}
+
+					if(isset($editedFields["overallTotalProfitPercent"])){
+						$totalsBuffer["overallTotalProfitPercent"] = $editedFields["overallTotalProfitPercent"];
+						unset($editedFields["overallTotalProfitPercent"]);
+					}
+
+
+
+
+					$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> edited the job ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$result.',\'\',\'\',\'\',\'\',0,\'\')">#'.$result.'</a>';
+					foreach ($editedFields as $key => $value) {
+						$prevField = isset($jobOldData[$key]) ? $jobOldData[$key] : "" ;
+						$bufferedInfo = array();
+						switch ($key) {
+							case 'dispatcher_id': $bufferedInfo  = $this->Job->getEntityInfoById($value,"dispatcher");	
+												  $value = $bufferedInfo["first_name"]." ".$bufferedInfo["last_name"]; $key = "Dispatcher";
+
+												  $bufferedInfo  = $this->Job->getEntityInfoById($prevField,"dispatcher");	
+												  $prevField = $bufferedInfo["first_name"]." ".$bufferedInfo["last_name"]; 
+												  break;
+							
+							case 'vehicle_id'   : $bufferedInfo  = $this->Job->getEntityInfoById($value,"truck");
+												  if( !empty($bufferedInfo["label"])){
+												  	$value =  "Truck - ".$bufferedInfo["label"];
+												  }else{
+												  	$value =  ""; 
+												  }  $key = "vehicle";
+
+												  $bufferedInfo  = $this->Job->getEntityInfoById($prevField,"truck");
+												  if( !empty($bufferedInfo["label"])){
+												  	$prevField =  "Truck - ".$bufferedInfo["label"];
+												  }else{
+												  	$prevField =  ""; $key = "ticket";
+												  } break;
+
+							case 'driver_id'    : $bufferedInfo  = $this->Job->getEntityInfoById($result,"driver");
+												  $value = $bufferedInfo["driverName"]; $key="driver";
+												  $prevField = $oldDriverName["driverName"];
+												  break;
+
+							case 'broker_id'    : $bufferedInfo  = $this->Job->getEntityInfoById($value,"broker");
+												  $value = $bufferedInfo["TruckCompanyName"]; $key="broker";
+												  $bufferedInfo  = $this->Job->getEntityInfoById($prevField,"broker");
+												  $prevField = $oldDriverName["TruckCompanyName"];
+												  break;
+						}
+
+						if(in_array($key, array("second_driver_id","trailer_id","driver_type","PickupAddress","updated","updated_record","created","PickDate"))){continue;}
+
+						if($key == "stops"){
+							$key = "extra stop(s)";
+							if(!empty(trim($value)) ){
+								$message.= "<br/> - Added  <i>".$value."</i> ".ucwords(str_replace("_"," ",$key)).".";
+							}else if (empty(trim($value))){
+								$message.= "<br/> - Removed  <i>".$prevField."</i>  ".ucwords(str_replace("_"," ",$key)).".";
+							}
+						}else if($key == "driver"){
+							if(empty($value)){
+								$message.= "<br/> - Unassigned  driver ".$prevField ." from ticket.";	
+							}else if(empty($prevField)){
+								$message.= "<br/> - Assigned driver ".$value." to ticket.";	
+							}else{
+								$message.= "<br/> - Changed ".ucwords(str_replace("_"," ",$key))." from <i>".$prevField."</i> to <i>".$value."</i>";
+							}
+						}else{
+							if(!empty(trim($prevField)) && !empty(trim($value))){
+								$message.= "<br/> - Changed ".ucwords(str_replace("_"," ",$key))." from <i>".$prevField."</i> to <i>".$value."</i>";
+							}else if(!empty(trim($value)) ){
+								$message.= "<br/> - Added  <i>".$value."</i> to ".ucwords(str_replace("_"," ",$key));
+							}else if (empty(trim($value))){
+								$message.= "<br/> - Removed  <i>".$prevField."</i> from ".ucwords(str_replace("_"," ",$key));
+							}
+						}
+					}
+				}else{
+					$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> edited the job ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$result.',\'\',\'\',\'\',\'\',0,\'\')">#'.$result.'</a>, but changed nothing.';
+				}
+				/*if( count($totalsBuffer) > 0  ){
+					$message.="<br> As a result";
+					foreach ($totalsBuffer as $key => $value) {
+						$prevField = isset($jobOldData[$key]) ? $jobOldData[$key] : "" ;
+						if(!empty(trim($prevField))){
+							$message.= "<br/> - ".ucwords(str_replace("_"," ",$key))." has been changed from <i>".$prevField."</i> to <i>".$value."</i>";
+						}
+					}
+				}*/
+				logActivityEvent($result, $this->entity["ticket"], $this->event["edit"], $message, $this->Job,$_POST["srcPage"]);
+			} else {
+				if ( $loadFrom == 'ourLoad' ){
+					$result = $this->Job->save_Job($saveData,$extraStopsArray, $id);
+					$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> added a new job ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$result.',\'\',\'\',\'\',\'\',0,\'\')">#'.$result.'</a>';
+					logActivityEvent($result, $this->entity["ticket"], $this->event["add"], $message, $this->Job,$_POST["srcPage"]);
+				}
+				else{
+					$result = $this->Job->update_job($id , $vehicle_id, $saveData, $extraStopsArray);
+				}
+			}
+		}catch(Exception $e){
+			log_message('error',$loadFrom.'ADD_EDIT_JOB_TICKET'.$e->getMessage());
 		}
-		
+
 		$this->load->model('Billing');
 		$newDestlabel = array();
 		
@@ -3193,9 +3404,9 @@ class Truckstop extends Admin_Controller{
         try
         {
 	        while(true){
-	            $response =  file_get_contents("//maps.googleapis.com/maps/api/place/search/json?location=-33.8670522,151.1957362&radius=500&sensor=false&key=".$gKeys[$keyIndex]);
-	            $response =  file_get_contents("//maps.googleapis.com/maps/api/place/search/json?location=-33.8670522,151.1957362&radius=500&sensor=false&key=".$gKeys[$keyIndex]);
-	            $response =  file_get_contents("//maps.googleapis.com/maps/api/place/search/json?location=-33.8670522,151.1957362&radius=500&sensor=false&key=".$gKeys[$keyIndex]);
+	            $response =  file_get_contents("https://maps.googleapis.com/maps/api/place/search/json?location=-33.8670522,151.1957362&radius=500&sensor=false&key=".$gKeys[$keyIndex]);
+	            $response =  file_get_contents("https://maps.googleapis.com/maps/api/place/search/json?location=-33.8670522,151.1957362&radius=500&sensor=false&key=".$gKeys[$keyIndex]);
+	            $response =  file_get_contents("https://maps.googleapis.com/maps/api/place/search/json?location=-33.8670522,151.1957362&radius=500&sensor=false&key=".$gKeys[$keyIndex]);
 	            
 	            $response = json_decode($response,true);
 	            if(in_array($response["status"], array("OVER_QUERY_LIMIT","REQUEST_DENIED"))){

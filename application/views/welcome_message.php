@@ -56,7 +56,7 @@
         </div>
         <ui-view></ui-view>
     </div>
-     <script src="app/dependecies.min.js"></script>
+    <script src="app/dependecies.min.js"></script>
     <link id="lazyload_placeholder">
 
 
@@ -107,6 +107,7 @@
     <script src="app/controllers/testController.js"></script>
     <script src="app/controllers/trailersController.js"></script>
     <script src="app/controllers/sendPaymentController.js"></script>
+    <script src="app/controllers/notificationsController.js"></script>
     <script src="login/loadLanguages"></script>
     <!--for footable-->
     
@@ -152,5 +153,6 @@
         }  
     </script>
     <script src="//maps.google.com/maps/api/js?key=<?php echo $key; ?>&libraries=places,geometry"></script>
+   
 </body>
 </html>

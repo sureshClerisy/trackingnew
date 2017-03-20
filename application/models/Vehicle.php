@@ -147,6 +147,23 @@ class Vehicle extends Parent_Model
         return false;
     }
 
+    /*
+    * Request URL: 
+    * Method: null
+    * Params: null
+    * Return: array
+    * Comment: Used for get driver name
+    */
+    public function getDriverName($id){
+        $data = $this->db->select('d.first_name, d.last_name')->from('drivers as d')
+        ->where('d.id',$id)->get();
+        if($data->num_rows()>0){
+            return $data->row_array();
+        }
+        return false;
+    }
+
+
     public function deleteVehicle($id=null){
         $this->db->where('id',$id);
 		$result = $this->db->delete('vehicles');
