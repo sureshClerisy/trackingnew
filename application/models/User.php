@@ -17,16 +17,22 @@ class User extends CI_Model
 		if($query->num_rows() > 0)
 		{
 			$data = $query->row_array();
+
 			$user_email = $data['email'];
 			$user_username = $data['username'];
-			$user_id = $data['id'];
-			$role = $data['role_id'];
+			$user_id 	= $data['id'];
+			$role 		= $data['role_id'];
 			$user_fname = $data['first_name'];
+			$user_last 	= $data['last_name'];
+			$color 		= $data['color'];
+
 			$this->session->set_userdata('role', $role);
 			$this->session->set_userdata('loggedUser_parentId', $data['parent_id']);
 			$this->session->set_userdata('loggedUser_username', $user_username);
 			$this->session->set_userdata('loggedUser_fname', $user_fname);
 			$this->session->set_userdata('loggedUser_id', $user_id);
+			$this->session->set_userdata('color', $color);
+			$this->session->set_userdata('LastName', $user_last);
 			$this->session->set_userdata('loggedUser_loggedin', true);
 			return true;	
 		}

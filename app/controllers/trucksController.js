@@ -1,4 +1,4 @@
-app.controller('trucksController', function(dataFactory,$scope,$http ,$rootScope , $location , $cookies,getTrucksListing){
+app.controller('trucksController', function(dataFactory,$scope, PubNub, $http ,$rootScope , $location , $cookies,getTrucksListing){
 	
 	if($rootScope.loggedInUser == false)
 		$location.path('login');
@@ -85,6 +85,7 @@ app.controller('trucksController', function(dataFactory,$scope,$http ,$rootScope
 			var index  = angular.element("#confirm-delete").data("index");
 			if ( truckid != '' && truckid != undefined ) {
 				dataFactory.httpRequest(URL + '/vehicles/delete/'+truckid).then(function(data) {
+					PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
 					if ( data.success == true ) {
 						$scope.truckdeleteMessage = $rootScope.languageArray.truckDeleteSuccMsg;
 						$scope.alertdeletemsg = true;
@@ -114,6 +115,7 @@ app.controller('trucksController', function(dataFactory,$scope,$http ,$rootScope
 	$scope.confirmVehicleStatus = function( confirm) {
 		if(confirm == 'yes'){
 			dataFactory.httpRequest(URL+'/vehicles/changeStatus/'+$scope.vehicleId+'/'+$scope.Status).then(function(data) {
+				PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
 				angular.copy(data.records.rows, $scope.data[$scope.StatusIndex]);
 				if ( data.status == true ) {
 					$scope.truckdeleteMessage = $rootScope.languageArray.truckStatusSuccMsg;
@@ -310,6 +312,7 @@ app.controller('editTruckController', function(dataFactory,getTruckData,$sce,$sc
 	$rootScope.confirmCommonDocumentStatus = function(confirm){
 		if(confirm=='yes'){
 		dataFactory.httpRequest(URL + '/vehicles/deleteContractDocs/'+$scope.docId+"/"+$scope.documentName).then(function(data) {
+			PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
 			if(data.success == true) {
 				$scope.truckDocuments.splice($scope.documentIndex,1);
 			}
@@ -332,6 +335,7 @@ app.controller('editTruckController', function(dataFactory,getTruckData,$sce,$sc
 			formData.append("truckId", editedDriverId);
 		},
 		success:function(file,response){
+			PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
 			file.previewElement.classList.add("dz-success");
 			if(!response.error){ // succeeded
 				this.removeFile(file);
@@ -364,6 +368,7 @@ app.controller('editTruckController', function(dataFactory,getTruckData,$sce,$sc
 					$scope.truckData.vehicle_image = response.data;
 					}
 			dataFactory.httpRequest(URL+'/vehicles/update/'+$scope.truckData.id,'POST',{},$scope.truckData).then(function(data) {
+				PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
 				if ( data.success == true ) {
 					$rootScope.truckEditMessage = $rootScope.languageArray.truckUpdatedSuccMsg;
 					//~ $scope.dropzone.processQueue();
@@ -543,6 +548,7 @@ app.controller('editTruckController', function(dataFactory,getTruckData,$sce,$sc
 			formData.append("truckId", $scope.lastAddedTruck);
 		},
 		success:function(file,response){
+			PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
 			file.previewElement.classList.add("dz-success");
 			if(!response.error){ // succeeded
 				this.removeFile(file);
@@ -573,6 +579,7 @@ app.controller('editTruckController', function(dataFactory,getTruckData,$sce,$sc
 					}
 	
 					dataFactory.httpRequest(URL+'/vehicles/addTruck/','POST',{},$scope.addTruckData).then(function(data) {
+						PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
 						if ( data.success == true ) {
 							$rootScope.truckEditMessage = $rootScope.languageArray.truckSavedSuccMsg;
 							$scope.lastAddedTruck = data.lastTruckId;

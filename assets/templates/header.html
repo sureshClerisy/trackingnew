@@ -58,8 +58,12 @@
 			<div class="dropdown pull-right">
 				<button class="profile-dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
 					<span class="thumbnail-wrapper d32 circular inline m-t-5">
-						<img ng-src="assets/uploads/users/{{profileImage}}"  width="32" height="32" ng-if="profileImage != '' && profileImage != 'null'">
-						<img ng-src="pages/img/user.png"  width="32" height="32" ng-if="profileImage == '' || profileImage == 'null'">
+						<img src="assets/uploads/users/{{profileImage}}"  width="32" height="32" onerror="this.style.display = 'none'" >
+						<!-- <img ng-src="pages/img/user.png"  width="32" height="32" ng-if="profileImage == '' || profileImage == 'null'"> -->
+						
+						<span class="text-image hide-1" style="background: {{color}};padding: 0px;">{{loggedUserFirstName.charAt(0) | capitalize}} {{LastName.charAt(0) | capitalize}}
+						</span>
+
 					</span>
 				</button>
 				<ul class="dropdown-menu profile-dropdown" role="menu">
@@ -91,7 +95,7 @@
 			<div class="icon mail"><img src="assets/img/mail.png"></div>
 			<div class="icon list"><img src="assets/img/list.png"></div>
 			<div class="icon bell" data-target="#modalSlideLeft" data-toggle="modal" ng-click="modalSlideLeft()"> <img src="assets/img/bell.png">
-			<div ng-show="ureadCount > 0" class="num-block">{{ureadCount}}</div></div>
+			<div ng-show="haveUnread > 0" class="num-block">{{ureadCount}}</div></div>
 		 </div>
         <!--mail-icon block-->
       </div>
@@ -385,7 +389,8 @@
 										<div class="popup-load-detail-grid driver-name-grid">
 											<span>
 												<figure class="driver-image">
-													<img fallback-src="./pages/img/user.png" ng-src="./assets/uploads/drivers/thumbnail/{{vehicleInfo.profile_image}}">
+													<img ng-src="./assets/uploads/drivers/thumbnail/{{vehicleInfo.profile_image}}" onerror="this.style.display = 'none'">
+													<span class="text-image hide-1" style="background: {{vehicleInfo.color}}">{{vehicleInfo.avatarText}}</span>
 												</figure>
 												{{ languageCommonVariables.truckdrivername }}</span>
 											<p>{{ driverPlaceholder }}</p>

@@ -414,9 +414,10 @@ class Truckstop extends Admin_Controller{
 		$data['vehicleInfo'] = array();
 		$data['brokerData'] = array();
 		$data['rateSheetUploaded'] = 'no';
+		$truckAverage 		= $this->defaultTruckAvg;
 	
 		if ( $loadId != '' && is_numeric($loadId) ) {
-		
+
 			$jobRecord = $this->Job->FetchSingleJob($loadId);
 			
 			if ( isset($_POST['loadRequest']) && ($_POST['loadRequest'] == 'addRequest') ){
@@ -468,15 +469,10 @@ class Truckstop extends Admin_Controller{
 				}
 			}
 		
-			if ( !empty($data['vehicleInfo']) && $data['vehicleInfo']['fuel_consumption'] != '' ) {
-				$truckAverage = (int)($data['vehicleInfo']['fuel_consumption'] / 100);
-			} else {
-				$truckAverage = $this->defaultTruckAvg;
-			}
-			
 			/**Check if rate sheet is uploaded for load or not */
-				$data['rateSheetUploaded'] = $this->Job->checkRateSheetUploaded($loadId,'rateSheet');
+			$data['rateSheetUploaded'] = $this->Job->checkRateSheetUploaded($loadId,'rateSheet');
 		} else {
+						
 			$client   = new SOAPClient($this->wsdl_url);
 			$params   = array(
 				'detailRequest' => array(
@@ -524,7 +520,7 @@ class Truckstop extends Admin_Controller{
 			$truckAverage = $this->defaultTruckAvg;
 			$jobRecord['totalCost'] = $_POST['totalCost'];			
 			$jobRecord['deadmiles'] = $_POST['deadmiles'];
-			
+	
 			if ( isset($_POST['deadMilesLocation']) && $_POST['deadMilesLocation'] != '' ) {
 				$deadMilesDestination 	=  $jobRecord['OriginCity'].','.$jobRecord['OriginState'].','.$jobRecord['OriginCountry'];
 				$deadMilesDestination 	= trim($deadMilesDestination,',');
@@ -562,9 +558,25 @@ class Truckstop extends Admin_Controller{
 			$jobRecord['PickupTimeRangeEnd'] = '';
 			$jobRecord['DeliveryTime'] = '';
 			$jobRecord['DeliveryTimeRangeEnd'] = '';
-			
+
+			if ( $vehicleId != ''  && $vehicleId != null && $vehicleId != 0 ) {
+				$jobRecord['vehicle_id'] = $vehicleId;			
+				$data['vehicleInfo'] = $this->Vehicle->getVehicleInfoForIteration( $vehicleId );	
+				
+				$jobRecord['assignedDriverName']	= ($data['vehicleInfo']['driverName']) ? $data['vehicleInfo']['driverName'] : '';
+				$jobRecord['assigedDriverFullName'] = ($data['vehicleInfo']['driverName']) ? $data['vehicleInfo']['driverName'] : '';
+				$jobRecord['assignedTruckLabel'] 	= 'Truck - '.$data['vehicleInfo']['label'];
+				$jobRecord['username'] 				= $data['vehicleInfo']['username'];
+				$jobRecord['dispatcher_id'] 		= $data['vehicleInfo']['dispatcherId'];
+				$jobRecord['driver_id'] 			= $data['vehicleInfo']['driver_id'];
+			}
+		
+						
 		}
 
+		if ( !empty($data['vehicleInfo']) && $data['vehicleInfo']['fuel_consumption'] != '' ) {
+			$truckAverage = (int)($data['vehicleInfo']['fuel_consumption'] / 100);
+		} 
 		$jobRecord['timer_distance'] = $jobRecord['Mileage'];
 		
 		$jobRecord['Stops'] = ( isset($jobRecord['Stops']) && $jobRecord['Stops'] != '' ) ? $jobRecord['Stops'] : 0;
@@ -650,6 +662,16 @@ class Truckstop extends Admin_Controller{
 		$jobRecord = $_POST['allData'];
 
 		$vehicleInfo = $this->Vehicle->assignTruckDriver( $driverId ,$driverAssignType);
+
+		if(!empty($vehicleInfo['assignedTeamName'])){
+			$nameChunk = explode('+',$vehicleInfo['assignedTeamName']);
+			$vehicleInfo['avatarText'] = $nameChunk[0][0].$nameChunk[1][1];
+		}else{
+			
+
+			$vehicleInfo['avatarText'] = $vehicleInfo['first_name'][0].$vehicleInfo['last_name'][0];
+		}
+			// pr($vehicleInfo);
 		
 		$error = '';
 		$jobRecord['vehicle_id'] = $vehicleInfo['assignedVehicleId'];
@@ -659,7 +681,7 @@ class Truckstop extends Admin_Controller{
 				$error = '';	
 			else
 				$error = 'alreadyBookedPickDate';
-		} 
+		}
 		
 		echo json_encode(array('vehicleDetail' => $vehicleInfo,'error' => $error));
 	} 
@@ -1994,7 +2016,7 @@ class Truckstop extends Admin_Controller{
 		try{
 			if($docPrimaryId){
 				$docInfo = $this->Job->getDocDetail($docPrimaryId);
-				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> deleted/overwrite the '.$metaKey.'('.$docInfo["doc_name"].') from ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$loadId.',\'\',\'\',\'\',\'\',0,\'\')">#'.$loadId.'</a>';
+				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> deleted/overwrote the '.$metaKey.'( '.$docInfo["doc_name"].' ) from ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$loadId.',\'\',\'\',\'\',\'\',0,\'\')">#'.$loadId.'</a>';
 				logActivityEvent($loadId, $this->entity["ticket"], $this->event["overwrite_doc"], $message, $this->Job, $srcPage);
 			}
 
@@ -2524,14 +2546,29 @@ class Truckstop extends Admin_Controller{
 				}
 				$jobOldData = $this->Job->getLoadDetailsById($id);
 
+				$addedExtraStops 	= array();
+				$updatedExtraStops  = array();
+				if ( isset($jobOldData['Stops']) && $jobOldData['Stops'] > 0 ) {
+					$addedExtraStops = $this->Job->getExtraStops( $jobOldData['id']);
+				}
+
 				$oldDriverName  = $this->Job->getEntityInfoById($id,"driver");
-				
+
 				$result = $this->Job->update_job($id , $vehicle_id, $saveData, $extraStopsArray);
 				$jobUpdatedData = $this->Job->getLoadDetailsById($id);
-				$editedFields = array_diff_assoc($jobUpdatedData,$jobOldData);
+
+				if( isset($jobUpdatedData['Stops']) && $jobUpdatedData['Stops'] > 0 ) {
+					$updatedExtraStops = $this->Job->getExtraStops( $jobUpdatedData['id']);
+				}
+
+				$editedFields 		= array_diff_assoc($jobUpdatedData,$jobOldData);
+				
 				$totalsBuffer = array();
-				if(count($editedFields) > 0){
+				$message = '';
+				$logMessage = 0;
+				if(count($editedFields) > 0) {
 					
+					$logMessage = 1;
 					if(isset($editedFields["totalCost"])){
 						$totalsBuffer["totalCost"] = $editedFields["totalCost"];
 						unset($editedFields["totalCost"]);
@@ -2547,10 +2584,7 @@ class Truckstop extends Admin_Controller{
 						unset($editedFields["overallTotalProfitPercent"]);
 					}
 
-
-
-
-					$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> edited the job ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$result.',\'\',\'\',\'\',\'\',0,\'\')">#'.$result.'</a>';
+					$message .= '<span class="blue-color uname">'.ucfirst($this->userName).'</span> edited the job ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$result.',\'\',\'\',\'\',\'\',0,\'\')">#'.$result.'</a>';
 					foreach ($editedFields as $key => $value) {
 						$prevField = isset($jobOldData[$key]) ? $jobOldData[$key] : "" ;
 						$bufferedInfo = array();
@@ -2590,14 +2624,20 @@ class Truckstop extends Admin_Controller{
 
 						if(in_array($key, array("second_driver_id","trailer_id","driver_type","PickupAddress","updated","updated_record","created","PickDate","ready_for_invoice"))){continue;}
 
-						if($key == "stops"){
+						if($key == "Stops"){
 							$key = "extra stop(s)";
-							if(!empty(trim($value)) ){
-								$message.= "<br/> - Added  <i>".$value."</i> ".ucwords(str_replace("_"," ",$key)).".";
-							}else if (empty(trim($value))){
-								$message.= "<br/> - Removed  <i>".$prevField."</i>  ".ucwords(str_replace("_"," ",$key)).".";
+							if(!empty(trim($value)) && $value > $jobOldData['Stops'] ){
+								$val = $value - $jobOldData['Stops'];
+								$message.= "<br/> - Added  <i>".$val."</i> new ".ucwords(str_replace("_"," ",$key)).".";
+							} else if(!empty(trim($value)) && $value < $jobOldData['Stops'] ){
+								$val = $jobOldData['Stops'] - $value;
+								$message.= "<br/> - removed  <i>".$val."</i> ".ucwords(str_replace("_"," ",$key)).".";
 							}
-						}else if($key == "driver"){
+							//  else if (empty(trim($value))){
+							// 	$message.= "<br/> - Removed  <i>".$prevField."</i>  ".ucwords(str_replace("_"," ",$key)).".";
+							// }
+						}else 
+						if($key == "driver"){
 							if(empty($value)){
 								$message.= "<br/> - Unassigned  driver ".$prevField ." from ticket.";	
 							}else if(empty($prevField)){
@@ -2614,8 +2654,70 @@ class Truckstop extends Admin_Controller{
 								$message.= "<br/> - Removed  <i>".$prevField."</i> from ".ucwords(str_replace("_"," ",$key));
 							}
 						}
+
 					}
-				}else{
+
+				}
+
+				if ( count($addedExtraStops) > 0 ) {	
+					for( $i = 0; $i < count($addedExtraStops);  $i++ ) {
+						$stopsEditedFields = array();
+						if ( isset($updatedExtraStops[$i]['id']) && $updatedExtraStops[$i]['id'] == $addedExtraStops[$i]['id'] ) {
+							$stopsEditedFields 	= array_diff_assoc($updatedExtraStops[$i],$addedExtraStops[$i]);
+							if ( !empty($stopsEditedFields)) {
+								$logMessage = 1;
+								if ( $message == '')  {
+									$message .= '<span class="blue-color uname">'.ucfirst($this->userName).'</span> edited the job ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$result.',\'\',\'\',\'\',\'\',0,\'\')">#'.$result.'</a>';
+								} 
+								foreach( $stopsEditedFields as $stopKey => $stopValue) {
+									$prevField = isset($addedExtraStops[$i][$stopKey]) ? $addedExtraStops[$i][$stopKey] : "" ;
+									$j = $i+1;
+									switch ($stopKey) {
+										case 'extraStopEntity': 
+											$prevField = ($prevField != '') ? $prevField : 'select entity';
+											$message .= "<br/> - Changed extra stop entity from <i>".$prevField."</i> to <i>".$stopValue."</i> for <b>extra stop (". $j .")</b>" ;
+														  break;
+										case 'extraStopName': 
+											$message .= "<br/> - Changed extra stop name from <i>".$prevField."</i> to <i>".$stopValue."</i> for <b>extra stop (". $j .")</b>" ;
+														  break;
+										case 'extraStopPhone': 
+											$message .= "<br/> - Changed extra stop phone from <i>".$prevField."</i> to <i>".$stopValue."</i> for <b>extra stop (". $j .")</b>" ;
+													  break;
+													  
+										case 'extraStopDate': 
+											$message .= "<br/> - Changed extra stop date from <i>".$prevField."</i> to <i>".$stopValue."</i> for <b>extra stop (". $j .")</b>" ;
+														  break;
+										case 'extraStopTime': 
+											$message .= "<br/> - Changed extra stop time from <i>".$prevField."</i> to <i>".$stopValue."</i> for <b>extra stop (". $j .")</b>" ;
+														  break;
+										case 'extraStopTimeRange': 
+											$message .= "<br/> - Changed extra stop time range from <i>".$prevField."</i> to <i>".$stopValue."</i> for <b>extra stop (". $j .")</b>" ;
+														  break;
+										case 'extraStopAddress': 
+											$message .= "<br/> - Changed extra stop address from <i>".$prevField."</i> to <i>".$stopValue."</i> for <b>extra stop (". $j .")</b>" ;
+														  break;
+										case 'extraStopCity': 
+											$message .= "<br/> - Changed extra stop city from <i>".$prevField."</i> to <i>".$stopValue."</i> for <b>extra stop (". $j .")</b>" ;
+														  break;
+										case 'extraStopState': 
+											$message .= "<br/> - Changed extra stop state from <i>".$prevField."</i> to <i>".$stopValue."</i> for <b>extra stop (". $j .")</b>" ;
+														  break;
+										case 'extraStopZipCode': 
+											$message .= "<br/> - Changed extra stop zip code from <i>".$prevField."</i> to <i>".$stopValue."</i> <b>for extra stop (". $j .")</b>" ;
+														  break;
+										case 'extraStopCountry': 
+											$message .= "<br/> - Changed extra stop country from <i>".$prevField."</i> to <i>".$stopValue."</i> <b>for extra stop (". $j .")</b>" ;
+														  break;
+									}
+								}
+							}
+						}
+					}
+				
+					
+				} 
+
+				if( $logMessage == 0 ) {
 					$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> edited the job ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$result.',\'\',\'\',\'\',\'\',0,\'\')">#'.$result.'</a>, but changed nothing.';
 				}
 				/*if( count($totalsBuffer) > 0  ){
@@ -2638,7 +2740,7 @@ class Truckstop extends Admin_Controller{
 					$result = $this->Job->update_job($id , $vehicle_id, $saveData, $extraStopsArray);
 				}
 			}
-		}catch(Exception $e){
+		} catch(Exception $e){
 			log_message('error',$loadFrom.'ADD_EDIT_JOB_TICKET'.$e->getMessage());
 		}
 

@@ -1,0 +1,41 @@
+{
+  "name": "deepstream.io-client-js",
+  "version": "2.1.2",
+  "homepage": "http://deepstream.io",
+  "author": "deepstreamHub GmbH",
+  "description": "The browser and node client for deepstream.io",
+  "main": "dist/deepstream.min.js",
+  "moduleType": [
+    "amd",
+    "globals",
+    "node"
+  ],
+  "keywords": [
+    "deepstream",
+    "realtime",
+    "streaming"
+  ],
+  "license": "Apache-2.0",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test-node",
+    "test-page",
+    "test-unit",
+    "test-e2e",
+    ".travis.yml",
+    "Gruntfile.js",
+    "karma.conf.js"
+  ],
+  "_release": "2.1.2",
+  "_resolution": {
+    "type": "version",
+    "tag": "2.1.2",
+    "commit": "9f30ce4f610a4ee44cb4c0f9b944c250346cf251"
+  },
+  "_source": "https://github.com/hoxton-one/deepstream.io-client-js.git",
+  "_target": "^2.1.2",
+  "_originalSource": "deepstream.io-client-js",
+  "_direct": true
+}

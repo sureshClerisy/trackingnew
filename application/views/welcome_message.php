@@ -39,8 +39,10 @@
     <link type="text/css" rel="stylesheet" href="assets/plugins/jquery-datatable/extensions/RowReorder/css/rowReorder.dataTables.min.css">
     <link type="text/css" rel="stylesheet" href="assets/plugins/jquery-datatable/extensions/Responsive/css/responsive.dataTables.min.css">
    <!-- BEGIN VENDOR JS -->
+
+
 </head>
-<body class="fixed-header" ng-class="showBackground == true ? 'login-bg-head' : ''" ng-controller="mainController as mCtrl">
+<body class="fixed-header" ng-class="showBackground == true ? 'login-bg-head' : ''" ng-controller="mainController as mc">
    
     <div ng-if="showHeader == true">
         <ng-include src="'./assets/templates/sidebar.html'"></ng-include>
@@ -56,14 +58,24 @@
         </div>
         <ui-view></ui-view>
     </div>
-    <script src="app/dependecies.min.js"></script>
+    
     <link id="lazyload_placeholder">
 
+    <script type="text/javascript">
+        window.paceOptions = {
+            ajax: {
+                ignoreURLs: ['pubnub.com/time','pubnub.com/subscribe','pubnub.com/publish','pubnub.com/v2/presence']
+            }
+        };
+    </script>
 
+    <script src="http://cdn.pubnub.com/pubnub.min.js"></script>
+    <script src="app/dependecies.min.js"></script>
+    <script src="http://pubnub.github.io/angular-js/scripts/pubnub-angular.js"></script>
     <script src="app/routes.js"></script>
     <script src="app/mainController.js"></script>
     <script src="app/config.lazyload.js" type="text/javascript"></script>
-    
+
     <script src="assets/js/directives/pg-sidebar.js" type="text/javascript"></script>
     <script src="assets/js/directives/datepicker.js" type="text/javascript"></script>
     <script src="assets/js/directives/pg-dropdown.js" type="text/javascript"></script>
@@ -87,6 +99,7 @@
     <script src="app/services/myServices.js"></script>
     <script src="app/services/sample.js"></script>
     <script src="app/helper/myHelper.js"></script>
+    
 
     <!-- App Controller -->
     <script src="app/controllers/ItemController.js"></script>
@@ -150,6 +163,9 @@
             }, function() {
                 $(this).parents('.form-group').removeClass('focused');
             });
+
+
+            
         }  
     </script>
     <script src="//maps.google.com/maps/api/js?key=<?php echo $key; ?>&libraries=places,geometry"></script>

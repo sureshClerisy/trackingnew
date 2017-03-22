@@ -87,7 +87,7 @@ class Brokers extends Admin_Controller {
 				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> edited a broker <a class="notify-link" href="'.$this->serverAddr.'#/editbroker/'.$id.'">'.$brockerOldData["TruckCompanyName"]."</a>.";
 				foreach ($editedFields as $key => $value) {
 					$prevField = isset($brockerOldData[$key]) ? $brockerOldData[$key] : "" ;
-					if(in_array($key, array("PointOfContact","PointOfContactPhone","TruckCompanyEmail","TruckCompanyPhone","TruckCompanyFax"))){
+					if(in_array($key, array("delete_broker","PointOfContact","PointOfContactPhone","TruckCompanyEmail","TruckCompanyPhone","TruckCompanyFax"))){
 						continue;
 					}
 					if(!empty($prevField)){
@@ -289,7 +289,7 @@ class Brokers extends Admin_Controller {
 	* Return: success or error
 	* Comment: Used for deleting drivers documents
 	*/
-	public function deleteContractDocs($docId = null, $docName = '')
+	public function deleteContractDocs($docId = null, $docName = '', $srcPage = '')
 	{
 		try{
 
@@ -316,7 +316,7 @@ class Brokers extends Admin_Controller {
 			$brokerInfo = $this->BrokersModel->getEntityInfoByDocId($docId,$this->entity["broker"]);
 			$this->BrokersModel->removeContractDocs($docId);
 			$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> deleted a document ('.$brokerInfo["document_name"].') from broker <a class="notify-link" href="'.$this->serverAddr.'#/editbroker/'.$brokerInfo["id"].'"> '.$brokerInfo["TruckCompanyName"].'</a>';
-			logActivityEvent($brokerInfo['id'], $this->entity["broker"], $this->event["remove_doc"], $message, $this->Job);	
+			logActivityEvent($brokerInfo['id'], $this->entity["broker"], $this->event["remove_doc"], $message, $this->Job, $srcPage);	
 			echo json_encode(array("success" => true));
 
 		}catch(Exception $e){

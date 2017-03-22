@@ -65,8 +65,11 @@
 
 							<ul class="no-padding">
 								<li ng-repeat="value in SendLoads track by value.id" class="item padding-15" ng-click="showLoad(value.id,$index)" ng-class="{selectedLi: $index == selectedIndex}"> 
-									<div class="thumbnail-wrapper d32 circular bordered {{item.color}}"> 
-										<img width="40" height="40" alt="" ng-src="./assets/uploads/drivers/thumbnail/{{value.profile_image}}" fallback-src="./pages/img/user.png" />
+									<div class="thumbnail-wrapper d32 circular bordered {{item.color}}" style="background: {{value.color}}"> 
+										<img width="40" height="40" alt="" ng-src="./assets/uploads/drivers/thumbnail/{{value.profile_image}}" onerror="this.style.display = 'none'"/>
+										<span class="text-image hide-1 sendpayment">
+										{{value.first_name.substring(0, 1).toUpperCase()}}{{value.last_name.substring(0, 1).toUpperCase()}}
+										</span>
 									</div> 
 									
 									<div class="checkbox  no-margin p-l-10"> 

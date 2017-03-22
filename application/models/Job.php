@@ -451,14 +451,14 @@ class Job extends Parent_Model {
 	}
 
 	public function FetchSingleJob( $jobId ) {
-		$this->db->select('loads.*,concat(drivers.first_name," ",drivers.last_name,"-",vehicles.label) as assignedDriverName, users.username, concat("Truck - ",vehicles.label) as assignedTruckLabel,concat(drivers.first_name," ",drivers.last_name) as assigedDriverFullName, broker_info.MCNumber,broker_info.DOTNumber,broker_info.TruckCompanyName,broker_info.postingAddress,broker_info.CarrierMC,broker_info.city,broker_info.state,broker_info.zipcode');
+		$this->db->select('loads.*,concat(drivers.first_name," ",drivers.last_name,"-",vehicles.label) as assignedDriverName, users.username, concat("Truck - ",vehicles.label) as assignedTruckLabel,concat(drivers.first_name," ",drivers.last_name) as assigedDriverFullName, broker_info.MCNumber,broker_info.DOTNumber,broker_info.TruckCompanyName,broker_info.postingAddress,broker_info.CarrierMC,broker_info.city,broker_info.state,broker_info.zipcode,drivers.color');
 		$this->db->join('drivers', 'drivers.id = loads.driver_id','Left');
 		$this->db->join('vehicles', 'vehicles.id = loads.vehicle_id','Left');
 		$this->db->join('broker_info', 'broker_info.id = loads.broker_id','Left');
 		$this->db->join('users', 'users.id = loads.dispatcher_id','Left');
 		$this->db->where('loads.id', $jobId);
-		
 		return $this->db->get('loads')->row_array();
+		
 	}
 	
 	/**
@@ -707,7 +707,7 @@ class Job extends Parent_Model {
 	
 		$saveData['truckstopID'] = $saveData['ID'];
 		$saveData['vehicle_id'] = $vehicle_id;
-			
+		
 		/** saving broker info to broker table */
 		if ( $saveData['MCNumber'] != '' && $saveData['MCNumber'] != null ) {
 			$brokerData = array(
@@ -717,7 +717,7 @@ class Job extends Parent_Model {
 				'state' => isset($saveData['state']) ? $saveData['state'] : '',
 				'zipcode' => isset($saveData['zipcode']) ? $saveData['zipcode'] : '',
 				'MCNumber' => $saveData['MCNumber'],
-				'CarrierMC' => '',
+				'CarrierMC' => isset($saveData['CarrierMC']) ? $saveData['CarrierMC'] : '',
 				'DOTNumber' => $saveData['DOTNumber'],
 				'brokerStatus' => @$saveData['brokerStatus'],
 				'DebtorKey' => isset($saveData['DebtorKey']) ? $saveData['DebtorKey'] : '',
@@ -2063,12 +2063,15 @@ class Job extends Parent_Model {
 	*/
 
 	public function getUnreadNotificationsCount($userId) {
-		$this->db->select('count(activity_log.id) as unreadCount');
-		$this->db->where("activity_log.user_id != ", $userId);
-		$this->db->where("not find_in_set(".$userId.", activity_log.read_users)");
-		$this->db->where("activity_log.event_type != 'login' AND activity_log.event_type != 'logout'");
-
-		return $this->db->get('activity_log')->row_array()["unreadCount"];
+		if($userId){
+			$this->db->select('count(activity_log.id) as unreadCount');
+			$this->db->where("activity_log.user_id != ", $userId);
+			$this->db->where("not find_in_set(".$userId.", activity_log.read_users)");
+			$this->db->where("activity_log.event_type != 'login' AND activity_log.event_type != 'logout'");
+			return $this->db->get('activity_log')->row_array()["unreadCount"];
+		}else{
+			return 0;
+		}
 	}
 
 	public function flagNotificationsAsRead($userId) {
@@ -2084,7 +2087,7 @@ class Job extends Parent_Model {
 		$this->db->Join("users as u","log.user_id = u.id","inner");
 		$this->db->where("log.user_id != ", $userId);
 		$this->db->where("log.event_type != 'login' AND log.event_type != 'logout'");
-		$this->db->order_by("created_at",'DESC');
+		$this->db->order_by("log.created_at",'DESC');
 		$filters["limitStart"] = $filters["limitStart"] == 1 ? 0 : $filters["limitStart"];
 		$this->db->limit($filters["itemsPerPage"],$filters["limitStart"]);
 		return $this->db->get('activity_log as log')->result_array();
@@ -2093,14 +2096,12 @@ class Job extends Parent_Model {
 
 
 	public function getTicketActivity( $loadId ) {
-		$this->db->select("CONCAT(SUBSTRING(u.first_name, 1, 1),SUBSTRING(u.last_name, 1, 1)) as userIntial, log.entity_name, u.profile_image, log.event_type, CONCAT(u.first_name, ' ', u.last_name) as userName, log.event_msg, CONCAT(DATE_FORMAT( CONVERT_TZ( log.created_at, '+00:00', '-05:00' ) , '%d-%b-%Y %r' ),' ','EST') AS created_at,
+		$this->db->select("CONCAT(SUBSTRING(u.first_name, 1, 1),SUBSTRING(u.last_name, 1, 1)) as userIntial, log.entity_name, u.profile_image, log.event_type, CONCAT(u.first_name, ' ', u.last_name) as userName, log.event_msg, CONCAT(DATE_FORMAT( CONVERT_TZ( log.created_at, '+00:00', '-05:00' ) , '%d-%b-%Y %r' ),' ','EST') AS created_at,u.color,
 			CASE
 				WHEN log.event_type = 'edit'              THEN   'fa-pencil'
 				WHEN log.event_type = 'add'               THEN   'fa-plus'
-				WHEN log.event_type = 'add_to_queue'      THEN   'fa-plus'
 				WHEN log.event_type = 'delete'            THEN   'fa-trash'
 				WHEN log.event_type = 'upload_doc'        THEN   'fa-upload'
-				WHEN log.event_type = 'remove_from_queue' THEN   'fa-trash'
 				WHEN log.event_type = 'remove_doc'        THEN   'fa-trash'
 				WHEN log.event_type = 'overwrite_doc'     THEN   'fa-trash'
 				WHEN log.event_type = 'status_change'     THEN   'fa-exchange'
@@ -2111,7 +2112,7 @@ class Job extends Parent_Model {
 		$this->db->Join("users as u","log.user_id = u.id","inner");
 		$this->db->where("log.entity_name",'ticket');
 		$this->db->where("log.entity_id",$loadId);
-		$this->db->order_by("created_at",'DESC');
+		$this->db->order_by("log.created_at",'DESC');
 		return $this->db->get('activity_log as log')->result_array();
 		
 	}
@@ -2134,6 +2135,11 @@ class Job extends Parent_Model {
 		return $this->db->select('*')->from('loads')->where('id',$load_id)->get()->row_array();
 	}
 
-	
+	public function getColumns($id,$columns,$model){
+
+			$data = $this->db->select(implode(',',$columns))->where('id', $id)->get($model)->result_array();
+			// echo $this->db->last_query();
+			return $data;
+		}
 }
 ?>

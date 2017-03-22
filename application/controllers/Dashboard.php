@@ -20,6 +20,7 @@ class Dashboard extends CI_Controller {
 		$gDropdown = array();$rparam = array();
 		$lPerformance = '';
 		$args = json_decode(file_get_contents('php://input'),true);
+
 		if(isset($_COOKIE["_globalDropdown"])){
 			$gDropdown = json_decode($_COOKIE["_globalDropdown"],true);
 		}
@@ -97,36 +98,36 @@ class Dashboard extends CI_Controller {
 		foreach ($lPResult as $key => $value) {
 			switch ($lPerformance) {
 				case '_iall'		: array_push($chartStack["xaxis"], $value["dispatcher"]); 
-									  array_push($chartStack["invoiced"], (float) $value["invoice"]);
-									  array_push($chartStack["charges"],  (float) $value["charges"]);
-									  array_push($chartStack["ppercent"], (float) $value["profit"]);
-									  array_push($chartStack["profitAmount"], (float) $value["profit"]);
-									  $lPResult[$key]["fcolumn"] = $value["dispatcher"];
-									 break;
+				array_push($chartStack["invoiced"], (float) $value["invoice"]);
+				array_push($chartStack["charges"],  (float) $value["charges"]);
+				array_push($chartStack["ppercent"], (float) $value["profit"]);
+				array_push($chartStack["profitAmount"], (float) $value["profit"]);
+				$lPResult[$key]["fcolumn"] = $value["dispatcher"];
+				break;
 				case '_idispatcher'	: array_push($chartStack["xaxis"], $value["driver"]); 
-									  array_push($chartStack["invoiced"], (float) $value["invoice"]);
-									  array_push($chartStack["charges"],  (float) $value["charges"]);
-									  array_push($chartStack["ppercent"], (float) $value["profit"]);
-									  array_push($chartStack["profitAmount"], (float) $value["profit"]);
-									  $lPResult[$key]["fcolumn"] = $value["driver"];
-									 break; 
+				array_push($chartStack["invoiced"], (float) $value["invoice"]);
+				array_push($chartStack["charges"],  (float) $value["charges"]);
+				array_push($chartStack["ppercent"], (float) $value["profit"]);
+				array_push($chartStack["profitAmount"], (float) $value["profit"]);
+				$lPResult[$key]["fcolumn"] = $value["driver"];
+				break; 
 				case '_iteam'		:
 				case '_idriver'		: //array_push($chartStack["xaxis"], "Load ".$value["loadid"]); 
-									  $delDate = $this->validateDate($value["DeliveryDate"]) ?  $value["DeliveryDate"] : 'N/A';
-									  array_push($chartStack["xaxis"], $delDate); 
-									  array_push($chartStack["invoiced"], (float) $value["invoice"]);
-									  array_push($chartStack["charges"],  (float) $value["charges"]);
-									  array_push($chartStack["ppercent"], (float) $value["overallTotalProfitPercent"]);
-									  array_push($chartStack["profitAmount"], (float) $value["profit"]);
-									  $lPResult[$key]["fcolumn"] = $value["loadid"];
-									break;
+				$delDate = $this->validateDate($value["DeliveryDate"]) ?  $value["DeliveryDate"] : 'N/A';
+				array_push($chartStack["xaxis"], $delDate); 
+				array_push($chartStack["invoiced"], (float) $value["invoice"]);
+				array_push($chartStack["charges"],  (float) $value["charges"]);
+				array_push($chartStack["ppercent"], (float) $value["overallTotalProfitPercent"]);
+				array_push($chartStack["profitAmount"], (float) $value["profit"]);
+				$lPResult[$key]["fcolumn"] = $value["loadid"];
+				break;
 				default				: array_push($chartStack["xaxis"], $value["dispatcher"]); 
-									  array_push($chartStack["invoiced"], (float) $value["invoice"]);
-									  array_push($chartStack["charges"],  (float) $value["charges"]);
-									  array_push($chartStack["ppercent"], (float) $value["profit"]);
-									  array_push($chartStack["profitAmount"], (float) $value["profit"]);
-									  $lPResult[$key]["fcolumn"] = $value["dispatcher"];
-								  	break;
+				array_push($chartStack["invoiced"], (float) $value["invoice"]);
+				array_push($chartStack["charges"],  (float) $value["charges"]);
+				array_push($chartStack["ppercent"], (float) $value["profit"]);
+				array_push($chartStack["profitAmount"], (float) $value["profit"]);
+				$lPResult[$key]["fcolumn"] = $value["dispatcher"];
+				break;
 			}
 
 			if(isset($value["DeliveryDate"])){
@@ -171,31 +172,31 @@ class Dashboard extends CI_Controller {
 		$chartStack['totals']['totCharges']       = $totalCharges;
 		$chartStack['totals']['totProfit']        = $totalProfit;
 		$chartStack['totals']['totProfitPercent'] = $totalProfitPercent;
-	
+
 		$vehicleInfo = $weatherNotFound = array();
 		$lat = $lng = '';
 		//--------------- Job Status ----------------
 			//$loadOnTheRoad 		= $this->Job->fetchSavedJobs(null, $vList, 'inprogress');
-			$vehicleLocation 	= $this->getTrucksLocation($rparam,$lPerformance);
-			$loadsSummary 		= $this->Job->fetchLoadsSummary(null, $rparam,$lPerformance);
-			$loadsChart['delivered'] = $loadsChart['assigned'] = $loadsChart['booked'] = $loadsChart['inprogress'] = 0;
-			$gotStatus = 0;
-			if(isset($loadsSummary[0])){
-				foreach ($loadsSummary as $key => $value) {
+		$vehicleLocation 	= $this->getTrucksLocation($rparam,$lPerformance);
+		$loadsSummary 		= $this->Job->fetchLoadsSummary(null, $rparam,$lPerformance);
+		$loadsChart['delivered'] = $loadsChart['assigned'] = $loadsChart['booked'] = $loadsChart['inprogress'] = 0;
+		$gotStatus = 0;
+		if(isset($loadsSummary[0])){
+			foreach ($loadsSummary as $key => $value) {
 
-					if(empty(trim($value['JobStatus'])) )
-						continue;
-					else
-						$gotStatus = 1;
-					$loadsChart[$value['JobStatus']] = (int)$value['tnum'];
-				}
+				if(empty(trim($value['JobStatus'])) )
+					continue;
+				else
+					$gotStatus = 1;
+				$loadsChart[$value['JobStatus']] = (int)$value['tnum'];
 			}
+		}
 
-			if(!$gotStatus){
-				$loadsChart['noLoads'] = 1;
-			}else{
-				$loadsChart['noLoads'] = 0;
-			}
+		if(!$gotStatus){
+			$loadsChart['noLoads'] = 1;
+		}else{
+			$loadsChart['noLoads'] = 0;
+		}
 
 			//pr($loadsChart);die;
 		//--------------- Job Status ----------------
@@ -256,8 +257,8 @@ class Dashboard extends CI_Controller {
 		if(count($allVehicles) <= 0)
 			$allVehicles = $this->Driver->getDriversList($userId,true,true);
 		
-			$teamList = $this->Driver->getDriversListAsTeam($userId,true);
-			$dispatcherList = $this->Driver->getDispatcherList($userId);
+		$teamList = $this->Driver->getDriversListAsTeam($userId,true);
+		$dispatcherList = $this->Driver->getDispatcherList($userId);
 		
 		$vehicleList = array();
 		if(!empty($allVehicles) && is_array($allVehicles)){	
@@ -353,10 +354,47 @@ class Dashboard extends CI_Controller {
 		if($dailyForecast == null || $currentWeather == null)
 			$weatherNotFound['status'] = true;	
 
+		
+		$avatraInfo = $this->createAvatarText($gDropdown);
+		
+		// pr($gDropdown);
+
+
+		$gDropdown['avtarText'] = $avatraInfo['text'];
+		$gDropdown['color'] 	= $avatraInfo['color'];
+		// pr($avatraInfo);
+		// pr($gDropdown);
+
 		echo json_encode(array("currentWeather"=>$currentWeather, "dailyForecast"=>$dailyForecast,"vehicleList"=>$vehicleList,'vehicleID'=>$vehicleID,'vehicleLabel'=>$vehicleLabel,'output'=>$output,'weatherNotFound'=>$weatherNotFound,"loadsChart"=>$loadsChart,"vehicleLocation"=>$vehicleLocation,'selectedDriver'=>$gDropdown, "chartStack"=>$chartStack, 'success'=>true));
 	}
 
+	/**
+	* method createAvatarText
+	* @param Data
+	* @return Avtar Text
+	*/
+	private function createAvatarText($data){
 		
+		$avatraInfo = '';
+		switch ($data['label']) {
+			case '_team':
+			$nameChunks = explode('+',$data['driverName']);
+			$avatraInfo['text'] = $nameChunks[0][0].$nameChunks[1][1];
+			break;
+
+			default:
+			$nameChunks = explode(' ',str_replace('  ', ' ', $data['driverName']));
+			
+			$avatraInfo['text'] = $nameChunks[0][0].$nameChunks[1][0];
+			break;
+		}
+		
+		$columns = ['color'];
+		$data = $this->Job->getColumns($data['id'],$columns,'drivers');;
+		$avatraInfo['color'] = $data[0]['color'];
+		return $avatraInfo;
+	}
+
 	public function fetchWidgetsOrder(){
 		$widgetOrd = array();
 		$widgetsOrder = $this->Job->getWidgetsOrder($this->userId);
@@ -372,7 +410,7 @@ class Dashboard extends CI_Controller {
 				$userId = $this->session->userdata('loggedUser_parentId');
 			else
 				$userId = $this->userId;
-				
+
 			$result = $this->Driver->getDriversList($userId,false,true);
 			if(!empty($result)){
 				foreach ($result as $key => $value) {
@@ -458,36 +496,36 @@ class Dashboard extends CI_Controller {
 		foreach ($lPResult as $key => $value) {
 			switch ($lPerformance) {
 				case '_iall'		: array_push($chartStack["xaxis"], $value["dispatcher"]); 
-									  array_push($chartStack["invoiced"], (float) $value["invoice"]);
-									  array_push($chartStack["charges"],  (float) $value["charges"]);
-									  array_push($chartStack["ppercent"], (float) $value["profit"]);
-									  array_push($chartStack["profitAmount"], (float) $value["profit"]);
-									  $lPResult[$key]["fcolumn"] = $value["dispatcher"];
-									 break;
+				array_push($chartStack["invoiced"], (float) $value["invoice"]);
+				array_push($chartStack["charges"],  (float) $value["charges"]);
+				array_push($chartStack["ppercent"], (float) $value["profit"]);
+				array_push($chartStack["profitAmount"], (float) $value["profit"]);
+				$lPResult[$key]["fcolumn"] = $value["dispatcher"];
+				break;
 				case '_idispatcher'	: array_push($chartStack["xaxis"], $value["driver"]); 
-									  array_push($chartStack["invoiced"], (float) $value["invoice"]);
-									  array_push($chartStack["charges"],  (float) $value["charges"]);
-									  array_push($chartStack["ppercent"], (float) $value["profit"]);
-									  array_push($chartStack["profitAmount"], (float) $value["profit"]);
-									  $lPResult[$key]["fcolumn"] = $value["driver"];
-									 break; 
+				array_push($chartStack["invoiced"], (float) $value["invoice"]);
+				array_push($chartStack["charges"],  (float) $value["charges"]);
+				array_push($chartStack["ppercent"], (float) $value["profit"]);
+				array_push($chartStack["profitAmount"], (float) $value["profit"]);
+				$lPResult[$key]["fcolumn"] = $value["driver"];
+				break; 
 				case '_iteam'		:
 				case '_idriver'		: //array_push($chartStack["xaxis"], "Load ".$value["loadid"]); 
-									  $delDate = $this->validateDate($value["DeliveryDate"]) ?  $value["DeliveryDate"] : 'N/A';
-									  array_push($chartStack["xaxis"], $delDate); 
-									  array_push($chartStack["invoiced"], (float) $value["invoice"]);
-									  array_push($chartStack["charges"],  (float) $value["charges"]);
-									  array_push($chartStack["ppercent"], (float) $value["overallTotalProfitPercent"]);
-									  array_push($chartStack["profitAmount"], (float) $value["profit"]);
-									  $lPResult[$key]["fcolumn"] = $value["loadid"];
-									break;
+				$delDate = $this->validateDate($value["DeliveryDate"]) ?  $value["DeliveryDate"] : 'N/A';
+				array_push($chartStack["xaxis"], $delDate); 
+				array_push($chartStack["invoiced"], (float) $value["invoice"]);
+				array_push($chartStack["charges"],  (float) $value["charges"]);
+				array_push($chartStack["ppercent"], (float) $value["overallTotalProfitPercent"]);
+				array_push($chartStack["profitAmount"], (float) $value["profit"]);
+				$lPResult[$key]["fcolumn"] = $value["loadid"];
+				break;
 				default				: array_push($chartStack["xaxis"], $value["dispatcher"]); 
-									  array_push($chartStack["invoiced"], (float) $value["invoice"]);
-									  array_push($chartStack["charges"],  (float) $value["charges"]);
-									  array_push($chartStack["ppercent"], (float) $value["profit"]);
-									  array_push($chartStack["profitAmount"], (float) $value["profit"]);
-									  $lPResult[$key]["fcolumn"] = $value["dispatcher"];
-								  	break;
+				array_push($chartStack["invoiced"], (float) $value["invoice"]);
+				array_push($chartStack["charges"],  (float) $value["charges"]);
+				array_push($chartStack["ppercent"], (float) $value["profit"]);
+				array_push($chartStack["profitAmount"], (float) $value["profit"]);
+				$lPResult[$key]["fcolumn"] = $value["dispatcher"];
+				break;
 			}
 
 			if(isset($value["DeliveryDate"])){
@@ -531,23 +569,23 @@ class Dashboard extends CI_Controller {
 		$vehicleInfo = $weatherNotFound = array();
 		$lat = $lng = '';
 		//--------------- Job Status ----------------
-			$loadsSummary 		= $this->Job->fetchLoadsSummary(null, $rparam,$lPerformance);
-			$loadsChart['delivered'] = $loadsChart['assigned'] = $loadsChart['booked'] = $loadsChart['inprogress'] = 0;
-			$gotStatus = 0;
-			if(isset($loadsSummary[0])){
-				foreach ($loadsSummary as $key => $value) {
-					if(empty(trim($value['JobStatus'])) )
-						continue;
-					else
-						$gotStatus = 1;
-					$loadsChart[$value['JobStatus']] = (int)$value['tnum'];
-				}
+		$loadsSummary 		= $this->Job->fetchLoadsSummary(null, $rparam,$lPerformance);
+		$loadsChart['delivered'] = $loadsChart['assigned'] = $loadsChart['booked'] = $loadsChart['inprogress'] = 0;
+		$gotStatus = 0;
+		if(isset($loadsSummary[0])){
+			foreach ($loadsSummary as $key => $value) {
+				if(empty(trim($value['JobStatus'])) )
+					continue;
+				else
+					$gotStatus = 1;
+				$loadsChart[$value['JobStatus']] = (int)$value['tnum'];
 			}
-			if(!$gotStatus){
-				$loadsChart['noLoads'] = 1;
-			}else{
-				$loadsChart['noLoads'] = 0;
-			}
+		}
+		if(!$gotStatus){
+			$loadsChart['noLoads'] = 1;
+		}else{
+			$loadsChart['noLoads'] = 0;
+		}
 		//--------------- Job Status ----------------
 
 		$loadsChart["summary"]["invoiceCount"] = $this->Job->getInvoiceCount($rparam,$lPerformance);
@@ -614,103 +652,103 @@ class Dashboard extends CI_Controller {
 	public function checkWeatherType($weather_type ,$weather_description){
 		$weather = "partly-cloudy-day";
 		if(strtolower($weather_type) == 'rain' && ($weather_description == 'light rain' || $weather_description == 'moderate rain') ){
-            $weather = 'sleet';
-        }
-        elseif(strtolower($weather_type) == 'rain'){
-        	$weather = 'rain';
-        }
-        elseif(strtolower($weather_type) == 'clouds' && $weather_description == 'few clouds'){
-            $weather = 'partly-cloudy-day';
-        }
-        elseif(strtolower($weather_type) == 'clouds'){
-            $weather = 'cloudy';
-        }
-        elseif(strtolower($weather_type) == 'snow'){
-            $weather = 'snow';
-        }
-        elseif(strtolower($weather_type) == 'clear'){
-            $weather = 'clear-day';
-        }
-        else{
-            $weather = 'partly-cloudy-day';
-        }
-        return $weather;
+			$weather = 'sleet';
+		}
+		elseif(strtolower($weather_type) == 'rain'){
+			$weather = 'rain';
+		}
+		elseif(strtolower($weather_type) == 'clouds' && $weather_description == 'few clouds'){
+			$weather = 'partly-cloudy-day';
+		}
+		elseif(strtolower($weather_type) == 'clouds'){
+			$weather = 'cloudy';
+		}
+		elseif(strtolower($weather_type) == 'snow'){
+			$weather = 'snow';
+		}
+		elseif(strtolower($weather_type) == 'clear'){
+			$weather = 'clear-day';
+		}
+		else{
+			$weather = 'partly-cloudy-day';
+		}
+		return $weather;
 
 	}
 	
 
 	public function getRssFeeds(){
 		$feeds = array(
-            array(
-            	array(
-                "title" => "Ryder Reports Third Quarter 2016 Results",
-                "description"=> "",
-                "link"=> "http://investors.ryder.com/newsroom/News-Release-Details/2016/Ryder-Reports-Third-Quarter-2016-Results/default.aspx",
-                "pubDate"=>"Tue, 25 Oct 2016 07:55:00 -0400"
-	            ),
-	            array(
-	                "title" => "Inbound Logistics Names Ryder a 2016 Top 100 Trucker for 20th Consecutive Year",
-	                "description"=> "",
-	                "link"=> "http://investors.ryder.com/newsroom/News-Release-Details/2016/Inbound-Logistics-Names-Ryder-a-2016-Top-100-Trucker-for-20th-Consecutive-Year/default.aspx",
-	                "pubDate"=>"Mon, 24 Oct 2016 16:39:00 -0400"
-	            ),
-	            array(
-	                "title" => "Ryder Recognized as Finalist for the Fourth Annual Texas Oil & Gas Awards",
-	                "description"=> "",
-	                "link"=> "http://investors.ryder.com/newsroom/News-Release-Details/2016/Ryder-Recognized-as-Finalist-for-the-Fourth-Annual-Texas-Oil--Gas-Awards/default.aspx",
-	                "pubDate"=>"Mon, 24 Oct 2016 06:55:00 -0400"
-	            ),
-	            array(
-	                "title" => "Ryder Introduces Industry’s Most Flexible Fueling Solution – Ryder Mobile Fuel",
-	                "description"=> "",
-	                "link"=> "http://investors.ryder.com/newsroom/News-Release-Details/2016/Ryder-Introduces-Industrys-Most-Flexible-Fueling-Solution--Ryder-Mobile-Fuel/default.aspx",
-	                "pubDate"=>"Thu, 20 Oct 2016 06:55:00 -0400"
-	            ),
-	            array(
-	                "title" => "Ryder Executive to Participate on Panel at 3PL Value Creation Summit",
-	                "description"=> "",
-	                "link"=> "http://investors.ryder.com/newsroom/News-Release-Details/2016/Ryder-Executive-to-Participate-on-Panel-at-3PL-Value-Creation-Summit/default.aspx",
-	                "pubDate"=>"Wed, 12 Oct 2016 06:55:00 -0400"
-	            ),
-	            
-	            	array(
-	                "title" => "Ryder Declares Quarterly Cash Dividend",
-	                "description"=> "",
-	                "link"=> "http://investors.ryder.com/newsroom/News-Release-Details/2016/Ryder-Declares-Quarterly-Cash-Dividend-1072016/default.aspx",
-	                "pubDate"=>"Fri, 07 Oct 2016 18:30:00 -0400"
-	            )
-	        ),
-            array(
-            	array(
-                "title" => "Ryder Donates $50,000 to Support Future Generation of Technicians in Canada",
-                "description"=> "",
-                "link"=> "http://investors.ryder.com/newsroom/News-Release-Details/2016/Ryder-Donates-50000-to-Support-Future-Generation-of-Technicians-in-Canada/default.aspx",
-	                "pubDate"=>"Wed, 05 Oct 2016 06:55:00 -0400"
-	            ),
-	            array(
-	                "title" => "Ryder Third Quarter Conference Call Scheduled for October 25, 2016",
-	                "description"=> "",
-	                "link"=> "http://investors.ryder.com/newsroom/News-Release-Details/2016/Ryder-Third-Quarter-Conference-Call-Scheduled-for-October-25-2016/default.aspx",
-	                "pubDate"=>"Thu, 29 Sep 2016 06:55:00 -0400"
-	            ),
-	            array(
-	                "title" => "Ryder Executives to Present at Global Supply Chain Conference",
-	                "description"=> "",
-	                "link"=> "http://investors.ryder.com/newsroom/News-Release-Details/2016/Ryder-Executives-to-Present-at-Global-Supply-Chain-Conference/default.aspx",
-	                "pubDate"=>"Mon, 19 Sep 2016 06:55:00 -0400"
-	            ),
-	            array(
-	                "title" => "Ryder CEO to Deliver Keynote on Transportation as “Next Wave of Disruption” at Automotive Logistics Global Conference",
-	                "description"=> "",
-	                "link"=> "http://investors.ryder.com/newsroom/News-Release-Details/2016/Ryder-CEO-to-Deliver-Keynote-on-Transportation-as-Next-Wave-of-Disruption-at-Automotive-Logistics-Global-Conference/default.aspx",
-	                "pubDate"=>"Thu, 15 Sep 2016 16:55:00 -0400"
-	            )
-            )
+			array(
+				array(
+					"title" => "Ryder Reports Third Quarter 2016 Results",
+					"description"=> "",
+					"link"=> "http://investors.ryder.com/newsroom/News-Release-Details/2016/Ryder-Reports-Third-Quarter-2016-Results/default.aspx",
+					"pubDate"=>"Tue, 25 Oct 2016 07:55:00 -0400"
+					),
+				array(
+					"title" => "Inbound Logistics Names Ryder a 2016 Top 100 Trucker for 20th Consecutive Year",
+					"description"=> "",
+					"link"=> "http://investors.ryder.com/newsroom/News-Release-Details/2016/Inbound-Logistics-Names-Ryder-a-2016-Top-100-Trucker-for-20th-Consecutive-Year/default.aspx",
+					"pubDate"=>"Mon, 24 Oct 2016 16:39:00 -0400"
+					),
+				array(
+					"title" => "Ryder Recognized as Finalist for the Fourth Annual Texas Oil & Gas Awards",
+					"description"=> "",
+					"link"=> "http://investors.ryder.com/newsroom/News-Release-Details/2016/Ryder-Recognized-as-Finalist-for-the-Fourth-Annual-Texas-Oil--Gas-Awards/default.aspx",
+					"pubDate"=>"Mon, 24 Oct 2016 06:55:00 -0400"
+					),
+				array(
+					"title" => "Ryder Introduces Industry’s Most Flexible Fueling Solution – Ryder Mobile Fuel",
+					"description"=> "",
+					"link"=> "http://investors.ryder.com/newsroom/News-Release-Details/2016/Ryder-Introduces-Industrys-Most-Flexible-Fueling-Solution--Ryder-Mobile-Fuel/default.aspx",
+					"pubDate"=>"Thu, 20 Oct 2016 06:55:00 -0400"
+					),
+				array(
+					"title" => "Ryder Executive to Participate on Panel at 3PL Value Creation Summit",
+					"description"=> "",
+					"link"=> "http://investors.ryder.com/newsroom/News-Release-Details/2016/Ryder-Executive-to-Participate-on-Panel-at-3PL-Value-Creation-Summit/default.aspx",
+					"pubDate"=>"Wed, 12 Oct 2016 06:55:00 -0400"
+					),
 
-    );
+				array(
+					"title" => "Ryder Declares Quarterly Cash Dividend",
+					"description"=> "",
+					"link"=> "http://investors.ryder.com/newsroom/News-Release-Details/2016/Ryder-Declares-Quarterly-Cash-Dividend-1072016/default.aspx",
+					"pubDate"=>"Fri, 07 Oct 2016 18:30:00 -0400"
+					)
+				),
+			array(
+				array(
+					"title" => "Ryder Donates $50,000 to Support Future Generation of Technicians in Canada",
+					"description"=> "",
+					"link"=> "http://investors.ryder.com/newsroom/News-Release-Details/2016/Ryder-Donates-50000-to-Support-Future-Generation-of-Technicians-in-Canada/default.aspx",
+					"pubDate"=>"Wed, 05 Oct 2016 06:55:00 -0400"
+					),
+				array(
+					"title" => "Ryder Third Quarter Conference Call Scheduled for October 25, 2016",
+					"description"=> "",
+					"link"=> "http://investors.ryder.com/newsroom/News-Release-Details/2016/Ryder-Third-Quarter-Conference-Call-Scheduled-for-October-25-2016/default.aspx",
+					"pubDate"=>"Thu, 29 Sep 2016 06:55:00 -0400"
+					),
+				array(
+					"title" => "Ryder Executives to Present at Global Supply Chain Conference",
+					"description"=> "",
+					"link"=> "http://investors.ryder.com/newsroom/News-Release-Details/2016/Ryder-Executives-to-Present-at-Global-Supply-Chain-Conference/default.aspx",
+					"pubDate"=>"Mon, 19 Sep 2016 06:55:00 -0400"
+					),
+				array(
+					"title" => "Ryder CEO to Deliver Keynote on Transportation as “Next Wave of Disruption” at Automotive Logistics Global Conference",
+					"description"=> "",
+					"link"=> "http://investors.ryder.com/newsroom/News-Release-Details/2016/Ryder-CEO-to-Deliver-Keynote-on-Transportation-as-Next-Wave-of-Disruption-at-Automotive-Logistics-Global-Conference/default.aspx",
+					"pubDate"=>"Thu, 15 Sep 2016 16:55:00 -0400"
+					)
+				)
+
+			);
 	//$trucks = $this->getTrucksLocation();
 	//echo json_encode(array("feeds"=>$feeds, "trucks"=>$trucks['allVehicles'], "fromAPI"=>$trucks["fromAPI"]));
-	echo json_encode(array("feeds"=>$feeds));
+		echo json_encode(array("feeds"=>$feeds));
 
 	}
 
@@ -728,8 +766,8 @@ class Dashboard extends CI_Controller {
 
 	function validateDate($date)
 	{
-	    $d = DateTime::createFromFormat('Y-m-d', $date);
-	    return $d && $d->format('Y-m-d') === $date;
+		$d = DateTime::createFromFormat('Y-m-d', $date);
+		return $d && $d->format('Y-m-d') === $date;
 	}
 
 

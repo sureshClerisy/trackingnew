@@ -1,5 +1,5 @@
 
-app.controller('AdminController', function($scope,$http,$rootScope, $localStorage,$sce,$location, $window, $cookies, $state, $stateParams,dataFactory){
+app.controller('AdminController', function($scope,  $http,$rootScope, $localStorage,$sce,$location, $window, $cookies, $state, $stateParams,dataFactory){
 	$scope.fuelType = [{ 'val' : 'Diesel','key' : 'diesel'},{ 'val' : 'Petrol','key' : 'petrol'},{ 'val' : 'Gas','key' : 'gas'}];
 	$scope.pools = [];
 	$rootScope.showHeader = true;
@@ -7,7 +7,7 @@ app.controller('AdminController', function($scope,$http,$rootScope, $localStorag
 	$scope.sparkline_pie_data = [3,4,3];
     $scope.skipClick = true;
     $rootScope.saveTypeLoad = "dashboard";
-   
+
     //------- Dashboar drag drop options----------------
     $scope.tSortableWidgets = 9;
 
@@ -18,6 +18,8 @@ app.controller('AdminController', function($scope,$http,$rootScope, $localStorag
             thousandsSep:","
         }
     });
+    
+   
 
     if( $cookies.getObject('_gDateRange') ){
         $scope.dateRangeSelector = $cookies.getObject('_gDateRange');
@@ -27,7 +29,7 @@ app.controller('AdminController', function($scope,$http,$rootScope, $localStorag
     }
 
     
-     $scope.opts = {
+    $scope.opts = {
         autoUpdateInput: false,
         locale: {
             applyClass: 'btn-green',
@@ -41,7 +43,7 @@ app.controller('AdminController', function($scope,$http,$rootScope, $localStorag
         eventHandlers: {
             'apply.daterangepicker': function(ev, picker) {  
                 if ( $scope.dateRangeSelector != undefined && Object.keys($scope.dateRangeSelector).length > 0 ) {
-                    
+
                     $cookies.putObject('_gDateRange', $scope.dateRangeSelector);    
                     
                 } else {
@@ -115,22 +117,22 @@ app.controller('AdminController', function($scope,$http,$rootScope, $localStorag
         plotOptions: {
           series: {
             stacking: 'normal'
-          }
-        },
-        series: $scope.chartSeries,
-        title: { text: '' },
-        exporting: { enabled: false },
-        tooltip: {
-            headerFormat: '<b>{point.x}</b><br/>',
-            pointFormat: '<b>{point.y}</b>',
-            valueDecimals: 2,
-            valuePrefix: '$',
-        },
+        }
+    },
+    series: $scope.chartSeries,
+    title: { text: '' },
+    exporting: { enabled: false },
+    tooltip: {
+        headerFormat: '<b>{point.x}</b><br/>',
+        pointFormat: '<b>{point.y}</b>',
+        valueDecimals: 2,
+        valuePrefix: '$',
+    },
 
         //colors: ['#f45b5b', '#91e8e1']
-   }
-$scope.topBrokersXaxis = ["one","two","three","four","five"];
-   $scope.chartConfigTopCustomers = {
+    }
+    $scope.topBrokersXaxis = ["one","two","three","four","five"];
+    $scope.chartConfigTopCustomers = {
         colors: ['rgba(7, 126, 208, 1)','rgba(109,92,174,1)','rgba(52, 214, 199, 1)','rgba(245,87,83,1)','rgba(109,92,174,1)'],
         chart: { type: 'column' },
         xAxis: {
@@ -145,35 +147,35 @@ $scope.topBrokersXaxis = ["one","two","three","four","five"];
         plotOptions: {
           series: {
             stacking: 'normal'
-          }
-        },
-        series: [{
-            name: 'Brands',
-            colorByPoint: true,
-            data: [{
-                name: 'Camas Transport',
-                y: 84.33,
-                drilldown: 'Camas Transport'
-            }, {
-                name: 'RPM Freight',
-                y: 78.03,
-                drilldown: 'RPM Freight'
-            }, {
-                name: 'VC Logistics',
-                y: 76.38,
-                drilldown: 'VC Logistics'
-            }, {
-                name: 'Matson Logistics',
-                y: 65.77,
-                drilldown: 'Matson Logistics'
-            }, {
-                name: 'Bennett',
-                y: 58.91,
-                drilldown: 'Bennett'
-            }]
-        }],
-        title: { text: '' },
-        exporting: { enabled: false },
+        }
+    },
+    series: [{
+        name: 'Brands',
+        colorByPoint: true,
+        data: [{
+            name: 'Camas Transport',
+            y: 84.33,
+            drilldown: 'Camas Transport'
+        }, {
+            name: 'RPM Freight',
+            y: 78.03,
+            drilldown: 'RPM Freight'
+        }, {
+            name: 'VC Logistics',
+            y: 76.38,
+            drilldown: 'VC Logistics'
+        }, {
+            name: 'Matson Logistics',
+            y: 65.77,
+            drilldown: 'Matson Logistics'
+        }, {
+            name: 'Bennett',
+            y: 58.91,
+            drilldown: 'Bennett'
+        }]
+    }],
+    title: { text: '' },
+    exporting: { enabled: false },
         /*tooltip: {
             headerFormat: '<b>{point.x}</b><br/>',
             pointFormat: '<b>{point.y}</b>',
@@ -194,7 +196,7 @@ $scope.topBrokersXaxis = ["one","two","three","four","five"];
         },
 
         //colors: ['#f45b5b', '#91e8e1']
-   }
+    }
 
 
 
@@ -210,17 +212,17 @@ $scope.topBrokersXaxis = ["one","two","three","four","five"];
 
 
     $scope.sortableOptions = {connectWith: ".sortable .row .col-md-6",
-        handle: ".panel-heading",
-        cancel: ".portlet-close",
-        placeholder: "sortable-box-placeholder round-all",
-        forcePlaceholderSize: true,
-        tolerance: "pointer",
-        forceHelperSize: true,
-        revert: true,
-        helper: "original",
-        opacity: 0.8,
-        iframeFix: false,
-        stop: function(e,ui){
+    handle: ".panel-heading",
+    cancel: ".portlet-close",
+    placeholder: "sortable-box-placeholder round-all",
+    forcePlaceholderSize: true,
+    tolerance: "pointer",
+    forceHelperSize: true,
+    revert: true,
+    helper: "original",
+    opacity: 0.8,
+    iframeFix: false,
+    stop: function(e,ui){
             /*var $list=ui.item.parent();
             var place = $list.attr('id');
             $scope.sortableOrder = $list.sortable('toArray');*/
@@ -232,7 +234,7 @@ $scope.topBrokersXaxis = ["one","two","three","four","five"];
             });
         },
         create: function (event, ui) {
-           
+
         }
     };
 
@@ -241,33 +243,33 @@ $scope.topBrokersXaxis = ["one","two","three","four","five"];
 
 
 
-	$scope.sparkline_pie_options = {
-		type: 'pie',
-		width: 130,
-		height: 130,
-		sliceColors: ["rgba(7, 126, 208, 1)","rgba(109, 92, 174, 1)","rgba(52, 214, 199, 1)"]
-	};
+    $scope.sparkline_pie_options = {
+      type: 'pie',
+      width: 130,
+      height: 130,
+      sliceColors: ["rgba(7, 126, 208, 1)","rgba(109, 92, 174, 1)","rgba(52, 214, 199, 1)"]
+  };
   $scope.sparkline_pie_data1 = [1,5,4];
-	$scope.sparkline_pie_options1 = {
-		type: 'pie',
-		width: ($("#sparkline-pie").width())-50,
-		height: ($("#sparkline-pie").height())-50,
-		sliceColors: ["rgba(7, 126, 208, 1)","rgba(109, 92, 174, 1)","rgba(52, 214, 199, 1)"]
+  $scope.sparkline_pie_options1 = {
+      type: 'pie',
+      width: ($("#sparkline-pie").width())-50,
+      height: ($("#sparkline-pie").height())-50,
+      sliceColors: ["rgba(7, 126, 208, 1)","rgba(109, 92, 174, 1)","rgba(52, 214, 199, 1)"]
 
-	};
+  };
 
-	$scope.sparkline_line_data = [0, 10, 8, 20, 15, 10, 15, 5];
-        $scope.sparkline_line_options = {
-            type: 'line',
-            width: '150',
-            height: '150',
-            chartRangeMax: 40,
+  $scope.sparkline_line_data = [0, 10, 8, 20, 15, 10, 15, 5];
+  $scope.sparkline_line_options = {
+    type: 'line',
+    width: '150',
+    height: '150',
+    chartRangeMax: 40,
             fillColor: $.Pages.getColor('danger', .3), // Get Pages contextual color
             lineColor: 'rgba(0,0,0,0)',
             highlightLineColor: 'rgba(0,0,0,.09)',
             highlightSpotColor: 'rgba(0,0,0,.21)',
-    };
-    
+        };
+
 
 	//-------------------------weather dropdown---------------------------
 	$scope.trustAsHtml = function(value) {
@@ -276,7 +278,7 @@ $scope.topBrokersXaxis = ["one","two","three","four","five"];
 
     
 
-   
+
     /**Clicking on load detail changes url withour reload state*/
     $scope.clickMatchLoadDetail = function(truckstopId,loadId, deadmile,calPayment,totalCost,orignPickDate,vehicleID, index) {
         if ( loadId == '' && loadId == undefined ) 
@@ -353,7 +355,7 @@ $scope.topBrokersXaxis = ["one","two","three","four","five"];
             $scope.showDrivers = true;
             $scope.getWeatherInfo();
         }
-	};
+    };
 
     $scope.groupFind = function(item){
         if(item.username !== "")
@@ -409,35 +411,64 @@ $scope.topBrokersXaxis = ["one","two","three","four","five"];
     $scope.selDrivers = []; //Dashboard drivers multiview && aggregated
     $scope.driverName = false;
     dataFactory.httpRequest(URL+'/dashboard/fetchWidgetsOrder').then(function(data){
-		if(data.widgetsOrder.length == 0 ) {
-			$scope.tSortableWidgetsLeft  = '1,2,3,4';
-			$scope.tSortableWidgetsRight = '6,7,8,9,5';	
-		} else {
-			$scope.tSortableWidgetsLeft  = data.widgetsOrder.left;
-			$scope.tSortableWidgetsRight = data.widgetsOrder.right;
-		}
-        $scope.user_role = data.user_role;
+      if(data.widgetsOrder.length == 0 ) {
+         $scope.tSortableWidgetsLeft  = '1,2,3,4';
+         $scope.tSortableWidgetsRight = '6,7,8,9,5';	
+     } else {
+         $scope.tSortableWidgetsLeft  = data.widgetsOrder.left;
+         $scope.tSortableWidgetsRight = data.widgetsOrder.right;
+     }
+     $scope.user_role = data.user_role;
 
-        var orderArray = $scope.tSortableWidgetsLeft.split(',');
-        
-        var listArray = $('.widget_div .wpanel');
-        for (var i = 0; i < orderArray.length; i++) {
-            $('#placeholder_left').append(listArray[orderArray[i]-1]);
+     var orderArray = $scope.tSortableWidgetsLeft.split(',');
+
+     var listArray = $('.widget_div .wpanel');
+     for (var i = 0; i < orderArray.length; i++) {
+        $('#placeholder_left').append(listArray[orderArray[i]-1]);
+    }
+
+    var orderArray = $scope.tSortableWidgetsRight.split(',');
+    for (var i = 0; i < orderArray.length; i++) {
+        $('#placeholder_right').append(listArray[orderArray[i]-1]);
+    } 
+
+    if( ($rootScope.ofDriver == undefined || $rootScope.ofDriver == '') && data.selDrivers.length > 0){
+        if( $cookies.getObject('_globalDropdown') ){
+            var tempBuffer = $cookies.getObject('_globalDropdown');
+            if(tempBuffer.vid !="" && tempBuffer.vid != undefined && tempBuffer.label != "_idispatcher"){
+                $rootScope.ofDriver = tempBuffer.vid;
+                $scope.skipClick = false;
+                if(tempBuffer.label == "_team"){
+                    $rootScope.vtype = "_iteam";
+                }
+            }else if (tempBuffer.label == "_idispatcher"){
+                $scope.skipClick = true;
+                $rootScope.ofFilter = {};
+                $rootScope.ofFilter.vtype="_idispatcher";
+                $rootScope.ofFilter.did= tempBuffer.dispId;
+            }
+            $rootScope.ofDriver = ($rootScope.ofDriver == undefined) ? '':$rootScope.ofDriver;
+            $scope.dashboardData($rootScope.ofDriver);    
+        }else{
+            $scope.skipClick = true;
+            $scope.selDrivers = data.selDrivers;
+            $scope.vtype = '_idispatcher';
+            $scope.search_vehicle1 = {};
+            $scope.search_vehicle1.selected = data.selectedDriver;
+            $cookies.remove("_globalDropdown");
+            $cookies.putObject('_globalDropdown', data.selectedDriver);    
+            $scope.driverName = true;
+            $scope.getWeatherInfo();
         }
-
-        var orderArray = $scope.tSortableWidgetsRight.split(',');
-        for (var i = 0; i < orderArray.length; i++) {
-            $('#placeholder_right').append(listArray[orderArray[i]-1]);
-        } 
-        
-        if( ($rootScope.ofDriver == undefined || $rootScope.ofDriver == '') && data.selDrivers.length > 0){
+    }else {
+        if($rootScope.ofDriver == "" || $rootScope.ofDriver == undefined){
             if( $cookies.getObject('_globalDropdown') ){
-                var tempBuffer = $cookies.getObject('_globalDropdown');
-                if(tempBuffer.vid !="" && tempBuffer.vid != undefined && tempBuffer.label != "_idispatcher"){
-                    $rootScope.ofDriver = tempBuffer.vid;
+                var tempBuffer = $cookies.getObject('_globalDropdown'); 
+                if(tempBuffer.vid !="" && tempBuffer.vid != undefined && tempBuffer.label != "_idispatcher" && tempBuffer.label != "_iall" && tempBuffer.label != ""){
                     $scope.skipClick = false;
+                    $rootScope.ofDriver = tempBuffer.vid;
                     if(tempBuffer.label == "_team"){
-                        $rootScope.vtype = "_iteam";
+                        $scope.vtype = "_iteam";
                     }
                 }else if (tempBuffer.label == "_idispatcher"){
                     $scope.skipClick = true;
@@ -445,57 +476,29 @@ $scope.topBrokersXaxis = ["one","two","three","four","five"];
                     $rootScope.ofFilter.vtype="_idispatcher";
                     $rootScope.ofFilter.did= tempBuffer.dispId;
                 }
-                $rootScope.ofDriver = ($rootScope.ofDriver == undefined) ? '':$rootScope.ofDriver;
-                $scope.dashboardData($rootScope.ofDriver);    
-            }else{
-                $scope.skipClick = true;
-                $scope.selDrivers = data.selDrivers;
-                $scope.vtype = '_idispatcher';
-                $scope.search_vehicle1 = {};
-                $scope.search_vehicle1.selected = data.selectedDriver;
-                $cookies.remove("_globalDropdown");
-                $cookies.putObject('_globalDropdown', data.selectedDriver);    
-                $scope.driverName = true;
-                $scope.getWeatherInfo();
-            }
-        }else {
-            if($rootScope.ofDriver == "" || $rootScope.ofDriver == undefined){
-                if( $cookies.getObject('_globalDropdown') ){
-                    var tempBuffer = $cookies.getObject('_globalDropdown'); 
-                    if(tempBuffer.vid !="" && tempBuffer.vid != undefined && tempBuffer.label != "_idispatcher" && tempBuffer.label != "_iall" && tempBuffer.label != ""){
-                        $scope.skipClick = false;
-                        $rootScope.ofDriver = tempBuffer.vid;
-                        if(tempBuffer.label == "_team"){
-                            $scope.vtype = "_iteam";
-                        }
-                    }else if (tempBuffer.label == "_idispatcher"){
-                        $scope.skipClick = true;
-                        $rootScope.ofFilter = {};
-                        $rootScope.ofFilter.vtype="_idispatcher";
-                        $rootScope.ofFilter.did= tempBuffer.dispId;
-                    }
-                }    
-            }
-
-            
-            $rootScope.ofDriver = ($rootScope.ofDriver == undefined) ? '':$rootScope.ofDriver;
-            $scope.dashboardData($rootScope.ofDriver);    
+            }    
         }
 
-        
-        
-    });
+
+        $rootScope.ofDriver = ($rootScope.ofDriver == undefined) ? '':$rootScope.ofDriver;
+        $scope.dashboardData($rootScope.ofDriver);    
+    }
+
+
+
+});
     $rootScope.ofFilter = {};
-	$scope.changeLang = function(){
+    $scope.changeLang = function(){
         if($scope.user_role != 2 && $scope.user_role != 4){
 			$scope.vehicleList[0].driverName = $rootScope.languageArray.allGroups;  //r288
         }
-	}
+    }
     $scope.dashboardData = function(ofDriver){
         $rootScope.ofFilter.startDate = $scope.dateRangeSelector.startDate;
         $rootScope.ofFilter.endDate = $scope.dateRangeSelector.endDate
 
         dataFactory.httpRequest(URL+'/dashboard/index/'+ofDriver,'POST',{},$rootScope.ofFilter).then(function(data){
+           
             $scope.currentWeather = data.currentWeather;
             $scope.dailyForecast = data.dailyForecast;
             $scope.vehicleList = data.vehicleList;
@@ -515,7 +518,7 @@ $scope.topBrokersXaxis = ["one","two","three","four","five"];
             $scope.search_vehicle1 = {};
             /********** for getting selected driver label - r288****/
             if(ofDriver == ''){
-                
+
                 if( $cookies.getObject('_globalDropdown') ){
                     $scope.search_vehicle1.selected = $cookies.getObject('_globalDropdown');
                 }else{
@@ -545,27 +548,27 @@ $scope.topBrokersXaxis = ["one","two","three","four","five"];
 
             // -------------- Stacked Chart Update ------------------
 
-                $rootScope.loadPerformance = data.chartStack.trecords;
-                if($rootScope.loadPerformance.length > 0 ){
-                    $scope.haveRecords = true;
-                }else{
-                    $scope.haveRecords = false;
-                }
-                $scope.totalAllArray = data.chartStack.totals;
-                $scope.typeOfData = data.chartStack.type;                 
-                switch($scope.typeOfData){
-                    case "_iall"        : $scope.fColumn = $scope.languageArray.dispatcher; $scope.skipClick = true;break;
-                    case "_idispatcher" : $scope.fColumn = $scope.languageArray.driver; $scope.skipClick = true;break;
-                    case "_iteam"       :
-                    case "_idriver"     : $scope.fColumn = $scope.languageArray.loadno; $scope.skipClick = false;break;
-                    default             : $scope.fColumn = $scope.languageArray.dispatcher;$scope.skipClick = true;break;
-                }
-                $scope.chartConfig.xAxis    = { categories: data.chartStack.xaxis };
-                $scope.chartConfig.series   = [
-                                                {"name": "Charges",  "data" : data.chartStack.charges,  type: "column", id: 's4'},
-                                                {"name": "Invoiced", "data" : data.chartStack.invoiced, type: "column", id: 's3'},
-                                                {"name": "Profit Amount",  "data" : data.chartStack.profitAmount,id: 's5'}
-                                            ];
+            $rootScope.loadPerformance = data.chartStack.trecords;
+            if($rootScope.loadPerformance.length > 0 ){
+                $scope.haveRecords = true;
+            }else{
+                $scope.haveRecords = false;
+            }
+            $scope.totalAllArray = data.chartStack.totals;
+            $scope.typeOfData = data.chartStack.type;                 
+            switch($scope.typeOfData){
+                case "_iall"        : $scope.fColumn = $scope.languageArray.dispatcher; $scope.skipClick = true;break;
+                case "_idispatcher" : $scope.fColumn = $scope.languageArray.driver; $scope.skipClick = true;break;
+                case "_iteam"       :
+                case "_idriver"     : $scope.fColumn = $scope.languageArray.loadno; $scope.skipClick = false;break;
+                default             : $scope.fColumn = $scope.languageArray.dispatcher;$scope.skipClick = true;break;
+            }
+            $scope.chartConfig.xAxis    = { categories: data.chartStack.xaxis };
+            $scope.chartConfig.series   = [
+            {"name": "Charges",  "data" : data.chartStack.charges,  type: "column", id: 's4'},
+            {"name": "Invoiced", "data" : data.chartStack.invoiced, type: "column", id: 's3'},
+            {"name": "Profit Amount",  "data" : data.chartStack.profitAmount,id: 's5'}
+            ];
             // -------------- Stacked Chart Update ------------------
 
 
@@ -578,14 +581,14 @@ $scope.topBrokersXaxis = ["one","two","three","four","five"];
                 $scope.currentWeather.country = data.weatherNotFound.country;
             }
             if(data.success == true){
-    		   $scope.weatherShow = true;
-    	    }
-            var chartData = [];
-            chartData.push({name:'Delivered',y:data.loadsChart.delivered });
-            chartData.push({name:'Booked',y:data.loadsChart.booked });
-            chartData.push({name:'In-progress',y:data.loadsChart.inprogress });
-            chartData.push({name:'No-loads',y:data.loadsChart.noLoads });
-            $scope.drawMatrix("delivery_matrix",chartData,'Loads');
+               $scope.weatherShow = true;
+           }
+           var chartData = [];
+           chartData.push({name:'Delivered',y:data.loadsChart.delivered });
+           chartData.push({name:'Booked',y:data.loadsChart.booked });
+           chartData.push({name:'In-progress',y:data.loadsChart.inprogress });
+           chartData.push({name:'No-loads',y:data.loadsChart.noLoads });
+           $scope.drawMatrix("delivery_matrix",chartData,'Loads');
 
             // ---------------------------------------
             
@@ -593,47 +596,47 @@ $scope.topBrokersXaxis = ["one","two","three","four","five"];
             $scope.renderGoogleMap();
             //$scope.clusteredMap();
         });
-    }
+}
 
-    $scope.clusteredMap = function(){
-        var tiles = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-                maxZoom: 18,
-                attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors, Points &copy 2012 LINZ'
-            }),
-            latlng = L.latLng(37.09024, -95.712891);
-            var map = L.map('dash-map', {center: latlng, zoom:4, layers: [tiles]});
-            var markers = L.markerClusterGroup();
-            angular.forEach($scope.liveTrucks, function(value, key) {
-                var position = {lat: parseFloat(value.latitude), lng: parseFloat(value.longitude)};
-                var marker = L.marker(new L.LatLng(position.lat, position.lng), { title: title });
-                
-                var icon = "./pages/img/truck-live.png";
-                var msgClass = "truck-live";
-                if(value.mintues_ago > 2){
-                    icon = "./pages/img/truck-stale.png";
-                    timestamp = "Last known location telemetry stopped ("+value.timestamp+")";
-                    msgClass = "truck-stale";
-                }
-                var timestamp = "Live telemetry from tracker as of ("+value.timestamp+")";
-                var title = '<div class="info-container">\
-                                                <p class="'+msgClass+'">'+ timestamp+'</p>\
-                                                <p><b>Driver : </b>'+ value.driverName+'</p>\
-                                                <p><b>Truck Name : </b> '+value.label+ '</p>\
-                                                <p><b>Address : </b> '+value.vehicle_address+', '+ value.city+', '+value.state+'</p>\
-                                                </div>';
+$scope.clusteredMap = function(){
+    var tiles = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors, Points &copy 2012 LINZ'
+    }),
+    latlng = L.latLng(37.09024, -95.712891);
+    var map = L.map('dash-map', {center: latlng, zoom:4, layers: [tiles]});
+    var markers = L.markerClusterGroup();
+    angular.forEach($scope.liveTrucks, function(value, key) {
+        var position = {lat: parseFloat(value.latitude), lng: parseFloat(value.longitude)};
+        var marker = L.marker(new L.LatLng(position.lat, position.lng), { title: title });
 
-                
-                marker.bindPopup(title);
-                markers.addLayer(marker);
+        var icon = "./pages/img/truck-live.png";
+        var msgClass = "truck-live";
+        if(value.mintues_ago > 2){
+            icon = "./pages/img/truck-stale.png";
+            timestamp = "Last known location telemetry stopped ("+value.timestamp+")";
+            msgClass = "truck-stale";
+        }
+        var timestamp = "Live telemetry from tracker as of ("+value.timestamp+")";
+        var title = '<div class="info-container">\
+        <p class="'+msgClass+'">'+ timestamp+'</p>\
+        <p><b>Driver : </b>'+ value.driverName+'</p>\
+        <p><b>Truck Name : </b> '+value.label+ '</p>\
+        <p><b>Address : </b> '+value.vehicle_address+', '+ value.city+', '+value.state+'</p>\
+        </div>';
 
-           });
 
-        map.addLayer(markers);
-    }
+        marker.bindPopup(title);
+        markers.addLayer(marker);
 
-    $scope.getWeatherInfo = function(){
-        var sterm = '';
-		$scope.weatherStatus = false;
+    });
+
+    map.addLayer(markers);
+}
+
+$scope.getWeatherInfo = function(){
+    var sterm = '';
+    $scope.weatherStatus = false;
         //$scope.changeWeather = true;
         if(!$scope.driverName){
             $scope.autoFetchLoads = true;
@@ -649,42 +652,42 @@ $scope.topBrokersXaxis = ["one","two","three","four","five"];
         data = {'did':$scope.did, 'vid':sterm,"vtype":$scope.vtype,"startDate":$scope.dateRangeSelector.startDate, "endDate" : $scope.dateRangeSelector.endDate};
         //dataFactory.httpRequest(URL+'/dashboard/index/'+).then(function(data){
 
-        dataFactory.httpRequest(URL+'/dashboard/index','POST',{},data).then(function(data){
-            $scope.autoFetchLoads = false;
-            $scope.currentWeather = data.currentWeather;
-            $scope.dailyForecast = data.dailyForecast;
-            $scope.vehicleList = data.vehicleList;
-            $scope.wdriver = data.vehicleLabel;
-            $scope.summary = data.loadsChart.summary;
-            if($scope.driverName){
-                $scope.vehicleList[0].driverName = "All Drivers";  
-                $scope.driverName = false;
-            }
+            dataFactory.httpRequest(URL+'/dashboard/index','POST',{},data).then(function(data){
+                $scope.autoFetchLoads = false;
+                $scope.currentWeather = data.currentWeather;
+                $scope.dailyForecast = data.dailyForecast;
+                $scope.vehicleList = data.vehicleList;
+                $scope.wdriver = data.vehicleLabel;
+                $scope.summary = data.loadsChart.summary;
+                if($scope.driverName){
+                    $scope.vehicleList[0].driverName = "All Drivers";  
+                    $scope.driverName = false;
+                }
             //$scope.loadOnTheRoad = data.loadOnTheRoad;
             $scope.liveTrucks = data.vehicleLocation.allVehicles;
           // -------------- Stacked Chart Update ------------------
-            $rootScope.loadPerformance = data.chartStack.trecords;
-            if($rootScope.loadPerformance.length > 0 ){
-                $scope.haveRecords = true;
-            }else{
-                $scope.haveRecords = false;
-            }
-            $scope.totalAllArray = data.chartStack.totals;
-            $scope.typeOfData = data.chartStack.type;                 
-            switch($scope.typeOfData){
-                case "_all"         : $scope.fColumn = $scope.languageArray.dispatcher;break;
-                case "_idispatcher" : $scope.fColumn = $scope.languageArray.driver;break;
-                case "_iteam"       :
-                case "_idriver"     : $scope.fColumn = $scope.languageArray.loadno;break;
-                default             : $scope.fColumn = $scope.languageArray.dispatcher;break;
-            }
+          $rootScope.loadPerformance = data.chartStack.trecords;
+          if($rootScope.loadPerformance.length > 0 ){
+            $scope.haveRecords = true;
+        }else{
+            $scope.haveRecords = false;
+        }
+        $scope.totalAllArray = data.chartStack.totals;
+        $scope.typeOfData = data.chartStack.type;                 
+        switch($scope.typeOfData){
+            case "_all"         : $scope.fColumn = $scope.languageArray.dispatcher;break;
+            case "_idispatcher" : $scope.fColumn = $scope.languageArray.driver;break;
+            case "_iteam"       :
+            case "_idriver"     : $scope.fColumn = $scope.languageArray.loadno;break;
+            default             : $scope.fColumn = $scope.languageArray.dispatcher;break;
+        }
 
-            $scope.chartConfig.xAxis    = { categories: data.chartStack.xaxis };
-            $scope.chartConfig.series   = [
-                                            {"name": "Charges",  "data" : data.chartStack.charges,  type: "column", id: 's4'},
-                                            {"name": "Invoiced", "data" : data.chartStack.invoiced, type: "column", id: 's3'},
-                                            {"name": "Profit Amout",  "data" : data.chartStack.profitAmount, id: 's5'}
-                                        ];
+        $scope.chartConfig.xAxis    = { categories: data.chartStack.xaxis };
+        $scope.chartConfig.series   = [
+        {"name": "Charges",  "data" : data.chartStack.charges,  type: "column", id: 's4'},
+        {"name": "Invoiced", "data" : data.chartStack.invoiced, type: "column", id: 's3'},
+        {"name": "Profit Amout",  "data" : data.chartStack.profitAmount, id: 's5'}
+        ];
             // -------------- Stacked Chart Update ------------------
 
 
@@ -694,20 +697,20 @@ $scope.topBrokersXaxis = ["one","two","three","four","five"];
             	$scope.weatherStatus = true;
                 $scope.currentWeather.name = data.weatherNotFound.name;
                 $scope.currentWeather.country = data.weatherNotFound.country;
-              }
+            }
             if(data.success==true){
-               $scope.weatherShow = true;
-            }   
-            var chartData = [];
-            chartData.push({name:'Delivered',y:data.loadsChart.delivered });
-            chartData.push({name:'Booked',y:data.loadsChart.booked });
-            chartData.push({name:'In-progress',y:data.loadsChart.inprogress });
-            chartData.push({name:'No-loads',y:data.loadsChart.noLoads });
-            $scope.drawMatrix("delivery_matrix",chartData,'Loads');
-           $scope.renderGoogleMap();
-        });
-    }
- 
+             $scope.weatherShow = true;
+         }   
+         var chartData = [];
+         chartData.push({name:'Delivered',y:data.loadsChart.delivered });
+         chartData.push({name:'Booked',y:data.loadsChart.booked });
+         chartData.push({name:'In-progress',y:data.loadsChart.inprogress });
+         chartData.push({name:'No-loads',y:data.loadsChart.noLoads });
+         $scope.drawMatrix("delivery_matrix",chartData,'Loads');
+         $scope.renderGoogleMap();
+     });
+        }
+
     //------------------------- RSS Feeds ----------------------------
 
 
@@ -720,36 +723,36 @@ $scope.topBrokersXaxis = ["one","two","three","four","five"];
 
 
     $rootScope.updateDashboard = function(){
-         var sterm = '';
-        if(!$scope.driverName){
-            $scope.autoFetchLoads = true;
-        }
-        if( $scope.selDrivers.length > 0){
-            sterm = $scope.selDrivers.join();
-        }
-        else{
-            sterm = '';
-        }
+       var sterm = '';
+       if(!$scope.driverName){
+        $scope.autoFetchLoads = true;
+    }
+    if( $scope.selDrivers.length > 0){
+        sterm = $scope.selDrivers.join();
+    }
+    else{
+        sterm = '';
+    }
 
-        data = {'did':$scope.did, 'vid':sterm,"vtype":$scope.vtype,"startDate":$scope.dateRangeSelector.startDate, "endDate" : $scope.dateRangeSelector.endDate};
-        dataFactory.httpRequest(URL+'/dashboard/updateDashboardOnLoadEdit','POST',{},data).then(function(data){
-            $scope.autoFetchLoads = false;
-            $scope.summary = data.loadsChart.summary;
-            $rootScope.loadPerformance = data.chartStack.trecords;
-            if($rootScope.loadPerformance.length > 0 ){
-                $scope.haveRecords = true;
-            }else{
-                $scope.haveRecords = false;
-            }
-            $scope.totalAllArray = data.chartStack.totals;
+    data = {'did':$scope.did, 'vid':sterm,"vtype":$scope.vtype,"startDate":$scope.dateRangeSelector.startDate, "endDate" : $scope.dateRangeSelector.endDate};
+    dataFactory.httpRequest(URL+'/dashboard/updateDashboardOnLoadEdit','POST',{},data).then(function(data){
+        $scope.autoFetchLoads = false;
+        $scope.summary = data.loadsChart.summary;
+        $rootScope.loadPerformance = data.chartStack.trecords;
+        if($rootScope.loadPerformance.length > 0 ){
+            $scope.haveRecords = true;
+        }else{
+            $scope.haveRecords = false;
+        }
+        $scope.totalAllArray = data.chartStack.totals;
           // -------------- Stacked Chart Update ------------------
-            
-            $scope.chartConfig.xAxis    = { categories: data.chartStack.xaxis };
-            $scope.chartConfig.series   = [
-                                            {"name": "Charges",  "data" : data.chartStack.charges,  type: "column", id: 's4'},
-                                            {"name": "Invoiced", "data" : data.chartStack.invoiced, type: "column", id: 's3'},
-                                            {"name": "Profit Amonut",  "data" : data.chartStack.profitAmount, id: 's5'}
-                                        ];
+
+          $scope.chartConfig.xAxis    = { categories: data.chartStack.xaxis };
+          $scope.chartConfig.series   = [
+          {"name": "Charges",  "data" : data.chartStack.charges,  type: "column", id: 's4'},
+          {"name": "Invoiced", "data" : data.chartStack.invoiced, type: "column", id: 's3'},
+          {"name": "Profit Amonut",  "data" : data.chartStack.profitAmount, id: 's5'}
+          ];
             // -------------- Stacked Chart Update ------------------
             var chartData = [];
             chartData.push({name:'Delivered',y:data.loadsChart.delivered });
@@ -759,11 +762,6 @@ $scope.topBrokersXaxis = ["one","two","three","four","five"];
             $scope.drawMatrix("delivery_matrix",chartData,'Loads');
         });
     }
- 
-    
-
-
-
 
 
 
@@ -791,50 +789,50 @@ $scope.topBrokersXaxis = ["one","two","three","four","five"];
         
         if(fmap == true)    {
         //Red Pointer
-            context.clearRect(0, 0, canvas.width, canvas.height);
-            context.drawImage($scope.base_image2,0,0);
-            context.font = 'bold 14px Arial';
-            context.fillStyle = '#F62A2A';
-            context.fillText(text,9,19);
-            returnImg.red =  canvas.toDataURL();
-            return returnImg;   
-        }
-        
-        return returnImg.green;
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.drawImage($scope.base_image2,0,0);
+        context.font = 'bold 14px Arial';
+        context.fillStyle = '#F62A2A';
+        context.fillText(text,9,19);
+        returnImg.red =  canvas.toDataURL();
+        return returnImg;   
     }
+
+    return returnImg.green;
+}
 
     //--------------------- Google Map Dashboard--------------------------------
     $scope.renderGoogleMap = function(){
-         var mapOptions = {
-            zoom: 4,
-            center: {lat: 37.09024, lng: -95.712891},
-            scrollwheel: false, 
-            scaleControl: false, 
-            icon:"./pages/img/truck-stop.png"
-        }    
-        $scope.map = new google.maps.Map(document.getElementById('dash-map'), mapOptions);  
-        var markers=[];
-        $scope.directionsService = new google.maps.DirectionsService;
-        var infowindow = new google.maps.InfoWindow();
-        $scope.directionDisplay = [];
-        $scope.labels = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
-        var i=0;
-        var bounds = new google.maps.LatLngBounds();
-        angular.forEach($scope.liveTrucks, function(value, key) {
-            if(value.loadDetail != null){
-                var origin  =value.loadDetail['OriginCity']+', '+value.loadDetail['OriginState']+', USA';
-                var destination = value.loadDetail['DestinationCity']+', '+value.loadDetail['DestinationState']+', USA';
+       var mapOptions = {
+        zoom: 4,
+        center: {lat: 37.09024, lng: -95.712891},
+        scrollwheel: false, 
+        scaleControl: false, 
+        icon:"./pages/img/truck-stop.png"
+    }    
+    $scope.map = new google.maps.Map(document.getElementById('dash-map'), mapOptions);  
+    var markers=[];
+    $scope.directionsService = new google.maps.DirectionsService;
+    var infowindow = new google.maps.InfoWindow();
+    $scope.directionDisplay = [];
+    $scope.labels = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
+    var i=0;
+    var bounds = new google.maps.LatLngBounds();
+    angular.forEach($scope.liveTrucks, function(value, key) {
+        if(value.loadDetail != null){
+            var origin  =value.loadDetail['OriginCity']+', '+value.loadDetail['OriginState']+', USA';
+            var destination = value.loadDetail['DestinationCity']+', '+value.loadDetail['DestinationState']+', USA';
 
-                if(value.loadDetail['OriginCity'] == "" && value.loadDetail['OriginState'] == ""){
-                    origin = value.loadDetail["PickupAddress"];
-                }
-                if(value.loadDetail['DestinationCity'] == "" && value.loadDetail['DestinationState'] == ""){
-                    destination = value.loadDetail["DestinationAddress"];
-                }
+            if(value.loadDetail['OriginCity'] == "" && value.loadDetail['OriginState'] == ""){
+                origin = value.loadDetail["PickupAddress"];
+            }
+            if(value.loadDetail['DestinationCity'] == "" && value.loadDetail['DestinationState'] == ""){
+                destination = value.loadDetail["DestinationAddress"];
+            }
 
-                var dirRend = 'directionsDisplay'+key;
-                $scope.dirRend = new google.maps.DirectionsRenderer({suppressMarkers: true,preserveViewport: true});
-                $scope.dirRend.setMap($scope.map);
+            var dirRend = 'directionsDisplay'+key;
+            $scope.dirRend = new google.maps.DirectionsRenderer({suppressMarkers: true,preserveViewport: true});
+            $scope.dirRend.setMap($scope.map);
                 $scope.text = $scope.labels[i++];//Generating google pin text
                 makeRoute( origin, destination, $scope.dirRend,$scope.text);  
             }
@@ -859,22 +857,22 @@ $scope.topBrokersXaxis = ["one","two","three","four","five"];
             markers.push(marker);
             google.maps.event.addListener(marker, 'click', function() {
                 infowindow.setContent('<div class="info-container">\
-                                            <p class="'+msgClass+'">'+ timestamp+'</p>\
-                                            <p><b>Driver : </b>'+ value.driverName+'</p>\
-                                            <p><b>Truck Name : </b> '+value.label+ '</p>\
-                                            <p><b>Address : </b> '+value.vehicle_address+', '+ value.city+', '+value.state+'</p>\
-                                            </div>');
+                    <p class="'+msgClass+'">'+ timestamp+'</p>\
+                    <p><b>Driver : </b>'+ value.driverName+'</p>\
+                    <p><b>Truck Name : </b> '+value.label+ '</p>\
+                    <p><b>Address : </b> '+value.vehicle_address+', '+ value.city+', '+value.state+'</p>\
+                    </div>');
                 infowindow.open($scope.map, this);
             });
             bounds.extend(position);
 
         });
 
-        var mcOptions = {imagePath: "https://cdn.rawgit.com/googlemaps/js-marker-clusterer/gh-pages/images/m"};
-        var mc = new MarkerClusterer($scope.map,markers,mcOptions);     
-        google.maps.event.addListener(infowindow, 'domready', function() {
-            var iwOuter = $('.gm-style-iw').parent().addClass('live-trucks');
-        });
+    var mcOptions = {imagePath: "https://cdn.rawgit.com/googlemaps/js-marker-clusterer/gh-pages/images/m"};
+    var mc = new MarkerClusterer($scope.map,markers,mcOptions);     
+    google.maps.event.addListener(infowindow, 'domready', function() {
+        var iwOuter = $('.gm-style-iw').parent().addClass('live-trucks');
+    });
 
 
        /* google.maps.event.addListenerOnce($scope.map, 'bounds_changed', function(event) {
@@ -887,18 +885,18 @@ $scope.topBrokersXaxis = ["one","two","three","four","five"];
     }
     //------------------------ RSS Feeds -------------------------------------
 
-        function makeRoute(origin, destination,renderer,text) {
-                        
-            $scope.directionsService.route({
-                    origin: origin,
-                    destination: destination,
-                    travelMode: 'DRIVING'
-                }, function(response, status) {
-                    if (status === 'OK') {
-                        renderer.setDirections(response);
-                        var leg = response.routes['0'].legs['0'];
-                        var pointers = $scope.getImageMarker(text,'G',true);
-                        
+    function makeRoute(origin, destination,renderer,text) {
+
+        $scope.directionsService.route({
+            origin: origin,
+            destination: destination,
+            travelMode: 'DRIVING'
+        }, function(response, status) {
+            if (status === 'OK') {
+                renderer.setDirections(response);
+                var leg = response.routes['0'].legs['0'];
+                var pointers = $scope.getImageMarker(text,'G',true);
+
                         //makeMarker( leg.start_location, 'http://www.googlemapsmarkers.com/v1/'+text+'/224C16/FFFFFF/224C16', origin);
                         //makeMarker( leg.end_location, 'http://www.googlemapsmarkers.com/v1/'+text+'/A04646/FFFFFF/A04646', destination);
                         makeMarker( leg.start_location, pointers.green, origin);
@@ -908,66 +906,66 @@ $scope.topBrokersXaxis = ["one","two","three","four","five"];
                         console.log('Directions request failed due to ' + status);
                     }
                 });
-        }
+    }
 
-            function makeMarker( position, icon, title ) {
+    function makeMarker( position, icon, title ) {
                 //console.log(icon);
                 new google.maps.Marker({
                     position: position,
                     icon: icon,
                     title: title,
                     map: $scope.map,
-                
+
                 });
             }
 
-    
-    $scope.drawMatrix = function(id,data,brand){
-        $('#'+id).highcharts({
-            colors: ['rgba(109,92,174,1)','rgba(52, 214, 199, 1)','rgba(7, 126, 208, 1)','rgba(98,98,98,1)'],
-            chart: {
-                plotBackgroundColor: null,
-                plotBorderWidth: null,
-                plotShadow: false,
-                type: 'pie'
-            },
-            title: {
-                text: ''
-            },
-            plotOptions: {
-                pie: {
-                    allowPointSelect: true,
-                    cursor: 'pointer',
-                    dataLabels: {
-                        enabled: false
-                    },
-                    showInLegend: false
-                }
-            },
-            series: [{
-                name: brand,
-                colorByPoint: true,
-                data: data
-            }]
-        });
-    }
 
-    
-  $(function () {
-    $('#assets_insight').highcharts({
-		colors: ['rgba(52, 214, 199, 1)','rgba(7, 126, 208, 1)','rgba(98,98,98,1)'],
-		
-        chart: {
-            plotBackgroundColor: null,
-            plotBorderWidth: 0,
-            plotShadow: false
-        },
-        title: {
-            text: '',
-            align: 'left',
-            verticalAlign: 'left',
-            y: 5
-        },
+            $scope.drawMatrix = function(id,data,brand){
+                $('#'+id).highcharts({
+                    colors: ['rgba(109,92,174,1)','rgba(52, 214, 199, 1)','rgba(7, 126, 208, 1)','rgba(98,98,98,1)'],
+                    chart: {
+                        plotBackgroundColor: null,
+                        plotBorderWidth: null,
+                        plotShadow: false,
+                        type: 'pie'
+                    },
+                    title: {
+                        text: ''
+                    },
+                    plotOptions: {
+                        pie: {
+                            allowPointSelect: true,
+                            cursor: 'pointer',
+                            dataLabels: {
+                                enabled: false
+                            },
+                            showInLegend: false
+                        }
+                    },
+                    series: [{
+                        name: brand,
+                        colorByPoint: true,
+                        data: data
+                    }]
+                });
+            }
+
+
+            $(function () {
+                $('#assets_insight').highcharts({
+                  colors: ['rgba(52, 214, 199, 1)','rgba(7, 126, 208, 1)','rgba(98,98,98,1)'],
+
+                  chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: 0,
+                    plotShadow: false
+                },
+                title: {
+                    text: '',
+                    align: 'left',
+                    verticalAlign: 'left',
+                    y: 5
+                },
         /*tooltip: {
             pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
         },*/
@@ -977,62 +975,62 @@ $scope.topBrokersXaxis = ["one","two","three","four","five"];
                     enabled: false,
                     distance: -50,
                     style: {
-                        
+
                         color: 'black'
                     }
                 },
                 startAngle: -90,
                 endAngle: 90,
                 center: ['50%', '50%'],
-               
+
             }
         },
         series: [{
             type: 'pie',
             name: 'Sevices',
             innerSize: '60%',
-         
+
             
             data: [
-                ['In', 80],
-                ['Out of',13],
-                ['Random', 7],
-                
-               
+            ['In', 80],
+            ['Out of',13],
+            ['Random', 7],
+
+
             ]
         }]
     });
-    $('#driver_renewals').highcharts({
-		colors: ['rgba(52, 214, 199, 1)','rgba(7, 126, 208, 1)','rgba(98,98,98,1)','rgba(109,92,174,1)'],
-        chart: {
-            plotBackgroundColor: null,
-            plotBorderWidth: 0,
-            plotShadow: false
-        },
-        title: {
-            text: '',
-            align: 'left',
-            verticalAlign: 'left',
-            y: 5
-        },
+                $('#driver_renewals').highcharts({
+                  colors: ['rgba(52, 214, 199, 1)','rgba(7, 126, 208, 1)','rgba(98,98,98,1)','rgba(109,92,174,1)'],
+                  chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: 0,
+                    plotShadow: false
+                },
+                title: {
+                    text: '',
+                    align: 'left',
+                    verticalAlign: 'left',
+                    y: 5
+                },
         /*tooltip: {
             pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
         },*/
         plotOptions: {
             pie: {
-				allowPointSelect: true,
-				cursor: 'pointer',
+                allowPointSelect: true,
+                cursor: 'pointer',
                 dataLabels: {
                     enabled: false,
                     distance: -50,
                     style: {
-                        
+
                         color: 'black'
                     }
                 },
                 
                 center: ['50%', '50%'],
-               
+
             }
         },
         series: [{
@@ -1040,46 +1038,46 @@ $scope.topBrokersXaxis = ["one","two","three","four","five"];
             name: 'Sevices',
             innerSize: '60%',
             data: [
-                ['In Emergency', 7],
-                ['High Priority',30],
-                ['Opened', 40],
-                ['Un Opened', 23],
-                
-               
+            ['In Emergency', 7],
+            ['High Priority',30],
+            ['Opened', 40],
+            ['Un Opened', 23],
+
+
             ]
         }]
     });
-    $('#driver_msg').highcharts({
-		colors: ['rgba(98,98,98,1)','rgba(52, 214, 199, 1)','rgba(109,92,174,1)','rgba(7, 126, 208, 1)'],
-        chart: {
-            plotBackgroundColor: null,
-            plotBorderWidth: 0,
-            plotShadow: false
-        },
-        title: {
-            text: '',
-            align: 'left',
-            verticalAlign: 'left',
-            y: 5
-        },
+                $('#driver_msg').highcharts({
+                  colors: ['rgba(98,98,98,1)','rgba(52, 214, 199, 1)','rgba(109,92,174,1)','rgba(7, 126, 208, 1)'],
+                  chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: 0,
+                    plotShadow: false
+                },
+                title: {
+                    text: '',
+                    align: 'left',
+                    verticalAlign: 'left',
+                    y: 5
+                },
         /*tooltip: {
             pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
         },*/
         plotOptions: {
             pie: {
-				allowPointSelect: true,
-				cursor: 'pointer',
+                allowPointSelect: true,
+                cursor: 'pointer',
                 dataLabels: {
                     enabled: false,
                     distance: -50,
                     style: {
-                        
+
                         color: 'black'
                     }
                 },
                 
                 center: ['50%', '50%'],
-               
+
             }
         },
         series: [{
@@ -1087,18 +1085,18 @@ $scope.topBrokersXaxis = ["one","two","three","four","five"];
             name: 'Message',
             innerSize: '60%',
             data: [
-                ['In Emergency', 7],
-                ['High Priority',30],
-                ['Opened', 40],
-                ['Un Opened', 23],
-                
-               
+            ['In Emergency', 7],
+            ['High Priority',30],
+            ['Opened', 40],
+            ['Un Opened', 23],
+
+
             ]
         }]
     });
 	// pie chart
 	
-    
+
 
 
 
@@ -1145,38 +1143,38 @@ $scope.topBrokersXaxis = ["one","two","three","four","five"];
 		}]
 	});
     //bar-graph
-	 $('#customers').highcharts({
-		 colors: ['rgba(7, 126, 208, 1)','rgba(109,92,174,1)','rgba(52, 214, 199, 1)','rgba(245,87,83,1)','rgba(109,92,174,1)'],
-        chart: {
-            type: 'column'
-        },
+    $('#customers').highcharts({
+     colors: ['rgba(7, 126, 208, 1)','rgba(109,92,174,1)','rgba(52, 214, 199, 1)','rgba(245,87,83,1)','rgba(109,92,174,1)'],
+     chart: {
+        type: 'column'
+    },
+    title: {
+        text: ''
+    },
+    subtitle: {
+        text: ''
+    },
+    xAxis: {
+        type: ''
+    },
+    yAxis: {
         title: {
             text: ''
-        },
-        subtitle: {
-            text: ''
-        },
-        xAxis: {
-            type: ''
-        },
-        yAxis: {
-            title: {
-                text: ''
-            }
+        }
 
-        },
-        legend: {
-            enabled: false
-        },
-        plotOptions: {
-            series: {
-                borderWidth: 0,
-                dataLabels: {
-                    enabled: true,
-                    format: '{point.y:.1f}%'
-                }
+    },
+    legend: {
+        enabled: false
+    },
+    plotOptions: {
+        series: {
+            borderWidth: 0,
+            dataLabels: {
+                enabled: true,
+                format: '{point.y:.1f}%'
             }
-        },
+        }
+    },
 
         //~ tooltip: {
             //~ headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
@@ -1208,10 +1206,10 @@ $scope.topBrokersXaxis = ["one","two","three","four","five"];
                 drilldown: 'Bennett'
             }]
         }]
-       
+
     });
     //multiple line graph
-     $('#fleet_load').highcharts({
+    $('#fleet_load').highcharts({
         chart: {
             type: 'areaspline'
         },
@@ -1230,13 +1228,13 @@ $scope.topBrokersXaxis = ["one","two","three","four","five"];
         },
         xAxis: {
             categories: [
-                'Monday',
-                'Tuesday',
-                'Wednesday',
-                'Thursday',
-                'Friday',
-                'Saturday',
-                'Sunday'
+            'Monday',
+            'Tuesday',
+            'Wednesday',
+            'Thursday',
+            'Friday',
+            'Saturday',
+            'Sunday'
             ],
             plotBands: [{ // visualize the weekend
                 from: 4.5,
@@ -1271,13 +1269,13 @@ $scope.topBrokersXaxis = ["one","two","three","four","five"];
     });
     //colored line chart
     $('#best_safety').highcharts({
-		colors: ['rgba(245,87,83,1)','rgba(52, 214, 199, 1)','rgba(7, 126, 208, 1)'],
-        chart: {
-            type: 'area'
-        },
-        title: {
-            text: ''
-        },
+      colors: ['rgba(245,87,83,1)','rgba(52, 214, 199, 1)','rgba(7, 126, 208, 1)'],
+      chart: {
+        type: 'area'
+    },
+    title: {
+        text: ''
+    },
         //~ xAxis: {
             //~ categories: ['Apples', 'Oranges', 'Pears', 'Grapes', 'Bananas']
         //~ },
@@ -1402,26 +1400,26 @@ $scope.topBrokersXaxis = ["one","two","three","four","five"];
         }]
     });*/
 });
-  if($rootScope.loggedInUser == false) {
-		$location.path('login');
-	} else {	
-		$rootScope.loggedInUser = true;
-	}
-	
+if($rootScope.loggedInUser == false) {
+  $location.path('login');
+} else {	
+  $rootScope.loggedInUser = true;
+}
+
 });
 app.directive('csSelect', function() {
-        return {
-            restrict: 'A',
-            link: function(scope, el, attrs) {
-                if (!window.SelectFx) return;
+    return {
+        restrict: 'A',
+        link: function(scope, el, attrs) {
+            if (!window.SelectFx) return;
 
-                var el = $(el).get(0);
-                $(el).wrap('<div class="cs-wrapper"></div>');
-                new SelectFx(el);
+            var el = $(el).get(0);
+            $(el).wrap('<div class="cs-wrapper"></div>');
+            new SelectFx(el);
 
-            }
-        };
-    });
+        }
+    };
+});
 app.controller('ItemController', function(dataFactory,$scope,$http ,$rootScope , $location , $cookies, $localStorage,DTOptionsBuilder){
 	
 	if($rootScope.loggedInUser == false)
@@ -1434,9 +1432,9 @@ app.controller('ItemController', function(dataFactory,$scope,$http ,$rootScope ,
 
   $scope.totalItems = 0;
   $scope.pageChanged = function(newPage) {
-	  getResultsPage(newPage);
-  };
-  
+     getResultsPage(newPage);
+ };
+
   $scope.sortType     = 'title'; // set the default sort type
   $scope.sortReverse  = false;  // set the default sort order
   $scope.searchFish   = '';     // set the default search/filter term
@@ -1451,7 +1449,7 @@ app.controller('ItemController', function(dataFactory,$scope,$http ,$rootScope ,
 	//~ };
 	
 	$scope.dtOptions = {
-			
+
 		"destroy": true,
 		fixedHeader: true,
 		"scrollCollapse": true,
@@ -1470,62 +1468,62 @@ app.controller('ItemController', function(dataFactory,$scope,$http ,$rootScope ,
             $scope.data = data.data;
             $scope.totalItems = data.total;
             $scope.pageNumber = pageNumber;
-          });
-      }else{
-	    dataFactory.httpRequest(URL+'/items?page='+pageNumber).then(function(data) {
-		  $scope.data = data.data;
-          $scope.totalItems = data.total;
-          $scope.pageNumber = pageNumber;
         });
-      }
-  }
-
-	
-  $scope.searchDB = function(){
-      if($scope.searchText.length >= 3){
-          if($.isEmptyObject($scope.libraryTemp)){
-              $scope.libraryTemp = $scope.data;
-              $scope.totalItemsTemp = $scope.totalItems;
-              $scope.data = {};
-          }
-          getResultsPage(1);
       }else{
-		  if(! $.isEmptyObject($scope.libraryTemp)){
-			  $scope.data = $scope.libraryTemp ;
-              $scope.totalItems = $scope.totalItemsTemp;
-              $scope.libraryTemp = {};
-          }
+       dataFactory.httpRequest(URL+'/items?page='+pageNumber).then(function(data) {
+        $scope.data = data.data;
+        $scope.totalItems = data.total;
+        $scope.pageNumber = pageNumber;
+    });
+   }
+}
+
+
+$scope.searchDB = function(){
+  if($scope.searchText.length >= 3){
+      if($.isEmptyObject($scope.libraryTemp)){
+          $scope.libraryTemp = $scope.data;
+          $scope.totalItemsTemp = $scope.totalItems;
+          $scope.data = {};
       }
-  }
+      getResultsPage(1);
+  }else{
+    if(! $.isEmptyObject($scope.libraryTemp)){
+       $scope.data = $scope.libraryTemp ;
+       $scope.totalItems = $scope.totalItemsTemp;
+       $scope.libraryTemp = {};
+   }
+}
+}
 
-  $scope.saveAdd = function(){
-	 dataFactory.httpRequest('itemsCreate','POST',{},$scope.form).then(function(data) {
-	  $scope.data.push(data);
-      $(".modal").modal("hide");
-    });
-  }
+$scope.saveAdd = function(){
+  dataFactory.httpRequest('itemsCreate','POST',{},$scope.form).then(function(data) {
+     $scope.data.push(data);
+     $(".modal").modal("hide");
+ });
+}
 
-  $scope.edit = function(id){
-	  dataFactory.httpRequest('itemsEdit/'+id).then(function(data) {
-    	$scope.form = data;
-    });
-  }
+$scope.edit = function(id){
+ dataFactory.httpRequest('itemsEdit/'+id).then(function(data) {
+   $scope.form = data;
+});
+}
 
-  $scope.saveEdit = function(){
+$scope.saveEdit = function(){
     dataFactory.httpRequest('itemsUpdate/'+$scope.form.id,'PUT',{},$scope.form).then(function(data) {
-      	$(".modal").modal("hide");
-        $scope.data = apiModifyTable($scope.data,data.id,data);
-    });
-  }
+     $(".modal").modal("hide");
+     $scope.data = apiModifyTable($scope.data,data.id,data);
+ });
+}
 
-  $scope.remove = function(item,index){
+$scope.remove = function(item,index){
     var result = confirm("Are you sure delete this item?");
-   	if (result) {
+    if (result) {
       dataFactory.httpRequest('itemsDelete/'+item.id,'DELETE').then(function(data) {
           $scope.data.splice(index,1);
       });
-    }
   }
+}
 });
 
 
@@ -1556,7 +1554,7 @@ app.controller('ItemController', function(dataFactory,$scope,$http ,$rootScope ,
         timer(hello, 0);
       }
     }
-  }]);*/
+}]);*/
 
 
 

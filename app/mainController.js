@@ -1,12 +1,59 @@
-app.controller('mainController', function (dataFactory,$scope, $sce,$rootScope, $location, $http , $cookies, $state, $localStorage, $q, $timeout,$window, $compile) {
+app.controller('mainController', function (dataFactory,  PubNub, $scope, $sce,$rootScope, $location, $http , $cookies, $state, $localStorage, $q, $timeout,$window, $compile) {
 $rootScope.logoutmessage=false;
     $scope.login = {};
 	
 	$scope.trustAsHtml = function(value) {
         return $sce.trustAsHtml(value);
     };
+/*
+	$rootScope.record = deepstream.record.getRecord('deepstream/lisetnActivity');   
 
-   
+   $rootScope.record.subscribe("activity",function(value) {
+   	console.log("lisetnActivity");
+       $rootScope.getNotifications();
+        if( !$scope.$$phase ) {
+            $scope.$apply();
+        }
+    });*/
+	
+	$rootScope.notificationChannel = "notification";
+	PubNub.init({
+		publishKey: 'pub-c-f7a76c0e-01b3-42b8-be2d-769a2588a4e0',
+		subscribeKey: 'sub-c-d07294ba-1043-11e6-bb6c-02ee2ddab7fe',
+		//uuid: $rootScope.activeUser
+	});
+
+
+	//~~~~~~~~~~~~~~~~~~~~~~~ Pubnub Code ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	PubNub.ngSubscribe({ channel: $rootScope.notificationChannel });		
+	
+	if (typeof Notification !== 'undefined') {
+		Notification.requestPermission(function() {
+			if (Notification.permission === 'granted') {
+				// Now your page can send the user notifications!
+			}
+		});
+	}
+	// handle message events
+	$rootScope.$on(PubNub.ngMsgEv($rootScope.notificationChannel), function(event, payload) { 
+		console.log(payload);
+		if(payload.env[0][0].sender_uuid  != undefined && payload.env[0][0].sender_uuid != $rootScope.activeUser){
+			$rootScope.getNotifications();
+			if (Notification.permission === 'granted' && $scope.haveUnread > 0) {
+				console.log(payload);
+				var notification = new Notification('Yeah!', {
+					body: 'You got a new notification !!!' ,
+					tag: "",
+				});
+				notification.onclick = function(x) { parent.focus(); window.focus(); this.close(); };
+				notification.onshow = function() {
+					setTimeout(notification.close, 30000);
+				};
+				
+			}
+		}
+	});
+	//~~~~~~~~~~~~~~~~~~~~~~~ Pubnub Code ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     /**Fetching language values*/
 	$scope.ticketActivity   = []; 	//For activities in timeline tab of job ticket
 	$rootScope.languageArray = [];
@@ -34,9 +81,9 @@ $rootScope.logoutmessage=false;
         setTimeout(function() {
             $('#modalSlideLeft').modal('show');
         }, 50);
-        //if($scope.ureadCount > 0){
+        //if($rootScope.ureadCount > 0){
 	        dataFactory.httpRequest(URL + '/login/flagAsRead').then(function(data) {
-	        	$scope.ureadCount = data.ureadCount;
+	        	$rootScope.ureadCount = data.ureadCount;
 				$scope.notificationsList = [];
 	            $scope.notificationsList = data.notifications;
 	        });
@@ -55,7 +102,13 @@ $rootScope.logoutmessage=false;
 				$rootScope.showHeader = true;
 				$rootScope.showBackground = false;
 				$rootScope.loggedUserFirstName = $cookies.get('loggedUserFirstNameCookie');
+				
+				$rootScope.LastName = $cookies.get('LastName');
+				$rootScope.color = $cookies.get('color');
+
 				$rootScope.loggedUserRoleId = $cookies.get('loggedUserRoleId');
+				$rootScope.activeUser = $cookies.get('loggedUserId');
+				
 				$rootScope.profileImage = $cookies.get('profileImage');
 				if ( $rootScope.previousUrl != undefined && $rootScope.previousUrl != '' ) {
 					var prevUrl = $rootScope.previousUrl.split('#/');
@@ -66,6 +119,13 @@ $rootScope.logoutmessage=false;
 						$location.path('dashboard');
 				}
 				$rootScope.previousUrl = ''; 
+
+				
+				
+
+
+
+
 				
 			} else {
 				if ( currentState != 'login') 
@@ -82,7 +142,8 @@ $rootScope.logoutmessage=false;
 
 	$rootScope.getNotifications = function(){
 		dataFactory.httpRequest(URL + '/login/getNotifications').then(function(data) {
-			$scope.ureadCount = data.ureadCount;
+			$rootScope.ureadCount    = (data.ureadCount > 99) ? "99+" : data.ureadCount;
+			$scope.haveUnread        = data.ureadCount;
 			$scope.notificationsList = [];
             $scope.notificationsList = data.notifications;
             $scope.haveNotifications = data.notifications.length;
@@ -505,6 +566,7 @@ $rootScope.logoutmessage=false;
 			$cookies.remove("_globalDropdown");
 			$cookies.remove("_gDateRange");
 			$cookies.remove("printTicket");
+			PubNub.ngUnsubscribe({channel:$rootScope.channel})
 		}
 
 		$rootScope.selectCommoditySuggestion = function(suggestion){
@@ -841,9 +903,12 @@ $rootScope.logoutmessage=false;
 						} else {
 							$rootScope.setDeadMilePage = 1;				// setting default value for iteration page for deadmiles check
 						}
+						$rootScope.vehicleIdRepeat = $rootScope.iterationVehicleId;
 					} else {
 						$rootScope.vehicleIdRepeat = splitedArray[6];
 					}								
+				} else {
+					$rootScope.vehicleIdRepeat = '';
 				} 
 				
 				var driverType = "driver";
@@ -1079,19 +1144,24 @@ $rootScope.logoutmessage=false;
 						}
 						
 						$rootScope.listDrivers = data.driversList;
-						
+
+						nameChunks = $rootScope.editSavedLoad.assignedDriverName.split(' ');
+						$rootScope.avatarText 		= nameChunks[0].charAt(0) + nameChunks[1].charAt(0);
+
 						$rootScope.driverPlaceholder = ($rootScope.editSavedLoad.assignedDriverName != null && $rootScope.editSavedLoad.assignedDriverName != '' ) ? $rootScope.editSavedLoad.assignedDriverName : 'Unassign';
 						/** Three dropdowns on edit page use */
 						$rootScope.driver_idName = ($rootScope.editSavedLoad.driver_id != undefined && $rootScope.editSavedLoad.driver_id != 0 ) ? $rootScope.editSavedLoad.assigedDriverFullName : 'Select Driver';
 						$rootScope.dispatcher_idName = ($rootScope.editSavedLoad.dispatcher_id != undefined && $rootScope.editSavedLoad.dispatcher_id != 0 ) ? $rootScope.editSavedLoad.username: 'Select Dispatcher';
 						$rootScope.vehicle_idName = ($rootScope.editSavedLoad.vehicle_id != undefined && $rootScope.editSavedLoad.vehicle_id != 0 ) ? $rootScope.editSavedLoad.assignedTruckLabel: 'Select Vehicle';
 						
-						$rootScope.dispatchersList = [];
-						$rootScope.vehiclesList = [];
-						$rootScope.driversListNew = [];
-						$rootScope.dispatchersList = data.dispatchersList;
-						$rootScope.vehiclesList = data.vehiclesList;
-						$rootScope.driversListNew = data.driversListNew;
+						$rootScope.dispatchersList 	= [];
+						$rootScope.vehiclesList 	= [];
+						$rootScope.driversListNew 	= [];
+						$rootScope.dispatchersList 	= data.dispatchersList;
+						$rootScope.vehiclesList 	= data.vehiclesList;
+						$rootScope.driversListNew 	= data.driversListNew;
+						
+						$rootScope.avatarBackground = $rootScope.editSavedLoad.color;
 						/** Three dropdowns on edit page use */
 						
 						//----------drop-down ---------------------------
@@ -1314,7 +1384,7 @@ $rootScope.logoutmessage=false;
 				});
 			}
 			$rootScope.disableAnotherDropdowns = true;
-					
+				
 		} else {
 			$rootScope.editSavedLoad.driver_id = item.id;
 			$rootScope.driverPlaceholder = item.driverName;
@@ -1323,7 +1393,7 @@ $rootScope.logoutmessage=false;
 			
 			dataFactory.httpRequest(URL+'/truckstop/assignTruckToDriver/'+item.id,'POST',{},{allData : $rootScope.editSavedLoad,driverAssignType:$rootScope.driverAssignType}).then(function(dataRes) {
 				if ( dataRes ) {
-
+					
 					$rootScope.vehicleInfo = dataRes.vehicleDetail;
 					if(item.label == "_team"){
 						$rootScope.vehicleInfo.dName = dataRes.vehicleDetail.driverName;
@@ -1343,9 +1413,13 @@ $rootScope.logoutmessage=false;
 						
 					$rootScope.vehicleDriverFound = true;
 					
-					$rootScope.globalVehicleId = dataRes.vehicleDetail.assignedVehicleId; 			// for billing load
-					$rootScope.selectedVehicleId = dataRes.vehicleDetail.assignedVehicleId; 			// for truckstop controller load
-					$rootScope.vehicleIdSelected = dataRes.vehicleDetail.assignedVehicleId; 			// for assigned loads controller and iterationsLoads controller
+					$rootScope.globalVehicleId 		= dataRes.vehicleDetail.assignedVehicleId; 			// for billing load
+					$rootScope.selectedVehicleId 	= dataRes.vehicleDetail.assignedVehicleId; 			// for truckstop controller load
+					$rootScope.vehicleIdSelected 	= dataRes.vehicleDetail.assignedVehicleId; 			// for assigned loads controller and iterationsLoads controller
+					
+					$rootScope.avatarText = dataRes.vehicleDetail.first_name.charAt(0) + dataRes.vehicleDetail.last_name.charAt(0);
+					
+					$rootScope.avatarBackground = $rootScope.vehicleDetail.color;
 					
 					if ( parameter == 'addRequest' ) {   // for adding new Load
 						$rootScope.setAddVehicleId = dataRes.vehicleDetail.assignedVehicleId;   
@@ -1367,11 +1441,10 @@ $rootScope.logoutmessage=false;
 					} else {
 						$rootScope.alertExceedMsg = false;
 					}
-					
 				}
 			});
-			$rootScope.disableAnotherDropdowns = false;
-			
+
+			$rootScope.disableAnotherDropdowns = false;			
 			$rootScope.driverAssignValue = $rootScope.languageCommonVariables.assigned;
 		}
 	}
@@ -2274,9 +2347,10 @@ $rootScope.logoutmessage=false;
 								$rootScope.defaultDriverImage = true;
 						}
 						
-						$rootScope.listDrivers = data.driversList;
-						$rootScope.driverPlaceholder = $rootScope.editSavedLoad.assignedDriverName;
+						$rootScope.listDrivers 		= data.driversList;
+						$rootScope.driverPlaceholder= $rootScope.editSavedLoad.assignedDriverName;
 							
+						
 						$rootScope.rateSheetUploaded = data.rateSheetUploaded;		
 						//----------drop-down ---------------------------
 						$rootScope.jobPlaceholder = $rootScope.editSavedLoad.JobStatus;
@@ -2641,6 +2715,7 @@ $rootScope.logoutmessage=false;
 							
 			if ( addPrimaryId != '' && addPrimaryId != undefined ) {
 				dataFactory.httpRequest(URL+'/truckstop/saveBrokerShipperInfo/'+addPrimaryId+'/'+type,'POST',{},{ loadRecords : postData }).then(function(data) {
+
 					if ( data.success == true ) {
 						$rootScope.alertloadmsg = true;
 						$rootScope.alertExceedMsg = false;
@@ -2716,6 +2791,7 @@ $rootScope.logoutmessage=false;
 			$scope.autoFetchLoads = true;
 			if ( loadId != '' && loadId != undefined ) {
 				dataFactory.httpRequest(URL+'/truckstop/save_trip_details/'+0+'/'+loadId+'/'+tripDetailId,'POST',{},{jobRecords: $rootScope.editSavedLoad, jobPrimary: loadId, vehicleId : $rootScope.editSavedLoad.vehicle_id, truckDetailsInfo: $scope.matchedTruckData ,extraStops : $rootScope.extraStops, loadRequest : 'addRequest',driverAssignType:$rootScope.driverAssignType,srcPage:$rootScope.srcPage  }).then(function(data) {
+					PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
 					$rootScope.Message = $rootScope.languageCommonVariables.LoadSavedSuccMsg;
 					$rootScope.alertloadmsg = true;
 					$rootScope.alertExceedMsg = false;
@@ -2920,7 +2996,8 @@ $rootScope.logoutmessage=false;
 			
 			$rootScope.editedItem = {};
 			dataFactory.httpRequest(URL+'/truckstop/edit_live/'+$rootScope.primaryLoadId+'/'+saveType,'POST',{},{jobRecords: $rootScope.editSavedLoad, jobPrimary: $rootScope.primaryLoadId, jobDistance: $rootScope.editSavedDist, vehicleId : $rootScope.vehicleIdRepeat, extraStops : $rootScope.extraStops, timeStorage : $rootScope.tempstorage,  loadSource : $scope.loadSource,driverAssignType : $rootScope.driverAssignType, vehicleDriverFlag : $rootScope.setVehicleIdFlag, srcPage: srcPage}).then(function(data){
-			
+				PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
+				
 				$rootScope.alertloadmsg = false;
 				if ( data.refStatus != undefined && data.refStatus == false ) {
 					angular.element($('#edit-fetched-load')).animate({ scrollTop: 0 }, 'slow');
@@ -2939,7 +3016,7 @@ $rootScope.logoutmessage=false;
 				} else {
 					
 					if(from == 'statusChange') {
-						if ( $rootScope.editSavedLoad.JobStatus != undefined  && $rootScope.editSavedLoad.JobStatus != '' ) 
+						if ( $rootScope.editSavedLoad.JoabStatus != undefined  && $rootScope.editSavedLoad.JobStatus != '' ) 
 							statusmsgValue = $rootScope.languageCommonVariables[$rootScope.editSavedLoad.JobStatus];				
 						else
 							statusmsgValue = $rootScope.languageCommonVariables['noStatusValue'];				// status message to show success message on status change.
@@ -3116,6 +3193,8 @@ $rootScope.logoutmessage=false;
 			$scope.autoFetchLoads = true;
 			if ( truckstopId != '' && truckstopId != undefined ) {
 				dataFactory.httpRequest(URL+'/truckstop/save_trip_details/'+truckstopId+'/'+loadId+'/'+tripDetailId,'POST',{},{jobRecords: $rootScope.editSavedLoad, jobPrimary: $rootScope.primaryLoadId,  vehicleId : $rootScope.vehicleIdRepeat, truckDetailsInfo: $scope.matchedTruckData ,extraStops : $rootScope.extraStops,driverAssignType:$rootScope.driverAssignType,srcPage:$rootScope.srcPage }).then(function(data) {
+					PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
+					
 					$rootScope.Message = $rootScope.languageCommonVariables.LoadSavedSuccMsg;
 					$rootScope.alertloadmsg = true;
 					$rootScope.alertExceedMsg = false;
@@ -3549,6 +3628,7 @@ $rootScope.logoutmessage=false;
 			formData.append("srcPage", $rootScope.srcPage);
 		},
 		success:function(file,response){
+			PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
 			file.previewElement.classList.add("dz-success");
 			if(!response.error){ // succeeded
 				this.removeFile(file);
@@ -3666,6 +3746,7 @@ $rootScope.logoutmessage=false;
 			
 			if ( loadId != '' && loadId != undefined ) {
 				dataFactory.httpRequest(URL+'/truckstop/deleteDocument','POST',{},{loadId:loadId,docId:id,filename:filename,doc_type:doc_type,assignedBrokeId : assignedBrokerId,srcPage:$rootScope.srcPage,bloadId:$rootScope.primaryLoadId}).then(function(data){
+					PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
 					$rootScope.alertExceedMsg = false;
 					if ( doc_type == 'broker' ) {
 						$scope.brokerDocuments = data.result.brokerDocuments;
@@ -3843,6 +3924,8 @@ $rootScope.logoutmessage=false;
 		
 		$scope.autoFetchLoads = true;
 		dataFactory.httpRequest(URL+'/assignedloads/generateInvoice/'+loadId+'/'+$rootScope.saveTypeLoad+'/'+$rootScope.srcPage).then(function(data){
+			PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
+
 			if ( data.showError == 1 && data.showError != undefined ) {
 				$rootScope.alertloadmsg = false;
 				$rootScope.alertExceedMsg = true;
@@ -3877,6 +3960,8 @@ $rootScope.logoutmessage=false;
 			formData.append("srcPage", $rootScope.srcPage);
 		},
 		success:function(file,response){
+			PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
+
 			$rootScope.alertloadmsg = true;
 			$rootScope.Message = $rootScope.languageArray.rateSheetSuccMsg;
 			$rootScope.uploadRateSheetDoc = false;
@@ -3918,6 +4003,7 @@ $rootScope.logoutmessage=false;
 			formData.append("srcPage", $rootScope.srcPage);
 		},
 		success:function(file,response){
+			PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
 			$rootScope.alertloadmsg = true;
 			$rootScope.Message = $rootScope.languageArray.podSuccMsg;
 			$rootScope.uploadPODDoc = false;
@@ -3960,6 +4046,7 @@ $rootScope.logoutmessage=false;
 			formData.append("srcPage", $rootScope.srcPage);
 		},
 		success:function(file,response){
+			PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
 			$rootScope.alertloadmsg = true;
 			$rootScope.alertExceedMsg = false;
 			$rootScope.Message = 'Success: The broker document has been uploaded successfully.';
@@ -4130,3 +4217,18 @@ app.filter('thighlight', function($sce) {
 	return $sce.trustAsHtml(text)
     }
 });
+
+// app.directive('errSrc', function() {
+// return {
+//     link: function(scope, element, attrs) {
+// 	scope.$watch(function() {
+//           return attrs['ngSrc'];
+//         }, function (value) {
+//           if (!value) {
+//           	element.attr('style', 'display:none');
+//           	element.next('.text-image').addClass('show');  
+//           }
+//       });
+//     }
+//   }
+// });

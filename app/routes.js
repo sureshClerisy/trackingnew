@@ -11,6 +11,7 @@ var app = angular.module('app',['gantt','gantt.table','gantt.tooltips','signatur
     'gantt.groups',
     'gantt.overlap',
     'gantt.resizeSensor',*/
+    "pubnub.angular.service",
 	'angularUtils.directives.dirPagination','ngCookies','ui.router','ngStorage','jQueryScrollbar','ui.utils',
     'oc.lazyLoad','datatables','ngSanitize','ui.select','angular-sortable-view','dcbImgFallback']);
     

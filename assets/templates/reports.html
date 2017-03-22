@@ -54,19 +54,27 @@
               <form ng-show="report.name == 'breadcrumb_detail'"> 
                 <div class="report-filter">
                   <h2>Scope</h2>
+                  
+
+
+
                   <div class="drange-block" style="position:relative;z-index:999">
                     <div class="data-range filter-range">
-                      <span>Select Vehicles: </span>
-                      <div class="date-wrapper">
-                        <button type="button" ng-click="toggleSelectVehicles('none')" class="btn btn-info">Select None</button>
+                      <div class="outer-range-block">
+                          <span>Select Vehicles: </span>
+                          <div class="date-wrapper">
+                           
+                            <ui-select multiple ng-model="formFilter.vehicles" class="multiSelect multi-select" theme="select2" required>
+                              <ui-select-match class="ui-select-match">{{$item.truck}}</ui-select-match>
+                                <ui-select-choices class="ui-select-choices" repeat="vehicle in vehicles | filter: $select.search">
+                                  {{vehicle.truck}}
+                                </ui-select-choices>
+                            </ui-select>
+
+                            </div>
+                          </div>
+                       <button type="button" ng-click="toggleSelectVehicles('none')" class="btn btn-info">Select None</button>
                         <button type="button" ng-click="toggleSelectVehicles('all')" class="btn btn-info">Select All</button>
-                        <ui-select multiple ng-model="formFilter.vehicles" class="multiSelect multi-select" theme="select2" required>
-                          <ui-select-match class="ui-select-match" placeholder="Select vehicles...">{{$item.truck}}</ui-select-match>
-                            <ui-select-choices class="ui-select-choices" repeat="vehicle in vehicles | filter: $select.search">
-                              {{vehicle.truck}}
-                            </ui-select-choices>
-                        </ui-select>
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -113,17 +121,21 @@
                   <h2>Filters and Options</h2>
                   <div class="drange-block">
                     <div class="data-range filter-range">
-                      <span>Filters On Status: </span>
-                      <div class="date-wrapper">
-                        <button type="button" ng-click="toggleSelectStatus('none',report.name)" class="btn btn-info">Select None</button>
-                        <button type="button" ng-click="toggleSelectStatus('all', report.name)" class="btn btn-info">Select All</button>
-                        <ui-select multiple ng-model="formFilter.vStatus" class="multiSelect multi-select" theme="select2" required>
-                          <ui-select-match class="ui-select-match" placeholder="Select status...">{{$item.label}}</ui-select-match>
-                            <ui-select-choices class="ui-select-choices" repeat="status in vStatus | filter: $select.search">
-                              {{status.label}}
-                            </ui-select-choices>
-                        </ui-select>
-                      </div>
+                      <div class="outer-range-block">
+                        <span>Filters On Status: </span>
+                        <div class="date-wrapper">
+                          
+                          <ui-select multiple ng-model="formFilter.vStatus" class="multiSelect multi-select" theme="select2" required>
+                            <ui-select-match class="ui-select-match">{{$item.label}}</ui-select-match>
+                              <ui-select-choices class="ui-select-choices" repeat="status in vStatus | filter: $select.search">
+                                {{status.label}}
+                              </ui-select-choices>
+                          </ui-select>
+                        </div>
+
+                        </div>
+                         <button type="button" ng-click="toggleSelectStatus('none',report.name)" class="btn btn-info">Select None</button>
+                          <button type="button" ng-click="toggleSelectStatus('all', report.name)" class="btn btn-info">Select All</button>
                     </div>
                     <div class="checkbox check-success latlng-check "   >
                       <input id = "includeLatLng" ng-model="formFilter.includeLatLong" type="checkbox">
@@ -262,7 +274,7 @@
             </div>
             <div class="loadtable rtable" id="report-table" ng-if="showLoadWOPagination == false">
               <div class="table-scroll-custom">
-                <table width="100%" class=" report-table fixed-thead table table-striped" cell-padding="0" cell-spacing="0" ng-show="report.name == 'breadcrumb_detail'" style=" z-index: 999; position: relative;">
+                <table width="100%" class=" report-table fixed-thead table table-striped" cell-padding="0" cell-spacing="0" ng-show="report.name == 'breadcrumb_detail'" style="position: relative;">
                   <thead>
                     <tr>
                       <th><a href="javascript:void(0)" >Vehicle ID</a> </th>

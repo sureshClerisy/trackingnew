@@ -414,9 +414,6 @@
 												<i class="fa fa-cloud-upload"></i> 
 												<span class="bold">{{languageCommonVariables.uploadRateSheet}}</span>
 											</button>
-
-											
-										
 									</div>
 									
 								<div class="popup-load-detail-inner detail-inner-dsp">
@@ -429,7 +426,9 @@
 											<span>
 												<figure class="driver-image">
 													<!--img ng-src="./pages/images/user.png" ng-if="defaultDriverImage == true"-->
-												<img ng-src="./assets/uploads/drivers/thumbnail/{{vehicleInfo.profile_image}}" fallback-src="./pages/img/user.png">
+												<img src="./assets/uploads/drivers/thumbnail/{{vehicleInfo.profile_image}}" onerror="this.style.display = 'none'">
+												<span class="text-image hide-1" style="background: {{vehicleInfo.color}}">{{avatarText}}</span>
+
 												</figure>{{ languageCommonVariables.truckdrivername }}
 											</span>
 											<p>{{ driverPlaceholder }} </p>
@@ -438,7 +437,7 @@
 
 											<span>
 												<figure class="truck-image">
-													<img ng-src="./assets/uploads/vehicles/thumbnail/{{vehicleInfo.vehicle_image}}" fallback-src="pages/img/map-truck.png" >
+													<img src="./assets/uploads/vehicles/thumbnail/{{vehicleInfo.vehicle_image}}" fallback-src="pages/img/map-truck.png">
 												</figure>
 												{{ languageCommonVariables.truckNumber }} 
 											</span>
@@ -1486,8 +1485,8 @@
 						</div>
 						
 						<div class="popup-inner-content-main" ng-show="showhighlighted == 'timeline'">
-							<div class="col-xs-12">
-								<input ng-show="haveActivities == 'yes'" type="text" placeholder="Search" ng-model="search.text"><br><br>
+							<div class="col-xs-12 modals-search-timeline">
+								<i class="pg-search"></i><input ng-show="haveActivities == 'yes'" type="text" placeholder="Timeline Search" ng-model="search.text"><br><br>
 								<div class="timeline-tab bg-master-lighter"  ng-show="haveActivities == 'yes'" data-jquery-scrollbar="jqueryScrollbarOptions">
 								    <div class="timeline-container top-circle">
 								        <section class="timeline">
@@ -1501,8 +1500,8 @@
 								                        <!-- <div class="circle" data-toggle="tooltip" title="Label" data-container="body">
 								                        </div> -->
 								                        <div class="card-header clearfix">
-								                            <div class="user-pic ">
-								                                <img ng-show="activity.profile_image != null && activity!= ''" alt="Profile Image" width="33" height="33" ui-jq="unveil"  src="assets/uploads/users/{{activity.profile_image}}" />
+								                            <div class="user-pic " style="background: {{activity.color}}">
+								                                <img ng-show="activity.profile_image != null && activity!= ''" alt="Profile Image" width="33" height="33" ui-jq="unveil"  src="assets/uploads/users/{{activity.profile_image}}" onerror="this.style.display = 'none'" />
 																<span ng-show="activity.profile_image == null || activity == ''">{{activity.userIntial}}</span>
 																
 								                            </div>

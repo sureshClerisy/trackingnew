@@ -1,4 +1,4 @@
-app.controller('trailersController', function(dataFactory,$scope, $rootScope , $location , $cookies, $localStorage, getTrailersListing){
+app.controller('trailersController', function(dataFactory,$scope, PubNub, $rootScope , $location , $cookies, $localStorage, getTrailersListing){
 	
 	if($rootScope.loggedInUser == false)
 		$location.path('login');
@@ -61,10 +61,11 @@ app.controller('trailersController', function(dataFactory,$scope, $rootScope , $
 		angular.element("#vehicle-list-status").modal('show');
 	}
 	
-	$scope.confirmVehicleStatus = function( confirm) {
+	$scope.confirmVehicleStatus = function( confirm ) {
 		$scope.Message = '';
 		if(confirm == 'yes'){
 			dataFactory.httpRequest(URL+'/trailers/changeStatus/'+$scope.trailerId+'/'+$scope.Status).then(function(data) {
+				PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
 				angular.copy(data.rows, $scope.trailers[$scope.statusIndex]);
 				if ( data.status == true ) {
 					$scope.Message = $rootScope.languageArray.trailerStatusMsg;
@@ -149,6 +150,7 @@ app.controller('addEditTrailerController', function(dataFactory, getAddTrailerDa
 			formData.append("trailerId", $scope.lastAddedTrailer);
 		},
 		success:function(file,response){
+			PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
 			file.previewElement.classList.add("dz-success");
 			if(!response.error){ // succeeded
 				this.removeFile(file);
@@ -176,6 +178,7 @@ app.controller('addEditTrailerController', function(dataFactory, getAddTrailerDa
 				formData.append("trailerId", $scope.editTrailerId);
 			},
 			success:function(file,response){
+				PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
 				file.previewElement.classList.add("dz-success");
 				if(!response.error){ // succeeded
 					this.removeFile(file);
@@ -194,6 +197,7 @@ app.controller('addEditTrailerController', function(dataFactory, getAddTrailerDa
 	
 	$scope.saveTrailer = function(submitType){
 		dataFactory.httpRequest(URL+'/trailers/addEditTrailer/'+submitType,'POST',{},$scope.trailerData).then(function(data) {
+			PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
 			if ( data.success == true ) {
 				if ( submitType == 'add') {
 
@@ -254,6 +258,7 @@ app.controller('addEditTrailerController', function(dataFactory, getAddTrailerDa
 	$rootScope.confirmCommonDocumentStatus = function(confirm){
 		if(confirm=='yes'){
 		dataFactory.httpRequest(URL + '/trailers/deleteContractDocs/'+$scope.docId+"/"+$scope.documentName).then(function(data) {
+			PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
 			if(data.success == true) {
 				$scope.trailerDocs.splice($scope.documentIndex,1);
 			}

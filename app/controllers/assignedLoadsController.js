@@ -1,4 +1,4 @@
-app.controller('assignedLoadsController', ["dataFactory","$scope","$http","$rootScope", "$state","$location","$cookies","$stateParams", "$localStorage", "getAllAssignedLoads","$compile","$filter","$log","ganttUtils",'GanttObjectModel', 'Sample', 'ganttMouseOffset', 'ganttDebounce', 'moment','$q','$window','$sce','$timeout','DTOptionsBuilder',function(dataFactory,$scope,$http ,$rootScope ,$state, $location ,  $cookies, $stateParams, $localStorage, getAllAssignedLoads , $compile,$filter,$log,utils, ObjectModel, Sample, mouseOffset, debounce, moment,$q,$window,$sce,$timeout,DTOptionsBuilder){
+app.controller('assignedLoadsController', ["dataFactory","$scope", "PubNub", "$http","$rootScope", "$state","$location","$cookies","$stateParams", "$localStorage", "getAllAssignedLoads","$compile","$filter","$log","ganttUtils",'GanttObjectModel', 'Sample', 'ganttMouseOffset', 'ganttDebounce', 'moment','$q','$window','$sce','$timeout','DTOptionsBuilder',function(dataFactory,$scope, PubNub, $http ,$rootScope ,$state, $location ,  $cookies, $stateParams, $localStorage, getAllAssignedLoads , $compile,$filter,$log,utils, ObjectModel, Sample, mouseOffset, debounce, moment,$q,$window,$sce,$timeout,DTOptionsBuilder){
 	if($rootScope.loggedInUser == false)
 		$location.path('login');
 	
@@ -86,7 +86,7 @@ app.controller('assignedLoadsController', ["dataFactory","$scope","$http","$root
 	$rootScope.selectedVehicleId = ($rootScope.vehicleIdRepeat != undefined && $rootScope.vehicleIdRepeat != '' ) ? $rootScope.vehicleIdRepeat.toString() : '';
 	$scope.deletedRowIndex = '';
 	
-	$scope.noRecordFoundMessage = $rootScope.languageArray.noRecordFound;
+	$scope.noRecordFoundMessage = $rootScope.languageCommonVariables.noRecordFound;
 	$rootScope.saveTypeLoad = 'assignedLoads';    			// setting the save type for dynamic changing the listing on routes
 	$scope.loadSource = getAllAssignedLoads.loadSource; 			// setting load source for getting loads listing
 	
@@ -501,6 +501,7 @@ app.controller('assignedLoadsController', ["dataFactory","$scope","$http","$root
 			var index  = angular.element("#confirm-delete").data("index");
 			if ( loadId != '' && loadId != undefined ) {
 				dataFactory.httpRequest('assignedloads/deleteAssignedLoad/'+loadId+'/'+$rootScope.srcPage).then(function(data) {
+					PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
 					if ( data.success == true ) {
 						$rootScope.alertdeletemsg = true;
 						$rootScope.Message = $rootScope.languageArray.LoadDeleteSuccMsg;

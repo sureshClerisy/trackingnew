@@ -1142,13 +1142,19 @@ class Iterationloads extends Admin_Controller{
 		}
 
 		$driverVehicleInfoArray = $this->getDriverVehicleInfo( $vehicleID); //For Driver Name
-		
+		$result = $this->Vehicle->getLastLoadRecord( $vehicleID);
+
 		$deadMilesOriginLocation =  '';
 		if ( isset($obj['args']['multiOrigins']) && !empty($obj['args']['multiOrigins']) ) {
 			$searchFromMultiOrigins = $obj['args']['multiOrigins'];
 			$this->origin_city = '';
 			$this->origin_state = implode(',',$searchFromMultiOrigins);
 			$country = strtolower($obj['args']['origin_country']) == strtolower("Canada") ? "CAN" : $obj["args"]['origin_country'];
+			if ( !empty($result) ) {
+				$deadMilesOriginLocation = $result['DestinationCity'].','.$result['DestinationState'].','.$result['DestinationCountry'];
+			} else {
+				$deadMilesOriginLocation = $driverVehicleInfoArray[0].','.$driverVehicleInfoArray[1].',USA';
+			}
 		} else {
 			$searchFrom = $obj['args']['searchFrom'];
 			$searchBuffer = explode(",", $searchFrom);
@@ -1158,7 +1164,14 @@ class Iterationloads extends Admin_Controller{
 			$deadMilesOriginLocation = $obj['args']['searchFrom'];
 		}
 		
-		$tableTitle = $driverVehicleInfoArray[5].'-'.$this->origin_city.'-'.$this->origin_state;
+		$searchingFrom  = $this->origin_city.'-'.$this->origin_state;
+		$searchingFrom  = trim($searchingFrom,'-');
+
+		if ( !empty($result) ) {
+			$tableTitle = $driverVehicleInfoArray[5].'-'.$result['DestinationCity'].'-'.$result['DestinationState'].' ( Search From : '.$searchingFrom.')';
+		} else {
+			$tableTitle = $driverVehicleInfoArray[4].' ( Search From : '.$searchingFrom.')';
+		}
 
 		$dateTime = array ();
 		if ( $pickupDateDest != ''  ) {

@@ -432,6 +432,29 @@ class Vehicle extends Parent_Model
         }
     }
 	
+
+    /**
+    * Fetching vehicle information for iteration page
+    */
+
+    public function getVehicleInfoForIteration($vehicleId = null ) {
+        $this->db->select('case vehicles.driver_type
+                when "team" then concat(drivers.first_name," + ",team.first_name)
+                ELSE concat(drivers.first_name," ",drivers.last_name)
+            end as driverName, label,vehicle_type,cargo_capacity,cargo_bay_l,cargo_bay_w,fuel_consumption,vehicles.vehicle_image,drivers.profile_image,drivers.color,trailers.unit_id, users.username, users.id as dispatcherId,vehicles.driver_id,vehicles.team_driver_id,driver_type');
+        $this->db->join('drivers', 'drivers.id = vehicles.driver_id');       
+        $this->db->join('drivers as team','team.id = vehicles.driver_id','left');
+        $this->db->join('trailers', 'trailers.truck_id = vehicles.id','LEFT');
+        $this->db->join('users', 'drivers.user_id = users.id','LEFT');
+        $this->db->where('vehicles.id',$vehicleId);
+        $result = $this->db->get('vehicles');
+        if ( $result->num_rows() > 0 ) {
+            return $result->row_array();
+        } else {
+            return array();
+        }
+
+    }
 	/**
 	 *  Assigning Truck to driver on load detail
 	 */
@@ -443,7 +466,7 @@ class Vehicle extends Parent_Model
             $addFilter .= " CONCAT( drivers.first_name ,' + ' ,team.first_name, ' - ',vehicles.label) AS driverName , ";
             $addFilter .= " CONCAT( drivers.first_name ,' + ' ,team.first_name) AS assignedTeamName , ";
         }
-		$this->db->select($addFilter.'  concat( drivers.first_name, " ", `drivers`.`last_name`, " - ",vehicles.label ) as dName,users.username, concat( drivers.first_name, " ", `drivers`.`last_name`) as assignedDrivername, concat( "Truck - ", vehicles.label) as assignedVehicleName, ,drivers.user_id as dispatcher_id,drivers.id,label,vehicle_type,cargo_capacity,cargo_bay_l,cargo_bay_w,drivers.first_name,drivers.last_name,fuel_consumption,driver_id,team_driver_id,vehicles.vehicle_image,drivers.profile_image,vehicles.id as assignedVehicleId,trailers.unit_id,trailers.id as trailerId');
+		$this->db->select($addFilter.'  concat( drivers.first_name, " ", `drivers`.`last_name`, " - ",vehicles.label ) as dName,users.username, concat( drivers.first_name, " ", `drivers`.`last_name`) as assignedDrivername, concat( "Truck - ", vehicles.label) as assignedVehicleName, ,drivers.user_id as dispatcher_id,drivers.id,label,vehicle_type,cargo_capacity,cargo_bay_l,cargo_bay_w,drivers.first_name,drivers.color,drivers.last_name,fuel_consumption,driver_id,team_driver_id,vehicles.vehicle_image,drivers.profile_image,vehicles.id as assignedVehicleId,trailers.unit_id,trailers.id as trailerId');
 		$this->db->join('vehicles', 'vehicles.driver_id = drivers.id','LEFT');
 		$this->db->join('trailers', 'trailers.truck_id = vehicles.id','LEFT');
 		$this->db->join('users', 'users.id = drivers.user_id','LEFT');

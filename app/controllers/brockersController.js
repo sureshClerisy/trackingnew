@@ -1,4 +1,4 @@
-app.controller('brokersController', function(dataFactory,$scope,$http ,$rootScope , $location , $cookies, $localStorage,getBrokersListing,$timeout){
+app.controller('brokersController', function(dataFactory,$scope, PubNub ,$http ,$rootScope , $location , $cookies, $localStorage,getBrokersListing,$timeout){
 	if($rootScope.loggedInUser == false)
 		$location.path('login');
 	$rootScope.showHeader = true;
@@ -34,6 +34,7 @@ app.controller('brokersController', function(dataFactory,$scope,$http ,$rootScop
 			var index  = angular.element("#confirm-delete").data("index");
 			if ( brokerid != '' && brokerid != undefined ) {
 				dataFactory.httpRequest(URL + '/brokers/delete/'+brokerid).then(function(data) {
+					PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
 		 		    if ( data.success == true ) {
 						$scope.brokerdeleteMessage = $rootScope.languageArray.brokerDeleteSuccMsg;
 						$scope.alertdeletemsg = true;
@@ -63,6 +64,7 @@ app.controller('brokersController', function(dataFactory,$scope,$http ,$rootScop
 	$scope.confirmBlackList = function(confirm){
 		if(confirm == 'yes'){
 			dataFactory.httpRequest(URL + '/brokers/blackListBroker/'+$scope.blBrokerId+'/'+$scope.blStatus).then(function(data) {
+				PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
 				angular.copy(data.records.brokerData, $scope.data[$scope.blIndex]);
 				if ( data.status == true ) {
 					$scope.brokerdeleteMessage = $rootScope.languageArray.brokerBlackListUpdate;
@@ -115,6 +117,7 @@ app.controller('editBrokersController', function(dataFactory,getBrokersData, $sc
 			formData.append("brokerId", $scope.editedBrokerId);
 		},
 		success:function(file,response){
+			PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
 			file.previewElement.classList.add("dz-success");
 			if(!response.error){ // succeeded
 				this.removeFile(file);
@@ -135,6 +138,7 @@ app.controller('editBrokersController', function(dataFactory,getBrokersData, $sc
 	$scope.saveBroker = function(){
 		$scope.brokersData.rating = $scope.changedRating;
 		dataFactory.httpRequest(URL + '/brokers/update/'+$scope.brokersData.id,'POST',{},$scope.brokersData).then(function(data) {
+			PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
 			if ( data.success == true ) {
 				$rootScope.brokerEditMessage = $rootScope.languageArray.brokerUpdatedSuccMsg;
 				//~ $scope.dropzone.processQueue();
@@ -161,7 +165,8 @@ app.controller('editBrokersController', function(dataFactory,getBrokersData, $sc
 
 	$rootScope.confirmCommonDocumentStatus = function(confirm){
 		if(confirm == 'yes'){
-			dataFactory.httpRequest(URL + '/brokers/deleteContractDocs/'+$scope.docId+"/"+$scope.documentName).then(function(data) {
+			dataFactory.httpRequest(URL + '/brokers/deleteContractDocs/'+$scope.docId+"/"+$scope.documentName+"/"+$rootScope.srcPage).then(function(data) {
+				PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
 				if(data.success == true) {
 					$scope.brokerDocs.splice($scope.documentIndex,1);
 				}
@@ -199,6 +204,7 @@ app.controller('addBrokersController', function(dataFactory,$scope,$http ,$rootS
 			formData.append("srcPage", $rootScope.srcPage);
 		},
 		success:function(file,response){
+			PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
 			file.previewElement.classList.add("dz-success");
 			if(!response.error){ // succeeded
 				this.removeFile(file);
@@ -217,6 +223,7 @@ app.controller('addBrokersController', function(dataFactory,$scope,$http ,$rootS
 	
 	$scope.addBroker = function(){
 		dataFactory.httpRequest(URL + '/brokers/addBroker/','POST',{},{data:$scope.addBrokersData,srcPage:$rootScope.srcPage}).then(function(data) {
+			PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
 			if ( data.success == true ) {
 				if(data.update == true){
 					$rootScope.brokerEditMessage = $rootScope.languageArray.brokerExistingSuccMsg;	

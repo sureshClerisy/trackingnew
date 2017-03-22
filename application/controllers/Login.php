@@ -21,7 +21,19 @@ class Login extends CI_Controller {
 		$data = array();
 		if( $this->User->check_admin_credentials($username, $password) == true ) {
 			$profile_img = $this->User->user_Profile($this->session->userdata('loggedUser_id'));
-			echo json_encode(array('success'=>true,'loggedUser_email' => $this->session->userdata('loggedUser_email'),'loggedUser_username' => $this->session->userdata('loggedUser_username'),'loggedUser_fname' => $this->session->userdata('loggedUser_fname'),'loggedUser_id' => $this->session->userdata('loggedUser_id'),'loggedUserRole_id' => $this->session->userdata('role'),'profile_img' => $profile_img));
+			echo json_encode(
+				array(
+					'success'=>true,
+					'LastName' 			=> $this->session->userdata('LastName'),
+					'color' 			=> $this->session->userdata('color'),
+					'loggedUser_email' 	=> $this->session->userdata('loggedUser_email'),
+					'loggedUser_username' => $this->session->userdata('loggedUser_username'),
+					'loggedUser_fname' 	=> $this->session->userdata('loggedUser_fname'),
+					'loggedUser_id' 	=> $this->session->userdata('loggedUser_id'),
+					'loggedUserRole_id' => $this->session->userdata('role'),
+					'profile_img' 		=> $profile_img)
+				);
+
 			$message = '<span class="blue-color uname">'.ucfirst($this->session->userdata('loggedUser_username'))."</span> logged in from ip : <b>".$_SERVER['REMOTE_ADDR']."</b>";
 			logActivityEvent($this->session->userdata('loggedUser_id'),$this->entity["user"], $this->event["login"], $message, $this->Job);
 		} else { 

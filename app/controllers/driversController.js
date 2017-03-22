@@ -1,4 +1,4 @@
-app.controller('driversController', function(dataFactory,$scope,$http ,$rootScope , $location , $cookies, $localStorage,getDriversListing,$state){
+app.controller('driversController', function(dataFactory,$scope, PubNub, $http ,$rootScope , $location , $cookies, $localStorage,getDriversListing,$state){
 	
   $rootScope.showHeader = true;
   $scope.sortReverse  = false;  // set the default sort order 
@@ -76,6 +76,7 @@ app.controller('driversController', function(dataFactory,$scope,$http ,$rootScop
 	$scope.confirmDriverStatus = function( confirm) {
 		if(confirm == 'yes'){
 			dataFactory.httpRequest(URL+'/drivers/changeStatus/'+$scope.driverID+'/'+$scope.Status).then(function(data) {
+				PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
 				angular.copy(data.records.rows, $scope.data[$scope.driverIndex]);
 				if ( data.status == true ) {
 					$scope.driverdeleteMessage = $rootScope.languageArray.driverStatusSuccMsg;
@@ -96,6 +97,7 @@ app.controller('driversController', function(dataFactory,$scope,$http ,$rootScop
 			var index  = angular.element("#confirm-delete").data("index");
 			if ( driverid != '' && driverid != undefined ) {
 				dataFactory.httpRequest(URL + '/drivers/delete/'+driverid).then(function(data) {
+					PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
 					if ( data.success == true ) {
 						$scope.driverdeleteMessage = $rootScope.languageArray.driverDeleteSuccMsg;
 						$scope.alertdeletemsg = true;
@@ -142,6 +144,7 @@ app.controller('editDriversController', function(dataFactory,getDriversData, $sc
 			formData.append("driverId", $scope.editedDriverId);
 		},
 		success:function(file,response){
+			PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
 			file.previewElement.classList.add("dz-success");
 			if(!response.error){ // succeeded
 				this.removeFile(file);
@@ -168,6 +171,7 @@ app.controller('editDriversController', function(dataFactory,getDriversData, $sc
 	$rootScope.confirmCommonDocumentStatus = function(confirm){
 		if(confirm == 'yes'){
 			dataFactory.httpRequest(URL + '/drivers/deleteContractDocs/'+$scope.docId+"/"+$scope.documentName).then(function(data) {
+				PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
 				if(data.success == true) {
 					$scope.driverDocs.splice($scope.documentIndex,1);
 				}
@@ -235,6 +239,7 @@ app.controller('addDriversController', function(dataFactory,$scope,$http ,$rootS
 			formData.append("driverId", $scope.lastAddedDriver);
 		},
 		success:function(file,response){
+			PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
 			file.previewElement.classList.add("dz-success");
 			if(!response.error){ // succeeded
 				this.removeFile(file);

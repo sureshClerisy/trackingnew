@@ -1,6 +1,6 @@
 //~ URL = 'http://192.168.1.178/trackingnew';
 URL = window.location.protocol+'//'+window.location.host+'/trackingnew';
-app.controller('authCtrl', function (dataFactory,$scope, $rootScope, $location, $http , $cookies, $state, $localStorage) {
+app.controller('authCtrl', function (dataFactory,$scope, PubNub, $rootScope, $location, $http , $cookies, $state, $localStorage) {
     $scope.login = {};
     $scope.signup = {};
     $scope.logmsg = $rootScope.logoutmessage;
@@ -18,6 +18,10 @@ app.controller('authCtrl', function (dataFactory,$scope, $rootScope, $location, 
 		$rootScope.showBackground = false;
 		$rootScope.loggedUserFirstName = $cookies.get('loggedUserFirstNameCookie');
 		$rootScope.loggedUserRoleId = $cookies.get('loggedUserRoleId');
+		
+		$rootScope.LastName = $cookies.get('LastName');
+		$rootScope.color 	= $cookies.get('color');
+
 		$location.path('dashboard');
 		
 	} else {
@@ -38,12 +42,21 @@ app.controller('authCtrl', function (dataFactory,$scope, $rootScope, $location, 
 					$rootScope.profileImage = data.profile_img.profile_image;
 					$rootScope.loggedInUser = true;
 					$rootScope.loggedInUserID = data.loggedUser_id;
-					$rootScope.loggedUserFirstName = data.loggedUser_fname;
+					$rootScope.loggedUserFirstName 	= data.loggedUser_fname;
+					$rootScope.LastName 	= data.LastName;
+					$rootScope.color 		= data.color;
+					
+					$cookies.put('LastName', $rootScope.LastName);
+					$cookies.put('color', $rootScope.color);
+					
 					$cookies.put('loggedUserFirstNameCookie', data.loggedUser_fname);
 					$cookies.put('loggedUserId', data.loggedUser_id);
 					$cookies.put('loggedUserRoleId', data.loggedUserRole_id);
 					$cookies.put('profileImage', data.profile_img.profile_image);
 					$cookies.put('userIsLoggedIn', 1);
+					$rootScope.activeUser = data.loggedUser_id;
+							
+
 				}
 				else
 				{
@@ -69,6 +82,7 @@ app.controller('authLogoutCtrl', function (dataFactory,$scope, $rootScope, $loca
 		$cookies.remove("admin_email");
 		$cookies.remove("admin_uid");
 		$cookies.remove('loggedUserFirstNameCookie');	
+		$cookies.remove('LastName');	
 		$cookies.remove('loggedUserRoleId');	
 		$cookies.remove('userIsLoggedIn');	
 		$rootScope.loggedInUser = false;		

@@ -69,6 +69,7 @@ app.controller('iterationLoadsController', ["dataFactory","$scope","$http","$roo
 	$scope.tableTitle = [];
 	$scope.dataErrorMessage = true;
 	$scope.loadsIdArray = [];
+
 	if(getIterationLoadData.loadsData != undefined && getIterationLoadData.loadsData !==false){
 		$scope.dataErrorMessage = false;
 		$scope.unFinishedChain = getIterationLoadData.loadsData.unFinishedChain;
@@ -77,12 +78,11 @@ app.controller('iterationLoadsController', ["dataFactory","$scope","$http","$roo
 		$scope.tableTitle.push(getIterationLoadData.loadsData.table_title);
 		
 		$rootScope.selectedVehicleId = '';
-		$scope.vehicleIdRepeat = getIterationLoadData.loadsData.vehicleIdRepeat; //Vehicle id that is selected in driver dropdown :)
-
+		$rootScope.iterationVehicleId = getIterationLoadData.loadsData.vehicleIdRepeat; //Vehicle id that is selected in driver dropdown :)
 		$scope.labelArray = getIterationLoadData.loadsData.labelArray;
 		//$scope.selectedDriver = $scope.labelArray[0].driverName+' - '+$scope.labelArray[0].label;
 		$scope.selectedDriver = getIterationLoadData.loadsData.selectedDriver;
-		$rootScope.search_label = $scope.vehicleIdRepeat.toString();
+		$rootScope.search_label = $rootScope.iterationVehicleId.toString();
 		$scope.loadsIdArray = getIterationLoadData.loadsData.loadsIdArray;
 		
 		$scope.originCitySearch = getIterationLoadData.loadsData.originCitySearch;
@@ -126,14 +126,14 @@ app.controller('iterationLoadsController', ["dataFactory","$scope","$http","$roo
 	
 	$scope.startOverChain = function(){
 		$scope.startOverSpin = true;
-		dataFactory.httpRequest(URL+'/iterationloads/destroyLoadsChain/'+$scope.vehicleIdRepeat).then(function(data){
+		dataFactory.httpRequest(URL+'/iterationloads/destroyLoadsChain/'+$rootScope.iterationVehicleId).then(function(data){
 			$scope.startOverSpin = false;
 			$scope.perPageNumber = 25;
 			$scope.loadsData = data.loadsData.rows;
 			$scope.tableTitle = [];
 			$scope.tableTitle.push(data.loadsData.table_title);
-			$scope.vehicleIdRepeat = data.loadsData.vehicleIdRepeat;
-			$rootScope.search_label = $scope.vehicleIdRepeat.toString();
+			$rootScope.iterationVehicleId = data.loadsData.vehicleIdRepeat;
+			$rootScope.search_label = $rootScope.iterationVehicleId.toString();
 			$scope.unFinishedChain = data.loadsData.chainWithDriver;
 			$scope.renderDriverChain();
 			$scope.newChangeDriverLoads = false;
@@ -183,7 +183,7 @@ app.controller('iterationLoadsController', ["dataFactory","$scope","$http","$roo
 							
     	$($event.target).closest('tr.ng-scope').addClass( 'itenary-added-row' ).attr("data-uinfo", valuesArray['ID']);
     	$($event.target).closest('tr.ng-scope').addClass( 'itenary-added-row' ).attr("data-pickdate", valuesArray['pickDate']);
-		dataFactory.httpRequest(URL+'/iterationloads/getIterationLoadNextDate/'+$scope.vehicleIdRepeat,'Post',{} ,{ valueArray : valuesArray , DriverName : driverName , previousDate : $scope.previousDate, divIndex:$scope.chainElement,xchain:xchain, driverType:$scope.driverType}).then(function(data) {
+		dataFactory.httpRequest(URL+'/iterationloads/getIterationLoadNextDate/'+$rootScope.iterationVehicleId,'Post',{} ,{ valueArray : valuesArray , DriverName : driverName , previousDate : $scope.previousDate, divIndex:$scope.chainElement,xchain:xchain, driverType:$scope.driverType}).then(function(data) {
 			$rootScope.iterationPopData = data;
 			
 			if($scope.multiData === true)
@@ -521,9 +521,7 @@ app.controller('iterationLoadsController', ["dataFactory","$scope","$http","$roo
 				$scope.renderHOSGantt($scope.HOS, $scope.newRowsArray);
 
 				$scope.callDynamicFn = true;
-				/*dataFactory.httpRequest(URL+'/iterationloads/removeFromChain/','Post',{} ,{ valueArray : valuesArray , deletedRowIndex : divIndex, ID:truckstopId, driverID: $scope.vehicleIdRepeat}).then(function(data) {
-				});
-*/			}
+			}
 
 			$scope.deletedRowIndex = divIndex;
 			if ( $scope.newRowsArray.length == 0 && $scope.callDynamicFn == true) {
@@ -595,7 +593,7 @@ app.controller('iterationLoadsController', ["dataFactory","$scope","$http","$roo
 	
 	$scope.changeDailyHour = function(hoursLimit) {
 		if ( hoursLimit != '' ) {
-			dataFactory.httpRequest(URL+'/iterationloads/getIterationLoadNextDate/'+$scope.vehicleIdRepeat+'/'+hoursLimit,'Post',{} ,{ valueArray: $rootScope.iterationPopData, previousDate : $scope.previousDate, skipSaveSession:'yes' }).then(function(data) {
+			dataFactory.httpRequest(URL+'/iterationloads/getIterationLoadNextDate/'+$rootScope.iterationVehicleId+'/'+hoursLimit,'Post',{} ,{ valueArray: $rootScope.iterationPopData, previousDate : $scope.previousDate, skipSaveSession:'yes' }).then(function(data) {
 				$rootScope.iterationPopData = data;
 				$scope.dailyWorkingHoursLimit = hoursLimit;
 			});
@@ -604,7 +602,7 @@ app.controller('iterationLoadsController', ["dataFactory","$scope","$http","$roo
 	
 	$scope.fetchNewIterationLoad = function() {
 		$scope.newIterationButtonShow = true;
-		dataFactory.httpRequest(URL+'/iterationloads/getIterationLoad/'+$scope.vehicleIdRepeat,'Post',{} ,{loadInfo:$rootScope.iterationPopData,driverType:$scope.driverType}).then(function(data) {
+		dataFactory.httpRequest(URL+'/iterationloads/getIterationLoad/'+$rootScope.iterationVehicleId,'Post',{} ,{loadInfo:$rootScope.iterationPopData,driverType:$scope.driverType}).then(function(data) {
 				if ( data.rows.length == 0 ) {
 					$scope.loadsData = [];
 					$scope.perPageNumber = 9;
@@ -645,7 +643,7 @@ app.controller('iterationLoadsController', ["dataFactory","$scope","$http","$roo
 				$scope.tableTitle = [];
 				$scope.loadsData = data.loadsData.rows;
 				$scope.tableTitle.push(data.loadsData.table_title);
-				$scope.vehicleIdRepeat = data.loadsData.vehicleIdRepeat;
+				$rootScope.iterationVehicleId = data.loadsData.vehicleIdRepeat;
 				$rootScope.search_label = driverValue;
 				$scope.unFinishedChain = data.loadsData.chainWithDriver;
 				$scope.renderDriverChain();
@@ -666,9 +664,9 @@ app.controller('iterationLoadsController', ["dataFactory","$scope","$http","$roo
    	 */
    	  
    	$scope.customLocationSearch = function() {
-		if ( $scope.vehicleIdRepeat != '' && $scope.vehicleIdRepeat != 0 && $scope.vehicleIdRepeat != undefined && $scope.vehicleIdRepeat != 'all' ) {
+		if ( $rootScope.iterationVehicleId != '' && $rootScope.iterationVehicleId != 0 && $rootScope.iterationVehicleId != undefined && $rootScope.iterationVehicleId != 'all' ) {
 			$scope.autoFetchLoads = true;
-			dataFactory.httpRequest(URL+'/iterationloads/customLocationSearch','POST',{},{vehicleId: $scope.vehicleIdRepeat, args:$rootScope.askCustom,driverType:$scope.driverType}).then(function(data) {
+			dataFactory.httpRequest(URL+'/iterationloads/customLocationSearch','POST',{},{vehicleId: $rootScope.iterationVehicleId, args:$rootScope.askCustom,driverType:$scope.driverType}).then(function(data) {
 				angular.element("#askForCustomSearch").modal('hide');
 				$scope.loadsData = [];
 				$scope.tableTitle = [];
@@ -677,7 +675,7 @@ app.controller('iterationLoadsController', ["dataFactory","$scope","$http","$roo
 					$scope.showNoRecordFoundMsg = false;
 				}
 				$scope.tableTitle.push(data.loadsData.table_title);
-				$scope.vehicleIdRepeat = data.loadsData.vehicleIdRepeat;
+				$rootScope.iterationVehicleId = data.loadsData.vehicleIdRepeat;
 				$scope.originCitySearch = data.loadsData.originCitySearch;
 				$scope.originStateSearch = data.loadsData.originStateSearch;
 				$scope.originDateSearch = data.loadsData.originDateSearch;
@@ -1342,7 +1340,7 @@ app.controller('iterationLoadsController', ["dataFactory","$scope","$http","$roo
 		$scope.formSearch.pickup_date = $scope.originDateSearch;
 		
 		var searchStatus = 'planSearch';
-		dataFactory.httpRequest('truckstop/get_load_data_repeat','POST',{},{loadsArray: $scope.loadsIdArray, vehicleIDRepeat : $scope.vehicleIdRepeat, formPost: $scope.formSearch, searchStatus : searchStatus}).then(function(data){
+		dataFactory.httpRequest('truckstop/get_load_data_repeat','POST',{},{loadsArray: $scope.loadsIdArray, vehicleIDRepeat : $rootScope.iterationVehicleId, formPost: $scope.formSearch, searchStatus : searchStatus}).then(function(data){
 			$scope.loadsIdArray = data.loadsIdArray;
 			$scope.newRows = data.rows;
 			

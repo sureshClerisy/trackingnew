@@ -16,7 +16,19 @@ select option { padding-left: 5px; }
 input.header-serach-input.header-serach-input { background: #fafafa;  border: none;  padding: 10px;  margin-left: 15px; max-width: 161px;  width: 100%;  display: inline-block;}
 .icon-set.menu-hambuger-plus{color:#4f4f4f;}
 .icon { display: inline-block;margin: 20px 18px 0px 0px; position: relative;cursor:pointer;}
-.num-block { position: absolute; right: -14px; top: -7px; font-size: 12px; width: 20px; height: 20px; border-radius: 20px; line-height: 17px; border: 1px solid #000; text-align: center;  background: #fff;  box-shadow: 0px 0px 0px 2px #fff;-moz-box-shadow: 0px 0px 0px 2px #fff;-webkit-box-shadow: 0px 0px 0px 2px #fff;-o-box-shadow: 0px 0px 0px 2px #fff;-ms-box-shadow: 0px 0px 0px 2px #fff;
+.num-block {
+  background: #fff none repeat scroll 0 0;
+  border: 1px solid #000;
+  border-radius: 20px;
+  box-shadow: 0 0 0 2px #fff;
+  font-size: 10px;
+  height: 20px;
+  line-height: 17px;
+  position: absolute;
+  right: -14px;
+  text-align: center;
+  top: -11px;
+  width: 21px;
 }
 .highlighted { background: yellow }
 .mail-icons-block{padding-right:30px;}
@@ -6001,7 +6013,66 @@ tr.tr-bold td {
     width: 100%;
     z-index: 1;
 }
+.outer-range-block {
+  border: 1px solid #d3d3d3;
+  float: left;
+  min-height: 49px;
+  padding: 7px 12px 0;
+  width: 100%;
+  margin-bottom: 13px;
+}
+.outer-range-block .select2-choices {
+  background: transparent none repeat scroll 0 0 !important;
+  border: 0 none !important;
+  font-size: 11px !important;
+  left: 0;
+  min-height: auto !important;
+}
+.outer-range-block .multiSelect {
+  margin: 0px;
+}
+.outer-range-block > span{
+font-family: "Montserrat";
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color:#7c7c7c !important; line-height: 20px;
+}
+.highlighted {
+  background: rgb(7, 126, 208) none repeat scroll 0 0;
+  color: #fff;
+}
+.modals-search-timeline > i{
+ left: 33px;
+    position: absolute;
+    top: -3px;  
+}
+.modals-search-timeline input{
+border: 0 none;
+    margin-top: -7px;
+    padding-left: 49px;
+    width: 100%;
+}
 
+.text-image {
+  background: #0784dc;
+    color: #ffffff;
+    float: left;
+    font-size: 11px !important;
+    height: 37px;
+    padding: 7px 0;
+    text-align: center;
+    width: 37px;
+}
+.text-image.sendpayment {
+    color: #ffffff;
+    float: left;
+    font-size: 11px !important;
+    height: 13px;
+    padding: 2px 4px;
+    text-align: center;
+    width: 30px;
+}
 /****************notification-block-lt popup end****************/
 @media (min-width:2000px)
 {
