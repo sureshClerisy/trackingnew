@@ -31,7 +31,8 @@ app.controller('driversController', function(dataFactory,$scope, PubNub, $http ,
 		getResultsPage(1);
 	}
 
-	$scope.goForDashboard = function(vid){
+	$scope.goForDashboard = function(driverId,driverName,label, dispId, vid, team_driver_id, city){
+		$rootScope.driverBeingSelected = {driverId:driverId, driverName: driverName,label: label,dispId: dispId,vid: vid,team_driver_id: team_driver_id,city:city}	
 		$rootScope.ofDriver = vid;
 		$state.go('dashboard',{},{reload: true});
 	}
@@ -117,7 +118,7 @@ app.controller('driversController', function(dataFactory,$scope, PubNub, $http ,
 		
 });
 
-app.controller('editDriversController', function(dataFactory,getDriversData, $scope,$http ,$rootScope , $location , $cookies, $stateParams,getDispatcherList){
+app.controller('editDriversController', function(dataFactory,getDriversData, $scope, PubNub, $http ,$rootScope , $location , $cookies, $stateParams,getDispatcherList){
 	$rootScope.showHeader = true;
 	$scope.driversData = {};
 	$scope.driversData = getDriversData.drivers;
@@ -215,7 +216,7 @@ app.controller('editDriversController', function(dataFactory,getDriversData, $sc
 });
 
 
-app.controller('addDriversController', function(dataFactory,$scope,$http ,$rootScope , $location , $cookies, $stateParams,getDispatcherList){
+app.controller('addDriversController', function(dataFactory,$scope, PubNub, $http ,$rootScope , $location , $cookies, $stateParams,getDispatcherList){
 	
 	if($rootScope.loggedInUser == false)
 		$location.path('login');

@@ -1,3 +1,4 @@
+	<img src="assets/img/print_logo.png" style="display:none">
      <!-- START PAGE CONTENT WRAPPER -->
       <div class="page-content-wrapper ">
         <!-- START PAGE CONTENT -->
@@ -27,13 +28,15 @@
 							</div>
 						</div>
 					</div>
-
 					<div class="drivers-selected">
 					   <div class="drivers-cont pgn push-on-sidebar-open pgn-circle" ng-repeat="driver in driversOnDashboard">
 					      <div class="alert alert-info">
 					         <div>
 					            <div class="pgn-thumbnail">
-					               <div><img style="display: inline-block;" fallback-src="pages/img/user.png" ng-src="assets/uploads/drivers/thumbnail/{{driver.profile_image}}" ui-jq="unveil" alt="" width="40" height="40" src="pages/img/user.png"></div>
+					               <div><img style="display: inline-block;" src="assets/uploads/drivers/thumbnail/{{driver.profile_image}}" ui-jq="unveil" alt="" width="40" height="40" onerror="this.style.display = 'none'">
+										<span class="text-image hide-1" style="background: {{color}};padding: 13px 0px;width:100%; height:100%;font-size:15px !important;text-align: center;">{{uInitial}}
+										</span>
+					               </div>
 					            </div>
 					            <div class="pgn-message">
 					               <div>
@@ -53,7 +56,7 @@
 		<div class="row">
 		    <div class="panel panel-transparent">
 		        <div class="panel-body sortable widget_div no-padding">
-		            <div class="row " >
+		            <div class="row">
 			            <div style="display: none;" id="left"></div>
 	    				<div style="display: none;" id="right"></div>
 			            <canvas id="viewport" style="display: none;"></canvas>
@@ -64,12 +67,11 @@
 		                            </div>
 		                            <div class="panel-controls">
 		                                <ul>
-		                                    <li><a class="portlet-collapse" href="" data-toggle="collapse"><i class="portlet-icon portlet-icon-collapse"></i></a>
+		                                    <li ng-show="otherIcon">
+		                                    	<a class="portlet-collapse" href="" data-toggle="collapse"><i class="portlet-icon portlet-icon-collapse"></i>
+		                                    	</a>
 		                                    </li>
-		                                    <li><a class="portlet-refresh" href="" data-toggle="refresh"><i class="portlet-icon portlet-icon-refresh"></i></a>
-		                                    </li>
-		                                    <li><a class="portlet-close" href="" data-toggle="close"><i class="portlet-icon portlet-icon-close"></i></a>
-		                                    </li>
+		                                   <li><a href="" class="portlet-maximize" data-toggle="maximize" ng-click = "best_safety(); toggleIcon($event,'best_safety')"><i class="portlet-icon portlet-icon-maximize portlet-increase-size" ></i></a></li>
 		                                </ul>
 		                            </div>
 		                        </div>
@@ -78,13 +80,6 @@
 									    <div class="col-lg-12 dashboard-small">
 											<div class="audits-block">
 												<p>{{ languageArray.auditsHeading }}</p>
-												<!-- <div class="one-third-block">
-													<ul class="bext-safty-block">
-														<li> <span style="background:rgba(245,87,83,1);"> </span>{{ languageArray.auditsfail }}</li>
-														<li> <span style="background:rgba(52, 214, 199, 1);"> </span>{{ languageArray.auditspassed }}</li>
-														<li> <span style="background:rgba(7, 126, 208, 1);"> </span>{{ languageArray.auditsissues }}</li>
-													</ul>
-												</div> -->
 												<div class="pos-ab">
 													<div id="best_safety" style="min-width: 310px; height: 229px; margin: 0 auto"></div>
 												</div>
@@ -136,19 +131,18 @@
 		                            </div>
 		                            <div class="panel-controls">
 		                                <ul>
-		                                    <li><a class="portlet-collapse" href="" data-toggle="collapse"><i class="portlet-icon portlet-icon-collapse"></i></a>
+		                                    <li ng-show="otherIcon"><a class="portlet-collapse" href="" data-toggle="collapse"><i class="portlet-icon portlet-icon-collapse"></i></a>
 		                                    </li>
-		                                    <li><a class="portlet-refresh" href="" data-toggle="refresh"><i class="portlet-icon portlet-icon-refresh"></i></a>
-		                                    </li>
-		                                    <li><a class="portlet-close" href="" data-toggle="close"><i class="portlet-icon portlet-icon-close"></i></a>
-		                                    </li>
+		                                     <li><a href="" class="portlet-maximize" data-toggle="maximize" ng-click = "toggleIcon($event,'active_vs_idle')"><i class="portlet-icon portlet-icon-maximize portlet-increase-size" ></i></a>
+		                                     </li>
 		                                </ul>
 		                            </div>
 		                        </div>
 		                        <div class="panel-body">
-									<div class="ser-chat">
-										<div id="fleet_load" style="min-width: 310px; height: 180px; margin: 0 auto"></div>
-									</div>
+									<!-- <div class="ser-chat"> -->
+										<!-- <div id="fleet_load" style="min-width: 310px; height: 180px; margin: 0 auto"></div> -->
+										<highchart id="fleet_load" config="configActiveVsIdle" style=" height: 200px; margin: 0 auto" class="loads-tracking" ></highchart>	
+									<!-- </div> -->
 		                        </div><!-- panel-body -->
 		                    </div>
 		                    <div class="panel panel-default parpal-border wpanel" id="3" pg-portlet>
@@ -157,12 +151,11 @@
 		                            </div>
 		                            <div class="panel-controls">
 		                                <ul>
-		                                    <li><a class="portlet-collapse" href="" data-toggle="collapse"><i class="portlet-icon portlet-icon-collapse"></i></a>
+		                                    <li ng-show="otherIcon"><a class="portlet-collapse" href="" data-toggle="collapse"><i class="portlet-icon portlet-icon-collapse"></i></a>
 		                                    </li>
-		                                    <li><a class="portlet-refresh" href="" data-toggle="refresh"><i class="portlet-icon portlet-icon-refresh"></i></a>
-		                                    </li>
-		                                    <li><a class="portlet-close" href="" data-toggle="close"><i class="portlet-icon portlet-icon-close"></i></a>
-		                                    </li>
+		                                   <li><a href="" class="portlet-maximize" data-toggle="maximize" ng-click="toggleIcon($event, 'driver_msg')"><i class="portlet-icon portlet-icon-maximize portlet-increase-size" ></i></a></li>
+		                                    <!-- <li><a class="portlet-close" href="" data-toggle="close"><i class="portlet-icon portlet-icon-close"></i></a>
+		                                    </li> -->
 		                                </ul>
 		                            </div>
 		                        </div>
@@ -177,10 +170,10 @@
 										<div class="col-md-4 col-xlg-4 last-chart-block">
 											<div class="cart-color">
 												<ul class="print-listing chart-color">
-													<li><span style="background:#626262;"></span> <P>{{ languageArray.drivermsginemncy }}</P></li>
-													<li><span style="background:#34d6c7;"></span> <P>{{ languageArray.drivermsgonhighprior }}</P></li>
-													<li> <span style="background:#6d5cae;"></span><P>{{ languageArray.drivermsgopened }}</P></li>
-													<li><span style="background:#077ed0;"></span> <P>{{ languageArray.drivermsgunopened }}</P></li>
+													<li><span style="background:#626262;"></span> <p>{{ languageArray.drivermsginemncy }}</p></li>
+													<li><span style="background:#34d6c7;"></span> <p>{{ languageArray.drivermsgonhighprior }}</p></li>
+													<li> <span style="background:#6d5cae;"></span><p>{{ languageArray.drivermsgopened }}</p></li>
+													<li><span style="background:#077ed0;"></span> <p>{{ languageArray.drivermsgunopened }}</p></li>
 												</ul>
 											</div>
 										</div>
@@ -193,12 +186,11 @@
 		                            </div>
 		                            <div class="panel-controls">
 		                                <ul>
-		                                    <li><a class="portlet-collapse" href="" data-toggle="collapse"><i class="portlet-icon portlet-icon-collapse"></i></a>
+		                                    <li ng-show="otherIcon"><a class="portlet-collapse" href="" data-toggle="collapse"><i class="portlet-icon portlet-icon-collapse"></i></a>
 		                                    </li>
-		                                    <li><a class="portlet-refresh" href="" data-toggle="refresh"><i class="portlet-icon portlet-icon-refresh"></i></a>
-		                                    </li>
-		                                    <li><a class="portlet-close" href="" data-toggle="close"><i class="portlet-icon portlet-icon-close"></i></a>
-		                                    </li>
+		                                     <li><a href="" class="portlet-maximize" data-toggle="maximize" ng-click= "toggleIcon($event,'trucks_location'); test(); "><i class="portlet-icon portlet-icon-maximize portlet-increase-size" ></i></a></li>
+		                                    <!-- <li><a class="portlet-close" href="" data-toggle="close"><i class="portlet-icon portlet-icon-close"></i></a>
+		                                    </li> -->
 		                                </ul>
 		                            </div>
 		                        </div>
@@ -206,7 +198,7 @@
 		                            <div class="row invocie-block-row no-margin">
 										<div class="col-xlg-12 col-md-12 no-padding">
 											<div class="map-block-main text-center">
-												<div id="dash-map"></div>
+												<div id="dash-map"  ></div>
 											</div>
 										</div>     	
 									</div>
@@ -218,12 +210,11 @@
 		                            </div>
 		                            <div class="panel-controls ul-color-fff">
 		                                <ul>
-		                                    <li><a class="portlet-collapse" href="" data-toggle="collapse"><i class="portlet-icon portlet-icon-collapse"></i></a>
+		                                    <li ng-show="otherIcon"><a class="portlet-collapse" href="" data-toggle="collapse"><i class="portlet-icon portlet-icon-collapse"></i></a>
 		                                    </li>
-		                                    <li><a class="portlet-refresh" href="" data-toggle="refresh"><i class="portlet-icon portlet-icon-refresh"></i></a>
-		                                    </li>
-		                                    <li><a class="portlet-close" href="" data-toggle="close"><i class="portlet-icon portlet-icon-close"></i></a>
-		                                    </li>
+		                                    <li><a href="" class="portlet-maximize" data-toggle="maximize" ng-click="toggleIcon($event,'news_feed')"><i class="portlet-icon portlet-icon-maximize portlet-increase-size" ></i></a></li>
+		                                   <!--  <li><a class="portlet-close" href="" data-toggle="close"><i class="portlet-icon portlet-icon-close"></i></a>
+		                                    </li> -->
 		                                </ul>
 		                            </div>
 		                        </div>
@@ -264,67 +255,73 @@
 		                            </div>
 		                            <div class="panel-controls">
 		                                <ul>
-		                                    <li><a class="portlet-collapse text-white" href="" data-toggle="collapse"><i class="portlet-icon portlet-icon-collapse"></i></a>
+		                                    <li ng-show="otherIcon"><a class="portlet-collapse text-white" href="" data-toggle="collapse"><i class="portlet-icon portlet-icon-collapse"></i></a>
 		                                    </li>
-		                                    <li><a class="portlet-refresh text-white" href="" data-toggle="refresh"><i class="portlet-icon portlet-icon-refresh"></i></a>
-		                                    </li>
-		                                    <li><a class="portlet-close text-white" href="" data-toggle="close"><i class="portlet-icon portlet-icon-close"></i></a>
-		                                    </li>
+		                                    <li><a href="" class="portlet-maximize" data-toggle="maximize" ng-click="toggleIcon($event,'top_brokers')"><i class="portlet-icon portlet-icon-maximize portlet-increase-size" ></i> </a></li>
+		                                   <!--  <li><a class="portlet-close text-white" href="" data-toggle="close"><i class="portlet-icon portlet-icon-close"></i></a>
+		                                    </li> -->
 		                                </ul>
 		                            </div>
 		                        </div>
+
 		                        <div class="panel-body">
-									<div class="row drive-msg-block">
+		                       		<div class="row drive-msg-block" ng-if="dashboard.showTopCustomers == true" >
 										<!-- <div class="col-sm-12 col-md-12 col-xlg-12 chart-block"> -->
-										<div class="col-sm-6 col-md-7 col-xlg-7 chart-block">
-											<div id="customers" style="min-width: 150px; min-height: 160px; margin: 0 auto"></div>
-											<!-- <div style="width: 100%;">
-												<highchart id="cust" class="top-brokers"  config="chartConfigTopCustomers" class="span9" ></highchart>	
-											</div> -->
-										</div>
-										<div class="col-sm-6 col-md-5 col-xlg-5 gp-mp-block cart-color-size">
-											<div class="cart-color">
-												<ul class="print-listing chart-color">
-													<li><span style="background:rgba(7, 126, 208, 1);"></span> <p>{{ languageArray.topcustomercamas }}</p></li>
-													<li> <span style="background:rgba(109,92,174,1);"></span><p>{{ languageArray.topcustomerrpm }}</p></li>
-													<li><span style="background:rgba(52, 214, 199, 1);"></span> <p>{{ languageArray.topcustomervclogist }}</p></li>
-													<li><span style="background:rgba(245,87,83,1);"></span> <p>{{ languageArray.topcustomermaston }}</p></li>
-													<li><span style="background:rgba(109,92,174,1);"></span> <p>{{ languageArray.topcustomerbennett }}</p></li>
-												</ul>
+										<div class="height-cart-main-block">
+											<div class="tb-cell-gph gp-mp-block1">
+											<div class="col-sm-12 col-md-12 col-xlg-12 chart-block11" >
+												<div style="width: 100%;">
+													<highchart id="customers" class="loads-tracking" config="topCustomersConfig" class="span9" ></highchart>	
+												</div>
+											</div>
+											</div>
+											<div class="tb-cell-gph">
+											<div class="col-sm-12 col-md-12 col-xlg-12  cart-color-size">
+												<div class="cart-color">
+													<ul class="print-listing chart-color"> 
+														<li ng-repeat="(key,value) in comp_name "><span style="background:{{barColors[$index]}}"></span><p>{{ value}}</p></li>
+													</ul>
+												</div>
 											</div>
 										</div>
+										</div>
+									</div>
+
+									<div class="not-having-customer" ng-if="dashboard.showTopCustomers == false" >
+										No Information Available
 									</div>
 		                        </div><!-- panel-body -->
+		                        <div class="topfive_portlet-progress portlet-progress" style="background-color: rgba(255, 255, 255, 0.8); display: none;"><div class="topfive_portlet-progress portlet-progress progress-circle-indeterminate progress-circle-master" style="display: none;"></div>
+		                        </div>
 		                    </div>
 		                    <div class="panel panel-default green-border wpanel" id="7" pg-portlet>
 		                        <div class="panel-heading">
-		                            <div class="panel-title">Loads Tracking
+		                            <div class="panel-title">Leader Board
 		                            </div>
-		                            <div class="panel-controls">
+		                            <div class="panel-controls ">
 		                                <ul>
-		                                    <li><a class="portlet-collapse" href="" data-toggle="collapse"><i class="portlet-icon portlet-icon-collapse"></i></a>
-		                                    </li>
-		                                    <li><a class="portlet-refresh" href="" data-toggle="refresh"><i class="portlet-icon portlet-icon-refresh"></i></a>
-		                                    </li>
-		                                    <li><a class="portlet-close" href="" data-toggle="close"><i class="portlet-icon portlet-icon-close"></i></a>
-		                                    </li>
+		                                    <li ng-show="otherIcon"><a class="portlet-collapse" href="" data-toggle="collapse"><i class="portlet-icon portlet-icon-collapse"></i></a></li>
+		                                    <li ng-show="otherIcon"><a href=""><i class="fa fa-print" ng-click="print_xl()"></i></a></li>
+		                                    <li><a href="" class="portlet-maximize" data-toggle="maximize" ng-click = "toggleIcon($event,'leaderboard')"><i class="portlet-icon portlet-icon-maximize portlet-increase-size" ></i></a></li>
+		                                    <!-- <li><a class="portlet-close" href="" data-toggle="close"><i class="portlet-icon portlet-icon-close"></i></a>
+		                                    </li> -->
 		                                </ul>
 		                            </div>
 		                        </div>
-		                        <div class="panel-body">
+		                        <div class="panel-body auto-overflow">
 		                           <div class="graph-block-tabel">
 										<div class="load-road-graph text-center ">
 											<!-- <div id="load_on_road" style="min-width: 400px; height:400px; margin: 0 auto"></div> -->
 											<!-- <hc-pie-chart title="Browser usage" data="pieData">Placeholder for pie chart</hc-pie-chart> -->
 											<div style="width: 100%;">
-												<highchart id="chart1" class="loads-tracking"  config="chartConfig" class="span9" ></highchart>	
+												<highchart id="chart1" class="loads-tracking" config="chartConfig" class="span9" ></highchart>	
 											</div>
 											
 
 										</div>
 										<div class="table-mainass">
 											<div class="table-responsive">
-												<div class="table-scroll-custom">
+												<div class="table-scroll-custom max-leaderboard today-insights sroll-vertical" data-jquery-scrollbar="jqueryScrollbarOptions">
 												  <table class="lperform table table-hover table-condensed table-detailed" id="detailedTable">
 													<thead>
 													  <tr>
@@ -333,23 +330,32 @@
 														<th class="text-center" ng-show="typeOfData == '_idriver'" style="width:20%">{{ languageArray.pickupdate }} </th>
 														<th class="text-center" ng-show="typeOfData == '_idriver'" style="width:20%">{{ languageArray.deliverdate }} </th> 
 
+														<th ng-if="typeOfData != '_idriver' && typeOfData != '_iteam'" class="text-center" style="width:20%">$-Goals</th>
+														<th ng-if="typeOfData != '_idriver' && typeOfData != '_iteam'" class="text-center" style="width:20%">Mile-Goals</th>
 														<th class="text-center" style="width:20%">{{ languageArray.miles }} </th>
 														<th class="text-center" style="width:20%">{{ languageArray.deadmiles}}   </th>
-														<th class="text-center" style="width:20%">{{ languageArray.invoiced }}</th>
+														<th class="text-center" style="width:20%">{{ languageArray.loadstatusbooked }}</th>
 														<th class="text-center" style="width:20%">{{ languageArray.charges }}  </th>
 														<th class="text-center" style="width:20%">{{ languageArray.profit }}   </th>
 														<th class="text-center" style="width:20%">{{ languageArray.profit_percent }}   </th>
 													  </tr>
 													</thead>
 													<tbody>
-													  	<tr ng-repeat="loads in loadPerformance" ng-class="{'skip-click':skipClick}" ng-click="skipClick || clickMatchLoadDetail(loads.truckstopID, loads.loadid, loads.deadmiles, loads.invoice, loads.totalCost, loads.pickDate, loads.vehicle_id , $index)">
+													  	<tr ng-repeat="loads in loadPerformance"  ng-click="skipClick ? showRecordsWithFilter('reports', 'loads', loads.urlColumn, loads.username,loads.dispatcherId, loads.second_driver_id) : clickMatchLoadDetail(loads.truckstopID, loads.loadid, loads.deadmiles, loads.invoice, loads.totalCost, loads.pickDate, loads.vehicle_id , $index)">
 															<td class="v-align-middle semi-bold">{{loads.fcolumn}}</td>
 															
 															<td ng-show="typeOfData == '_idriver'" class="text-center v-align-middle semi-bold">{{loads.PickupDate}}</td>
 															<td ng-show="typeOfData == '_idriver'" class="text-center v-align-middle semi-bold">{{loads.DeliveryDate}}</td>
 
-															<td  class="text-center v-align-middle semi-bold">{{loads.miles}}</td>
-															<td  class="text-center v-align-middle">{{loads.deadmiles}}</td>
+															<td ng-if="typeOfData != '_idriver' && typeOfData != '_iteam'" class="text-center v-align-middle semi-bold">{{loads.financialGoal | currency:"$":2}} 
+																<span class="goals-font" ng-class="loads.plusMinusFinancialGoal >= 0 ? 'positiveGoal' : 'negativeGoal'">{{loads.plusMinusFinancialGoal | currency:"$":2}}</span>
+															</td>
+															<td ng-if="typeOfData != '_idriver' && typeOfData != '_iteam'" class="text-center v-align-middle semi-bold">{{loads.milesGoal | number:0}} 
+																<span class="goals-font" ng-class="loads.plusMinusMilesGoal >= 0 ? 'positiveGoal' : 'negativeGoal'">{{loads.plusMinusMilesGoal | number:0}}</span>
+															</td>
+															<td  class="text-center v-align-middle semi-bold">{{loads.miles | number:0}}</td>
+															<td  class="text-center v-align-middle">{{loads.deadmiles | number:0}}</td>
+															<!--td  class="text-center v-align-middle semi-bold">{{loads.invoice | currency:"$":2}}</td-->
 															<td  class="text-center v-align-middle semi-bold">{{loads.invoice | currency:"$":2}}</td>
 															<td  class="text-center v-align-middle">{{loads.charges | currency:"$":2}}</td>
 															<td  class="text-center v-align-middle">{{loads.profit | currency:"$":2}}</td>
@@ -361,8 +367,12 @@
 															<td ng-show="typeOfData == '_idriver'" class="text-center v-align-middle semi-bold"></td>
 															<td ng-show="typeOfData == '_idriver'" class="text-center v-align-middle semi-bold"></td>
 
-															<td  class="text-center v-align-middle semi-bold">{{totalAllArray.totMiles}}</td>
-															<td  class="text-center v-align-middle">{{totalAllArray.totDeadMiles}}</td>
+															<td ng-if="typeOfData != '_idriver' && typeOfData != '_iteam'" class="text-center v-align-middle semi-bold">	{{totalAllArray.overallTotalFinancialGoal | currency:"$":2}} <span class="goals-font" ng-class="totalAllArray.overallPlusMinusFinancialGoal >= 0 ? 'positiveGoal' : 'negativeGoal'" > 	{{totalAllArray.overallPlusMinusFinancialGoal | currency:"$":2}}</span>
+															</td>
+															<td ng-if="typeOfData != '_idriver' && typeOfData != '_iteam'" class="text-center v-align-middle semi-bold">{{totalAllArray.overallTotalMilesGoal | number:0}} <span class="goals-font" ng-class="totalAllArray.overallPlusMinusMilesGoal >= 0 ? 'positiveGoal' : 'negativeGoal'"> {{totalAllArray.overallPlusMinusMilesGoal | number:0}} </span>
+															 </td>
+															<td  class="text-center v-align-middle semi-bold">{{totalAllArray.totMiles | number:0}}</td>
+															<td  class="text-center v-align-middle">{{totalAllArray.totDeadMiles | number:0}}</td>
 															<td  class="text-center v-align-middle semi-bold">{{totalAllArray.totInvoices | currency:"$":2}}</td>
 															<td  class="text-center v-align-middle">{{totalAllArray.totCharges | currency:"$":2}}</td>
 															<td  class="text-center v-align-middle">{{totalAllArray.totProfit | currency:"$":2}}</td>
@@ -373,8 +383,8 @@
 												  </table>
 												</div>
 											</div>
-										  </div>
-									 </div>
+										</div>
+									</div>
 		                        </div> <!-- panel body -->
 		                    </div>
 		                    <div class="panel panel-default red-border wpanel pos-rel " id="8" pg-portlet>
@@ -383,7 +393,7 @@
 									<div class="loader-inner">
 										<div class="full-height">
 											<div class="panel-body text-center">
-												<img class="image-responsive-height demo-mw-50" src="assets/img/demo/progress.svg" alt="Progress">
+												<img class="image-responsive-height demo-mw-50" src="assets/img/demo/progress.svg" alt="Progress" />
 											</div>
 										</div>
 									</div>
@@ -396,21 +406,23 @@
 		                            </div>
 		                            <div class="panel-controls">
 		                                <ul>
-		                                    <li><a class="portlet-collapse text-white" href="" data-toggle="collapse"><i class="portlet-icon portlet-icon-collapse"></i></a>
+		                                    <li ng-show="otherIcon"><a class="portlet-collapse text-white" href="" data-toggle="collapse"><i class="portlet-icon portlet-icon-collapse"></i></a>
 		                                    </li>
-		                                    <li><a class="portlet-refresh text-white" href="" data-toggle="refresh"><i class="portlet-icon portlet-icon-refresh"></i></a>
-		                                    </li>
-		                                    <li><a class="portlet-close text-white" href="" data-toggle="close"><i class="portlet-icon portlet-icon-close"></i></a>
-		                                    </li>
+		                                    <li ng-show="otherIcon"><a href="" class="portlet-refresh" data-toggle="refresh"><i class="portlet-icon portlet-icon-refresh" ng-click = "update_weather(latitude, longitude , curAdd )"></i></a></li>
+	                                        <li ng-show="otherIcon">
+	                                        	<a href="" ><i class="fa fa-print" ng-click = "print_weather()"></i></a></li>
+                           					<li><a href="" class="portlet-maximize" data-toggle="maximize" ng-click="toggleIcon($event, 'weather')"><i class="portlet-icon portlet-icon-maximize portlet-increase-size" ></i></a></li>
+		                                    <!-- <li><a class="portlet-close text-white" href="" data-toggle="close"><i class="portlet-icon portlet-icon-close"></i></a>
+		                                    </li> -->
 		                                </ul>
 		                            </div>
 		                        </div>
-		                        <div class="panel-body">
+		                        <div class="panel-body ">
 		                            <div class="row ">
 										<div class="col-md-12 col-lg-12 col-xlg-12 widget-height no-padding">
 												
 				                
-										   <div class="widget-17 widget-17-height panel  no-border no-margin widget-loader-circle">
+										   <div class="widget-17 widget-17-height panel   no-border no-margin widget-loader-circle">
 											    <div class="panel-heading no-padding panel-height" ng-show = "weatherShow == true">
 													<div class="panel-title weather-dropdown">
 														<div class="weather-location no-padding weth-text">
@@ -444,8 +456,8 @@
 											                           <h4 class="text-danger bold no-margin">{{currentWeather.current_temperature}}{{ languageArray.wheatherinfoscale }}
 											                           </h4>
 											                        </div>
-											                        <div class="pull-right">
-											                           <canvas height="64" width="64" class="{{currentWeather.weather_class}}" skycons></canvas>
+											                        <div class="pull-right" id="current_weather_icon">
+											                          
 											                        </div>
 											                     </div>
 											                  </div>
@@ -505,7 +517,7 @@
 											                              <div class="padding-10">
 											                                 <div class="row">
 											                                    <div class="col-md-6 text-center">
-											                                       <p class="small">{{ languageArray.wheathersunset }}</p>
+											                                       <p class="small">Noon</p>
 											                                       <canvas class="{{daily.weather_class}}" width="25" height="25" skycons></canvas>
 											                                       <p class="text-danger bold">{{daily.noon}}{{ languageArray.wheatherinfoscale }}</p>
 											                                    </div>
@@ -527,7 +539,12 @@
 										   </div>
 										</div>
 									</div>
-		                        </div> <!-- panel-body -->
+		                        </div>
+		                        <div class="myweather1_portlet-progress portlet-progress" style="background-color: rgba(255, 255, 255, 0.8); display: none;"><div class="myweather1_portlet-progress portlet-progress progress-circle-indeterminate progress-circle-master" style="display: none;"></div></div>
+
+
+
+		                         <!-- panel-body -->
 		                    </div>
 		                    <div class="panel panel-default parpal-border wpanel" id="9" pg-portlet>
 		                        <div class="panel-heading">
@@ -535,12 +552,13 @@
 		                            </div>
 		                            <div class="panel-controls">
 		                                <ul>
-		                                    <li><a class="portlet-collapse" href="" data-toggle="collapse"><i class="portlet-icon portlet-icon-collapse"></i></a>
+		                                    <li ng-show="otherIcon"><a class="portlet-collapse" href="" data-toggle="collapse"><i class="portlet-icon portlet-icon-collapse"></i></a>
 		                                    </li>
-		                                    <li><a class="portlet-refresh" href="" data-toggle="refresh"><i class="portlet-icon portlet-icon-refresh"></i></a>
-		                                    </li>
-		                                    <li><a class="portlet-close" href="" data-toggle="close"><i class="portlet-icon portlet-icon-close"></i></a>
-		                                    </li>
+		                                     <li ng-show="otherIcon"><a href="" class="portlet-refresh" data-toggle="refresh"><i class="portlet-icon portlet-icon-refresh" ng-click = "refresh_loadStatus()"></i></a></li>
+		                                     <li ng-show="otherIcon"><a href=""><i class="fa fa-print" ng-click = "load_status()"></i></a></li>
+		                                     <li><a href="" class="portlet-maximize" data-toggle="maximize" ng-click="toggleIcon($event,'load_status')" ><i class="portlet-icon portlet-icon-maximize portlet-increase-size" ></i></a></li>
+		                                    <!-- <li><a class="portlet-close" href="" data-toggle="close"><i class="portlet-icon portlet-icon-close"></i></a>
+		                                    </li> -->
 		                                </ul>
 		                            </div>
 		                        </div>
@@ -578,10 +596,235 @@
 												</div>
 											</div>
 										</div>
+										<div class="load_portlet-progress" style="background-color: rgba(255, 255, 255, 0.8); display: none;"><div class="load_portlet-progress progress-circle-indeterminate progress-circle-master" style="display: none;"></div></div>
 									</div>
 		                        </div><!-- panel-body -->
 		                    </div>
+
+		                    <div class="panel panel-default blue-border wpanel" id="10" pg-portlet>
+		                        <div class="panel-heading">
+		                            <div class="panel-title">Today Insights
+		                            </div>
+		                            <div class="panel-controls">
+		                                <ul>
+		                                    <li ng-show="otherIcon" ><a class="portlet-collapse" href="" data-toggle="collapse"><i class="portlet-icon portlet-icon-collapse"></i></a>
+		                                    </li>
+		                                    <li ng-show="otherIcon" ><a href = ""><i class="fa fa-print" ng-click ="print_todayInsights()"></i></a></li>
+		                                    <li><a class="portlet-maximize" href="" data-toggle="maximize" ng-click="toggleIcon($event,'today-insights')"><i class="portlet-icon portlet-icon-maximize portlet-increase-size"></i></a>
+		                                    </li>
+		                                    <!-- <li><a class="portlet-close" href="" data-toggle="close"><i class="portlet-icon portlet-icon-close"></i></a>
+		                                    </li> -->
+		                                </ul>
+		                            </div>
+		                        </div>
+		                        <div class="panel-body">
+					                <ul class="nav nav-tabs nav-tabs-simple" id="tinsights" role="tablist" ui-jq="tabCollapse">
+					                    <li class="active tpickup" ng-click="getTodayReport('booked')"  ><a href="#todayPickup"  data-toggle="tab" pg-tab role="tab">Pickup</a> </li>
+					                    <li class="tinprogress"> <a href="#todayInprogress" ng-click="getTodayReport('inprogress')" data-toggle="tab" pg-tab role="tab">Inprogress</a> </li>
+					                    <li class="tdelivery"> <a href="#todayDelivery"  ng-click="getTodayReport('delivery')" data-toggle="tab" pg-tab role="tab">Delivery</a> </li>
+					                    <li class="tidle"> <a href="#todayIdle" ng-click="getTodayReport('idle')" data-toggle="tab" pg-tab role="tab">Idle</a> </li>
+					                </ul>
+					                <div class="tab-content no-padding">
+					                    <div class="tab-pane active" id="todayPickup">
+					                        <div class="row column-seperation">
+					                            <div class="col-md-12">
+					                            	<div class="table-scroll-custom max-tinsights today-insights table-mainass sroll-vertical"  data-jquery-scrollbar="jqueryScrollbarOptions">
+						                                <table class="lperform table table-hover table-condensed table-detailed" id="todayReportPickup">
+															<thead>
+															  <tr>
+																<th>Driver</th>
+																<th>Truck</th>
+																<th>Dispatcher</th>
+																<th>Pickup</th>
+																<th>Delivery</th>
+																<th>Origin</th>
+																<th>St</th>
+																<th>Destination</th>
+																<th>St</th>
+																<th>Payment</th>
+																<th>RPM</th>
+																<th>Miles</th>
+																<th>Deadmiles</th>
+																<th>Company</th>
+															  </tr>
+															</thead>
+															<tbody>
+															  	<tr ng-repeat="record in todayReport" ng-click="clickMatchLoadDetail(0, record.id, '', '', '', '', 0, '')">
+																	<td>{{record.driverName}}</td>
+																	<td>{{record.truckName}}</td>
+																	<td>{{record.dispatcher}}</td>
+																	<td>{{record.PickupDate}}</td>
+																	<td>{{record.DeliveryDate}}</td>
+																	<td>{{record.OriginCity}}</td>
+																	<td>{{record.OriginState}}</td>
+																	<td>{{record.DestinationCity}}</td>
+																	<td>{{record.DestinationState}}</td>
+																	<td>{{record.PaymentAmount | currency:"$":2}}</td>
+																	<td>{{ record.Mileage != 0 ? (record.PaymentAmount / record.Mileage | currency:"$":2) : '' }}</td>
+																	<td>{{record.Mileage | number:0}}</td>
+																	<td>{{record.deadmiles | number:0}}</td>
+																	<td>{{record.companyName}}</td>
+															 	</tr>
+															 	<tr class="bold-content" ng-show="todayReport.length > 0">
+															 		<td colspan="9">Totals</td>
+															 		<td>{{todayReport.totals.PaymentAmount | currency:"$":2}}</td>
+															 		<td>{{todayReport.totals.Mileage != 0 ? (todayReport.totals.PaymentAmount / todayReport.totals.Mileage | currency: "$" : 2) : ''}}</td>
+															 		<td>{{todayReport.totals.Mileage | number:0}}</td>
+															 		<td>{{todayReport.totals.deadmiles | number:0}}</td>
+															 		<td>&nbsp;</td>
+															 	</tr>
+															 	<tr ng-show="todayReport.length <= 0"><td class="	semi-bold" style="text-align: center;" colspan="14"> Oops! No Record found</td></tr>
+															</tbody>
+													  	</table>
+													</div>
+					                            </div>
+					                        </div><!-- column-sepration -->
+					                    </div>
+					                    <div class="tab-pane" id="todayInprogress">
+					                        <div class="row">
+					                            <div class="col-md-12">
+					                               <div class="table-scroll-custom max-tinsights today-insights table-mainass sroll-vertical" data-jquery-scrollbar="jqueryScrollbarOptions">
+						                                <table class="lperform table table-hover table-condensed table-detailed" id="todayReportInprogress">
+															<thead>
+															  <tr>
+																<th>Driver</th>
+																<th>Truck</th>
+																<th>Dispatcher</th>
+																<th>Pickup</th>
+																<th>Delivery</th>
+																<th>Origin</th>
+																<th>St</th>
+																<th>Destination</th>
+																<th>St</th>
+																<th>Payment</th>
+																<th>RPM</th>
+																<th>Miles</th>
+																<th>Deadmiles</th>
+																<th>Company</th>
+															  </tr>
+															</thead>
+															<tbody>
+															  	<tr ng-repeat="record in todayReport" ng-click="clickMatchLoadDetail(0, record.id, '', '', '', '', 0, '')">
+																	<td>{{record.driverName}}</td>
+																	<td>{{record.truckName}}</td>
+																	<td>{{record.dispatcher}}</td>
+																	<td>{{record.PickupDate}}</td>
+																	<td>{{record.DeliveryDate}}</td>
+																	<td>{{record.OriginCity}}</td>
+																	<td>{{record.OriginState}}</td>
+																	<td>{{record.DestinationCity}}</td>
+																	<td>{{record.DestinationState}}</td>
+																	<td>{{record.PaymentAmount | currency:"$":2}}</td>
+																	<td>{{ record.Mileage != 0 ? (record.PaymentAmount / record.Mileage | currency:"$":2) : '' }}</td>
+																	<td>{{record.Mileage | number:0}}</td>
+																	<td>{{record.deadmiles | number:0}}</td>
+																	<td>{{record.companyName}}</td>
+															 	</tr>
+															 	<tr class="bold-content" ng-show="todayReport.length > 0">
+															 		<td colspan="9">Totals</td>
+															 		<td>{{todayReport.totals.PaymentAmount | currency:"$":2}}</td>
+															 		<td>{{todayReport.totals.Mileage != 0 ? (todayReport.totals.PaymentAmount / todayReport.totals.Mileage | currency: "$" : 2) : ''}}</td>
+															 		<td>{{todayReport.totals.Mileage | number:0}}</td>
+															 		<td>{{todayReport.totals.deadmiles | number:0}}</td>
+															 		<td>&nbsp;</td>
+															 	</tr>
+															 	<tr ng-show="todayReport.length <= 0"><td class="semi-bold" style="text-align: center;" colspan="14"> Oops! No Record Found</td></tr>
+															</tbody>
+													  	</table>
+													</div>
+					                            </div>
+					                        </div>
+					                    </div>
+					                    <div class="tab-pane " id="todayDelivery">
+					                        <div class="row">
+					                            <div class="col-md-12">
+					                               <div class="table-scroll-custom max-tinsights today-insights table-mainass sroll-vertical" data-jquery-scrollbar="jqueryScrollbarOptions">
+						                                <table class="lperform table table-hover table-condensed table-detailed" id="todayReportDelivery">
+															<thead>
+															  <tr>
+																<th>Driver</th>
+																<th>Truck</th>
+																<th>Dispatcher</th>
+																<th>Pickup</th>
+																<th>Delivery</th>
+																<th>Origin</th>
+																<th>St</th>
+																<th>Destination</th>
+																<th>St</th>
+																<th>Payment</th>
+																<th>RPM</th>
+																<th>Miles</th>
+																<th>Deadmiles</th>
+																<th>Company</th>
+															  </tr>
+															</thead>
+															<tbody>
+															  	<tr ng-repeat="record in todayReport" ng-click="clickMatchLoadDetail(0, record.id, '', '', '', '', 0, '')">
+																	<td>{{record.driverName}}</td>
+																	<td>{{record.truckName}}</td>
+																	<td>{{record.dispatcher}}</td>
+																	<td>{{record.PickupDate}}</td>
+																	<td>{{record.DeliveryDate}}</td>
+																	<td>{{record.OriginCity}}</td>
+																	<td>{{record.OriginState}}</td>
+																	<td>{{record.DestinationCity}}</td>
+																	<td>{{record.DestinationState}}</td>
+																	<td>{{record.PaymentAmount | currency:"$":2}}</td>
+																	<td>{{ record.Mileage != 0 ? (record.PaymentAmount / record.Mileage | currency:"$":2) : '' }}</td>
+																	<td>{{record.Mileage | number:0}}</td>
+																	<td>{{record.deadmiles | number:0}}</td>
+																	<td>{{record.companyName}}</td>
+															 	</tr>
+															 	<tr class="bold-content" ng-show="todayReport.length > 0">
+															 		<td colspan="9">Totals</td>
+															 		<td>{{todayReport.totals.PaymentAmount | currency:"$":2}}</td>
+															 		<td>{{todayReport.totals.Mileage != 0 ? (todayReport.totals.PaymentAmount / todayReport.totals.Mileage | currency: "$" : 2) : ''}}</td>
+															 		<td>{{todayReport.totals.Mileage | number:0}}</td>
+															 		<td>{{todayReport.totals.deadmiles | number:0}}</td>
+															 		<td>&nbsp;</td>
+															 	</tr>
+															 	<tr ng-show="todayReport.length <= 0"><td class="semi-bold" style="text-align: center;" colspan="14"> Oops! No Record Found</td></tr>
+															</tbody>
+													  	</table>
+													</div>
+					                            </div>
+					                        </div>
+					                    </div>
+					                    
+					                    <div class="tab-pane" id="todayIdle">
+					                        <div class="row">
+					                            <div class="col-md-12">
+					                               <div class="table-scroll-custom max-tinsights today-insights tidle table-mainass sroll-vertical" data-jquery-scrollbar="jqueryScrollbarOptions">
+						                                <table class="lperform table table-hover table-condensed table-detailed" id="todayReportIdle">
+															<thead>
+															  <tr>
+																<th>Driver</th>
+																<th>Truck</th>
+																<th>Dispatcher</th>
+															  </tr>
+															</thead>
+															<tbody>
+															  	<tr ng-repeat="record in todayReport" >
+																	<td>{{record.driverName}}</td>
+																	<td>{{record.truckName == null ? "NA" : record.truckName}}</td>
+																	<td>{{record.dispatcher}}</td>
+															 	</tr>
+															 	<tr ng-show="todayReport.length <= 0"><td class="semi-bold" style="text-align: center;" colspan="3"> Oops! No Record Found</td></tr>
+															</tbody>
+													  	</table>
+													</div>
+					                            </div>
+					                        </div>
+					                    </div>
+					                </div> <!-- tab-content -->
+						            
+		                        </div> <!-- panel body -->
+		                        <div  class="today-progress portlet-progress" >
+		                        	<div class="today-progress portlet-progress progress-circle-indeterminate progress-circle-master" ></div>
+		                        </div>
+		                    </div>
 		                </div>
+
 		            </div><!--  row end -->
 		        </div><!-- panel sorting -->
 		    </div>
@@ -605,7 +848,17 @@
 
 
 <style type="text/css">
-	#dash-map{height: 700px}
+
+	#dash-map{
+		height: 90%;
+		overflow: auto;
+		}
+	.ver_scroll{
+		overflow:hidden;overflow-y:auto;
+		max-height: 880px !important;overflow: auto; }
+		.tem{  width: 100 %;
+
+		}
 </style>
 <!-- test -->
 

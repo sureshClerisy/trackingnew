@@ -1,97 +1,138 @@
 <!-- BEGIN SIDEBPANEL-->
 <nav class="page-sidebar" data-pages="sidebar" pg-sidebar>
+<!-- BEGIN SIDEBAR MENU TOP TRAY CONTENT-->
+  <div class="sidebar-overlay-slide from-top" id="appMenu">
+    <div class="row">
+      <div class="col-xs-5 portrait-box" ng-click= "selectPortlet($event,'1')" style="background: #077ED0">
+        <h3>SAFETY</h3>
+        <img src="assets/images/check.png" alt = "Best Safety">
+        <p>Best Safety</p>
+    </div>
+    <div class="col-xs-5 portrait-box" ng-click= "selectPortlet($event,'6')" style="background: #4DEFE0">
+        <h3>CUSTOMER</h3>
+        <p>Top 5 Customers</p>
+        <img src="assets/images/check.png" alt = "Top 5 Customers">
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-5 portrait-box" ng-click= "selectPortlet($event,'9')" style="background: #F0F0F0">
+        <h3>LOAD</h3>
+        <p>Load Status</p>
+        <img src="assets/images/check.png" alt = "Load Status">
+    </div>
+    <div class="col-xs-5 portrait-box" ng-click= "selectPortlet($event,'8')" style="background: #077ED0">
+        <h3>WHEATHER</h3>
+        <p>Wheather Info</p>
+        <img src="assets/images/check.png" alt = "Wheather Info">
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-5 portrait-box" ng-click= "selectPortlet($event,'7')" style="background: #F0F0F0">
+        <h3>LEADER</h3>
+        <p>Leader Board</p>
+        <img src="assets/images/check.png" alt = "Leader Board">
+    </div>
+    <div class="col-xs-5 portrait-box" ng-click= "selectPortlet($event,'4')" style="background: #077ED0">
+        <h3>LOCATION</h3>
+        <p>Truck Location</p>
+        <img src="assets/images/check.png" alt = "Truck Location">
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-5 portrait-box" ng-click= "selectPortlet($event,'3')" style="background: #077ED0">
+        <h3>MESSAGE</h3>
+        <p>Driver Message</p>
+        <img src="assets/images/check.png" alt = "Driver Message">
+    </div>
+    <div class="col-xs-5 portrait-box" ng-click= "selectPortlet($event,'5')" style="background: #F0F0F0">
+        <h3>NEWS</h3>
+        <p>News Feeds</p>
+        <img src="assets/images/check.png" alt = "News Feeds">
+    </div>
+</div>
 
+<div class="row">
+    <div class="col-xs-5 portrait-box" ng-click= "selectPortlet($event,'2')" style="background: #F0F0F0">
+        <h3>CAPACITY</h3>
+        <p>Capacity Analysis</p>
+        <img src="assets/images/check.png" alt = "Driver Message">
+    </div>
+    <div class="col-xs-5 portrait-box" ng-click= "selectPortlet($event,10)" style="background: #077ED0">
+        <h3>INSIGHTES</h3>
+        <p>Today Insights</p>
+        <img src="assets/images/check.png" alt = "Driver Message">
+    </div>
+</div>
+</div>
+<!-- END SIDEBAR MENU TOP TRAY CONTENT-->
+<!-- BEGIN SIDEBAR MENU HEADER-->
+<div class="sidebar-header">
+    <!--img src="assets/img/logo_white.png" alt="logo" class="brand" data-src="assets/img/logo_white.png" data-src-retina="assets/img/logo_white_2x.png" class="logo-main-block"-->
+    <img src="assets/img/vikalogo2.png" alt="logo" class="brand" data-src="assets/img/vikalogo2.png" data-src-retina="assets/img/logo_white_2x.png" class="logo-main-block">
+    <div class="sidebar-header-controls">
+      <button type="button" class="btn btn-xs sidebar-slide-toggle btn-link m-l-20" data-pages-toggle="#appMenu">
+        <i class="fa fa-angle-down fs-16"></i>
+    </button>
+          <!-- <button type="button" class="btn btn-link visible-lg-inline" data-toggle-pin="sidebar">
+            <i class="fa fs-12"></i>
+        </button> -->
+    </div>
+</div>
+<!-- END SIDEBAR MENU HEADER-->
+<!-- START SIDEBAR MENU -->
+<div class="sidebar-menu">
+    <!-- BEGIN SIDEBAR MENU ITEMS-->
+    <ul class="menu-items">
+      <li class="m-t-30 ">
+        <a class="test" href="#/dashboard" class="detailed">
+          <span class="title">{{ languageCommonVariables.dashboard }}</span>
+          <!--span class="details">12 New Updates</span-->
 
-      <!-- BEGIN SIDEBAR MENU TOP TRAY CONTENT-->
-      <div class="sidebar-overlay-slide from-top" id="appMenu">
-        <div class="row">
-          <div class="col-xs-6 no-padding">
-            <a href="#" class="p-l-40"><img src="assets/img/demo/social_app.svg" alt="socail">
-            </a>
-          </div>
-          <div class="col-xs-6 no-padding">
-            <a href="#" class="p-l-10"><img src="assets/img/demo/email_app.svg" alt="socail">
-            </a>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-xs-6 m-t-20 no-padding">
-            <a href="#" class="p-l-40"><img src="assets/img/demo/calendar_app.svg" alt="socail">
-            </a>
-          </div>
-          <div class="col-xs-6 m-t-20 no-padding">
-            <a href="#" class="p-l-10"><img src="assets/img/demo/add_more.svg" alt="socail">
-            </a>
-          </div>
-        </div>
-      </div>
-      <!-- END SIDEBAR MENU TOP TRAY CONTENT-->
-      <!-- BEGIN SIDEBAR MENU HEADER-->
-      <div class="sidebar-header">
-        <!--img src="assets/img/logo_white.png" alt="logo" class="brand" data-src="assets/img/logo_white.png" data-src-retina="assets/img/logo_white_2x.png" class="logo-main-block"-->
-        <img src="assets/img/vikalogo2.png" alt="logo" class="brand" data-src="assets/img/vikalogo2.png" data-src-retina="assets/img/logo_white_2x.png" class="logo-main-block">
-        <div class="sidebar-header-controls">
-          <!--button type="button" class="btn btn-xs sidebar-slide-toggle btn-link m-l-20" data-pages-toggle="#appMenu"><i class="fa fa-angle-down fs-16"></i>
-          </button-->
-          <!-- <button type="button" class="btn btn-link visible-lg-inline" data-toggle-pin="sidebar"><i class="fa fs-12"></i>
-          </button> -->
-        </div>
-      </div>
-      <!-- END SIDEBAR MENU HEADER-->
-      <!-- START SIDEBAR MENU -->
-      <div class="sidebar-menu">
-        <!-- BEGIN SIDEBAR MENU ITEMS-->
-        <ul class="menu-items">
-          <li class="m-t-30 ">
-            <a class="test" href="#/dashboard" class="detailed">
-              <span class="title">{{ languageCommonVariables.dashboard }}</span>
-              <!--span class="details">12 New Updates</span-->
-            
-            <span class="bg-success icon-thumbnail"><i class="pg-home"></i></span></a>
-          </li>
-          <li ng-class="{'open active':(state=='plan' || state=='myLoad' || state=='search' || state=='AutoLoad') }"> 
-				
-    				<a class="test" href="javascript:;"><span class="title">{{ languageCommonVariables.loads }}</span>
-						<span class=" arrow" ng-class="{'open active':(state=='plan' || state=='myLoad' || state=='search' || state=='AutoLoad') }"></span>
-  					
-  					<span class="icon-thumbnail"><i class="icon-pg loads"></i></span></a>
-  					
-    				<ul class="sub-menu">
-    					<li class="">
-    						<a href="#/plan">{{ languageCommonVariables.plan }}
-    						<span class="icon-thumbnail">{{ languageCommonVariables.planPl }}</span></a>
-    					</li>
+          <span class="bg-success icon-thumbnail"><i class="pg-home"></i></span></a>
+      </li>
+      <li ng-class="{'open active':(state=='plan' || state=='myLoad' || state=='search' || state=='AutoLoad') }"> 
+
+        <a class="test" href="javascript:;"><span class="title">{{ languageCommonVariables.loads }}</span>
+          <span class=" arrow" ng-class="{'open active':(state=='plan' || state=='myLoad' || state=='search' || state=='AutoLoad') }"></span>
+
+          <span class="icon-thumbnail"><i class="icon-pg loads"></i></span></a>
+
+          <ul class="sub-menu">
+           <li class="">
+              <a href="#/plan">{{ languageCommonVariables.plan }}
+                  <span class="icon-thumbnail">{{ languageCommonVariables.planPl }}</span></a>
+              </li>
     					<!--li class="">
     						<a href="#/autoGenerate">AutoLoad</a>
     						<span class="icon-thumbnail">AL</span>
     					</li-->
     					<li class="">
     						<a href="#/myLoad">{{ languageCommonVariables.assignedLoads }}
-    						<span class="icon-thumbnail">{{ languageCommonVariables.assignedLoadsAl }}</span></a>
-    					</li>
-    				</ul>
-    			</li>
-    			<li>
-            <a class="test" href="#/drivers"><span class="title">{{ languageCommonVariables.driver }}</span>
-            <span class="icon-thumbnail"><i class="icon-pg drivers"></i></span>
-            </a>
-            
-          </li>
-          <li ng-class="(state=='trucks' || state=='trailers') ? 'open active' : ''">
-    				<a class="test" href="javascript:void(0)">
-              <span class="title">{{ languageCommonVariables.vehicles }}</span>
-              <span class=" arrow" ng-class="{'open active':(state=='trucks' || state=='trailers' || state=='maintenance') }"></span>
-            
-    				<span class="icon-thumbnail"><i class="icon-pg trucks vehicles"></i></span></a>
-            <ul class="sub-menu">
-              <li>
-                <a  href="#/trucks">{{ languageCommonVariables.truck }}
-                <span class="icon-thumbnail">tr</span></a>
-              </li>
-              <li>
-                <a  href="#/trailers">{{ languageCommonVariables.trailer }}
-                <span class="icon-thumbnail">tl</span></a>
-              </li>
+                              <span class="icon-thumbnail">{{ languageCommonVariables.assignedLoadsAl }}</span></a>
+                          </li>
+                      </ul>
+                  </li>
+                  <li>
+                    <a class="test" href="#/drivers"><span class="title">{{ languageCommonVariables.driver }}</span>
+                        <span class="icon-thumbnail"><i class="icon-pg drivers"></i></span>
+                    </a>
+
+                </li>
+                <li ng-class="(state=='trucks' || state=='trailers') ? 'open active' : ''">
+                    <a class="test" href="javascript:void(0)">
+                      <span class="title">{{ languageCommonVariables.vehicles }}</span>
+                      <span class=" arrow" ng-class="{'open active':(state=='trucks' || state=='trailers' || state=='maintenance') }"></span>
+
+                      <span class="icon-thumbnail"><i class="icon-pg trucks vehicles"></i></span></a>
+                      <ul class="sub-menu">
+                          <li>
+                            <a  href="#/trucks">{{ languageCommonVariables.truck }}
+                                <span class="icon-thumbnail">tr</span></a>
+                            </li>
+                            <li>
+                                <a  href="#/trailers">{{ languageCommonVariables.trailer }}
+                                    <span class="icon-thumbnail">tl</span></a>
+                                </li>
               <!-- <li>
                 <a  href="#/maintenance">{{ languageCommonVariables.maintenance }}</a>
                 <span class="icon-thumbnail">MN</span>
@@ -101,40 +142,41 @@
     				<span class="icon-thumbnail"><i class="icon-pg safety"></i></span>
     			</li>  -->
             </ul>
-    			</li>
-        	<li>
-				<a class="test" href="#/broker"><span class="title">{{ languageCommonVariables.broker }}</span>
-				<span class="icon-thumbnail"><i class="fa fa-stack-exchange" aria-hidden="true"></i></span>
-				</a>
-				
-			</li>
-      		<li ng-if="loggedUserRoleId == 3 || loggedUserRoleId == 1 || loggedUserRoleId == 5 " ng-class="{'open active':(state=='billing' || state=='sendForPayment') }"> 
-      			<a class="test" href="javascript:void(0);"><span class="title">{{ languageCommonVariables.billing }}</span>
-    				<span class=" arrow" ng-class="{'open active':(state=='billing' || state=='sendForPayment') }"></span>
-    				<span class="icon-thumbnail"><i class="icon-pg fa fa-usd"></i></span>
-    			</a>
-    				
-				<ul class="sub-menu">
-					<li class="">
-						<a href="#/billing">{{ languageCommonVariables.billingHeading }}
-						<span class="icon-thumbnail">bl</span></a>
-					</li>
-					<li class="">
-						<a href="#/sendForPayment">{{ languageCommonVariables.sendForPayment}}
-						<span class="icon-thumbnail">sp</span></a>
-					</li>
-				</ul>
-    		</li>
-    		
-			<li ng-if="loggedUserRoleId != 6 && loggedUserRoleId != 4">
-				<a class="test" href="#/reports"><span class="title">{{ languageCommonVariables.reports }}</span>
-				<span class="icon-thumbnail"><i class="fa fa-bar-chart-o" aria-hidden="true"></i></span></a>
+        </li>
+        <li>
+            <a class="test" href="#/broker"><span class="title">{{ languageCommonVariables.broker }}</span>
+                <span class="icon-thumbnail"><i class="fa fa-stack-exchange" aria-hidden="true"></i></span>
+            </a>
+
+        </li>
+
+        <li ng-if="loggedUserRoleId == 3 || loggedUserRoleId == 1 || loggedUserRoleId == 5 " ng-class="{'open active':(state=='billing' || state=='sendForPayment') }"> 
+           <a class="test" href="javascript:void(0);"><span class="title">{{ languageCommonVariables.billing }}</span>
+            <span class=" arrow" ng-class="{'open active':(state=='billing' || state=='sendForPayment') }"></span>
+            <span class="icon-thumbnail"><i class="icon-pg fa fa-usd"></i></span>
+        </a>
+
+        <ul class="sub-menu">
+           <li class="">
+              <a href="#/billing">{{ languageCommonVariables.billingHeading }}
+                  <span class="icon-thumbnail">bl</span></a>
+              </li>
+              <li class="">
+                  <a href="#/sendForPayment">{{ languageCommonVariables.sendForPayment}}
+                      <span class="icon-thumbnail">sp</span></a>
+                  </li>
+              </ul>
           </li>
-		</ul>
+
+          <li ng-if="loggedUserRoleId != 6 && loggedUserRoleId != 4">
+            <a class="test" href="#/reports"><span class="title">{{ languageCommonVariables.reports }}</span>
+                <span class="icon-thumbnail"><i class="fa fa-bar-chart-o" aria-hidden="true"></i></span></a>
+            </li>
+        </ul>
         <div class="clearfix"></div>
-      </div>
-      <!-- END SIDEBAR MENU -->
-    </nav>
-    <!-- END SIDEBAR -->
-    <!-- END SIDEBPANEL-->
+    </div>
+    <!-- END SIDEBAR MENU -->
+</nav>
+<!-- END SIDEBAR -->
+<!-- END SIDEBPANEL-->
 

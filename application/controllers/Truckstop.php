@@ -103,7 +103,6 @@ class Truckstop extends Admin_Controller{
 	
 	private function giveBestLoads( $loads = array(), $loadsIdArray = array() , $vehicleId = null, $todayDate, $moreThanMiles = null, $addNewClass = '' , $dailyFilter = '', $max_weight = null, $max_length = null ) {
 
-
 		$blackListedBrokers = $this->BrokersModel->getListOfBlacklisted(); //Getting all blacklisted compnies array
 		
 		if ( !empty($loads) ) {
@@ -111,7 +110,8 @@ class Truckstop extends Admin_Controller{
 			if ( $vehicleId != '' && $vehicleId != null ) {
 				$vehicle_fuel_consumption = $this->Vehicle->get_vehicles_fuel_consumption($this->userId, $vehicleId);
 				if ( !empty($vehicle_fuel_consumption) )
-					$truckAverage =(int)($vehicle_fuel_consumption[0]['fuel_consumption']/100);
+					$truckAverage =round( 100/$vehicle_fuel_consumption[0]['fuel_consumption'],2);
+					// $truckAverage = (int)($vehicle_fuel_consumption[0]['fuel_consumption']/100);
 			} 
 			$havePayment = array();
 			
@@ -250,11 +250,18 @@ class Truckstop extends Admin_Controller{
 		return array($loads, $loadsIdArray);
 	}
 	
-	public function fetchSearchResults($parameter = false)
-	{
+	/**
+	* Method fetchSearchResults
+	* @param GET Request
+	* @return JSON
+	* Reqeusting data from Truckstop Api
+	*/
+	public function fetchSearchResults($parameter = false) {
+
 		$this->lang->load('loads',$_REQUEST['setLanguage']);
-		$admin_email = $this->session->userdata('loggedUser_email');
+		$admin_email 	= $this->session->userdata('loggedUser_email');
 		$admin_loggedin = $this->session->userdata('loggedUser_username');
+
 		if( (isset($admin_email) && $admin_email != '') && (isset($admin_loggedin) && $admin_loggedin != '') ) {
 			$newData['shouldNotMoveFurther'] = true;
 		} else {
@@ -306,10 +313,10 @@ class Truckstop extends Admin_Controller{
 			
 			array_push($newDest,$this->origin_state,$this->origin_city);
 			$origin_country = isset($dataPost['origin_country']) ? $dataPost['origin_country'] : 'USA';
-			$dest_country = isset($dataPost['destination_country']) ? $dataPost['destination_country'] : $dataPost['origin_country'];	
+			$dest_country 	= isset($dataPost['destination_country']) ? $dataPost['destination_country'] : $dataPost['origin_country'];	
 			$destination_range = ( $dataPost['destination_range'] != '' && is_numeric($dataPost['destination_range']) ) ? $dataPost['destination_range'] : 300;			
 			$origin_range = ( $dataPost['origin_range'] != '' && is_numeric($dataPost['origin_range']) ) ? $dataPost['origin_range'] : 300;			
-			$load_type = ( isset($dataPost['load_type']) && $dataPost['load_type'] != '' ) ? $dataPost['load_type'] : 'Full';			
+			$load_type 	= ( isset($dataPost['load_type']) && $dataPost['load_type'] != '' ) ? $dataPost['load_type'] : 'Full';			
 			$min_payment = (isset($dataPost['min_payment']) && is_numeric($dataPost['min_payment']) ) ? $dataPost['min_payment'] : 0;			
 			$posted_time = ( isset($dataPost['posted_time']) ) ? $dataPost['posted_time'] : '';			
 			$max_weight = ( isset($dataPost['max_weight']) && is_numeric($dataPost['max_weight']) ) ? $dataPost['max_weight'] : 48000;			
@@ -324,14 +331,14 @@ class Truckstop extends Admin_Controller{
 						$dateTime[] = $datesNewArray[$i];
 						$pickupDate .= $datesNewArray[$i].',';
 					}
-					$this->todayDate = $datesNewArray[0];
+					$this->todayDate = date('m/d/y',strtotime($datesNewArray[0]));
 				} else {
-				
 					$pickupDate = $dataPost['pickup_date'];
 					$dateTime = array (
 						'dateTime' => $pickupDate,
 					);
-					$this->todayDate = $pickupDate;
+
+					$this->todayDate = date('m/d/y',strtotime($pickupDate));
 				}
 				
 			} else {
@@ -447,9 +454,11 @@ class Truckstop extends Admin_Controller{
 			$jobRecord['ID'] = @$jobRecord['truckstopID'];
 			
 			$jobRecord['PaymentAmount1'] = $jobRecord['PaymentAmount'];
-			if(@$jobRecord['Entered'] == '0000-00-00') {
-				$jobRecord['Entered']='';
+			$jobRecord['PostedOn'] = '';
+			if( isset($jobRecord['postedDate']) && $jobRecord['postedDate'] != '0000-00-00 00:00:00') {
+				$jobRecord['PostedOn'] = date('Y-m-d',strtotime($jobRecord['postedDate']));
 			}
+			
 			$jobRecord['EquipmentTypes']['Code'] = $jobRecord['equipment_options'];
 			$jobRecord['EquipmentTypes']['Description'] = $jobRecord['equipment'];
 			$data['primaryLoadId'] = $loadId;
@@ -499,14 +508,16 @@ class Truckstop extends Admin_Controller{
 			if ( $jobRecord['DeliveryDate'] != '' ) {
 				$jobRecord['DeliveryDate'] = date('Y-m-d',strtotime($jobRecord['DeliveryDate']));
 			}
-			
+		
+			$jobRecord['postedDate'] = '';
+			$jobRecord['PostedOn'] = '';
 			if ( $jobRecord['Entered'] != '' ) {
-				$enteredArray = explode('T',$jobRecord['Entered']);
-				$jobRecord['Entered'] = $enteredArray[0];
+				$jobRecord['postedDate'] = date('Y-m-d H:i:s',strtotime($jobRecord['Entered']));
+				$jobRecord['PostedOn']   = date('Y-m-d',strtotime($jobRecord['Entered']));
 			}
-			
+			unset($jobRecord['Entered']);
+
 			$jobRecord['equipment'] = $jobRecord['EquipmentTypes']['Description'];
-			$jobRecord['PostedOn']  = $jobRecord['Entered'];
 			$jobRecord['JobStatus'] = '';
 			$jobRecord['commodity'] = '';
 			
@@ -570,8 +581,7 @@ class Truckstop extends Admin_Controller{
 				$jobRecord['dispatcher_id'] 		= $data['vehicleInfo']['dispatcherId'];
 				$jobRecord['driver_id'] 			= $data['vehicleInfo']['driver_id'];
 			}
-		
-						
+								
 		}
 
 		if ( !empty($data['vehicleInfo']) && $data['vehicleInfo']['fuel_consumption'] != '' ) {
@@ -859,6 +869,7 @@ class Truckstop extends Admin_Controller{
 		} else {
 			$loadDetail = $_COOKIE['printTicket'];
 			$data['jobDetails'] = json_decode($loadDetail,true);
+			$data['jobDetails']['postedDate'] = $data['jobDetails']['PostedOn'];
 			$data['brokerData'] = array(
 				'postingAddress' => $data['jobDetails']['postingAddress'],
 				'city' => isset($data['jobDetails']['city']) ? $data['jobDetails']['city'] : '',
@@ -903,7 +914,7 @@ class Truckstop extends Admin_Controller{
 			}
 		
 			$jobRecord['PaymentAmount'] = str_replace(',','',$jobRecord['PaymentAmount']);
-			$jobRecord['Entered'] 		= ( isset($jobRecord['Entered']) && $jobRecord['Entered'] != '0000-00-00' ) ? $jobRecord['Entered'] : '';
+			$jobRecord['postedDate'] 	= ( isset($jobRecord['postedDate']) && $jobRecord['postedDate'] != '0000-00-00 00:00:00' ) ? date('Y-m-d',strtotime($jobRecord['postedDate'])) : '';
 		
 			$jobRecord['totalMiles'] = $jobRecord['deadmiles'] + $jobRecord['Mileage'];
 			
@@ -1468,8 +1479,10 @@ class Truckstop extends Admin_Controller{
 		
 		$updateLocations = $this->Vehicle->updateTruckDestination($vehicleId, $pickupDate, $planDeadmiles);
 		$vehicle_fuel_consumption = $this->Vehicle->get_vehicles_fuel_consumption($this->userId,$vehicleId);
+
 		if ( !empty($vehicle_fuel_consumption ) ) {
-			$truckAverage =(int)($vehicle_fuel_consumption[0]['fuel_consumption']/100);
+			$truckAverage =round( 100/$vehicle_fuel_consumption[0]['fuel_consumption'],2);
+			// $truckAverage =(int)($vehicle_fuel_consumption[0]['fuel_consumption']/100);
 		} else {
 			$truckAverage = $this->defaultTruckAvg;
 		}
@@ -1519,7 +1532,8 @@ class Truckstop extends Admin_Controller{
 		array_push($newDest,$this->origin_state,$this->origin_city);
 		$vehicle_fuel_consumption = $this->Vehicle->get_vehicles_fuel_consumption($this->userId,$vehicleId);
 		if ( !empty($vehicle_fuel_consumption ) ) {
-			$truckAverage =(int)($vehicle_fuel_consumption[0]['fuel_consumption']/100);
+			// $truckAverage =(int)($vehicle_fuel_consumption[0]['fuel_consumption']/100);
+			$truckAverage =round( 100 / $vehicle_fuel_consumption[0]['fuel_consumption'],2);
 		} else {
 			$truckAverage = $this->defaultTruckAvg;
 		}
@@ -1614,7 +1628,8 @@ class Truckstop extends Admin_Controller{
 		$truckAverage = $this->defaultTruckAvg;
 		if ( $vehicleId != '' && $vehicleId != null ) {
 			$vehicle_fuel_consumption = $this->Vehicle->get_vehicles_fuel_consumption($this->userId,$vehicleId);
-			$truckAverage =(int)($vehicle_fuel_consumption[0]['fuel_consumption']/100);
+			$truckAverage =round( 100/$vehicle_fuel_consumption[0]['fuel_consumption'],2);
+			// $truckAverage =(int)($vehicle_fuel_consumption[0]['fuel_consumption']/100);
 		}
 		
 		$truckAverage = ( $truckAverage != 0 && $truckAverage != '' && $truckAverage != null ) ? $truckAverage : $this->defaultTruckAvg;
@@ -1708,7 +1723,7 @@ class Truckstop extends Admin_Controller{
 			$dateTime = array (
 					'dateTime' => date('Y-m-d',strtotime($pickupDateDest)),
 				);
-			$this->todayDate = $pickupDateDest;
+			$this->todayDate = date('m/d/y',strtotime($pickupDateDest));
 		} else {
 			$dateTime = array (
 				
@@ -1834,13 +1849,13 @@ class Truckstop extends Admin_Controller{
 					for ( $i = 0; $i < count($datesNewArray);  $i++ ) {
 						$dateTime[] = $datesNewArray[$i];
 					}
-					$this->todayDate = $datesNewArray[0];
+					$this->todayDate = date('m/d/y',strtotime($datesNewArray[0]));
 				} else {
 					$pickupDate = $formPost['pickup_date'];
 					$dateTime 	= array (
 						'dateTime' => date('Y-m-d',strtotime($pickupDate)),
 					);
-					$this->todayDate = $pickupDate;
+					$this->todayDate = date('m/d/y',strtotime($pickupDate));
 				}
 			} else {
 				$pickupDate =  $dateTime = array ();
@@ -1988,7 +2003,7 @@ class Truckstop extends Admin_Controller{
 					$brokerInfo = $this->BrokersModel->getBrokerInfo($_REQUEST['brokerId']);
 					$this->BrokersModel->uploadBrokerDocument($response['data']['file_name'], $_REQUEST['brokerId']);
 					$this->fetchBrokerDocuments($_REQUEST['brokerId']);
-					$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> uploaded a new document ('.$response['data']['file_name'].') for broker <a class="notify-link" href="'.$this->serverAddr.'#/editbroker/'.$brokerInfo["id"].'">'.ucfirst($brokerInfo["TruckCompanyName"]).'</a> from ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$_REQUEST['loadId'].',\'\',\'\',\'\',\'\',0,\'\')">#'.$_REQUEST['loadId'].'</a>';
+					$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> uploaded a new document ( '.$response['data']['file_name'].' ) for broker <a class="notify-link" href="'.$this->serverAddr.'#/editbroker/'.$brokerInfo["id"].'">'.ucfirst($brokerInfo["TruckCompanyName"]).'</a> from ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$_REQUEST['loadId'].',\'\',\'\',\'\',\'\',0,\'\')">#'.$_REQUEST['loadId'].'</a>';
 					logActivityEvent($brokerInfo['id'], $this->entity["broker"], $this->event["upload_doc"], $message, $this->Job, $_REQUEST['srcPage']);
 				}catch(Exception $e){
 					log_message('error','UPLOAD_BROKER_DOC_FROM_TICKET'.$e->getMessage());
@@ -2016,14 +2031,14 @@ class Truckstop extends Admin_Controller{
 		try{
 			if($docPrimaryId){
 				$docInfo = $this->Job->getDocDetail($docPrimaryId);
-				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> deleted/overwrote the '.$metaKey.'( '.$docInfo["doc_name"].' ) from ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$loadId.',\'\',\'\',\'\',\'\',0,\'\')">#'.$loadId.'</a>';
+				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> deleted/overwrote the '.$metaKey.' ( '.$docInfo["doc_name"].' ) from ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$loadId.',\'\',\'\',\'\',\'\',0,\'\')">#'.$loadId.'</a>';
 				logActivityEvent($loadId, $this->entity["ticket"], $this->event["overwrite_doc"], $message, $this->Job, $srcPage);
 			}
 
 			$this->Job->insertDocumentEntry($fileName, $loadId, $parameter, $docPrimaryId);	
 			
 			
-			$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> uploaded a new '.$metaKey.'('.$fileName.') for ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$loadId.',\'\',\'\',\'\',\'\',0,\'\')">#'.$loadId.'</a>';
+			$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> uploaded a new '.$metaKey.' ( '.$fileName.' ) for ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$loadId.',\'\',\'\',\'\',\'\',0,\'\')">#'.$loadId.'</a>';
 			logActivityEvent($loadId, $this->entity["ticket"], $this->event["upload_doc"], $message, $this->Job, $srcPage);
 			$this->fetchDocuments($loadId);
 		}catch(Exception $e){
@@ -2275,7 +2290,7 @@ class Truckstop extends Admin_Controller{
 					unlink($bundleFile);
 				$docInfo = $this->Job->getDocDetail($bundleDocArray['id']);
 				$this->Job->deleteDocument($bundleDocArray['id']);
-				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> deleted the bundle document('.$docInfo["doc_name"].') from ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$_POST['loadId'].',\'\',\'\',\'\',\'\',0,\'\')">#'.$_POST['loadId'].'</a>';
+				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> deleted the bundle document ( '.$docInfo["doc_name"].' ) from ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$_POST['loadId'].',\'\',\'\',\'\',\'\',0,\'\')">#'.$_POST['loadId'].'</a>';
 				logActivityEvent($_POST['loadId'], $this->entity["ticket"], $this->event["remove_doc"], $message, $this->Job,$_POST["srcPage"]);
 			}
 		}
@@ -2288,7 +2303,7 @@ class Truckstop extends Admin_Controller{
 				$this->BrokersModel->removeContractDocs($_POST['docId']);
 				$this->fetchBrokerDocuments($brokerId);
 
-				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> deleted a document ('.$brokerInfo["document_name"].') of broker <a class="notify-link" href="'.$this->serverAddr.'#/editbroker/'.$brokerInfo["id"].'"> '.$brokerInfo["TruckCompanyName"].'</a>  from ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$_POST['bloadId'].',\'\',\'\',\'\',\'\',0,\'\')">#'.$_POST['bloadId'].'</a>';
+				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> deleted a document ( '.$brokerInfo["document_name"].' ) of broker <a class="notify-link" href="'.$this->serverAddr.'#/editbroker/'.$brokerInfo["id"].'"> '.$brokerInfo["TruckCompanyName"].'</a>  from ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$_POST['bloadId'].',\'\',\'\',\'\',\'\',0,\'\')">#'.$_POST['bloadId'].'</a>';
 				logActivityEvent($brokerInfo['id'], $this->entity["broker"], $this->event["remove_doc"], $message, $this->Job);	
 			}catch(Exception $e){
 				log_message('error','DELETE_BROKER_DOCS_TICKET'.$e->getMessage());
@@ -2306,7 +2321,7 @@ class Truckstop extends Admin_Controller{
 				$docInfo = $this->Job->getDocDetail($_POST['docId']);
 				$this->Job->deleteDocument($_POST['docId'], $_POST['loadId'], $_POST['doc_type']);
 				
-				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> deleted the '.$metaKey.'('.$docInfo["doc_name"].') from ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$_POST['loadId'].',\'\',\'\',\'\',\'\',0,\'\')">#'.$_POST['loadId'].'</a>';
+				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> deleted the '.$metaKey.' ( '.$docInfo["doc_name"].' ) from ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$_POST['loadId'].',\'\',\'\',\'\',\'\',0,\'\')">#'.$_POST['loadId'].'</a>';
 				logActivityEvent($_POST['loadId'], $this->entity["ticket"], $this->event["remove_doc"], $message, $this->Job,$_POST["srcPage"]);
 				$this->fetchDocuments(false, array(), $_POST['doc_type']);
 			}catch(Exception $e){
@@ -2526,6 +2541,11 @@ class Truckstop extends Admin_Controller{
 			$saveData['pickDate'] = date('m/d/y',strtotime($saveData['PickupDate']));  //estimated time function and gantt chart pick the date from pickDate variable
 		
 		$saveData["driver_type"] = $driverAssignType;	
+		if ( isset($saveData['JobStatus']) && $saveData['JobStatus'] == 'booked' ) {
+			if ( !isset($saveData['bookedDate']) || $saveData['bookedDate'] == '' || $saveData['bookedDate'] == '0000-00-00 00:00:00') {
+				$saveData['bookedDate'] = date('Y-m-d H:i:s');
+			} 
+		}
 
 		try{
 
@@ -2544,6 +2564,7 @@ class Truckstop extends Admin_Controller{
 						}
 					}			
 				}
+
 				$jobOldData = $this->Job->getLoadDetailsById($id);
 
 				$addedExtraStops 	= array();
@@ -2963,7 +2984,7 @@ class Truckstop extends Admin_Controller{
 				$vehicle_fuel_consumption = $this->Vehicle->get_vehicles_fuel_consumption($this->userId,$vehicleId);
 				
 				if ( !empty($vehicle_fuel_consumption ) )
-					$truckAverage =(int)($vehicle_fuel_consumption[0]['fuel_consumption']/100);
+					$truckAverage =round( 100/$vehicle_fuel_consumption[0]['fuel_consumption'],2);
 				
 				if ( !empty($updateLocations) ) {	
 					array_push($newDest,$updateLocations['DestinationState'],$updateLocations['DestinationCity'], $updateLocations['DestinationCountry']);	
@@ -3000,7 +3021,8 @@ class Truckstop extends Admin_Controller{
 			if ( $vehicleId != '' && @$vehicleId != null ) {
 				$vehicle_fuel_consumption = $this->Vehicle->get_vehicles_fuel_consumption($this->userId,@$vehicleId);
 				if ( !empty($vehicle_fuel_consumption ) ) {
-					$truckAverage =(int)($vehicle_fuel_consumption[0]['fuel_consumption']/100);
+					$truckAverage =round( 100/$vehicle_fuel_consumption[0]['fuel_consumption'],2);
+					// $truckAverage =(int)($vehicle_fuel_consumption[0]['fuel_consumption']/100);
 				} 
 			}
 		}

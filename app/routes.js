@@ -46,6 +46,7 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
 				title: 'Dashboard',
                 templateUrl: 'assets/templates/dashboard.html',
                 controller: 'AdminController',
+                controllerAs: 'dashboard',
                 moduleName: 'dashboard',
                   resolve: {
                   	/*getAllVehicles: function(dataFactory, $stateParams) {
@@ -59,7 +60,8 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
                                 'skycons',
                                 'sparkline',
                                 'metrojs',
-                                'markercluster'
+                                'markercluster',
+                                'tabcollapse'
                                 ], {
                                 insertBefore: '#lazyload_placeholder'
                             })

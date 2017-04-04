@@ -5,6 +5,21 @@ ini_set('max_execution_time', 300);
 class Dashboard extends CI_Controller {
 
 	public $userId;
+	public $totalInvoices;
+	public $totalMiles;
+	public $totalDeadMiles;
+	public $totalCharges;
+	public $totalProfit;
+	public $totalProfitPercent;
+	public $overallTotalFinancialGoal;
+	public $overallTotalMilesGoal;
+	public $overallPlusMinusFinancialGoal;
+	public $overallPlusMinusMilesGoal;
+	public $teamFinancialGoal;
+	public $teamMilesGoal;
+	public $singleFinancialGoal;
+	public $singleMilesGoal;
+
 	function __construct() {
 		parent::__construct();
 		$this->load->library('Htmldom');
@@ -14,169 +29,162 @@ class Dashboard extends CI_Controller {
 		$this->userId = $this->session->loggedUser_id;
 		$this->userRoleId = $this->session->role;
 
+		$this->totalInvoices	 				= 0;
+		$this->totalMiles  	    				= 0;
+		$this->totalDeadMiles 					= 0;
+		$this->totalCharges 					= 0;
+		$this->totalProfit 						= 0;
+		$this->totalProfitPercent 				= 0;
+		$this->overallTotalFinancialGoal		= 0;
+		$this->overallTotalMilesGoal 			= 0;
+		$this->overallPlusMinusFinancialGoal 	= 0;
+		$this->overallPlusMinusMilesGoal 		= 0;
+		$this->teamFinancialGoal 				= 0;
+		$this->teamMilesGoal 					= 0;
+		$this->singleFinancialGoal				= 0;
+		$this->singleMilesGoal				 	= 0;
+
 	}
 
+	public function getTodayReport($type){
+		$gDropdown = $vList = $rparam = array(); $lPerformance = '';
+		$args = json_decode(file_get_contents('php://input'),true);
+		if(isset($_COOKIE["_globalDropdown"])){
+			$gDropdown = json_decode($_COOKIE["_globalDropdown"],true);
+		}
+
+		if(isset($args["did"]) && !empty($args["did"]) && isset($args["vtype"]) && $args["vtype"] == "_idispatcher"){
+			$vList[] = $args["did"];
+		}
+		if(count($vList) <= 0){
+			$vList = isset($args['vid']) && !empty(trim($args['vid'])) ? explode(',', $args['vid']) : false;	
+		}
+		
+		if(isset($args['vtype']) && !empty(trim($args['vtype']))){
+			$lPerformance = $args['vtype'];
+		}else if(isset($gDropdown["label"])){
+			if($gDropdown["label"] != "_iall" && $gDropdown["label"] != "_idispatcher" && $gDropdown["label"] != "_idriver" && $gDropdown["label"] != "_iteam" && $gDropdown["label"] != "_team" && $gDropdown["label"] != ""){
+				$lPerformance = "_idriver";
+			}else if($gDropdown["label"] == ""){
+				$lPerformance = "_iall";
+			} else if($gDropdown["label"] == "_team" || $gDropdown['label'] == '_iteam' ){ 
+					$lPerformance = '_iteam';
+			} else {
+				$lPerformance = $gDropdown["label"];
+			}
+		}
+
+		$rparam["selScope"] = $vList;
+		$rparam["driverId"] = isset($gDropdown["id"]) ? $gDropdown["id"] : false; 
+		$rparam["dispId"] = isset($gDropdown["dispId"]) ? $gDropdown["dispId"] : false;
+		$rparam["secondDriverId"]   = isset($gDropdown["team_driver_id"]) ? $gDropdown["team_driver_id"] : false; 
+		$totals = array("PaymentAmount"=>0, "Mileage"=>0, "deadmiles"=>0);
+		if($type == "idle"){
+			$todayReport = $this->Job->getIdleDrivers($rparam,$lPerformance);
+		}else{
+			$todayReport = $this->Job->getTodayReport($rparam,$lPerformance,$type);	
+			foreach ($todayReport as $key => $value) {
+				$totals["PaymentAmount"] += $value["PaymentAmount"];
+				$totals["Mileage"]       += $value["Mileage"];
+				$totals["deadmiles"]     += $value["deadmiles"];
+			}
+		}
+		echo json_encode(array("success"=>true,"todayReport"=>$todayReport,"totals"=>$totals));
+	}
+
+
 	public function index($vehicleID = false){
-		$gDropdown = array();$rparam = array();
+
+		$latitude 	= "";
+		$longitude 	= "";
+		$curAddress = "";
+		$gDropdown 	= array();$rparam = array();
 		$lPerformance = '';
 		$args = json_decode(file_get_contents('php://input'),true);
 
 		if(isset($_COOKIE["_globalDropdown"])){
 			$gDropdown = json_decode($_COOKIE["_globalDropdown"],true);
 		}
+		
 		if($vehicleID){
-			$vList = array($vehicleID);
-			$lPerformance = "_idriver";
-			if( isset($gDropdown["label"]) && ($gDropdown["label"] == "team" || $gDropdown["label"] == "_team") ){
+			$vList 			= array($vehicleID);
+			$lPerformance 	= "_idriver"; 
+			$skip 			= false;
+			if(isset($args["vid"]) && !empty($args["vid"])){
+				$vList 						= array($args["vid"]);
+				$lPerformance 				= $args["vtype"];
+				$rparam["driverId"] 		= $args["driverId"];
+				$rparam["dispId"] 			= $args["did"];
+				$rparam["secondDriverId"]   = $args["team_driver_id"];
+				$skip 						= true;
+
+			}else {
+				$rparam["driverId"] 		= isset($gDropdown["id"]) ? $gDropdown["id"] : false; 
+				$rparam["dispId"] 			= isset($gDropdown["dispId"]) ? $gDropdown["dispId"] : false;
+				$rparam["secondDriverId"]   = isset($gDropdown["team_driver_id"]) ? $gDropdown["team_driver_id"] : false; 
+			}
+
+
+			if( !$skip && isset($gDropdown["label"]) && ($gDropdown["label"] == "team" || $gDropdown["label"] == "_team") ){
 				$lPerformance =  "_iteam" ;
 				$vList = array($gDropdown["vid"]);	
 			}
-			//echo $lPerformance;die;
+
 		}else{
+			
 			$vList = array();
 			if(isset($args["did"]) && !empty($args["did"]) && isset($args["vtype"]) && $args["vtype"] == "_idispatcher"){
 				$vList[] = $args["did"];
 				$drivers = $this->Driver->getDriversList($args["did"],false,true);
 				foreach ($drivers as $key => $value) {
-					//array_push($vList, $value["vid"]);
 					$vehicleID = $value["vid"];break;
 				}
 			}else{
-
 				$vehicleID = isset($args['vid']) && !empty(trim($args['vid'])) ? $args['vid'] : end($vList);	
 			}
-
-
 
 			if(count($vList) <= 0){
 				$vList = isset($args['vid']) && !empty(trim($args['vid'])) ? explode(',', $args['vid']) : false;	
 			}
-			
+	
 			if(isset($args['vtype']) && !empty(trim($args['vtype']))){
 				$lPerformance = 	$args['vtype'];
 			}else if(isset($gDropdown["label"])){
-				if($gDropdown["label"] != "_iall" && $gDropdown["label"] != "_idispatcher" && $gDropdown["label"] != "_idriver" && $gDropdown["label"] != "_iteam" && $gDropdown["label"] != ""){
-					$lPerformance = "_idriver";
-				}else if($gDropdown["label"] == ""){
-					$lPerformance = "_iall";
-				}
-			}
-
-		}
-
-
-		if(isset($args["startDate"]))	{ $rparam["startDate"] = $args["startDate"]; }
-		if(isset($args["endDate"]))		{ $rparam["endDate"] = $args["endDate"]; }
-		$rparam["selScope"] = $vList;
-		$rparam["driverId"] = isset($gDropdown["id"]) ? $gDropdown["id"] : false; $rparam["dispId"] = isset($gDropdown["dispId"]) ? $gDropdown["dispId"] : false;
-		$this->load->model("Report");
-		$lPResult = array();
-		switch ($lPerformance) {
-			case '_iall'		: $lPResult = 	$this->Report->getLoadsTrackingAggregate($rparam,"dispatchers","dashboard"); break;
-			case '_idispatcher'	: $lPResult =	$this->Report->getLoadsTrackingAggregate($rparam,"drivers","dashboard"); break; 
-			case '_idriver'		: $lPResult =	$this->Report->getLoadsTrackingIndividual($rparam,"loads","dashboard"); break;
-			case '_iteam'		: $lPResult =	$this->Report->getLoadsTrackingIndividual($rparam,"team","dashboard"); break;
-			default				: $lPResult =	$this->Report->getLoadsTrackingAggregate($rparam,"dispatchers","dashboard"); break;
-		}
-
-		$chartStack = array();
-		$chartStack["xaxis"] = array();
-		$chartStack["invoiced"] = array();
-		$chartStack["charges"] = array();
-		$chartStack["ppercent"] = array();
-		$chartStack["profitAmount"] = array();
-		$chartStack["type"] = $lPerformance;
-
-		$lPResult = empty($lPResult) ? array() : $lPResult; 
-		$totalInvoices	 	= 0;
-		$totalMiles  	    = 0;
-		$totalDeadMiles 	= 0;
-		$totalCharges 		= 0;
-		$totalProfit 		= 0;
-		$totalProfitPercent = 0;
-
-		foreach ($lPResult as $key => $value) {
-			switch ($lPerformance) {
-				case '_iall'		: array_push($chartStack["xaxis"], $value["dispatcher"]); 
-				array_push($chartStack["invoiced"], (float) $value["invoice"]);
-				array_push($chartStack["charges"],  (float) $value["charges"]);
-				array_push($chartStack["ppercent"], (float) $value["profit"]);
-				array_push($chartStack["profitAmount"], (float) $value["profit"]);
-				$lPResult[$key]["fcolumn"] = $value["dispatcher"];
-				break;
-				case '_idispatcher'	: array_push($chartStack["xaxis"], $value["driver"]); 
-				array_push($chartStack["invoiced"], (float) $value["invoice"]);
-				array_push($chartStack["charges"],  (float) $value["charges"]);
-				array_push($chartStack["ppercent"], (float) $value["profit"]);
-				array_push($chartStack["profitAmount"], (float) $value["profit"]);
-				$lPResult[$key]["fcolumn"] = $value["driver"];
-				break; 
-				case '_iteam'		:
-				case '_idriver'		: //array_push($chartStack["xaxis"], "Load ".$value["loadid"]); 
-				$delDate = $this->validateDate($value["DeliveryDate"]) ?  $value["DeliveryDate"] : 'N/A';
-				array_push($chartStack["xaxis"], $delDate); 
-				array_push($chartStack["invoiced"], (float) $value["invoice"]);
-				array_push($chartStack["charges"],  (float) $value["charges"]);
-				array_push($chartStack["ppercent"], (float) $value["overallTotalProfitPercent"]);
-				array_push($chartStack["profitAmount"], (float) $value["profit"]);
-				$lPResult[$key]["fcolumn"] = $value["loadid"];
-				break;
-				default				: array_push($chartStack["xaxis"], $value["dispatcher"]); 
-				array_push($chartStack["invoiced"], (float) $value["invoice"]);
-				array_push($chartStack["charges"],  (float) $value["charges"]);
-				array_push($chartStack["ppercent"], (float) $value["profit"]);
-				array_push($chartStack["profitAmount"], (float) $value["profit"]);
-				$lPResult[$key]["fcolumn"] = $value["dispatcher"];
-				break;
-			}
-
-			if(isset($value["DeliveryDate"])){
-				$lPResult[$key]["DeliveryDate"]  = $this->validateDate($value["DeliveryDate"]) ? $value["DeliveryDate"] : "N/A";	
-			}
-			
-			/*$lPResult[$key]["invoice"]  = money_format('%.2n', (float)$value["invoice"]);
-			$lPResult[$key]["charges"]  = money_format('%.2n', (float)$value["charges"]);
-			$lPResult[$key]["profit"]  	= money_format('%.2n', (float)$value["profit"]);*/
-			$lPResult[$key]["miles"]      = intval($value["miles"]);
-			$lPResult[$key]["deadmiles"]  = intval($value["deadmiles"]);
-			$lPResult[$key]["invoice"]    = floatval($value["invoice"]);
-			$lPResult[$key]["charges"]    = floatval($value["charges"]);
-			$lPResult[$key]["profit"]     = floatval($value["profit"]);
-			if(isset($value["profitPercent"]) ){
-				if($value["invoice"] > 0){
-					$lPResult[$key]["ppercent"]  = number_format((float)(($value["profit"]/$value["invoice"]) * 100),2);	
-				}else{
-					$lPResult[$key]["ppercent"] =$value["profitPercent"];
-				}
 				
-			}else if(isset($value["overallTotalProfitPercent"])){
-				$lPResult[$key]["ppercent"] = number_format((float)$value["overallTotalProfitPercent"],2);
+				if($gDropdown["label"] != "_iall" && $gDropdown["label"] != "_idispatcher" && $gDropdown["label"] != "_idriver" && $gDropdown["label"] != "_iteam" && $gDropdown["label"] != "_team" && $gDropdown["label"] != ""){
+					$lPerformance = "_idriver";
+				} else if($gDropdown["label"] == ""){
+					$lPerformance = "_iall";
+				} else if($gDropdown["label"] == "_team" || $gDropdown['label'] == '_iteam' ){ 
+					$lPerformance = '_iteam';
+				} else {
+					$lPerformance = $gDropdown["label"];
+				}
 			}
 
-			$totalInvoices		 += $lPResult[$key]["invoice"];
-			$totalMiles 		 += $lPResult[$key]["miles"];
-			$totalDeadMiles		 += $lPResult[$key]["deadmiles"];
-			$totalCharges	     += $lPResult[$key]["charges"];
-			$totalProfit         += $lPResult[$key]["profit"];
+			$rparam["driverId"] 		= isset($gDropdown["id"]) ? $gDropdown["id"] : false; 
+			$rparam["dispId"] 			= isset($gDropdown["dispId"]) ? $gDropdown["dispId"] : false;
+			$rparam["secondDriverId"]   = isset($gDropdown["team_driver_id"]) ? $gDropdown["team_driver_id"] : false; 
 		}
 
-		$chartStack["trecords"] = $lPResult;
-		if ( $totalInvoices != 0 )
-			$totalProfitPercent = number_format((float)(($totalProfit / $totalInvoices) * 100),2);
-		else
-			$totalProfitPercent = 0;
 
-		$chartStack['totals']['totInvoices']      = $totalInvoices;
-		$chartStack['totals']['totMiles']         = $totalMiles;
-		$chartStack['totals']['totDeadMiles']     = $totalDeadMiles;
-		$chartStack['totals']['totCharges']       = $totalCharges;
-		$chartStack['totals']['totProfit']        = $totalProfit;
-		$chartStack['totals']['totProfitPercent'] = $totalProfitPercent;
+		if(isset($args["startDate"]) && $args['startDate'] != '') 
+			$rparam["startDate"] = $args["startDate"]; 
+		else 
+			$rparam["startDate"] = date('Y-m-01'); 
+		
+		if(isset($args["endDate"]) && $args['endDate'] != '') 
+			$rparam["endDate"] = $args["endDate"]; 
+		else 
+			$rparam["endDate"] = date('Y-m-d');
 
+		$rparam["selScope"] 		  = $vList;
+		
+		$chartStack = $this->fetchDashboardData( $rparam, $lPerformance);
+	 		
 		$vehicleInfo = $weatherNotFound = array();
 		$lat = $lng = '';
-		//--------------- Job Status ----------------
-			//$loadOnTheRoad 		= $this->Job->fetchSavedJobs(null, $vList, 'inprogress');
+
 		$vehicleLocation 	= $this->getTrucksLocation($rparam,$lPerformance);
 		$loadsSummary 		= $this->Job->fetchLoadsSummary(null, $rparam,$lPerformance);
 		$loadsChart['delivered'] = $loadsChart['assigned'] = $loadsChart['booked'] = $loadsChart['inprogress'] = 0;
@@ -197,16 +205,30 @@ class Dashboard extends CI_Controller {
 		}else{
 			$loadsChart['noLoads'] = 0;
 		}
-
-			//pr($loadsChart);die;
+			
 		//--------------- Job Status ----------------
 
-		$loadsChart["summary"]["invoiceCount"] = $this->Job->getInvoiceCount($rparam,$lPerformance);
+		$loadsChart["summary"]["invoiceCount"] 			= $this->Job->getInvoiceCount($rparam,$lPerformance);
 		$loadsChart["summary"]["waitingPaperworkCount"] = $this->Job->getWaitingPaperworkCount($rparam,$lPerformance);
-		$loadsChart["summary"]["sentForPaymentCount"] = $this->Job->getSentForPaymentCount($rparam,$lPerformance);
+		$loadsChart["summary"]["sentForPaymentCount"] 	= $this->Job->getSentForPaymentCount($rparam,$lPerformance);
 		$loadsChart["summary"]["paymentNotRecievedCount"] = 0;
+		$todayReport = $this->Job->getTodayReport($rparam,$lPerformance, "booked");
 
-
+		$capcityDaysStart = date("Y-m-d");
+		$driversIdleVsActive = array();
+		for ($caIndex=0; $caIndex < 7 ; $caIndex++) { 
+			$driversIdleVsActive["xaxis"][] = date("l",strtotime($capcityDaysStart));
+			$driversIdleVsActive["active"][]   = (int)$this->Job->getTodayReport($rparam,$lPerformance, "exceptIdle", $capcityDaysStart);
+			$driversIdleVsActive["idle"][] = (int)$this->Job->getIdleDrivers($rparam,$lPerformance,'idle',$capcityDaysStart);
+			$capcityDaysStart = date("Y-m-d", strtotime("+1 days", strtotime($capcityDaysStart)));
+		}
+ 
+		$totals = array("PaymentAmount"=>0, "Mileage"=>0, "deadmiles"=>0);
+		foreach ($todayReport as $key => $value) {
+			$totals["PaymentAmount"] += $value["PaymentAmount"];
+			$totals["Mileage"]       += $value["Mileage"];
+			$totals["deadmiles"]     += $value["deadmiles"];
+		}
 		$userId = false;
 		$parentId = false;
 		if($this->userRoleId == _DISPATCHER){
@@ -220,7 +242,7 @@ class Dashboard extends CI_Controller {
 		}
 		
 		$allVehicles = array();
-		if($vehicleID){ 
+		if($vehicleID){
 			if($lPerformance == "_iteam"){
 				$vehicleInfo = $this->Vehicle->get_vehicle_address($vehicleID,false,'team');	
 				$vehicleInfo["dtype"] = "_team";
@@ -239,28 +261,27 @@ class Dashboard extends CI_Controller {
 			foreach ($allVehicles as $key => $value) {
 				if(!empty($value['latitude']) && !empty($value['longitude'])){
 					$vehicleInfo['vehicle_address'] = urlencode($value['vehicle_address'].','.$value['city'].', '.$value['state']);
-					$vehicleID = $value['vid'];
-					$vehicleLabel = $value['driverName'];
-					$lat = $value['latitude'];
-					$lng = $value['longitude'];
+					$vehicleID 		= $value['vid'];
+					$vehicleLabel 	= $value['driverName'];
+					$lat 			= $value['latitude'];
+					$lng 			= $value['longitude'];
+					$latitude 		= $lat;
+					$longitude 		= $lng;
+					$curAddress 	= $vehicleInfo['vehicle_address'];
 					$weatherNotFound['country'] = 'US';
-					$weatherNotFound['name'] = $value['driverName'];	
+					$weatherNotFound['name'] 	= $value['city'];	
 					break;
 				}
 			}
 		}
 
-		/*if(isset($vehicleInfo["driverName"])){
-			$vehicleInfo["driverName"] .=  " - ".$vehicleInfo["label"];
-		}*/
-
 		if(count($allVehicles) <= 0)
 			$allVehicles = $this->Driver->getDriversList($userId,true,true);
 		
-		$teamList = $this->Driver->getDriversListAsTeam($userId,true);
+		$teamList 		= $this->Driver->getDriversListAsTeam($userId,true);
 		$dispatcherList = $this->Driver->getDispatcherList($userId);
 		
-		$vehicleList = array();
+		$vehicleList 	= array();
 		if(!empty($allVehicles) && is_array($allVehicles)){	
 			$vehicleList = $allVehicles;
 			if(is_array($teamList) && count($teamList) > 0){
@@ -269,7 +290,6 @@ class Dashboard extends CI_Controller {
 					array_unshift($vehicleList, $value);
 				}
 			}
-			
 			foreach ($dispatcherList as $key => $value) {
 				array_unshift($vehicleList, $value);
 			}
@@ -278,94 +298,30 @@ class Dashboard extends CI_Controller {
 				$new = array("id"=>"","profile_image"=>"","driverName"=>"All Groups","label"=>"","username"=>"","latitude"=>"","longitude"=>"","vid"=>"","city"=>"","vehicle_address"=>"","state"=>"");
 				array_unshift($vehicleList, $new);
 			}
-			//$vehicleList = array_merge($vehicleList, $dispatcherList);
-			//array_multisort($vehicleList);
 		}
 
-		$output  = '';
-		if((empty($lat) || empty($lng)) ){
-			$output = json_decode(file_get_contents("https://maps.googleapis.com/maps/api/geocode/json?address=".$vehicleInfo['vehicle_address']."&key=AIzaSyBSPVGmxdOqe2yrxzla4iezs00zWe_p6j4"),true);
-			if($output['status'] == 'OK'){
-				$lat = $output['results'][0]['geometry']['location']['lat'];
-				$lng = $output['results'][0]['geometry']['location']['lng'];
-				$output = $output['results'][0]['geometry']['location'];
-			}
-		}
-
-		$currentWeather = array();
-		$dailyForecast = array();
 		$weatherNotFound['status'] = false;
-		if(!empty($lat) && !empty($lng) ){
+		$latitude = $lat;
+		$longitude = $lng;
+		$curAddress = $vehicleInfo['vehicle_address'];
 
-			try{
-				$currentWeather = @json_decode(file_get_contents('http://api.openweathermap.org/data/2.5/weather?lat='.$lat.'&lon='.$lng.'&mode=json&units=imperial&appid=51b18a47eee105fcac60c7c2e832f587'),true);
-				if(is_array($currentWeather) && count($currentWeather) > 0){
-					$currentWeather['day'] = date('N',$currentWeather['dt']);
-					$currentWeather['date'] = date('dS F , Y', $currentWeather['dt']);
-					$currentWeather['today'] = date('l', $currentWeather['dt']);
-					$currentWeather['sunrise'] = date('h:i', $currentWeather['sys']['sunrise']);
-					$currentWeather['sunset'] = date('h:i', $currentWeather['sys']['sunset']);
-					$currentWeather['weather_description'] = $currentWeather['weather'][0]['description'];
-					$currentWeather['wind'] = $currentWeather['wind']['speed'];
-					$currentWeather['humidity'] = $currentWeather['main']['humidity'];
-					$currentWeather['current_temperature'] = $currentWeather['main']['temp'];
-					$currentWeather['country'] = $currentWeather['sys']["country"];
-					$currentWeather['name'] = $currentWeather["name"];
-					$currentWeather['weather_class'] = $this->checkWeatherType($currentWeather['weather'][0]['main'],$currentWeather['weather'][0]['description'] );
-					$dailyForecast = @json_decode(file_get_contents('http://api.openweathermap.org/data/2.5/forecast/daily?lat='.$lat.'&lon='.$lng.'&cnt=5&units=imperial&mode=json&appid=3401586ebfec8accfb4845bd016a0819'),true);
-					if (!empty($dailyForecast)) {
-						$count = 0;
-						foreach ($dailyForecast['list'] as $key=>$day) { 
-							if($count >= 2 ){
-								break;
-							}
 
-							if( date('Ymd', $currentWeather['dt']) == date('Ymd', $day['dt']) || $currentWeather['dt'] >= $day['dt'] ){
-								unset($dailyForecast['list'][$key]); continue;
-							}
-							$count++;
-							$dailyForecast['list'][$key]['count'] = $count;
+		/**
+		* Getting avatar text and dynamic color of selected driver
+		* Check if driver selected from driver list page if yes then priroty to it otherwise to cookie data
+		*/
+		
+		$driverId = (!empty($rparam['driverId'])) ? $rparam['driverId'] : (isset($gDropdown['id']) ? $gDropdown["id"] : ""); 
 
-							$dailyForecast['list'][$key]['day'] = date('N',$day['dt']);
-							$dailyForecast['list'][$key]['date'] = date('dS F , Y', $day['dt']);
-							$dailyForecast['list'][$key]['today'] = date('l', $day['dt']);
-							$dailyForecast['list'][$key]['weather_class'] = $this->checkWeatherType($day['weather'][0]['main'],$day['weather'][0]['description'] );
-							$dailyForecast['list'][$key]['weather_description'] = $day['weather'][0]['description'];
-
-							$dailyForecast['list'][$key]['current_temperature'] = $day['temp']['day'];
-							$dailyForecast['list'][$key]['noon'] = $day['temp']['day'];
-							$dailyForecast['list'][$key]['night'] = $day['temp']['night'];
-							$dailyForecast['list'][$key]['wind'] = $day['speed'];
-						}
-						$dailyForecast['list'] = array_values($dailyForecast['list']);
-					}
-				}else{
-					$weatherNotFound['status'] = true;		
-					$currentWeather = $dailyForecast = array();
-				}
-			}catch(Exception $e){
-				$weatherNotFound['status'] = true;	
-			}
-
-		}else{
-			$weatherNotFound['status'] = true;
+		if(!empty($driverId)){
+			
+			$avatraInfo = $this->createAvatarText($driverId);
+			$gDropdown['avtarText'] = $avatraInfo['text'];
+			$gDropdown['color'] 	= $avatraInfo['color'];
 		}
 
-		if($dailyForecast == null || $currentWeather == null)
-			$weatherNotFound['status'] = true;	
+		echo json_encode(array('longitude'=>$longitude, 'latitude' =>$latitude , 'address' => $curAddress,  "vehicleList"=>$vehicleList,'vehicleID'=>$vehicleID,'vehicleLabel'=>$vehicleLabel, 'weatherNotFound'=>$weatherNotFound,"loadsChart"=>$loadsChart,"vehicleLocation"=>$vehicleLocation,'selectedDriver'=>$gDropdown, "chartStack"=>$chartStack, "todayReport"=>$todayReport, "totals"=>$totals, "driversIdleVsActive"=>$driversIdleVsActive, 'success'=>true));    
 
-		
-		$avatraInfo = $this->createAvatarText($gDropdown);
-		
-		// pr($gDropdown);
-
-
-		$gDropdown['avtarText'] = $avatraInfo['text'];
-		$gDropdown['color'] 	= $avatraInfo['color'];
-		// pr($avatraInfo);
-		// pr($gDropdown);
-
-		echo json_encode(array("currentWeather"=>$currentWeather, "dailyForecast"=>$dailyForecast,"vehicleList"=>$vehicleList,'vehicleID'=>$vehicleID,'vehicleLabel'=>$vehicleLabel,'output'=>$output,'weatherNotFound'=>$weatherNotFound,"loadsChart"=>$loadsChart,"vehicleLocation"=>$vehicleLocation,'selectedDriver'=>$gDropdown, "chartStack"=>$chartStack, 'success'=>true));
 	}
 
 	/**
@@ -373,25 +329,14 @@ class Dashboard extends CI_Controller {
 	* @param Data
 	* @return Avtar Text
 	*/
-	private function createAvatarText($data){
+	private function createAvatarText($driverId){
 		
 		$avatraInfo = '';
-		switch ($data['label']) {
-			case '_team':
-			$nameChunks = explode('+',$data['driverName']);
-			$avatraInfo['text'] = $nameChunks[0][0].$nameChunks[1][1];
-			break;
+		$columns 				= ['color','first_name','last_name'];
+		$data 					= $this->Job->getColumns($driverId,$columns,'drivers');;
+		$avatraInfo['color'] 	= $data[0]['color'];
+		$avatraInfo['text'] 	= $data[0]['first_name'][0].$data[0]['last_name'][0];
 
-			default:
-			$nameChunks = explode(' ',str_replace('  ', ' ', $data['driverName']));
-			
-			$avatraInfo['text'] = $nameChunks[0][0].$nameChunks[1][0];
-			break;
-		}
-		
-		$columns = ['color'];
-		$data = $this->Job->getColumns($data['id'],$columns,'drivers');;
-		$avatraInfo['color'] = $data[0]['color'];
 		return $avatraInfo;
 	}
 
@@ -399,11 +344,13 @@ class Dashboard extends CI_Controller {
 		$widgetOrd = array();
 		$widgetsOrder = $this->Job->getWidgetsOrder($this->userId);
 		
+
 		if ( !empty($widgetsOrder) ) {
-			$widgetsOrder = json_decode($widgetsOrder['widget_order'],true);
-			$widgetOrd['left'] = implode(',', $widgetsOrder['left']);
+			$widgetsOrder 		= json_decode($widgetsOrder['widget_order'],true);
+			$widgetOrd['left'] 	= implode(',', $widgetsOrder['left']);
 			$widgetOrd['right'] = implode(',', $widgetsOrder['right']);
 		}
+
 		$userDrivers = array();$vehicleInfo = array();
 		if($this->userRoleId == _DISPATCHER || $this->userRoleId == 4 ){
 			if( $this->session->userdata('loggedUser_parentId') != 0 )
@@ -423,6 +370,19 @@ class Dashboard extends CI_Controller {
 			}
 		}
 		echo json_encode(array('widgetsOrder'=>$widgetOrd,"selectedDriver"=>$vehicleInfo,"selDrivers"=>$userDrivers,"user_role"=>$this->userRoleId));
+	}	
+
+	/**
+	* Method widgetVisibility
+	* @param widget ID,visibility(0 OR 1)
+	* @return NULL
+	* 
+	*/
+	public function widgetVisibility(){
+		
+		$args = json_decode(file_get_contents('php://input'),true);
+
+		$this->Job->widgetsVisibility($args);
 	}
 
 	
@@ -453,119 +413,33 @@ class Dashboard extends CI_Controller {
 		if(isset($args['vtype']) && !empty(trim($args['vtype']))){
 			$lPerformance = 	$args['vtype'];
 		}else if(isset($gDropdown["label"])){
-			if($gDropdown["label"] != "_iall" && $gDropdown["label"] != "_idispatcher" && $gDropdown["label"] != "_idriver" && $gDropdown["label"] != "_iteam" && $gDropdown["label"] != ""){
+			if($gDropdown["label"] != "_iall" && $gDropdown["label"] != "_idispatcher" && $gDropdown["label"] != "_idriver" && $gDropdown["label"] != "_iteam" && $gDropdown["label"] != "_team" && $gDropdown["label"] != ""){
 				$lPerformance = "_idriver";
-			}else if($gDropdown["label"] == ""){
+			} else if($gDropdown["label"] == ""){
 				$lPerformance = "_iall";
+			} else if($gDropdown["label"] == "_team" || $gDropdown['label'] == '_iteam' ){ 
+				$lPerformance = '_iteam';
+			} else {
+					$lPerformance = $gDropdown["label"];
 			}
 		}
 
-
-
-
-		if(isset($args["startDate"]))	{ $rparam["startDate"] = $args["startDate"]; }
-		if(isset($args["endDate"]))		{ $rparam["endDate"] = $args["endDate"]; }
-		$rparam["selScope"] = $vList;
-		$rparam["driverId"] = isset($gDropdown["id"]) ? $gDropdown["id"] : false; $rparam["dispId"] = isset($gDropdown["dispId"]) ? $gDropdown["dispId"] : false;
-		$this->load->model("Report");
-		$lPResult = array();
-		switch ($lPerformance) {
-			case '_iall'		: $lPResult = 	$this->Report->getLoadsTrackingAggregate($rparam,"dispatchers","dashboard"); break;
-			case '_idispatcher'	: $lPResult =	$this->Report->getLoadsTrackingAggregate($rparam,"drivers","dashboard"); break; 
-			case '_idriver'		: $lPResult =	$this->Report->getLoadsTrackingIndividual($rparam,"loads","dashboard"); break;
-			case '_iteam'		: $lPResult =	$this->Report->getLoadsTrackingIndividual($rparam,"team","dashboard"); break;
-			default				: $lPResult =	$this->Report->getLoadsTrackingAggregate($rparam,"dispatchers","dashboard"); break;
-		}
-
-		$chartStack = array();
-		$chartStack["xaxis"] = array();
-		$chartStack["invoiced"] = array();
-		$chartStack["charges"] = array();
-		$chartStack["ppercent"] = array();
-		$chartStack["profitAmount"] = array();
-		$chartStack["type"] = $lPerformance;
-
-		$lPResult = empty($lPResult) ? array() : $lPResult; 
-		$totalInvoices	 	= 0;
-		$totalMiles  	    = 0;
-		$totalDeadMiles 	= 0;
-		$totalCharges 		= 0;
-		$totalProfit 		= 0;
-		$totalProfitPercent = 0;
-
-		foreach ($lPResult as $key => $value) {
-			switch ($lPerformance) {
-				case '_iall'		: array_push($chartStack["xaxis"], $value["dispatcher"]); 
-				array_push($chartStack["invoiced"], (float) $value["invoice"]);
-				array_push($chartStack["charges"],  (float) $value["charges"]);
-				array_push($chartStack["ppercent"], (float) $value["profit"]);
-				array_push($chartStack["profitAmount"], (float) $value["profit"]);
-				$lPResult[$key]["fcolumn"] = $value["dispatcher"];
-				break;
-				case '_idispatcher'	: array_push($chartStack["xaxis"], $value["driver"]); 
-				array_push($chartStack["invoiced"], (float) $value["invoice"]);
-				array_push($chartStack["charges"],  (float) $value["charges"]);
-				array_push($chartStack["ppercent"], (float) $value["profit"]);
-				array_push($chartStack["profitAmount"], (float) $value["profit"]);
-				$lPResult[$key]["fcolumn"] = $value["driver"];
-				break; 
-				case '_iteam'		:
-				case '_idriver'		: //array_push($chartStack["xaxis"], "Load ".$value["loadid"]); 
-				$delDate = $this->validateDate($value["DeliveryDate"]) ?  $value["DeliveryDate"] : 'N/A';
-				array_push($chartStack["xaxis"], $delDate); 
-				array_push($chartStack["invoiced"], (float) $value["invoice"]);
-				array_push($chartStack["charges"],  (float) $value["charges"]);
-				array_push($chartStack["ppercent"], (float) $value["overallTotalProfitPercent"]);
-				array_push($chartStack["profitAmount"], (float) $value["profit"]);
-				$lPResult[$key]["fcolumn"] = $value["loadid"];
-				break;
-				default				: array_push($chartStack["xaxis"], $value["dispatcher"]); 
-				array_push($chartStack["invoiced"], (float) $value["invoice"]);
-				array_push($chartStack["charges"],  (float) $value["charges"]);
-				array_push($chartStack["ppercent"], (float) $value["profit"]);
-				array_push($chartStack["profitAmount"], (float) $value["profit"]);
-				$lPResult[$key]["fcolumn"] = $value["dispatcher"];
-				break;
-			}
-
-			if(isset($value["DeliveryDate"])){
-				$lPResult[$key]["DeliveryDate"]  = $this->validateDate($value["DeliveryDate"]) ? $value["DeliveryDate"] : "N/A";	
-			}
-			
-			/*$lPResult[$key]["invoice"]  = money_format('%.2n', (float)$value["invoice"]);
-			$lPResult[$key]["charges"]  = money_format('%.2n', (float)$value["charges"]);
-			$lPResult[$key]["profit"]  	= money_format('%.2n', (float)$value["profit"]);*/
-			$lPResult[$key]["miles"]      = intval($value["miles"]);
-			$lPResult[$key]["deadmiles"]  = intval($value["deadmiles"]);
-			$lPResult[$key]["invoice"] 	  = floatval($value["invoice"]);
-			$lPResult[$key]["charges"]    = floatval($value["charges"]);
-			$lPResult[$key]["profit"]  	  = floatval($value["profit"]);
-			if(isset($value["profitPercent"])){
-				$lPResult[$key]["ppercent"]  = number_format((float)(($value["profit"]/$value["invoice"]) * 100),2);
-			}else if(isset($value["overallTotalProfitPercent"])){
-				$lPResult[$key]["ppercent"] = number_format((float)$value["overallTotalProfitPercent"],2);
-			}
-
-			$totalInvoices		 += $lPResult[$key]["invoice"];
-			$totalMiles 		 += $lPResult[$key]["miles"];
-			$totalDeadMiles		 += $lPResult[$key]["deadmiles"];
-			$totalCharges	     += $lPResult[$key]["charges"];
-			$totalProfit         += $lPResult[$key]["profit"];
-		}
-
-		$chartStack["trecords"] = $lPResult;
-		if ( $totalInvoices != 0 )
-			$totalProfitPercent = number_format((float)(($totalProfit / $totalInvoices) * 100),2);
-		else
-			$totalProfitPercent = 0;
+		if(isset($args["startDate"]) && $args['startDate'] != '') 
+			$rparam["startDate"] = $args["startDate"]; 
+		else 
+			$rparam["startDate"] = date('Y-m-01'); 
 		
-		$chartStack['totals']['totInvoices']      = $totalInvoices;
-		$chartStack['totals']['totMiles']         = $totalMiles;
-		$chartStack['totals']['totDeadMiles']     = $totalDeadMiles;
-		$chartStack['totals']['totCharges']       = $totalCharges;
-		$chartStack['totals']['totProfit']        = $totalProfit;
-		$chartStack['totals']['totProfitPercent'] = $totalProfitPercent;
+		if(isset($args["endDate"]) && $args['endDate'] != '') 
+			$rparam["endDate"] = $args["endDate"]; 
+		else 
+			$rparam["endDate"] = date('Y-m-d');
 
+		$rparam["selScope"] = $vList;
+		$rparam["driverId"] = isset($gDropdown["id"]) ? $gDropdown["id"] : false; 
+		$rparam["dispId"] = isset($gDropdown["dispId"]) ? $gDropdown["dispId"] : false;
+		$rparam["secondDriverId"]   = isset($gDropdown["team_driver_id"]) ? $gDropdown["team_driver_id"] : false;
+
+		$chartStack = $this->fetchDashboardData( $rparam, $lPerformance);
 		$vehicleInfo = $weatherNotFound = array();
 		$lat = $lng = '';
 		//--------------- Job Status ----------------
@@ -625,7 +499,7 @@ class Dashboard extends CI_Controller {
 				continue;
 			}else{
 				$uid = isset($value['vid']) ? $value['vid'] : $value['id'];
-				$allVehicles[$key]["loadDetail"] = $this->Vehicle->get_current_load($uid);	
+				//$allVehicles[$key]["loadDetail"] = $this->Vehicle->get_current_load($uid);	
 				$tHeading = unserialize($value["telemetry"]);
 				$headingType = (isset($tHeading["heading"]) && $tHeading["heading"] != "") ? floor($tHeading["heading"]/45) : "_EMPTY" ;
 
@@ -641,6 +515,8 @@ class Dashboard extends CI_Controller {
 					case 7: $allVehicles[$key]["heading"] = "NW"; break;
 					
 				}
+
+				$allVehicles[$key]["timestamp"] = toLocalTimezone($value["timestamp"]);
 			}
 		}
 		$allVehicles =  array_values($allVehicles);
@@ -771,5 +647,793 @@ class Dashboard extends CI_Controller {
 	}
 
 
+	function weather_updates($vehicleID = false){
+
+		$userId = $this->userId;
+		$args = json_decode(file_get_contents('php://input'),true);
+		//$vehicleID = $args['vehicleID'];
+		$lat = $args['latitude'];
+		$lng = $args['longitude'];
+		$vehicleInfo['vehicle_address'] = $args['address'];
+
+		$output  = '';
+		if((empty($lat) || empty($lng)) ){
+			$output = json_decode(file_get_contents("https://maps.googleapis.com/maps/api/geocode/json?address=".$vehicleInfo['vehicle_address']."&key=AIzaSyBSPVGmxdOqe2yrxzla4iezs00zWe_p6j4"),true);
+			if($output['status'] == 'OK'){
+				$lat = $output['results'][0]['geometry']['location']['lat'];
+				$lng = $output['results'][0]['geometry']['location']['lng'];
+				$output = $output['results'][0]['geometry']['location'];
+			}
+		} 
+		$currentWeather = array();
+		$dailyForecast = array();
+		$weatherNotFound['status'] = false;
+		if(!empty($lat) && !empty($lng) ){
+
+			try{
+				$currentWeather = @json_decode(file_get_contents('http://api.openweathermap.org/data/2.5/weather?lat='.$lat.'&lon='.$lng.'&mode=json&units=imperial&appid=51b18a47eee105fcac60c7c2e832f587'),true);
+				if(is_array($currentWeather) && count($currentWeather) > 0){
+					$currentWeather['day'] = date('N',$currentWeather['dt']);
+					$currentWeather['date'] = date('dS F , Y', $currentWeather['dt']);
+					$currentWeather['today'] = date('l', $currentWeather['dt']);
+					$currentWeather['sunrise'] = date('h:i', $currentWeather['sys']['sunrise']);
+					$currentWeather['sunset'] = date('h:i', $currentWeather['sys']['sunset']);
+					$currentWeather['weather_description'] = $currentWeather['weather'][0]['description'];
+					$currentWeather['wind'] = $currentWeather['wind']['speed'];
+					$currentWeather['humidity'] = $currentWeather['main']['humidity'];
+					$currentWeather['current_temperature'] = $currentWeather['main']['temp'];
+					$currentWeather['country'] = $currentWeather['sys']["country"];
+					$currentWeather['name'] = $currentWeather["name"];
+					$currentWeather['weather_class'] = $this->checkWeatherType($currentWeather['weather'][0]['main'],$currentWeather['weather'][0]['description'] );
+					$dailyForecast = @json_decode(file_get_contents('http://api.openweathermap.org/data/2.5/forecast/daily?lat='.$lat.'&lon='.$lng.'&cnt=5&units=imperial&mode=json&appid=3401586ebfec8accfb4845bd016a0819'),true);
+					if (!empty($dailyForecast)) {
+						$count = 0;
+						foreach ($dailyForecast['list'] as $key=>$day) { 
+							if($count >= 2 ){
+								break;
+							}
+
+							if( date('Ymd', $currentWeather['dt']) == date('Ymd', $day['dt']) || $currentWeather['dt'] >= $day['dt'] ){
+								unset($dailyForecast['list'][$key]); continue;
+							}
+							$count++;
+							$dailyForecast['list'][$key]['count'] = $count;
+
+							$dailyForecast['list'][$key]['day'] = date('N',$day['dt']);
+							$dailyForecast['list'][$key]['date'] = date('dS F , Y', $day['dt']);
+							$dailyForecast['list'][$key]['today'] = date('l', $day['dt']);
+							$dailyForecast['list'][$key]['weather_class'] = $this->checkWeatherType($day['weather'][0]['main'],$day['weather'][0]['description'] );
+							$dailyForecast['list'][$key]['weather_description'] = $day['weather'][0]['description'];
+
+							$dailyForecast['list'][$key]['current_temperature'] = $day['temp']['day'];
+							$dailyForecast['list'][$key]['noon'] = $day['temp']['day'];
+							$dailyForecast['list'][$key]['night'] = $day['temp']['night'];
+							$dailyForecast['list'][$key]['wind'] = $day['speed'];
+						}
+						$dailyForecast['list'] = array_values($dailyForecast['list']);
+					}
+				}else{
+					$weatherNotFound['status'] = true;		
+					$currentWeather = $dailyForecast = array();
+				}
+			}catch(Exception $e){
+				$weatherNotFound['status'] = true;	
+			}
+
+		}else{
+			$weatherNotFound['status'] = true;
+		}
+
+		if($dailyForecast == null || $currentWeather == null)
+			$weatherNotFound['status'] = true;	
+
+
+
+		 print_r(json_encode(array('currentWeather' =>$currentWeather , 'dailyForecast'=>$dailyForecast , 'weatherNotFound'=>$weatherNotFound)));
+	}
+
+	/**
+	* get number of days in month
+	*/
+
+	public function getMonthDays($startDate = '', $endDate = '' ) {
+		$data 	= array();
+		$time  	  = strtotime($startDate);
+		$endTime  = strtotime($endDate);
+		$month    = date("m",$time);
+		$year     = date("Y",$time);
+		$endMonth = date("m",$endTime);
+		$endYear  = date("Y",$endTime);
+
+		$monthsRange = range($month,$endMonth);
+		$days = 0;
+		for($i = 0; $i < count($monthsRange); $i++) {
+			$days += cal_days_in_month(CAL_GREGORIAN, $monthsRange[$i], $endYear);
+		}
+
+		$data['singleFinancial'] 	= round( $this->config->item('singleFinancialGoal') / $days ) * count($monthsRange);
+		$data['teamFinancial']  	= round( $this->config->item('teamFinancialGoal') / $days ) * count($monthsRange);					
+		$data['singleMiles'] 		= round( $this->config->item('singleMilesGoal') / $days ) * count($monthsRange);
+		$data['teamMiles']          = round( $this->config->item('teamMilesGoal') / $days ) * count($monthsRange);
+		
+		return $data;
+	}
+
+	public function fetchDashboardData( $rparam = array(), $lPerformance = '' ) {
+
+		$this->load->model("Report");
+		$lPResult = array();
+		
+		$chartStack = array();
+		$chartStack["xaxis"] = array();
+		$chartStack["charges"] = array();
+		$chartStack["ppercent"] = array();
+		$chartStack["profitAmount"] = array();
+		$chartStack["goalsAchievement"] = array();
+		$chartStack["type"] = $lPerformance;
+
+		$goalValues 					= $this->getMonthDays($rparam['startDate'],$rparam['endDate']);	
+		$startDate 						= new DateTime($rparam["startDate"]);
+		$endDate   						= new DateTime($rparam["endDate"]);
+		$daysdiff 						= $endDate->diff($startDate)->format("%a");
+		$daysdiff 						= $daysdiff + 1;
+	
+		$goalValues = $this->getMonthDays($rparam['startDate'],$rparam['endDate']);
+	 
+		$startDate = new DateTime($rparam["startDate"]);
+		$endDate   = new DateTime($rparam["endDate"]);
+
+		$daysdiff = $endDate->diff($startDate)->format("%a");
+		$daysdiff = $daysdiff + 1;
+
+		$lPResult = array();
+
+			switch ($lPerformance) {
+				case '_iall'		:
+					$dispatchersList = $this->Report->getDispatchersListForGoals($rparam);
+					$loadResult = $this->getPerformanceLoadsForAllDispatchers($dispatchersList,$rparam,$goalValues);
+					$lPResult 	= $loadResult['lPResult'];
+					$chartStack = $loadResult['chartStack'];				
+				break;
+				case '_idispatcher'	: 
+					// $rparam['startDate']		= '2017-04-01';
+					// $rparam['endDate']		= '2017-04-30';
+					$getDrivers = $this->Report->getDispatcherDriverDashboard($rparam);
+					$currentDrivers = $this->Report->getTotalTeamDrivers($rparam['dispId'], $rparam['startDate'], $rparam['endDate'] );
+
+					$val = array();
+					$arrSingle = array();
+					$arrTeam = array();
+					if ( !empty($currentDrivers)) {
+						
+						$driversList = $this->getUniqueDriverDate($currentDrivers);
+						$newArrayTeam = array();
+						$newArraySingle = array();
+						for($i = 0; $i < count($driversList); $i++ )	 {
+							if ( $driversList[$i]['team'] > 0) {
+								$newArrayTeam[] = explode(',',$driversList[$i]['assigned_team']);
+							} 
+
+							if ( $driversList[$i]['single'] > 0) {
+								$newArraySingle[] = explode(',',$driversList[$i]['assigned_drivers']);
+							} 
+						}
+
+						for( $i = 0; $i < count($newArraySingle); $i++ ) {
+							if( isset($newArraySingle[$i+1]))
+								$result = array_unique(array_merge($newArraySingle[$i], $newArraySingle[$i+1]));
+						}
+
+						for( $i = 0; $i < count($newArrayTeam); $i++ ) {
+							if( isset($newArrayTeam[$i+1]))
+								$resultTeam = array_unique(array_merge($newArrayTeam[$i], $newArrayTeam[$i+1]));
+						}
+						
+						if ( isset($result)) {
+							$newArraySingle = array_values($result);
+						} else if ( isset($newArraySingle[0] ) ){
+							$newArraySingle = $newArraySingle[0];
+						}
+
+						if ( isset($resultTeam)) {
+							$newArrayTeam = array_values($resultTeam);
+						} else if ( isset($newArrayTeam[0] ) ){
+							$newArrayTeam = $newArrayTeam[0];
+						}
+
+						$daysDriversList = $driversList;
+					} else {
+
+						$driversList = $this->Report->getTotalDriversList($rparam['dispId'], $rparam['startDate'], $rparam['endDate'] );
+						$newArraySingle = ($driversList['assigned_drivers'] != '' ) ? explode(',',$driversList['assigned_drivers']) : array();
+						$newArrayTeam = ($driversList['assigned_team'] != '' ) ? explode(',',$driversList['assigned_team']) : array();
+
+						$daysDriversList = array();
+					}
+								
+				if ( !empty($getDrivers)) {			
+					$newArray = array();
+
+					if ( isset($driversList[0]) && is_array($driversList[0])) {
+			
+					} else if ( !empty($driversList)) {
+						$driversList = array($driversList);
+					}
+					$lastDate = end($driversList);
+					$lastDate = isset($lastDate['createdDate']) ? $lastDate['createdDate'] : $rparam['endDate'];
+					$driversListCount = count($driversList);
+					
+				foreach( $getDrivers as $key => $driver ) {
+					$daysdiff = 1;	
+					$notFind = 0;
+					$find = 0;
+
+					for ( $i = $driversListCount; $i > 0; $i-- ) {
+						$j = $i - 1;
+							if ( $driver['driver_type'] =='team' ) {
+								$checkArray = array();
+								if ( $driversList[$j]['assigned_team'] != '' )
+									$checkArray = explode(',',$driversList[$j]['assigned_team']);
+							
+								$teamArray = array();
+								if ( !empty($checkArray)) {
+									for($k = 0; $k < count($checkArray); $k++ ) {
+										$driverIds = explode(':',$checkArray[$k]);
+										$teamArray['driversId'][$k] = $driverIds[0];
+										$teamArray['teamsId'][$k] = $driverIds[1];
+									}
+								}
+								
+								if ( !empty($teamArray) && in_array($driver['driverId'],$teamArray['driversId']) && in_array($driver['second_driver_id'],$teamArray['teamsId'])) {
+									$startDate = new DateTime($rparam['startDate']);
+									if ( $driversList[$j]['createdDate'] < $rparam['startDate'] ) {		// check if start date is greater than logged date
+										$endDate   = new DateTime($rparam['endDate']);
+										$lastDate  = $rparam['endDate'];
+									} else {
+										if ( $i == $driversListCount ) {						// check if drivers is found in latest date log
+											$endDate   = new DateTime($driversList[$j]["createdDate"]);
+											$lastDate  = $driversList[$j]['createdDate'];
+										} else {
+											$endDate   = new DateTime($driversList[$i]["createdDate"]);
+											$lastDate  = $driversList[$i]['createdDate'];
+											$notFind  = 0;
+										}
+									}
+
+									$daysdiff += $endDate->diff($startDate)->format("%a");
+									$driver['days'][$key] = $daysdiff;
+									$find = 1;
+									$arrTeam[] = $driver['driverId'].':'.$driver['second_driver_id'];
+									break;
+								}
+							} else {
+								$checkSingleArray = explode(',',$driversList[$j]['assigned_drivers']);
+								if ( in_array($driver['driverId'],$checkSingleArray)) {
+									$startDate = new DateTime($rparam['startDate']);
+									if ( $driversList[$j]['createdDate'] < $rparam['startDate'] ) {			// check if start date is greater than logged date
+										$endDate   = new DateTime($rparam['endDate']);
+										$lastDate  = $rparam['endDate'];
+									} else {
+										if ( $i == $driversListCount ) {									// check if drivers is found in latest date log
+											$endDate   = new DateTime($driversList[$j]["createdDate"]);
+											$lastDate  = $driversList[$j]['createdDate'];
+										} else {
+											$endDate   = new DateTime($driversList[$i]["createdDate"]);
+											$lastDate  = $driversList[$i]['createdDate'];
+											$notFind   = 0;
+										}
+									}
+
+									$daysdiff += $endDate->diff($startDate)->format("%a");
+									$driver['days'][$key] = $daysdiff;
+									$find = 1;
+									$arrSingle[] = $driver['driverId'];
+									break;
+								}
+							}
+						}
+						
+						if ($find == 0 ) {
+
+							$startDate = new DateTime($rparam['startDate']);
+							$setEndDate = (isset($driver['DeliveryDate']) && $driver['DeliveryDate'] != '0000-00-00' && $driver['DeliveryDate'] != '' ) ? $driver['DeliveryDate'] : $driversList[0]['createdDate'];
+					
+							$endDate   = new DateTime($setEndDate);
+							$daysdiff += $endDate->diff($startDate)->format("%a");
+							$driver['days'][$key] = $daysdiff;
+							$notFind = 1;
+						}
+				
+					if ( $lastDate < $rparam['endDate'] && $notFind == 0 ) {
+						$startDate = new DateTime($lastDate);
+						$endDate   = new DateTime($rparam["endDate"]);
+
+						$daysdiff = $endDate->diff($startDate)->format("%a");						
+						$driver['days'][$key] += $daysdiff;
+					}
+
+					if ( $driver['driver_type'] == 'team' ) {
+						$rparam['driverId']			= $driver['driverId'];
+						$rparam['secondDriverId'] 	= $driver['second_driver_id'];
+						$type = 'team';
+						$setDriverId = $driver['driverId'].':'.$driver['second_driver_id'];
+					} else {
+						$rparam['driverId']			= $driver['driverId'];
+						$rparam['secondDriverId'] 	= 0;
+						$type = 'driver';
+						$setDriverId = $driver['driverId'];
+					}
+
+					$totalDays = $driver['days'][$key];
+					$value = array();
+					$value = $this->Report->getLoadsTrackingDriverDashboardNew($rparam,$type,$rparam['dispId']);
+					
+					$val[$key]['records'] = $value;
+					$val[$key]['totalDays'] = $totalDays;
+					$val[$key]['type'] = $type;
+					$val[$key]['driverId'] = $setDriverId;
+				}
+
+			}
+
+				$singleDiff = array_diff($newArraySingle,$arrSingle);
+				$teamDiff   = array_diff($newArrayTeam,$arrTeam);
+				if ( !empty($singleDiff)) {
+					$key = count($val);
+					$singleDiff = array_values($singleDiff);
+					for( $i =0; $i < count($singleDiff); $i++ ) {
+						$key = $key + $i;
+						$type = 'driver';
+					 	$totalDays = $this->getNumberOfDays($rparam, $daysDriversList, $singleDiff[$i], $type);
+						$rparam['driverId'] = $singleDiff[$i];
+						$value = $this->Report->getLoadsTrackingDriverDashboardNew($rparam,$type,$rparam['dispId']);
+						$val[$key]['records'] = $value;
+						$val[$key]['totalDays'] = $totalDays;
+						$val[$key]['type'] = $type;
+						$val[$key]['driverId'] = $singleDiff[$i];
+					}
+				}
+
+				if ( !empty($teamDiff)) {
+					$key = count($val);
+					$teamDiff = array_values($teamDiff);
+					for( $i =0; $i < count($teamDiff); $i++ ) {
+						$key = $key + $i;
+						$ids = explode(':',$teamDiff[$i]);
+						$rparam['driverId'] = $ids[0];
+						$rparam['secondDriverId'] = $ids[1];
+						$type = 'team';
+						$totalDays = $this->getNumberOfDays($rparam, $daysDriversList, $teamDiff[$i], $type);
+						$value = $this->Report->getLoadsTrackingDriverDashboardNew($rparam,$type,$rparam['dispId']);
+						$val[$key]['records'] = $value;
+						$val[$key]['totalDays'] = $totalDays;
+						$val[$key]['type'] = $type;
+						$val[$key]['driverId'] = $teamDiff[$i];
+					}
+				}
+
+					foreach($val as $key => $res ) {
+						$this->teamFinancialGoal 		= 0;
+						$this->teamMilesGoal 			= 0;
+						$this->singleFinancialGoal		= 0;
+						$this->singleMilesGoal			= 0;
+						$value = $res['records'];
+						$totalDays = $res['totalDays'];
+						$type = $res['type'];
+					
+						$value["driver"]  = isset($value['driver']) ? $value['driver'] : '';
+						$value["charges"]  = isset($value['charges']) ? $value['charges'] : '';
+						$value["driverName"]  = isset($value['driverName']) ? $value['driverName'] : '';
+						$value["driverId"]  = isset($value['driverId']) ? $value['driverId'] : '';
+						$value["second_driver_id"]  = isset($value['second_driver_id']) ? $value['second_driver_id'] : '';
+						$value["profit"]  = isset($value['profit']) ? $value['profit'] : '';
+						$value["invoice"]  = isset($value['invoice']) ? $value['invoice'] : '';
+						$value["miles"]  = isset($value['miles']) ? $value['miles'] : '';
+						$value["deadmiles"]  = isset($value['deadmiles']) ? $value['deadmiles'] : '';
+
+						$value['driverName'] = $this->Report->fetchDriverName( $res['driverId']);						
+						
+						if( isset($type) && $type == 'team') {
+							$this->teamFinancialGoal 	 = $goalValues['teamFinancial'] * $totalDays;
+							$this->teamMilesGoal 	 	 = $goalValues['teamMiles'] * $totalDays;
+						} else {
+							$this->singleFinancialGoal = $goalValues['singleFinancial'] * $totalDays;
+							$this->singleMilesGoal     = $goalValues['singleMiles'] * $totalDays;
+						}
+
+						$this->totalFinancialGoal  					= $this->singleFinancialGoal + $this->teamFinancialGoal;
+						$this->totalMilesGoal 						= $this->singleMilesGoal + $this->teamMilesGoal;
+						$plusMinusFinancialGoal 					= $value['invoice'] - $this->totalFinancialGoal;
+						$plusMinusMilesGoal 						= $value['miles'] - $this->totalMilesGoal;
+						$lPResult[$key]["financialGoal"] 			= $this->totalFinancialGoal;
+						$lPResult[$key]["plusMinusFinancialGoal"] 	= $plusMinusFinancialGoal;
+						$lPResult[$key]["milesGoal"]	 			= $this->totalMilesGoal;
+						$lPResult[$key]["plusMinusMilesGoal"]	 	= $plusMinusMilesGoal;
+
+						$lPResult[$key]["fcolumn"] 					= $value["driverName"];
+						$lPResult[$key]["dispatcherId"] 			= $value["driverId"];
+						$lPResult[$key]["username"] 				= $value["driverName"];
+						$lPResult[$key]["urlColumn"] 				= 'driver';
+						$lPResult[$key]["second_driver_id"] 		= $value['second_driver_id'];
+
+						$lPResult[$key]["miles"]      				= intval($value["miles"]);
+						$lPResult[$key]["deadmiles"] 				= intval($value["deadmiles"]);
+						$lPResult[$key]["invoice"]   				= floatval($value["invoice"]);
+						$lPResult[$key]["charges"]    				= floatval($value["charges"]);
+						$lPResult[$key]["profit"]    				= floatval($value["profit"]);
+
+						if(isset($value["profitPercent"]) ){
+							if($value["invoice"] > 0){
+								$lPResult[$key]["ppercent"]  = number_format((float)(($value["profit"]/$value["invoice"]) * 100),2);	
+							}else{
+								$lPResult[$key]["ppercent"] =$value["profitPercent"];
+							}
+							
+						}else if(isset($value["overallTotalProfitPercent"])){
+							$lPResult[$key]["ppercent"] = number_format((float)$value["overallTotalProfitPercent"],2);
+						}
+
+						$this->overallTotalFinancialGoal 		+= $this->totalFinancialGoal;
+						$this->overallTotalMilesGoal 			+= $this->totalMilesGoal;
+						$this->overallPlusMinusFinancialGoal    += $plusMinusFinancialGoal;
+						$this->overallPlusMinusMilesGoal  		+= $plusMinusMilesGoal;
+						$this->totalInvoices		        	+= $lPResult[$key]["invoice"];
+						$this->totalMiles 		        		+= $lPResult[$key]["miles"];
+						$this->totalDeadMiles		        	+= $lPResult[$key]["deadmiles"];
+						$this->totalCharges	            		+= $lPResult[$key]["charges"];
+						$this->totalProfit                		+= $lPResult[$key]["profit"];
+						
+						array_push($chartStack["xaxis"], $value["driverName"]); 
+						array_push($chartStack["charges"],  array("y"=>(float) $value["charges"], "clickType"=>"sendToDetail", "urlColumn"=>"driver","username"=>$value["driverName"],"dispatcherId"=>$value["driverId"],"second_driver_id"=>$value["second_driver_id"]));
+						array_push($chartStack["profitAmount"],  array("y"=>(float) $value["profit"], "clickType"=>"sendToDetail", "urlColumn"=>"driver","username"=>$value["driverName"],"dispatcherId"=>$value["driverId"],"second_driver_id"=>$value["second_driver_id"]));
+						
+						array_push($chartStack["ppercent"], (float) $value["profit"]);
+						array_push($chartStack["goalsAchievement"],  array("y"=>(float) $this->totalFinancialGoal, "clickType"=>"sendToDetail", "urlColumn"=>"driver","username"=>$value["driverName"],"dispatcherId"=>$value['driverId'],"second_driver_id"=>$value["second_driver_id"]));
+					}
+
+				break; 
+				case '_iteam'		:
+				case '_idriver'		: 
+
+					if ($lPerformance == '_iteam' )
+						$lPResult =	$this->Report->getLoadsTrackingIndividual($rparam,"team","dashboard");
+					else
+						$lPResult =	$this->Report->getLoadsTrackingIndividual($rparam,"loads","dashboard"); 
+
+					foreach($lPResult as $key => $value ) {
+						$delDate = $this->validateDate($value["DeliveryDate"]) ?  $value["DeliveryDate"] : 'N/A';
+						array_push($chartStack["xaxis"], $delDate); 
+						array_push($chartStack["ppercent"], (float) $value["overallTotalProfitPercent"]);
+						array_push($chartStack["charges"],  array("y"=>(float) $value["charges"], "jobId"=> $value["loadid"], "clickType"=>"openTicket"));
+						array_push($chartStack["profitAmount"],  array("y"=>(float) $value["profit"], "jobId"=> $value["loadid"], "clickType"=>"openTicket"));
+						
+						$lPResult[$key]["fcolumn"] = $value["loadid"];
+						$lPResult[$key]["username"] = '';
+						$lPResult[$key]["urlColumn"] = '';
+
+						$lPResult[$key]["miles"]      = intval($value["miles"]);
+						$lPResult[$key]["deadmiles"]  = intval($value["deadmiles"]);
+						$lPResult[$key]["invoice"]    = floatval($value["invoice"]);
+						$lPResult[$key]["charges"]    = floatval($value["charges"]);
+						$lPResult[$key]["profit"]     = floatval($value["profit"]);
+
+						if(isset($value["DeliveryDate"])){
+							$lPResult[$key]["DeliveryDate"]  = $this->validateDate($value["DeliveryDate"]) ? $value["DeliveryDate"] : "N/A";	
+						}
+
+						if(isset($value["profitPercent"]) ){
+							if($value["invoice"] > 0){
+								$lPResult[$key]["ppercent"]  = number_format((float)(($value["profit"]/$value["invoice"]) * 100),2);	
+							}else{
+								$lPResult[$key]["ppercent"] =$value["profitPercent"];
+							}
+							
+						}else if(isset($value["overallTotalProfitPercent"])){
+							$lPResult[$key]["ppercent"] = number_format((float)$value["overallTotalProfitPercent"],2);
+						}
+
+						$this->totalInvoices		        += $lPResult[$key]["invoice"];
+						$this->totalMiles 		        	+= $lPResult[$key]["miles"];
+						$this->totalDeadMiles		       	+= $lPResult[$key]["deadmiles"];
+						$this->totalCharges	            	+= $lPResult[$key]["charges"];
+						$this->totalProfit                	+= $lPResult[$key]["profit"];
+						
+					}
+				break;
+				default				: 
+					$dispatchersList = $this->Report->getDispatchersListForGoals();
+					$loadResult = $this->getPerformanceLoadsForAllDispatchers($dispatchersList,$rparam,$goalValues);
+					$lPResult 	= $loadResult['lPResult'];
+					$chartStack = $loadResult['chartStack'];
+				break;
+			}
+
+		$chartStack["trecords"] = $lPResult;
+		
+		if ( $this->totalInvoices != 0 )
+			$totalProfitPercent = number_format((float)(($this->totalProfit / $this->totalInvoices) * 100),2);
+		else
+			$totalProfitPercent = 0;
+
+		if ( $lPerformance != '_iall' && $lPerformance != '' && $lPerformance != 'all') {
+
+			if(isset($this->totalInvoices) && $this->totalInvoices > 0 ) {
+				$this->totalProfitPercent  = number_format((float)(($this->totalProfit/$this->totalInvoices) * 100),2);	
+			} else {
+				$this->totalProfitPercent  			= 0;
+			}
+			
+			$chartStack['totals']['totInvoices']      				= $this->totalInvoices;
+			$chartStack['totals']['totMiles']         				= $this->totalMiles;
+			$chartStack['totals']['totDeadMiles']     				= $this->totalDeadMiles;
+			$chartStack['totals']['totCharges']       				= $this->totalCharges;
+			$chartStack['totals']['totProfit']        				= $this->totalProfit;
+			$chartStack['totals']['totProfitPercent'] 				= $this->totalProfitPercent;
+			$chartStack['totals']['overallTotalFinancialGoal'] 		= $this->overallTotalFinancialGoal;
+			$chartStack['totals']['overallTotalMilesGoal'] 			= $this->overallTotalMilesGoal;
+			$chartStack['totals']['overallPlusMinusFinancialGoal'] 	= $this->overallPlusMinusFinancialGoal;
+			$chartStack['totals']['overallPlusMinusMilesGoal'] 		= $this->overallPlusMinusMilesGoal;
+		}
+		return $chartStack;
+
+	}
+
+	/**
+	* Get number of days for drivers
+	*/
+	
+	public function getNumberOfDays($rparam, $driversList, $driverId, $type) {
+		$daysdiff = 1;
+		$newEndDate = $rparam['startDate'];
+
+		if ( isset($driversList[0]) && is_array($driversList[0])) {
+			
+		} else if ( !empty($driversList)) {
+			$driversList = array($driversList);
+		}
+	
+		if ( !empty($driversList)) {	
+			for( $i = 0; $i < count($driversList); $i++ ) {
+				if ( $type == 'team') {
+					$driverIds = explode(',',$driversList[$i]['assigned_team']);
+				} else {
+					$driverIds = explode(',',$driversList[$i]['assigned_drivers']);
+				}
+
+				if ( $i == 0 && in_array($driverId,$driverIds)) {
+					$sDate 			= new DateTime($rparam["startDate"]);
+					$eDate   		= new DateTime($driversList[$i]['createdDate']);
+					$newEndDate 	= $driversList[$i]['createdDate'];
+					$daysdiff 	   += $eDate->diff($sDate)->format("%a");
+					
+				} else if ( in_array($driverId,$driverIds)) { 
+					$endCreated = $driversList[$i]['createdDate'];
+					$sDate 			= new DateTime($driversList[$i -1 ]['createdDate']);
+					$eDate   		= new DateTime($endCreated);
+					$newEndDate 	= $driversList[$i]['createdDate'];
+
+					$daysdiff 		+= $eDate->diff($sDate)->format("%a");
+					
+				}		
+			}
+		}	
+
+		if( $newEndDate < $rparam['endDate'] ) {	
+			$sDate 					= new DateTime($newEndDate);
+			$eDate   				= new DateTime($rparam['endDate']);
+			$daysdiff 			   += $eDate->diff($sDate)->format("%a");
+		}
+		return $daysdiff; 
+	}
+
+	/**
+	* returning data for dashboard in case of all groups selected
+	*/
+
+	public function getPerformanceLoadsForAllDispatchers($dispatchersList = array(),$rparam, $goalValues) {
+		$mainArray = array();
+		$lPResult = array();
+		$chartStack = array();
+		$chartStack["xaxis"] = array();
+		$chartStack["charges"] = array();
+		$chartStack["ppercent"] = array();
+		$chartStack["profitAmount"] = array();
+		$chartStack["goalsAchievement"] = array();	
+
+		foreach( $dispatchersList as $key => $dispatcher ) {
+			$this->teamFinancialGoal 				= 0;
+			$this->teamMilesGoal 					= 0;
+			$this->singleFinancialGoal				= 0;
+			$this->singleMilesGoal					= 0;
+			$showDispatcher							= 1;
+			$value = 	$this->Report->getLoadsTrackingAggregateDashboard($rparam,"dispatchers","dashboard", $dispatcher['dispId']);
+			$driversList = $this->Report->getTotalTeamDrivers($dispatcher['dispId'], $rparam['startDate'], $rparam['endDate'] );
+			if( !empty($driversList)) {
+				$driversList = $this->getUniqueDriverDate($driversList);
+				$driversList = array_values($driversList);
+				for( $i = 0; $i < count($driversList); $i++ ) {
+					if ( $i == 0 ) {
+						$sDate 			= new DateTime($rparam["startDate"]);
+						$eDate   		= new DateTime($driversList[$i]['createdDate']);
+						$newEndDate 	= $driversList[$i]['createdDate'];
+						$daysdiff 			= $eDate->diff($sDate)->format("%a");
+						if ( $i == 0 )
+							$daysdiff 	= $daysdiff + 1;
+						
+						$this->singleFinancialGoal 	+= $driversList[$i]['single'] * $goalValues['singleFinancial'] * $daysdiff;
+						$this->teamFinancialGoal	+= $driversList[$i]['team'] * $goalValues['teamFinancial'] * $daysdiff;
+						$this->singleMilesGoal		+= $driversList[$i]['single'] * $goalValues['singleMiles'] * $daysdiff;
+						$this->teamMilesGoal	 	+= $driversList[$i]['team'] * $goalValues['teamMiles'] * $daysdiff;
+					} else {
+						$endCreated = date('Y-m-d',(strtotime ( '-1 day' , strtotime ( $driversList[$i]['createdDate']) ) ));
+						$sDate 			= new DateTime($driversList[$i -1 ]['createdDate']);
+						$eDate   		= new DateTime($endCreated);
+						$newEndDate 	= $driversList[$i]['createdDate'];
+
+						$daysdiff 			= $eDate->diff($sDate)->format("%a");
+						$this->singleFinancialGoal += $driversList[$i-1]['single'] * $goalValues['singleFinancial'] * $daysdiff;
+						$this->teamFinancialGoal   += $driversList[$i-1]['team'] * $goalValues['teamFinancial'] * $daysdiff;
+						$this->singleMilesGoal	   += $driversList[$i -1]['single'] * $goalValues['singleMiles'] * $daysdiff;
+						$this->teamMilesGoal	   += $driversList[$i -1]['team'] * $goalValues['teamMiles'] * $daysdiff;
+
+						$this->singleFinancialGoal += $driversList[$i]['single'] * $goalValues['singleFinancial'];
+						$this->teamFinancialGoal   += $driversList[$i]['team'] * $goalValues['teamFinancial'];
+						$this->singleMilesGoal	   += $driversList[$i]['single'] * $goalValues['singleMiles'];
+						$this->teamMilesGoal	   += $driversList[$i]['team'] * $goalValues['teamMiles'];
+					}		
+				}
+							
+				if( $newEndDate < $rparam['endDate'] ) {	
+					$sDate 					= new DateTime($newEndDate);
+					$eDate   				= new DateTime($rparam['endDate']);
+					$daysdiff 				= $eDate->diff($sDate)->format("%a");
+
+					$driverList = end($driversList);
+
+					$this->singleFinancialGoal 	+= $driverList['single'] * $goalValues['singleFinancial'] * $daysdiff;
+					$this->teamFinancialGoal 	+= $driverList['team'] * $goalValues['teamFinancial'] * $daysdiff;
+					$this->singleMilesGoal	 	+= $driverList['single'] * $goalValues['singleMiles'] * $daysdiff;
+					$this->teamMilesGoal	 	+= $driverList['team'] * $goalValues['teamMiles'] * $daysdiff;
+				}
+			} else {			
+				$driversList = $this->Report->getTotalDriversList($dispatcher['dispId'], $rparam['startDate'], $rparam['endDate'] );
+				
+				$sDate 		= new DateTime($rparam["startDate"]);
+				$eDate   	= new DateTime($rparam['endDate']);
+				$daysdiff 	= $eDate->diff($sDate)->format("%a");
+				$daysdiff 	= $daysdiff + 1;
+				
+				$single = isset($driversList['single']) ? $driversList['single'] : 0;
+				$team   = isset($driversList['team']) ? $driversList['team'] : 0;
+				$this->singleFinancialGoal  += $single * $goalValues['singleFinancial'] * $daysdiff;
+				$this->teamFinancialGoal	+= $team * $goalValues['teamFinancial'] * $daysdiff;
+				$this->singleMilesGoal	    += $single * $goalValues['singleMiles'] * $daysdiff;
+				$this->teamMilesGoal	 	+= $team * $goalValues['teamMiles'] * $daysdiff;
+
+				$showDispatcher = 0;
+			}									
+			
+			if ( empty($value) && empty($driversList))
+				continue;
+
+			$value['profit']     = isset($value['profit']) ? $value['profit'] : 0;
+			$value['charges']    = isset($value['charges']) ? $value['charges'] : 0;
+			$value['invoice'] 	 = isset($value['invoice']) ? $value['invoice'] : 0;
+			$value['miles']    	 = isset($value['miles']) ? $value['miles'] : 0;
+			$value['deadmiles']  = isset($value['deadmiles']) ? $value['deadmiles'] : 0;
+			$value['username']   = isset($value['username']) ? $value['username'] : '';
+
+			$this->totalFinancialGoal 				 	  = $this->singleFinancialGoal + $this->teamFinancialGoal; 		
+			$this->totalMilesGoal 						  = $this->singleMilesGoal + $this->teamMilesGoal;
+			$plusMinusFinancialGoal 				  = $value['invoice'] - $this->totalFinancialGoal;
+			$plusMinusMilesGoal 					  = $value['miles'] - $this->totalMilesGoal;
+			$lPResult[$key]["financialGoal"] 		  = $this->totalFinancialGoal;
+			$lPResult[$key]["plusMinusFinancialGoal"] = $plusMinusFinancialGoal;
+			$lPResult[$key]["milesGoal"]			  = $this->totalMilesGoal;
+			$lPResult[$key]["plusMinusMilesGoal"]	  = $plusMinusMilesGoal;
+			$lPResult[$key]["fcolumn"] 		 		  = $dispatcher["dispatcher"];
+			$lPResult[$key]["urlColumn"] 	 		  = 'dispatcher';
+			$lPResult[$key]["username"] 	 		  = $dispatcher['username'];
+			$lPResult[$key]["dispatcherId"] 	 	  = $dispatcher['dispId'];
+		
+			$lPResult[$key]["miles"]      = intval($value["miles"]);
+			$lPResult[$key]["deadmiles"]  = intval($value["deadmiles"]);
+			$lPResult[$key]["invoice"]    = floatval($value["invoice"]);
+			$lPResult[$key]["charges"]    = floatval($value["charges"]);
+			$lPResult[$key]["profit"]     = floatval($value["profit"]);
+
+			if(isset($value["profitPercent"]) ){
+				if($value["invoice"] > 0){
+					$lPResult[$key]["ppercent"]  = number_format((float)(($value["profit"]/$value["invoice"]) * 100),2);	
+				}else{
+					$lPResult[$key]["ppercent"] =$value["profitPercent"];
+				}
+				
+			}else if(isset($value["overallTotalProfitPercent"])){
+				$lPResult[$key]["ppercent"] = number_format((float)$value["overallTotalProfitPercent"],2);
+			}
+
+			$this->overallTotalFinancialGoal 		+= $this->totalFinancialGoal;
+			$this->overallTotalMilesGoal 			+= $this->totalMilesGoal;
+			$this->overallPlusMinusFinancialGoal  	+= $plusMinusFinancialGoal;
+			$this->overallPlusMinusMilesGoal  		+= $plusMinusMilesGoal;
+			$this->totalInvoices		        	+= $lPResult[$key]["invoice"];
+			$this->totalMiles 		        		+= $lPResult[$key]["miles"];
+			$this->totalDeadMiles		        	+= $lPResult[$key]["deadmiles"];
+			$this->totalCharges	            		+= $lPResult[$key]["charges"];
+			$this->totalProfit                		+= $lPResult[$key]["profit"];
+			
+			array_push($chartStack["xaxis"], $dispatcher["username"]); 
+			array_push($chartStack["charges"],  array("y"=> (float) $value["charges"], "clickType"=>"sendToDetail", "urlColumn"=>"dispatcher","username"=>$dispatcher["username"],"dispatcherId"=>$dispatcher['dispId'],"second_driver_id"=>''));
+			array_push($chartStack["ppercent"], (float) $value["profit"]);
+			array_push($chartStack["profitAmount"],  array("y"=> (float) $value["profit"], "clickType"=>"sendToDetail", "urlColumn"=>"dispatcher","username"=>$dispatcher["username"],"dispatcherId"=>$dispatcher['dispId'],"second_driver_id"=>''));
+			array_push($chartStack["goalsAchievement"],  array("y"=>(float) $this->totalFinancialGoal, "clickType"=>"sendToDetail", "urlColumn"=>"dispatcher","username"=>$dispatcher["username"],"dispatcherId"=>$dispatcher['dispId'],"second_driver_id"=>''));
+		}
+
+		if(isset($this->totalInvoices) && $this->totalInvoices > 0 ) {
+			$this->totalProfitPercent  = number_format((float)(($this->totalProfit/$this->totalInvoices) * 100),2);	
+		} else {
+			$this->totalProfitPercent  			= 0;
+		}
+		$chartStack['totals']['totInvoices']      				= $this->totalInvoices;
+		$chartStack['totals']['totMiles']         				= $this->totalMiles;
+		$chartStack['totals']['totDeadMiles']     				= $this->totalDeadMiles;
+		$chartStack['totals']['totCharges']       				= $this->totalCharges;
+		$chartStack['totals']['totProfit']        				= $this->totalProfit;
+		$chartStack['totals']['totProfitPercent'] 				= $this->totalProfitPercent;
+		$chartStack['totals']['overallTotalFinancialGoal'] 		= $this->overallTotalFinancialGoal;
+		$chartStack['totals']['overallTotalMilesGoal'] 			= $this->overallTotalMilesGoal;
+		$chartStack['totals']['overallPlusMinusFinancialGoal'] 	= $this->overallPlusMinusFinancialGoal;
+		$chartStack['totals']['overallPlusMinusMilesGoal'] 		= $this->overallPlusMinusMilesGoal;
+	
+		$mainArray['lPResult'] 	 = $lPResult;
+		$mainArray['chartStack'] = $chartStack;
+		return $mainArray;
+	}
+
+	/**
+	* get latest date from many date time of same day
+	*/
+
+	public function getUniqueDriverDate($driversList = array()) {
+		$driverListlength  = count($driversList);
+		for( $j = 0; $j < $driverListlength; $j++ ) {
+			if ( isset($driversList[$j]['createdDate']) && isset($driversList[$j+1]['createdDate'])  && ($driversList[$j]['createdDate'] == $driversList[$j+1]['createdDate']) ) {
+
+				if ( $driversList[$j]['createdTime'] > $driversList[$j+1]['createdTime']) {
+					unset($driversList[$j+1]);
+				}
+				else {
+					unset($driversList[$j]);
+				}
+			}
+		}
+		$driversList = array_values($driversList);
+		return $driversList;
+	}
+
+	/**
+	* Fetch list of top 5 customers
+	*/
+
+	public function topFiveCustomer(){
+		$data = array();
+		$args = json_decode(file_get_contents('php://input'),true);
+		$cmpName = $this->Job->getTopFiveCustomer($args);
+		$data["paymentAmount"] = array();
+		$data["cmpName"] = array();
+		$colors =  array('rgba(7, 126, 208, 1)','rgba(109,92,174,1)','rgba(52, 214, 199, 1)','rgba(245,87,83,1)','rgba(109,92,174,1)');
+		if ( !empty($cmpName)) {
+			$i = 0;
+			foreach( $cmpName as $cmp ) {
+				array_push($data["paymentAmount"],  array("y"=> (float) $cmp["Total"], 'color' => $colors[$i]));
+				array_push($data["cmpName"],   $cmp["TruckCompanyName"]);
+				$i++;
+			}
+		}
+		$data['colors'] = $colors;
+
+		echo json_encode($data); 				
+	}
 
 }

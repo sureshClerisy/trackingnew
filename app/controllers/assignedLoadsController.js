@@ -78,6 +78,7 @@ app.controller('assignedLoadsController', ["dataFactory","$scope", "PubNub", "$h
             $rootScope.selScope = [];     
             $rootScope.selScope.push(itemNew.vid);  
             $rootScope.setVehicleDriverId = itemNew.id;				// setting vehicle driver id to fetch saved loads
+            $rootScope.setVehicleSecondDriverId = itemNew.team_driver_id;				// setting vehicle driver id to fetch saved loads
         }
 	}
 	
@@ -244,6 +245,7 @@ app.controller('assignedLoadsController', ["dataFactory","$scope", "PubNub", "$h
             $rootScope.selScope = [];    
             $rootScope.selScope.push(item.vid);  
             $rootScope.setVehicleDriverId = item.id;				// setting vehicle driver id to fetch saved loads
+            $rootScope.setVehicleSecondDriverId = item.team_driver_id;
         }
     }
 
@@ -556,22 +558,10 @@ app.controller('assignedLoadsController', ["dataFactory","$scope", "PubNub", "$h
    	 */
    	  
    	$scope.changeDriverLoads = function() {
-		if ( $scope.dateRangeSelector != undefined && Object.keys($scope.dateRangeSelector).length > 0 ) {
-			date  = $scope.dateRangeSelector;
-			$cookies.putObject('_gDateRange', $scope.dateRangeSelector);
-			/*month = parseInt(date.startDate.month() + 1 );
-			$scope.startDate = date.startDate.year()+'-'+month+'-'+date.startDate.date();
-			month = parseInt(date.endDate.month() + 1 );
-			$scope.endDate = date.endDate.year()+'-'+month+'-'+date.endDate.date();*/
-		} else {
-			$scope.startDate = '';
-			$scope.endDate = '';
-		}
-			
 		if ( $rootScope.scope != undefined && $rootScope.selScope != undefined ) {
 			$scope.autoFetchLoads = true;
 		
-			dataFactory.httpRequest(URL+'/assignedloads/getChangeDriverLoads/'+$rootScope.selectedVehicle+'/'+$rootScope.setVehicleDriverId,'POST',{},{scopeType:$rootScope.scope, scope: $rootScope.selScope, loadSource : $scope.loadSource, startingDate: $scope.dateRangeSelector.startDate, endingDate : $scope.dateRangeSelector.endDate}).then(function(data) {
+			dataFactory.httpRequest(URL+'/assignedloads/getChangeDriverLoads/'+$rootScope.selectedVehicle+'/'+$rootScope.setVehicleDriverId+'/'+$rootScope.setVehicleSecondDriverId,'POST',{},{scopeType:$rootScope.scope, scope: $rootScope.selScope, loadSource : $scope.loadSource, startingDate: $scope.dateRangeSelector.startDate, endingDate : $scope.dateRangeSelector.endDate}).then(function(data) {
 				$rootScope.assignedLoads = [];
 				$rootScope.assignedLoads = data.assigned_loads;
 				if(Object.keys($rootScope.assignedLoads).length <= 0){
@@ -607,8 +597,8 @@ app.controller('assignedLoadsController', ["dataFactory","$scope", "PubNub", "$h
         	$scope.dateRangeSelector = {};
         }
     }else{
-        $scope.dateRangeSelector = {startDate: moment().subtract(29, 'days'), endDate: moment()};    
-        $cookies.putObject('_gDateRange', $scope.dateRangeSelector);  
+        $scope.dateRangeSelector = {};    
+        $cookies.putObject('_gDateRange', {startDate:null,endDate:null});    
     }
 
 	
@@ -624,6 +614,13 @@ app.controller('assignedLoadsController', ["dataFactory","$scope", "PubNub", "$h
         },
         eventHandlers: {
             'apply.daterangepicker': function(ev, picker) {  
+            	if ( $scope.dateRangeSelector.startDate != null && $scope.dateRangeSelector != undefined && Object.keys($scope.dateRangeSelector).length > 0 ) {
+	            	$scope.dateRangeSelector.startDate = $scope.dateRangeSelector.startDate.format('YYYY-MM-DD');
+	            	$scope.dateRangeSelector.endDate = $scope.dateRangeSelector.endDate.format('YYYY-MM-DD');
+	            	$cookies.putObject('_gDateRange', $scope.dateRangeSelector);    
+	            }else{
+	            	$scope.dateRangeSelector = {};
+	            }
                 $scope.changeDriverLoads();
             },
             'cancel.daterangepicker': function(ev, picker) {  

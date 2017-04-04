@@ -37,7 +37,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 			if( (isset($loggedUser_username) && $loggedUser_username != '') && (isset($loggedUser_id) && $loggedUser_id != '') && (isset($user_logged_in) && $user_logged_in == true) ) {
 			
 			} else {
-					
+				die();	
 			}
 			
 			$this->id 			= $this->config->item('truck_id');	
@@ -135,9 +135,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 		 * Fetching saved loads for one vehicle
 		 */
 		
-		public function getSingleVehicleLoads($userId = null , $vehicleId = null ,$scopeType = '', $dispatcherId = null, $driverId = null, $startDate = '', $endDate = '',$filters = array() ) {	//dispatcher id to get loads of particular dispatcher only if driver is selected
+		public function getSingleVehicleLoads($userId = null , $vehicleId = null ,$scopeType = '', $dispatcherId = null, $driverId = null, $secondDriverId = null, $startDate = '', $endDate = '',$filters = array() ) {	//dispatcher id to get loads of particular dispatcher only if driver is selected
 			$jobs = array();
-			$jobs = $this->Job->fetchSavedJobsNew($userId, $vehicleId, $scopeType, $dispatcherId, $driverId, $startDate, $endDate,$filters);
+			$jobs = $this->Job->fetchSavedJobsNew($userId, $vehicleId, $scopeType, $dispatcherId, $driverId, $secondDriverId, $startDate, $endDate,$filters);
 			if( !empty($jobs) && count($jobs) > 0){
 				foreach ($jobs as $key => $value) {
 						if($jobs[$key]['invoiceNo']==0){

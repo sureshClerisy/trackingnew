@@ -145,7 +145,7 @@ table .driver-table td table td, table .driver-table td  table th{
 									<!-- block-repeat-->
 									<div style="width:100%;float:left;">
 										<div style="width:100%;float:left;margin-bottom:20px;">
-										<?php if ( $args['scope'] == 'all' && $args['reportType'] == 'performance'){ ?>
+										<?php if ( ($args['scope'] == '' || $args['scope'] == 'all') && $args['reportType'] == 'performance'){ ?>
 											<table class="inner-thead" cellpadding="0" cellspacing="0" style="   width: 100%;">
 												<thead>
 													<tr style=" background: #077ed0">

@@ -1,6 +1,6 @@
 <?php
 
-class Scripts extends Admin_Controller {
+class Scripts extends CI_Controller {
     public $triuser;
     public $password;
     public $apikey;
@@ -400,5 +400,75 @@ class Scripts extends Admin_Controller {
 		
 		echo 'Total updated records are '.$j;
 		
+	}
+
+	/**
+	* Adding values to new table
+	*/
+
+	public function addValuesToDispDriLogs() {
+		$this->load->model('Driver');
+		$dispatchers = $this->Driver->getDispatchersListForLoad();
+
+		foreach($dispatchers as $disp) {
+			$driversList = $this->Driver->getDispatcherDriverList($disp['dispId']);
+			if ( !empty($driversList)) {
+				$driver = array();
+				$teamArray = array();
+				$assignedDriverIds = array();
+				$assignedTeamIds = array();
+				$idleDrivers = array();
+				foreach( $driversList as $drivers ){
+					if ( $drivers['driver_type'] == 'team' && $drivers['team_driver_id'] != '') {
+						$teamArray[] = $drivers['team_driver_id'];
+						$driver['team'][] = $drivers;
+						$assignedTeamIds[] = $drivers['id'].':'.$drivers['team_driver_id'];
+						//$assignedDriverIds[] = $drivers['team_driver_id'];
+					} else if( ($drivers['driver_type'] == 'single' || $drivers['driver_type'] == '') && $drivers['vehicleId'] != '' ) {
+						$teamArray[] = $drivers['team_driver_id'];
+						$driver['single'][] = $drivers;
+						$assignedDriverIds[] = $drivers['id'];
+					} else if ( !in_array($drivers['id'],$teamArray)){
+						$driver['others'][] = $drivers;
+						$idleDrivers[] = $drivers['id'];
+					}
+				}
+				
+				$singleDrivers 	= isset($driver['single']) ? count($driver['single']) : 0;
+				$idleCount      = isset($driver['others']) ? count($driver['others']) : 0;
+				$teamDrivers 	= isset($driver['team']) ? count($driver['team']) : 0;
+				$data = array(
+					'dispatcher_id' 	=> $disp['dispId'],
+					'assigned_drivers'  => implode(',',$assignedDriverIds),
+					'assigned_team' 	=> implode(',',$assignedTeamIds),
+					'idle_drivers'		=> !empty($idleDrivers) ? implode(',',$idleDrivers) : '',
+					'single' 			=> $singleDrivers,
+					'team'				=> $teamDrivers,
+					'idle'				=> $idleCount,
+					'created'			=> date('Y-m-d H:i:s')
+				);
+				
+				$this->db->insert('disp_dri_logs',$data);
+			}
+
+		}
+	
+
+	}
+
+	public function fetchDriverLogsFromLogTable() {
+		$driverLogs = $this->Script->getDriverLogs('driver');
+		$i = 0;
+		foreach($driverLogs as $driver) {
+			if ( strpos($driver['event_msg'],'Changed Dispatcher') !== false) {
+				$array = explode('-',$driver['event_msg']);
+				$array = array_values($array);
+				pr($array);
+				$i++;
+			}
+
+		}
+
+		pr($driverLogs);
 	}
 }

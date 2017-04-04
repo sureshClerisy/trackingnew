@@ -72,7 +72,7 @@
 															<a class="btn btn-default DTTT_button_csv" title="{{languageCommonVariables.activateDriver}}" ui-jq="tooltip" ng-click="changeDriverStatus(value.id,value.status,$index)" ng-if="value.status == 0 || value.status == ''">
 																<span><i class="fa fa-square-o"></i></span>
 															</a>
-															<a ng-class="{'disabled' : (!value.status || value.label == '' || value.label == null)}" class="btn btn-default DTTT_button_csv" title="{{languageCommonVariables.viewDashboard}}" ui-jq="tooltip" ng-click="goForDashboard(value.vehicle_id)">
+															<a ng-class="{'disabled' : (!value.status || value.label == '' || value.label == null)}" class="btn btn-default DTTT_button_csv" title="{{languageCommonVariables.viewDashboard}}" ui-jq="tooltip" ng-click="goForDashboard(value.driverId, value.first_name + ' ' + value.last_name, value.label, value.dispId, value.vehicle_id, value.team_driver_id, value.city)">
 																<span><i class="fa fa-th-large"></i></span>
 															</a>
 															<a class="btn btn-default DTTT_button_csv" data-original-title="{{languageCommonVariables.exportCSV}}" ui-jq="tooltip" ng-click="exportCsv($event,'drivers',value.id)">

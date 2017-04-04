@@ -82,7 +82,7 @@ app.controller('trailersController', function(dataFactory,$scope, PubNub, $rootS
 		
 });
 
-app.controller('addEditTrailerController', function(dataFactory, getAddTrailerData, $scope, $rootScope , $location , $cookies, $stateParams, $sce){
+app.controller('addEditTrailerController', function(dataFactory, getAddTrailerData, $scope, PubNub, $rootScope , $location , $cookies, $stateParams, $sce){
 	if($rootScope.loggedInUser == false)
 		$location.path('logout');
 		

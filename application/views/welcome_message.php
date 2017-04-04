@@ -64,17 +64,18 @@
     <script type="text/javascript">
         window.paceOptions = {
             ajax: {
-                ignoreURLs: ['pubnub.com/time','pubnub.com/subscribe','pubnub.com/publish','pubnub.com/v2/presence']
+                ignoreURLs: ['pubnub.com/time','pubnub.com/subscribe','pubnub.com/publish','pubnub.com/v2/presence','login/getNotifications']
             }
         };
     </script>
 
-    <script src="http://cdn.pubnub.com/pubnub.min.js"></script>
+    <script src="//cdn.pubnub.com/pubnub.min.js"></script>
     <script src="app/dependecies.min.js"></script>
-    <script src="http://pubnub.github.io/angular-js/scripts/pubnub-angular.js"></script>
+    <script src="//pubnub.github.io/angular-js/scripts/pubnub-angular.js"></script>
     <script src="app/routes.js"></script>
     <script src="app/mainController.js"></script>
     <script src="app/config.lazyload.js" type="text/javascript"></script>
+    <script src="assets/js/jstz.min.js" type="text/javascript"></script>
 
     <script src="assets/js/directives/pg-sidebar.js" type="text/javascript"></script>
     <script src="assets/js/directives/datepicker.js" type="text/javascript"></script>

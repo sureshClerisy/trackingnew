@@ -760,4 +760,18 @@ class Vehicle extends Parent_Model
             return false;
         }
     }
+
+    /*
+    * method    : Get
+    * Params    : driverId
+    * Return    : return dispatcherId
+    * Comment   : used to fetch dispatcher id from driverId
+    */
+
+    public function getDispatcherId($driverId = null) {
+        if ($driverId)
+            return $this->db->where('id', $driverId)->get('drivers')->row()->user_id;
+        else
+            return false;
+    }
 }

@@ -162,7 +162,13 @@ angular.module('app')
                         'assets/plugins/jquery-menuclipper/jquery.menuclipper.css',
                         'assets/plugins/jquery-menuclipper/jquery.menuclipper.js'
                     ]
+                },{
+                    name: 'tabcollapse',
+                    files: [
+                        'assets/plugins/bootstrap-collapse/bootstrap-tabcollapse.js'
+                    ]
                 }
+
 
             ]
         });

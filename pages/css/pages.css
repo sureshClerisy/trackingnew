@@ -6313,7 +6313,7 @@ body.rtl .checkbox label::after {
   border:1px solid #e2e2e2;
 }
   .form-group-default {
-  background-color: #ffffff !important;
+  background-color: #ffffff ;
   position: relative;
   border:1px solid #d3d3d3;
   border-radius: 1px;

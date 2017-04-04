@@ -31,12 +31,15 @@ if (!function_exists('getLoadDetail'))
 		if ( $jobRecord['DeliveryDate'] != '' ) {
 			$jobRecord['DeliveryDate'] = date('Y-m-d',strtotime($jobRecord['DeliveryDate']));
 		}
+		$jobRecord['PostedOn'] = '';
 		
-		if ( $jobRecord['Entered'] != '' ) {
-			$enteredArray = explode('T',$jobRecord['Entered']);
-			$jobRecord['Entered'] = $enteredArray[0];
+		if ( isset($jobRecord['Entered']) && $jobRecord['Entered'] != '' ) {
+			$jobRecord['postedDate'] = date('Y-m-d H:i:s',strtotime($jobRecord['Entered']));
+			$jobRecord['PostedOn']   = date('Y-m-d',strtotime($jobRecord['Entered']));
+		} else if ( isset($jobRecord['postedDate']) && $jobRecord['postedDate'] != '' ) {
+			$jobRecord['PostedOn'] = date('Y-m-d',strtotime($jobRecord['postedDate']));
 		}
-		$jobRecord['PostedOn'] = $jobRecord['Entered'];
+		 
 		$jobRecord['ExtraInfo'] = $jobRecord['SpecInfo'];
 		$jobRecord['PickupDate'] = empty($jobRecord['PickupDate']) ? 'daily' : date('m/d/y',strtotime($jobRecord['PickupDate']));
 		
@@ -191,6 +194,22 @@ if (!function_exists('getUnequalParts')){
 	        }
 	    }
 	    return $temp;
+	}
+}
+
+
+if (!function_exists('toLocalTimezone')){
+	function toLocalTimezone($utcDateTime){
+		$serverTimeZone = date_default_timezone_get();
+		$CI = & get_instance();  //get instance, access the CI superobject
+  		$tz = $CI->session->userdata('userTimeZone');
+        $tz = empty($tz) ? "America/New_York" : $tz;
+        $userTimeZone  = new DateTimeZone($tz);
+      	$dt = new DateTime($utcDateTime);
+      	$dt->setTimezone($userTimeZone);
+		$userTime =  $dt->format('Y-m-d g:i:s A');
+        date_default_timezone_set($serverTimeZone);
+        return $userTime;
 	}
 }
 

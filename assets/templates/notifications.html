@@ -10,8 +10,9 @@
 		    	<div class="notification-block-lt">
 					<ul>
 						<li ng-repeat="notification in notifications">
-							<div class="img-lt-block-noti">
-								<span>{{notification.userIntial}}</span>
+							<div class="img-lt-block-noti" style="background: {{notification.color}}">
+								<img ng-src="assets/uploads/users/{{notification.profile_image}}" onerror="this.style.display = 'none'">
+								<span >{{notification.userIntial}}</span>
 							</div>
 							<p dynamic="notification.event_msg"></p>
 							<p class="small">{{notification.created_at | date: 'medium' : -0500}}</p>

@@ -118,7 +118,7 @@
 						</td>
 						<td style="width:305px; float:left;">
 							<div style="padding-left:24px;">
-								<h1 style="font-size: 18px;margin: 0px;color: #363636;border-bottom: 1px solid #b6b6b6;padding-bottom: 10px;margin-bottom: 15px;">TRUCK DETAILS<span style="font-size: 13px;padding-left: 8px;position: relative;top: -2px;color: #363636;text-transform: none;">(Posted: <?php echo $jobDetails['Entered']; ?>)</span></h1>
+								<h1 style="font-size: 18px;margin: 0px;color: #363636;border-bottom: 1px solid #b6b6b6;padding-bottom: 10px;margin-bottom: 15px;">TRUCK DETAILS<span style="font-size: 13px;padding-left: 8px;position: relative;top: -2px;color: #363636;text-transform: none;">(Posted: <?php echo $jobDetails['postedDate']; ?>)</span></h1>
 								<div style="width: 100%;float: left;padding-bottom:13px;">
 									<span style="color: #6c6c6c;font-family: arial;font-weight: bold;font-size: 13px;float: left;">DRIVER NAME</span>
 									<span style="float: right;font-size: 13px;color: #000000;">

@@ -80,7 +80,7 @@ app.controller('brokersController', function(dataFactory,$scope, PubNub ,$http ,
 	}
 });
 
-app.controller('editBrokersController', function(dataFactory,getBrokersData, $scope,$http ,$rootScope , $location , $cookies, $stateParams){
+app.controller('editBrokersController', function(dataFactory,getBrokersData, $scope, PubNub, $http ,$rootScope , $location , $cookies, $stateParams){
 	
 	if($rootScope.loggedInUser == false)
 		$location.path('login');
@@ -180,7 +180,7 @@ app.controller('editBrokersController', function(dataFactory,getBrokersData, $sc
     };
 	
 });
-app.controller('addBrokersController', function(dataFactory,$scope,$http ,$rootScope , $location , $cookies, $stateParams){
+app.controller('addBrokersController', function(dataFactory,$scope, PubNub , $http ,$rootScope , $location , $cookies, $stateParams){
 	
 	if($rootScope.loggedInUser == false)
 		$location.path('login');

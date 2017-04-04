@@ -40,15 +40,15 @@ class Billings extends Admin_Controller{
 			$this->triumphUrl  	 		= $this->config->item('triumph_url_test');
 			$this->triumphUrlRequest   	= $this->config->item('triumph_url_request_test');
 		}
-    }
+
+	}
 	
 	public function index( $parameter = '' ) {
 		$data = array();
 		$filters = array("itemsPerPage"=>20, "limitStart"=>1, "sortColumn"=>"DeliveryDate", "sortType"=>"DESC");
-		$filters["startDate"] = date('Y-m-d', strtotime('-29 days'));
-		$filters["endDate"] = date("Y-m-d"); 
-		if(isset($_COOKIE["_gDateRange"]) && !empty($_COOKIE["_gDateRange"])){
-			$gDateRange = json_decode($_COOKIE["_gDateRange"],true);
+		$filters["startDate"] = $filters["endDate"] = '';
+		if(isset($_COOKIE["_gDateRangeBilling"]) && !empty($_COOKIE["_gDateRangeBilling"])){
+			$gDateRange = json_decode($_COOKIE["_gDateRangeBilling"],true);
 			$filters["startDate"] = $gDateRange["startDate"]; $filters["endDate"] = $gDateRange["endDate"];
 		}
 
@@ -119,8 +119,7 @@ class Billings extends Admin_Controller{
 	{
 		try{	
 			$objPost = json_decode(file_get_contents('php://input'),true);
-			//~ $objPost['selectedIds'] = array(10554,10572,10575,10591,10594,10595,10596,10596,10601,10602,10606,10608,10611,10613,10621,10622,10623,10630,10631,10634,10636,10640,10642,10643,10644,10646,10648,10650,10652,10654,10655,10661,10674,10676,10677,10678,10680,10682,10683,10684,10685,10687,10688,10689,10696,10699,10700,10702,10703,10717);	
-			//~ pr($objPost); die; 
+			$objPost['selectedIds'] = array(11735,11737,11739,11743);	
 
 			$genDocs = array();
 			$createDocument = array();
@@ -128,6 +127,8 @@ class Billings extends Admin_Controller{
 			$inputIdsForFinal = array();
 			$saveIds = array();
 			$resultReturnedArray = $this->createMultipleInputs($objPost['selectedIds']);
+
+			pr($resultReturnedArray);
 			$resultReturnedIds = $resultReturnedArray[0];
 			$this->triumphToken = $resultReturnedArray[1];
 			
@@ -168,6 +169,8 @@ class Billings extends Admin_Controller{
 				
 				$inputIdsForFinal[$i] = $genDocs[$i]['inputId'];
 				$saveIds[$i] = "'".$genDocs[$i]['inputId']."+".$objPost['selectedIds'][$i];
+
+				pr($genDocs);
 				$this->Billing->updatePaymentSent( $objPost['selectedIds'][$i] );
 			}
 		
@@ -193,6 +196,7 @@ class Billings extends Admin_Controller{
 			$errorMessage = '';
 			if ( !empty($inputIdsForFinal) ) {
 				$finalizeInputArray = $this->createFinalizeInputArray($inputIdsForFinal, $funding,$this->triumphToken);
+
 				$finalizeInput = $finalizeInputArray[0];
 				$this->triumphToken = $finalizeInputArray[1];
 				if ( $finalizeInput != '' && strpos($finalizeInput, 'Id:') === false ) {
@@ -334,6 +338,7 @@ class Billings extends Admin_Controller{
 		}
 		
 		$postData = rtrim($postData,'&');
+		
 		if ( $this->triumphToken != '' && $this->triumphToken != null ) {
 			
 		} else {
@@ -343,6 +348,8 @@ class Billings extends Admin_Controller{
 
 		$url = 'v1Submit/CreateInputsFromArray';
 		$result = $this->commonTriumphCurlRequest( $url, $postData, $this->triumphToken);
+		pr($result); 
+		
 		if ( $result['Error'] == 1 && ( strpos($result['ErrorMessage'], 'No cookie named SessionToken was passed with the request or it was not in a valid format.') !== false) ) {
 			$token = $this->get_sessionToken();
 			$this->triumphToken = $token->SessionToken;
@@ -442,7 +449,7 @@ class Billings extends Admin_Controller{
 		$params = json_decode(file_get_contents('php://input'),true);
 		$total = 0;
 		$jobs = array();
-		if($params["pageNo"] <= 1){
+		if($params["pageNo"] < 1){
 			$params["limitStart"] = ($params["pageNo"] * $params["itemsPerPage"] + 1);	
 		}else{
 			$params["limitStart"] = ($params["pageNo"] * $params["itemsPerPage"] );	

@@ -77,10 +77,21 @@ class Login extends CI_Controller {
 	* Comment: used for fetch notifications
 	*/
 	public function getNotifications(){
+
+
 		$userId = $this->session->userdata('loggedUser_id');
+		$post = json_decode(file_get_contents('php://input'),true);
+		$this->session->set_userdata('userTimeZone', $post["tz"]);
 		$response = array();
 		$response["ureadCount"]    = $this->Job->getUnreadNotificationsCount($userId);
-		$response["notifications"] = $this->Job->getNotifications($userId);
+		$notifications = $this->Job->getNotifications($userId);
+		//$response["notifications"] = $this->Job->getNotifications($userId,$filters);
+		if(count($notifications) > 0){
+			foreach ($notifications as $key => $value) {
+				$notifications[$key]["created_at"] = toLocalTimezone($value["created_at"]);
+			}
+		}
+		$response["notifications"] = $notifications;
 		echo json_encode($response);
 	}
 
@@ -101,8 +112,16 @@ class Login extends CI_Controller {
 		}
 		$response = array();
 		$response["total"]    = $this->Job->getNotificationsTotal($userId);
-		$response["notifications"] = $this->Job->getNotifications($userId,$filters);
+		$notifications = $this->Job->getNotifications($userId,$filters);
+		//$response["notifications"] = $this->Job->getNotifications($userId,$filters);
+		if(count($notifications) > 0){
+			foreach ($notifications as $key => $value) {
+				$notifications[$key]["created_at"] = toLocalTimezone($value["created_at"]);
 
+				//echo $notifications[$key]["created_at"];die;
+			}
+		}
+		$response["notifications"] = $notifications;
 		echo json_encode($response);
 	}
 
@@ -113,56 +132,59 @@ class Login extends CI_Controller {
 	* Return : null
 	* Comment: used for fetch notifications
 	*/
-	public function ticketActivity($loadId){
+	public function ticketActivity($loadId = false){
 		//$userId = $this->session->userdata('loggedUser_id');
 		//$filters = json_decode(file_get_contents('php://input'),true);
 		
-		$response = array();
-		$result = $this->Job->getTicketActivity($loadId);
-		foreach ($result as $key => $value) {
-			if($value["event_type"] == "add" && $value["entity_name"] == "ticket"){
-				$result[$key]["title"] = "Added a ticket.";
-				$result[$key]["event_color"] = "primary";
-			}
+		$response = $result = array();
+		if($loadId){
+			$result = $this->Job->getTicketActivity($loadId);
+			foreach ($result as $key => $value) {
+				if($value["event_type"] == "add" && $value["entity_name"] == "ticket"){
+					$result[$key]["title"] = "Added a ticket.";
+					$result[$key]["event_color"] = "primary";
+				}
 
-			if($value["event_type"] == "add_to_queue" && $value["entity_name"] == "ticket"){
-				$result[$key]["title"] = "Added a ticket to queue.";
-				$result[$key]["event_color"] = "primary";
-			}
+				if($value["event_type"] == "add_to_queue" && $value["entity_name"] == "ticket"){
+					$result[$key]["title"] = "Added a ticket to queue.";
+					$result[$key]["event_color"] = "primary";
+				}
 
 
-			if($value["event_type"] == "edit" && $value["entity_name"] == "ticket"){
-				$result[$key]["title"]        = "Edited the ticket.";
-				$result[$key]["event_color"] = "warning";
+				if($value["event_type"] == "edit" && $value["entity_name"] == "ticket"){
+					$result[$key]["title"]        = "Edited the ticket.";
+					$result[$key]["event_color"] = "warning";
+				}
+				if($value["event_type"] == "delete" && $value["entity_name"] == "ticket"){
+					$result[$key]["title"] = "Deleted the ticket.";
+					$result[$key]["event_color"] = "danger";
+				}
+				if($value["event_type"] == "upload_doc" && $value["entity_name"] == "ticket"){
+					$result[$key]["title"] = "Uploaded a document.";
+					$result[$key]["event_color"] = "info";
+				}
+				if(($value["event_type"] == "remove_doc" || $value["event_type"] == "overwrite_doc") && $value["entity_name"] == "ticket"){
+					$result[$key]["title"] = "Deleted a document.";
+					$result[$key]["event_color"] = "danger";
+				}
+				if($value["event_type"] == "remove_from_queue" && $value["entity_name"] == "ticket"){
+					$result[$key]["title"] = "Remove ticket from queue.";
+					$result[$key]["event_color"] = "danger";
+				}
+				if($value["event_type"] == "bundle_document" && $value["entity_name"] == "ticket"){
+					$result[$key]["title"] = "Generated a bundle document.";
+					$result[$key]["event_color"] = "success";
+				}
+				if($value["event_type"] == "generate_invoice" && $value["entity_name"] == "ticket"){
+					$result[$key]["title"] = "Generated an invoice.";
+					$result[$key]["event_color"] = "success";
+				}if($value["event_type"] == "add_to_queue" && $value["entity_name"] == "ticket"){
+					$result[$key]["title"] = "Added to the queue.";
+					$result[$key]["event_color"] = "primary";
+				}
+				$result[$key]["event_type"] = str_replace("_", " ", $result[$key]["event_type"]);
+				$result[$key]["created_at"] = toLocalTimezone($value["created_at"]);
 			}
-			if($value["event_type"] == "delete" && $value["entity_name"] == "ticket"){
-				$result[$key]["title"] = "Deleted the ticket.";
-				$result[$key]["event_color"] = "danger";
-			}
-			if($value["event_type"] == "upload_doc" && $value["entity_name"] == "ticket"){
-				$result[$key]["title"] = "Uploaded a document.";
-				$result[$key]["event_color"] = "info";
-			}
-			if(($value["event_type"] == "remove_doc" || $value["event_type"] == "overwrite_doc") && $value["entity_name"] == "ticket"){
-				$result[$key]["title"] = "Deleted a document.";
-				$result[$key]["event_color"] = "danger";
-			}
-			if($value["event_type"] == "remove_from_queue" && $value["entity_name"] == "ticket"){
-				$result[$key]["title"] = "Remove ticket from queue.";
-				$result[$key]["event_color"] = "danger";
-			}
-			if($value["event_type"] == "bundle_document" && $value["entity_name"] == "ticket"){
-				$result[$key]["title"] = "Generated a bundle document.";
-				$result[$key]["event_color"] = "success";
-			}
-			if($value["event_type"] == "generate_invoice" && $value["entity_name"] == "ticket"){
-				$result[$key]["title"] = "Generated an invoice.";
-				$result[$key]["event_color"] = "success";
-			}if($value["event_type"] == "add_to_queue" && $value["entity_name"] == "ticket"){
-				$result[$key]["title"] = "Added to the queue.";
-				$result[$key]["event_color"] = "primary";
-			}
-			$result[$key]["event_type"] = str_replace("_", " ", $result[$key]["event_type"]);
 		}
 
 		$response["notifications"]    = $result;
@@ -181,7 +203,14 @@ class Login extends CI_Controller {
 		$this->Job->flagNotificationsAsRead($userId);
 		$response = array();
 		$response["ureadCount"]    = $this->Job->getUnreadNotificationsCount($userId);
-		$response["notifications"] = $this->Job->getNotifications($userId);
+		$notifications = $this->Job->getNotifications($userId);
+		//$response["notifications"] = $this->Job->getNotifications($userId,$filters);
+		if(count($notifications) > 0){
+			foreach ($notifications as $key => $value) {
+				$notifications[$key]["created_at"] = toLocalTimezone($value["created_at"]);
+			}
+		}
+		$response["notifications"] = $notifications;
 		echo json_encode($response);
 	}
 

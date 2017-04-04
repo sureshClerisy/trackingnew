@@ -354,16 +354,16 @@
 					                </div>
 					            </div>
 					           <!-- END PANEL -->				
-					<form method="POST" name="addNewLoad" role="form" ng-class="showFormClass == true ? 'saveform' : ''" ng-submit="addNewLoad.$valid && saveAddLoad()" novalidate>	
+					<form method="POST" name="addNewLoad" role="form" ng-class="showFormClass == true ? 'saveform' : ''" novalidate>	
 						
 					<!-- end of location load section -->
 							<div class="col-xs-12">
 								<!--  Sheet ends-->
 								<div class="popup-load-detail-section">
-									<div class="table-input-head"">
+									<div class="table-input-head">
 										<h1>{{ languageCommonVariables.popuploaddetails }}</h1>
 										<div class="save-cancel" ng-show="add_load_div == true">
-											<button ng-click="submitted=true" class="btn btn-primary btn-cons m-b-10" type="submit"><i class="pg-form"></i> <span class="bold">Save</span></button>
+											<button ng-click="saveAddLoad()" class="btn btn-primary btn-cons m-b-10" type="button"><i class="pg-form"></i> <span class="bold">Save</span></button>
 											<button href="javascript:void(0)" ng-show= "saveAddPrimaryId == ''" ng-click="resetAllForm()" class="btn btn-danger btn-cons m-b-10" type="button"><i class="fa fa-close"></i>
 												<span class="bold"> Reset </span>
 											</button>
@@ -387,14 +387,15 @@
 										
 									<div class="vehicle-driver-found" ng-show="vehicleDriverFound == true">
 										<div class="popup-load-detail-grid driver-name-grid">
-											<span>
-												<figure class="driver-image">
-													<img ng-src="./assets/uploads/drivers/thumbnail/{{vehicleInfo.profile_image}}" onerror="this.style.display = 'none'">
-													<span class="text-image hide-1" style="background: {{vehicleInfo.color}}">{{vehicleInfo.avatarText}}</span>
-												</figure>
-												{{ languageCommonVariables.truckdrivername }}</span>
-											<p>{{ driverPlaceholder }}</p>
-											
+											<div class="relative-box-left-main">
+												<span>
+													<figure class="driver-image">
+														<img class="showme" ng-src="./assets/uploads/drivers/thumbnail/{{vehicleInfo.profile_image}}" onerror="this.style.display = 'none'">
+														<span class="text-image hide-1" style="background: {{vehicleInfo.color}}">{{vehicleInfo.avatarText}}</span>
+													</figure>
+													{{ languageCommonVariables.truckdrivername }}</span>
+												<p>{{ driverPlaceholder }}</p>
+											</div>
 										</div>
 										<div class="popup-load-detail-grid select-driver-name truck-number">
 											
@@ -1536,14 +1537,15 @@
 								<div class="notification-block-lt">
 									<ul>
 										<li ng-repeat="notification in notificationsList">
-											<div class="img-lt-block-noti">
+											<div class="img-lt-block-noti" style="background: {{notification.color}}">
+												<img ng-src="assets/uploads/users/{{notification.profile_image}}" onerror="this.style.display = 'none'">
 												<span>{{notification.userIntial}}</span>
 											</div>
 											<p dynamic="notification.event_msg"></p>
-											<p class="small">{{notification.created_at | date: 'yyyy-MM-dd HH:mm:ss Z'}}</p>
+											<p class="small">{{notification.created_at}}</p>
 										</li>
 									</ul>
-									<div ng-show="haveNotifications >= 8" class="see-all"><a  href="#/notifications">See all notifications</a></div>
+									<div ng-show="haveNotifications >= 8" ng-click="hideMe();" class="see-all"><a  href="#/notifications">See all notifications</a></div>
 								</div>
 								
 								

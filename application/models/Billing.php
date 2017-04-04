@@ -38,7 +38,7 @@ class Billing extends CI_Model {
 		
 			if(isset($filters["searchQuery"]) && !empty($filters["searchQuery"])){
 	            $this->db->group_start();
-	            $this->db->like('LOWER(CONCAT(drivers.first_name," ", drivers.last_name))', strtolower($filters['searchQuery']));
+	            $this->db->like('LOWER(CONCAT(TRIM(drivers.first_name)," ", TRIM(drivers.last_name)))', strtolower($filters['searchQuery']));
 	            $this->db->or_like('loads.id', $filters['searchQuery'] );
 	            $this->db->or_like('loads.invoiceNo', $filters['searchQuery'] );
 	            $this->db->or_like('LOWER(loads.LoadType)', strtolower($filters['searchQuery']) );
@@ -59,18 +59,15 @@ class Billing extends CI_Model {
 	            $this->db->group_end();
 			}
 		
-		
-
 		if(isset($filters["userType"]) && $filters["userType"] == 'team') {
-			if(isset($filters["vehicleId"]) && $filters["vehicleId"] != '') {
-				$this->db->where_in('loads.vehicle_id',$filters["vehicleId"]);
-			}			
-			$this->db->where('loads.driver_type',"team");	
-			$this->db->where('loads.dispatcher_id',$filters["dispatcherId"]);
+			// if(isset($filters["vehicleId"]) && $filters["vehicleId"] != '') {
+			// 	$this->db->where_in('loads.vehicle_id',$filters["vehicleId"]);
+			// }		
+			$this->db->where(array('loads.driver_type' => "team",'loads.driver_id' => $filters["userId"], 'loads.second_driver_id' => $filters['secondDriverId'], 'loads.dispatcher_id' => $filters['dispatcherId']));		
 		} else if(isset($filters["userType"]) && $filters["userType"] == 'driver') {
-			if(isset($filters["vehicleId"]) && $filters["vehicleId"] != '') {
-				$this->db->where_in('loads.vehicle_id',$filters["vehicleId"]);
-			}
+			// if(isset($filters["vehicleId"]) && $filters["vehicleId"] != '') {
+			// 	$this->db->where_in('loads.vehicle_id',$filters["vehicleId"]);
+			// }
 			$this->db->where("(`loads`.`driver_type` = '' OR `loads`.`driver_type` IS NULL || `loads`.`driver_type` = 'driver')");	
 			$this->db->where('loads.dispatcher_id',$filters["dispatcherId"]);
 			$this->db->where('loads.driver_id',$filters["userId"]);
@@ -105,7 +102,7 @@ class Billing extends CI_Model {
 
 		if(isset($filters["sortColumn"]) && $filters["sortColumn"] == "driverName"){
 			$this->db->order_by('CASE 
-								     WHEN loads.driver_type  = "team" THEN CONCAT(drivers.first_name, " + ", team.first_name) 
+								     WHEN loads.driver_type  = "team" THEN CONCAT(TRIM(drivers.first_name), " + ", TRIM(team.first_name)) 
 								     ELSE concat(drivers.first_name, " ", drivers.last_name) 
 								 END '.$filters["sortType"]);
 		}else if( isset($filters["sortColumn"]) && in_array($filters["sortColumn"] ,array( "TruckCompanyName"))){
@@ -181,7 +178,7 @@ class Billing extends CI_Model {
 
 			if(isset($filters["searchQuery"]) && !empty($filters["searchQuery"])){
 	            $this->db->group_start();
-	            $this->db->like('LOWER(CONCAT(drivers.first_name," ", drivers.last_name))', strtolower($filters['searchQuery']));
+	            $this->db->like('LOWER(CONCAT(TRIM(drivers.first_name)," ", TRIM(drivers.last_name)))', strtolower($filters['searchQuery']));
 	            $this->db->or_like('loads.id', $filters['searchQuery'] );
 	            $this->db->or_like('loads.invoiceNo', $filters['searchQuery'] );
 	            $this->db->or_like('LOWER(loads.LoadType)', strtolower($filters['searchQuery']) );
@@ -221,7 +218,7 @@ class Billing extends CI_Model {
 
 			if(isset($filters["searchQuery"]) && !empty($filters["searchQuery"])){
 	            $this->db->group_start();
-	            $this->db->like('LOWER(CONCAT(drivers.first_name," ", drivers.last_name))', 		strtolower($filters['searchQuery']));
+	            $this->db->like('LOWER(CONCAT(TRIM(drivers.first_name)," ", TRIM(drivers.last_name)))', 		strtolower($filters['searchQuery']));
 	            $this->db->or_like('loads.id', $filters['searchQuery'] );
 	            $this->db->or_like('loads.invoiceNo', $filters['searchQuery'] );
 	            $this->db->or_like('LOWER(loads.LoadType)', strtolower($filters['searchQuery']) );
@@ -262,6 +259,7 @@ class Billing extends CI_Model {
 			$this->db->limit($filters["itemsPerPage"],$filters["limitStart"]);
 		}
 
+		$this->db->where_IN('loads.JobStatus',$this->config->item('loadStatus'));
 		$result = $this->db->get('loads');
 		//echo $this->db->last_query(); die;
 		if($total){
@@ -322,7 +320,7 @@ class Billing extends CI_Model {
 			}
 		}
 		
-		$this->db->select('loads.PickupDate,loads.PickupAddress,loads.OriginCity,loads.OriginState,loads.OriginCountry,loads.DestinationAddress,loads.DestinationCity,loads.DestinationState,loads.DestinationCountry,loads.PaymentAmount,loads.truckstopID,loads.id,loads.flag,concat(drivers.first_name," ",drivers.last_name,"-",vehicles.label) as driverName,drivers.profile_image,vehicles.id as vehicleID');
+		$this->db->select('loads.PickupDate,loads.PickupAddress,loads.OriginCity,loads.OriginState,loads.OriginCountry,loads.DestinationAddress,loads.DestinationCity,loads.DestinationState,loads.DestinationCountry,loads.PaymentAmount,loads.truckstopID,loads.id,loads.flag,concat(drivers.first_name," ",drivers.last_name,"-",vehicles.label) as driverName,drivers.profile_image,vehicles.id as vehicleID,drivers.first_name,drivers.last_name,drivers.color');
 		$this->db->join('drivers','drivers.id = loads.driver_id','LEFT');
 		$this->db->join('vehicles','vehicles.id = loads.vehicle_id','LEFT');
 		$this->db->where_in('loads.id', $in_aray);
@@ -380,7 +378,7 @@ class Billing extends CI_Model {
 	 */
 	 
 	public function fetchFlaggedPaymentLoads() {
-		$this->db->select('loads.PickupDate,loads.PickupAddress,loads.OriginCity,loads.OriginState,loads.OriginCountry,loads.DestinationAddress,loads.DestinationCity,loads.DestinationState,loads.DestinationCountry,loads.PaymentAmount,loads.truckstopID,loads.id,loads.flag,concat(drivers.first_name," ",drivers.last_name,"-",vehicles.label) as driverName,drivers.profile_image,vehicles.id as vehicleID');
+		$this->db->select('loads.PickupDate,loads.PickupAddress,loads.OriginCity,loads.OriginState,loads.OriginCountry,loads.DestinationAddress,loads.DestinationCity,loads.DestinationState,loads.DestinationCountry,loads.PaymentAmount,loads.truckstopID,loads.id,loads.flag,concat(drivers.first_name," ",drivers.last_name,"-",vehicles.label) as driverName,drivers.profile_image,vehicles.id as vehicleID,drivers.first_name,drivers.last_name,drivers.color');
 		$this->db->join('drivers','drivers.id = loads.driver_id','LEFT');
 		$this->db->join('vehicles','vehicles.id = loads.vehicle_id','LEFT');
 		$where = array('loads.flag' => 1, 'loads.sent_for_payment' => 0, 'loads.delete_status' => 0 );

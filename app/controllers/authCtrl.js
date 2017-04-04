@@ -82,7 +82,8 @@ app.controller('authLogoutCtrl', function (dataFactory,$scope, $rootScope, $loca
 		$cookies.remove("admin_email");
 		$cookies.remove("admin_uid");
 		$cookies.remove('loggedUserFirstNameCookie');	
-		$cookies.remove('LastName');	
+																													$cookies.remove('LastName');	
+		$cookies.remove('color');	
 		$cookies.remove('loggedUserRoleId');	
 		$cookies.remove('userIsLoggedIn');	
 		$rootScope.loggedInUser = false;		

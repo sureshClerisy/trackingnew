@@ -134,7 +134,16 @@ class Script extends CI_Model {
 		return true;
 	} 
 	
-	
+	/**
+	* Fetching driver logs from logs table
+	*/
+
+	public function getDriverLogs($entity) {
+		$this->db->where('entity_name',$entity);
+		$result = $this->db->get('activity_log');
+		return $result->result_array();
+
+	}
 	 
 }
 

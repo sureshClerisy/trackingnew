@@ -42,6 +42,9 @@ class Reports extends Admin_Controller{
 		}
 
 		$response = array("vehicles"=>$vehicles,"vDriversList"=>$vDriversList);
+		// pr($response);
+
+
 		echo json_encode($response);
 	}
 	
@@ -216,6 +219,8 @@ class Reports extends Admin_Controller{
 			$filterArgs["driverId"] = $filters["args"]["driverId"]; 		
 		}
 
+		$filterArgs["secondDriverId"] = isset($filters["args"]["secondDriverId"]) ? $filters['args']['secondDriverId'] : 0; 		
+		
 		if(isset($filters["args"]["reportType"])){
 			$iscope = "all";
 			switch ($filterArgs["scope"]) {
@@ -228,7 +233,7 @@ class Reports extends Admin_Controller{
 
 			switch ($filters["args"]["reportType"]) {
 				case 'individual': if($args){
-									$response['column_mappings'] = array( "LOAD #", "DISPATCHER", "DRIVER", "BROKER",  "INVOICED AMT", "TOTAL CHARGES", "PROFIT", "PROFIT %", "MILES", "DEAD MILES", "RPM", "PICKUP DATE", "ORIGIN", "DEL. DATE", "DESTINATION");	
+									$response['column_mappings'] = array( "LOAD #", "DISPATCHER", "DRIVER", "BROKER",  "BOOKED", "TOTAL CHARGES", "PROFIT", "PROFIT %", "MILES", "DEAD MILES", "RPM", "PICKUP DATE", "ORIGIN", "DEL. DATE", "DESTINATION");	
 										$result = $this->Report->getLoadsTrackingIndividual($filterArgs,'export');
 									} else {
 										$response['column_mappings'] = array( "LOAD #", "DISPATCHER", "DRIVER", "BROKER",  "INVOICED AMT", "TOTAL CHARGES", "PROFIT", "PROFIT %", "MILES", "DEAD MILES", "RPM", "PICKUP DATE", "ORIGIN", "DEL. DATE", "DESTINATION");		
@@ -246,9 +251,11 @@ class Reports extends Admin_Controller{
 									$response['column_mappings'] = array_merge($response['column_mappings'],array("INVOICED AMT", "TOTAL CHARGES", "MILES", "DEAD MILES", "PROFIT", "PROFIT %")); 
 
 									$result = $this->Report->getLoadsTrackingAggregate($filterArgs,$iscope); break;
+
 			}
 			$filterArgs["reportType"] = $filters["args"]["reportType"];
 		}
+
 
 		$response['args'] = $filterArgs;
 		if($args && !$csv){
@@ -272,6 +279,13 @@ class Reports extends Admin_Controller{
 					$value["charges"] = money_format("%.2n", $value["charges"]);
 					$value["profit"] = money_format("%.2n", $value["profit"]);
 
+					unset($value['dispatcherId']);
+					unset($value['driverId']);
+					unset($value['second_driver_id']);
+					unset($value['driverName']);
+					unset($value['username']);
+					unset($value['driver_type']);
+
 					if ( isset($result[$key]['PickupAddress'])) {
 						$value['PickupAddress']		 = trim($value['PickupAddress'].','.$value['OriginCity'].','.$value['OriginState'].','.$value['OriginCountry'],',');
 						$value['DestinationAddress']  = trim($value['DestinationAddress'].','.$value['DestinationCity'].','.$value['DestinationState'].','.$value['DestinationCountry'],',');
@@ -283,7 +297,8 @@ class Reports extends Admin_Controller{
 						unset($value['DestinationCountry']);
 						$result_f[$dispatcher][$value["driver"]][$key] = $value;
 					} else {
-						if ( isset($args['args']['reportType']) && $args['args']['reportType'] == 'performance' && $args['args']['scope'] == 'all' ) {
+						
+						if ( isset($args['args']['reportType']) && $args['args']['reportType'] == 'performance' && ($args['args']['scope'] == 'all' || $args['args']['scope'] == '' ) ) {
 							$result_f[$dispatcher][] = $value;
 						} else {
 							$result_f[$dispatcher][$value["driver"]][$key] = $value;
@@ -325,8 +340,16 @@ class Reports extends Admin_Controller{
 					unset($result[$key]['DestinationCity']);
 					unset($result[$key]['DestinationState']);
 					unset($result[$key]['DestinationCountry']);
+					unset($result[$key]['driver_type']);
 				}
 				
+				unset($result[$key]['dispatcherId']);
+				unset($result[$key]['driverId']);
+				unset($result[$key]['second_driver_id']);
+				unset($result[$key]['driverName']);
+				unset($result[$key]['username']);
+				unset($result[$key]['driver_type']);
+
 				if ( $filters["args"]["reportType"] == 'performance') {
 					$totalInvoices		 += $value["invoice"];
 					$totalMiles 		 += $value["miles"];
@@ -428,7 +451,7 @@ class Reports extends Admin_Controller{
 		$filterArgs['limitStart']   = 1;
 		$filterArgs['sortColumn']   = "DeliveryDate";
 		$filterArgs['sortType']     = "DESC";
-		 
+
 		$data['loads'] = $this->Report->getTrackingIndividualLoadsPagination( $filterArgs, $iscope, false );
 		$total = $this->Report->getTrackingIndividualLoadsPagination( $filterArgs, $iscope, true );
 		$data['total'] =  $total[0]['count'];
@@ -438,21 +461,25 @@ class Reports extends Admin_Controller{
 	}
 
 	public function getReportRecords() {
-
 		$params = json_decode(file_get_contents('php://input'),true);
 		$data 	= array();
-		$filter["limitStart"] = ( $params["pageNo"] * $params["itemsPerPage"] + 1 );
-
-		$filter['sortColumn'] 	= ((isset($params["sortColumn"]) && !empty($params["sortColumn"]))) ? $params["sortColumn"]  : "DeliveryDate"; 
-		$filter['sortType']   	= ((isset($params["sortType"]) && !empty($params["sortType"]))) ? $params["sortType"]  : "DESC"; 
-		$filter['itemsPerPage'] = ((isset($params["itemsPerPage"]) && !empty($params["itemsPerPage"]))) ? $params["itemsPerPage"]  : "20"; 
-		$filter['searchQuery']  = ((isset($params["searchQuery"]) && !empty($params["searchQuery"]))) ? $params["searchQuery"]  : ""; 
-		$filter['scope']      = ((isset($params['formValue']['scope'])) && !empty($params['formValue']['scope']) ) ? $params['formValue']['scope'] : '';
-		$filter['selScope']   = ((isset($params['formValue']['selScope'])) && !empty($params['formValue']['selScope']) ) ? $params['formValue']['selScope'] : '';
-		$filter['dispId']     = ((isset($params['formValue']['dispId'])) && !empty($params['formValue']['dispId']) ) ? $params['formValue']['dispId'] : '';
-		$filter['driverId']   = ((isset($params['formValue']['driverId'])) && !empty($params['formValue']['driverId']) ) ? $params['formValue']['driverId'] : '';
-		$filter['startDate']  = ((isset($params['formValue']["startDate"]) && !empty($params['formValue']["startDate"]))) ? $params['formValue']["startDate"]  : ""; 
-		$filter['endDate']    = ((isset($params['formValue']["endDate"]) && !empty($params['formValue']["endDate"]))) ? $params['formValue']["endDate"]  : ""; 
+		if($params["pageNo"] < 1){
+			$filter["limitStart"] = ($params["pageNo"] * $params["itemsPerPage"] + 1);	
+		}else{
+			$filter["limitStart"] = ($params["pageNo"] * $params["itemsPerPage"] );	
+		}
+		
+		$filter['sortColumn'] 	   = ((isset($params["sortColumn"]) && !empty($params["sortColumn"]))) ? $params["sortColumn"]  : "DeliveryDate"; 
+		$filter['sortType']   	   = ((isset($params["sortType"]) && !empty($params["sortType"]))) ? $params["sortType"]  : "DESC"; 
+		$filter['itemsPerPage']    = ((isset($params["itemsPerPage"]) && !empty($params["itemsPerPage"]))) ? $params["itemsPerPage"]  : "20"; 
+		$filter['searchQuery']     = ((isset($params["searchQuery"]) && !empty($params["searchQuery"]))) ? $params["searchQuery"]  : ""; 
+		$filter['scope']     	   = ((isset($params['formValue']['scope'])) && !empty($params['formValue']['scope']) ) ? $params['formValue']['scope'] : '';
+		$filter['selScope']  	   = ((isset($params['formValue']['selScope'])) && !empty($params['formValue']['selScope']) ) ? $params['formValue']['selScope'] : '';
+		$filter['dispId']     	   = ((isset($params['formValue']['dispId'])) && !empty($params['formValue']['dispId']) ) ? $params['formValue']['dispId'] : '';
+		$filter['driverId']   	   = ((isset($params['formValue']['driverId'])) && !empty($params['formValue']['driverId']) ) ? $params['formValue']['driverId'] : '';
+		$filter['secondDriverId']  = ((isset($params['formValue']['secondDriverId'])) && !empty($params['formValue']['secondDriverId']) ) ? $params['formValue']['secondDriverId'] : '';
+		$filter['startDate']  	 = ((isset($params['formValue']["startDate"]) && !empty($params['formValue']["startDate"]))) ? $params['formValue']["startDate"]  : ""; 
+		$filter['endDate']    	 = ((isset($params['formValue']["endDate"]) && !empty($params['formValue']["endDate"]))) ? $params['formValue']["endDate"]  : ""; 
 		
 		$data['loads'] = $this->Report->getTrackingIndividualLoadsPagination( $filter, 'report', false );
 		$total = $this->Report->getTrackingIndividualLoadsPagination( $filter, 'report', true );
@@ -461,63 +488,6 @@ class Reports extends Admin_Controller{
 		echo json_encode(array('wPagination' => $data));
 	}
 
-	/**
-	* Method getBreadcrumbReportRecords
-	* @param POST
-	* @return JSON
-	*/
-
-	public function getBreadcrumbReportRecords(){
-
-		$params = json_decode(file_get_contents('php://input'),true);
-
-		$filterArgs['deviceID']  = array();
-		$filterArgs['eventType']  = array();
-
-		if(isset($params['formValue']['vehicles'])){
-			if( is_array($params['formValue']['vehicles']) && count($params['formValue']['vehicles']) > 0){
-				foreach ($params['formValue']['vehicles'] as $key => $value) {
-					array_push($filterArgs['deviceID'], $value['tracker_id']);
-				}
-			}
-		}
 	
-		if(isset($params['formValue']['vStatus'])){	
-			if( is_array($params['formValue']['vStatus']) && count($params['formValue']['vStatus']) > 0){
-				foreach ($params['formValue']['vStatus'] as $key => $value) {
-					switch ($value['key']) {
-						case 'IDLE'		: 	$filterArgs['eventType'] = array_merge($filterArgs['eventType'], array('IGON','STOP')); break;
-						case 'SPEED'	: 	$filterArgs['eventType'] = array_merge($filterArgs['eventType'], array('')); break;
-						case 'TRAVEL'	: 	$filterArgs['eventType'] = array_merge($filterArgs['eventType'], array('START','MOVING')); break;
-						case 'IGOFF'	: 	$filterArgs['eventType'] = array_merge($filterArgs['eventType'], array('IGOFF')); break;
-						case 'PTO_OFF'	: 	$filterArgs['eventType'] = array_merge($filterArgs['eventType'], array('DEVICEIO')); break; //IN4HI, IN4LO
-						case 'PTO_ON'	: 	$filterArgs['eventType'] = array_merge($filterArgs['eventType'], array('')); break;
-					}
-				}
-			} 
-		}
-
-		
-		$data 					= array();
-		$filter["limitStart"] 	= ( $params["pageNo"] * $params["itemsPerPage"] + 1 );
-		$filter['sortColumn'] 	= (!empty($params["sortColumn"])) ? $params["sortColumn"]  : "GMTTime"; 
-		$filter['sortType']   	= (!empty($params["sortType"])) ? $params["sortType"]  : "ASC"; 
-		$filter['itemsPerPage'] = (!empty($params["itemsPerPage"])) ? $params["itemsPerPage"]  : "20"; 
-		$filter['searchQuery']  = (!empty($params["searchQuery"])) ? $params["searchQuery"]  : ""; 
-		$filter['scope']      	= (!empty($params['formValue']['scope']) ) ? $params['formValue']['scope'] : '';
-		$filter['selScope']   	= (!empty($params['formValue']['selScope']) ) ? $params['formValue']['selScope'] : '';
-		$filter['dispId']     	= (!empty($params['formValue']['dispId']) ) ? $params['formValue']['dispId'] : '';
-		$filter['driverId']   	= (!empty($params['formValue']['driverId']) ) ? $params['formValue']['driverId'] : '';
-		$filter['startDate']  	= (!empty($params['formValue']["startDate"])) ? $params['formValue']["startDate"]  : ""; 
-		$filter['endDate']    	= (!empty($params['formValue']["endDate"])) ? $params['formValue']["endDate"]  : ""; 
-		$filter['deviceID']    	= $filterArgs["deviceID"]; 
-		$filter['eventType']    = $filterArgs["eventType"]; 
-		
-		$data['result'] 			= $this->Report->getBreadcrumbsDetail( $filter, false );
-		$totalRows				= $this->Report->getBreadcrumbsDetail( $filter, true );
-		$data['total'] 		= $totalRows[0]['totalRows'];
-
-		echo json_encode(array('breadCrumbPage' => $data));
-	}	
- }
+}
  

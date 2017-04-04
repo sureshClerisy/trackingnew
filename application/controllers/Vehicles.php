@@ -118,14 +118,17 @@ class Vehicles extends Admin_Controller {
 			$editedFields = array_diff_assoc($_POST,$vehicleOldData);
 			$skipFlag = false;
 			
+			$result = $this->vehicle->add_edit_vehicle($_POST, $id);	
+				
 			if(count($editedFields) > 0){
 				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> edited the vehicle <a class="notify-link" href="'.$this->serverAddr.'#/editTruck/'.$vehicleOldData["id"].'"> Truck - '.$vehicleOldData["label"].'</a>';
 				foreach ($editedFields as $key => $value) {
+
 					$prevField = isset($vehicleOldData[$key]) ? $vehicleOldData[$key] : "" ;
 					if( ( $key == "driver_id" || $key == "team_driver_id") && !$skipFlag){
 						$skipFlag = true; $key = "Driver"; $prevField = $vehicleOldData["driverName"];
 						
-						if($vehicleOldData["driver_type"] == "team"){
+						if($vehicleOldData["driver_type"] == "team") {
 							$prevField = $vehicleOldData["driverName"]." + ".$vehicleOldData["teamDriverTwo"];
 						}
 
@@ -137,12 +140,20 @@ class Vehicles extends Admin_Controller {
 							$value .= " + ".$teamDriver["first_name"]." ".$teamDriver["last_name"];
 						}
 
+						$newDisp = $this->vehicle->getDispatcherId($_POST['driver_id']);
+						$oldDisp = $this->vehicle->getDispatcherId($vehicleOldData['driver_id']);
+
+						if ( $newDisp == $oldDisp)
+							$this->vehicle->addDispatcherDriverLog($newDisp, false);
+						else
+							$this->vehicle->addDispatcherDriverLog($newDisp, $oldDisp);
+
 						if(!empty($prevField)){
-						$message.= "<br/> - Changed ".ucwords(str_replace("_"," ",$key))." from <i>".$prevField."</i> to <i>".$value."</i>";
+							$message.= "<br/> - Changed ".ucwords(str_replace("_"," ",$key))." from <i>".$prevField."</i> to <i>".$value."</i>";
 						}else{
 							$message.= "<br/> - Added  <i>".$value."</i> to ".ucwords(str_replace("_"," ",$key));
 						}
-					}else{
+					} else {
 						if(in_array($key,array("driverName","team_driver_id","driver_id"))){ continue;}
 						if(!empty($prevField)){
 							$message.= "<br/> - Changed ".ucwords(str_replace("_"," ",$key))." from <i>".$prevField."</i> to <i>".$value."</i>";
@@ -154,8 +165,8 @@ class Vehicles extends Admin_Controller {
 			}else{
 				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> edited the vehicle <a class="notify-link" href="'.$this->serverAddr.'#/editTruck/'.$vehicleOldData["id"].'"> Truck - '.$vehicleOldData["label"].'</a>, but changed nothing.';
 			}
-	       	$result = $this->vehicle->add_edit_vehicle($_POST, $id);
-			logActivityEvent($vehicleOldData["id"], $this->entity["truck"], $this->event["edit"], $message, $this->Job);	
+	       	
+	       	logActivityEvent($vehicleOldData["id"], $this->entity["truck"], $this->event["edit"], $message, $this->Job);	
 			echo json_encode(array('success' => true));
 		}catch(Exception $e){
 			log_message('error','EDIT_VEHICLE'.$e->getMessage());
@@ -203,7 +214,14 @@ class Vehicles extends Admin_Controller {
 			unset($_POST["teamDriverOne"]);
 			unset($_POST["teamDriverTwo"]);
 
+
 			$result = $this->vehicle->add_edit_vehicle($_POST);
+
+			if ( isset($_POST['driver_id']) && $_POST['driver_id'] != '' ) {
+				$dispId = $this->vehicle->getDispatcherId($_POST['driver_id']);
+				$this->vehicle->addDispatcherDriverLog($dispId, false);
+			}
+
 			$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> added a new vehicle <a class="notify-link" href="'.$this->serverAddr.'#/editTruck/'.$result.'"> Truck - '.$_POST["label"]."</a>";
 			logActivityEvent($result, $this->entity["truck"], $this->event["add"], $message, $this->Job);	
 			echo json_encode(array('success' => true,'lastTruckId' => $result));

@@ -168,6 +168,13 @@ class Drivers extends Admin_Controller
 				$data['profile_image'] = $file_name;
 			}
 
+			if (isset($data['user_id']) && $data['user_id'] != '') {
+				$this->Driver->addDispatcherDriverLog($data['user_id'], false);
+			} 
+
+			$data["first_name"] = trim($data["first_name"]);
+			$data["last_name"] = trim($data["last_name"]);
+
 			$result = $this->Driver->addDrivers($data,$this->userId);
 			$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> added a new driver <a class="notify-link" href="'.$this->serverAddr.'#/editDrivers/'.$result.'">'.ucfirst($data["first_name"])." ".ucfirst($data["last_name"]).'</a>';
 			logActivityEvent($result, $this->entity["driver"], $this->event["add"], $message, $this->Job);	
@@ -234,9 +241,16 @@ class Drivers extends Admin_Controller
 			$id = $_POST['id'];
 			$previous = array();
 			$previous = $this->Driver->get_driver_data($id);
+
 			$editedFields = array_diff_assoc($data,$previous);
 			unset($editedFields['created']);
 			unset($editedFields['updated']);
+			unset($data['uFirstName']); 
+			unset($data['uLastName']);
+
+			$data["first_name"] = trim($data["first_name"]);
+			$data["last_name"] = trim($data["last_name"]);
+			$result = $this->Driver->update($data, $id);
 
 			if(count($editedFields) > 0){
 				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> edited the driver <a class="notify-link" href="'.$this->serverAddr.'#/editDrivers/'.$previous["id"].'">'.ucfirst($previous["first_name"])." ".ucfirst($previous["last_name"])."</a>";
@@ -248,6 +262,8 @@ class Drivers extends Admin_Controller
 						$key = "dispatcher";
 						$prevField = $previous["uFirstName"]." ".$previous["uLastName"];
 						$value = $dispatcherInfo["first_name"]." ".$dispatcherInfo["last_name"];
+	
+						$this->Driver->addDispatcherDriverLog($editedFields['user_id'], $previous['user_id']);
 					} 
 
 					if(!empty($prevField)){
@@ -256,11 +272,10 @@ class Drivers extends Admin_Controller
 						$message.= "<br/> - Added  <i>".$value."</i> to ".ucwords(str_replace("_"," ",$key));
 					}
 				}
-			}else{
+			} else {
 				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> edited the driver <a class="notify-link" href="'.$this->serverAddr.'#/editDrivers/'.$previous["id"].'">'.ucfirst($previous["first_name"])." ".ucfirst($previous["last_name"])."</a>, but changed nothing.";
 			}
-			unset($data['uFirstName']); unset($data['uLastName']);
-			$result = $this->Driver->update($data, $id);
+			
 			logActivityEvent($previous["id"], $this->entity["driver"], $this->event["edit"], $message, $this->Job);	
 			echo json_encode(array('success' => true));
 		}catch(Exception $e){

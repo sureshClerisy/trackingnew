@@ -158,7 +158,7 @@ $config['composer_autoload'] = FALSE;
 | DO NOT CHANGE THIS UNLESS YOU FULLY UNDERSTAND THE REPERCUSSIONS!!
 |
 */
-$config['permitted_uri_chars'] = 'a-z 0-9~%.:_\-#';
+$config['permitted_uri_chars'] = 'a-z 0-9~%.:_\-#+';
 
 /*
 |--------------------------------------------------------------------------
@@ -588,6 +588,14 @@ $config['triumph_environment'] 		= 	'development';
 $config['transportComp_name']	 = 'Vika Logistics Corp';
 $config['transportComp_phoneNo'] = '(305)-407-2393';
 $config['transportComp_address'] = '8850, NW 18th Terrace Doral, FL, 33172';
+
+$config['loadStatus']  = array('booked','inprogress','delayed','delivered','completed','invoiced');
+
+$config['singleFinancialGoal'] = 18000;
+$config['teamFinancialGoal']   = 25000;
+
+$config['singleMilesGoal'] = 12000;
+$config['teamMilesGoal']   = 20000;
 
 function pr($data){
     echo '<pre>';

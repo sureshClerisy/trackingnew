@@ -128,7 +128,7 @@ class Test extends Admin_Controller {
 			
 			if ( $vehicleId != '' && $vehicleId != null ) {
 				$vehicle_fuel_consumption = $this->Vehicle->get_vehicles_fuel_consumption($this->userId, $vehicleId);
-				$truckAverage =(int)($vehicle_fuel_consumption[0]['fuel_consumption']/100);
+				$truckAverage =round( 100/$vehicle_fuel_consumption[0]['fuel_consumption'],2);
 			} else {
 				$truckAverage = $this->defaultTruckAvg;
 			}

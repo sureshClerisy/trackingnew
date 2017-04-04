@@ -22,94 +22,118 @@ app.controller('reportsController', function(dataFactory,$scope,$http ,$rootScop
 	$scope.noRecords 		= true;
 	$scope.sortType     	= 'deviceID'; // set the default sort type
   	$scope.sortReverse  	= false;  // set the default sort order
-	$scope.vStatus = [{key:'IDLE',label:'Idle'},{key:'SPEED',label:'Speeding'}, {key:'TRAVEL',label:'Travel'},{key:'IGOFF',label:'Engine Off'} ,{key:'PTO_OFF',label:'PTO OFF'} ,{key:'PTO_ON',label:'PTO ON'} ];
-	
+  	$scope.panelTransparent = true;
+
+  	$scope.vStatus = [{key:'IDLE',label:'Idle'},{key:'SPEED',label:'Speeding'}, {key:'TRAVEL',label:'Travel'},{key:'IGOFF',label:'Engine Off'} ,{key:'PTO_OFF',label:'PTO OFF'} ,{key:'PTO_ON',label:'PTO ON'} ];
+
 	$scope.reportList = {/*Administration:[
 									{name:"state_mileage", title:"State Mileage Report", context:"Miles driven per state" },
 									{name:"unauthorized_usage", title:"Unauthorized Usage Report", context:"Vehicle usage during non-working hours" },
 									{name:"user_login", title:"User Login Report", context:"User login statistics" },
 									{name:"work_order", title:"Work Order Report", context:"Work order detail report" }
-								],*/
-						Performance:[
+									],*/
+									Performance:[
 									//{name:"alert_report", title:"Alert Report", context:"Record of events meriting notifications" },
 									{name:"breadcrumb_detail", title:"Breadcrumb Detail Report", context:"Chronological list of events per Vehicle" },
 									{name:"loads_performance", title:"Loads Tracking Report", context:"Report of loads performance" },
 									//{name:"generate_idle", title:"Generate Idle Report", context:"Idle time calculations for generators" }
-								]
-						};
+									]
+								};
 
 
 
 
-	$scope.toggleReportOpen = function(report){
-		$scope.reportListOpen = $scope.reportListOpen ? false : true;
-		$scope.reportOpen = $scope.reportOpen ? false : true;
-		if(angular.isObject(report)){
+		$scope.toggleReportOpen = function(report){
+
+			$scope.panelTransparent = false;			
+			$scope.reportListOpen 	= $scope.reportListOpen ? false : true;
+			$scope.reportOpen 		= $scope.reportOpen ? false : true;
+			$scope.showTable		= false;
+
+			if(angular.isObject(report)){
+
 			//For report breadcrumb_detail
-			$scope.formFilter.vStatus = ''; $scope.formFilter.vehicles = '';
+			$scope.formFilter.vStatus 	= ''; 
+			$scope.formFilter.vehicles 	= '';
 
 			//For report loads_performance
-			$scope.formFilter.reportType = 'individual'; $scope.formFilter.scope = '';
+			$scope.formFilter.reportType 	= 'individual'; 
+			$scope.formFilter.scope 		= '';
 
 			//Common to all reports
-			$scope.reportTitle = report.title;
+			$scope.reportTitle 	 = report.title;
 			$scope.reportContext = report.context;
-			$scope.report = report;	
+
+			$scope.report 		 = report;
+
 		}else{
-			$scope.noFilterYet = true;
+			$scope.noFilterYet 	= true;
 			$scope.filteredResults = false;
 		}
 	}
 
 	$scope.opts = {
-        autoUpdateInput: false,
-        locale: {
-            applyClass: 'btn-green',
-            applyLabel: "Apply",
-            fromLabel: "From",
-            format: "YYYY-MM-DD",
-            toLabel: "To",
-            cancelLabel: 'Clear',
-            direction:'ltr'
-        },
-        eventHandlers: {
-            'cancel.daterangepicker': function(ev, picker) {  
-                $scope.dateRangeValue = {startDate: null, endDate: null};
-                angular.element('#reportsDRPicker').data('daterangepicker').setStartDate(new Date());
-                angular.element('#reportsDRPicker').data('daterangepicker').setEndDate(new Date());
-            }
-        },
-    };
+		autoUpdateInput: false,
+		locale: {
+			applyClass: 'btn-green',
+			applyLabel: "Apply",
+			fromLabel: "From",
+			format: "YYYY-MM-DD",
+			toLabel: "To",
+			cancelLabel: 'Clear',
+			direction:'ltr'
+		},
+		eventHandlers: {
+			'cancel.daterangepicker': function(ev, picker) {  
+				$scope.dateRangeValue = {startDate: null, endDate: null};
+				angular.element('#reportsDRPicker').data('daterangepicker').setStartDate(new Date());
+				angular.element('#reportsDRPicker').data('daterangepicker').setEndDate(new Date());
+			}
+		},
+	};
 
 	$scope.optsReportsBreadcrum = {
-        autoUpdateInput: false,
-        locale: {
-            applyClass: 'btn-green',
-            applyLabel: "Apply",
-            fromLabel: "From",
-            format: "YYYY-MM-DD",
-            toLabel: "To",
-            cancelLabel: 'Clear',
-            direction:'ltr'
-        },
-        eventHandlers: {
-            'cancel.daterangepicker': function(ev, picker) {  
-                $scope.dateRangeValueBreadcrum= {startDate: null, endDate: null};
-                angular.element('#reportsBreadCrumDRPicker').data('daterangepicker').setStartDate(new Date());
-                angular.element('#reportsBreadCrumDRPicker').data('daterangepicker').setEndDate(new Date());
-            }
-        },
-    };
-    
+		autoUpdateInput: false,
+		locale: {
+			applyClass: 'btn-green',
+			applyLabel: "Apply",
+			fromLabel: "From",
+			format: "YYYY-MM-DD",
+			toLabel: "To",
+			cancelLabel: 'Clear',
+			direction:'ltr'
+		},
+		eventHandlers: {
+			'cancel.daterangepicker': function(ev, picker) {  
+				$scope.dateRangeValueBreadcrum= {startDate: null, endDate: null};
+				angular.element('#reportsBreadCrumDRPicker').data('daterangepicker').setStartDate(new Date());
+				angular.element('#reportsBreadCrumDRPicker').data('daterangepicker').setEndDate(new Date());
+			}
+		},
+	};
 
-	$scope.toggleSelectStatus = function(action,reportName) {
+
+	$scope.toggleSelectStatus = function(reportName) {
+
 		switch(reportName){
-			case "breadcrumb_detail": $scope.formFilter.vStatus =  (action == 'all') ? $scope.vStatus : ''; break;
+			case "breadcrumb_detail": $scope.formFilter.vStatus =  ($scope.filterStatus) ? $scope.vStatus : ''; break;
 			//case "loads_performance": $scope.formFilter.vStatus =  (action == 'all') ? $scope.vStatus : ''; break;
 		}
-		
 	}
-	$scope.toggleSelectVehicles = function(action) {
+
+	$scope.backToList = function() {
+		$scope.panelTransparent = true;
+		$scope.showTable 		= false;
+		// alert($scope.showTable);
+
+	}
+
+	$scope.toggleSelectVehicles = function() {
+		$scope.formFilter.vehicles = ($scope.selectVehicles)?$scope.vehicles:'';
+	}
+
+	$scope.toggleSelectVehiclesOld = function(action) {
+		
 		if (action == 'all') {
 			$scope.formFilter.vehicles = $scope.vehicles;	
 		}else{
@@ -128,11 +152,13 @@ app.controller('reportsController', function(dataFactory,$scope,$http ,$rootScop
 	}
 
 	$scope.showLoadWOPagination = false;
-	$scope.generateReport = function(report){
 
-		if ( $scope.dateRangeValue != undefined && report.name == 'loads_performance' ) {
-			$scope.formFilter.startDate  = $scope.dateRangeValue.startDate;
-			$scope.formFilter.endDate    = $scope.dateRangeValue.endDate;
+	$scope.generateReport = function(report){
+		$scope.showTable = true;
+		$scope.autoFetchLoads = true;
+		if ( $scope.dateRangeValue != undefined && report.name == 'loads_performance' && $scope.dateRangeValue.startDate != null ) {
+			$scope.formFilter.startDate  = $scope.dateRangeValue.startDate.format('YYYY-MM-DD');
+			$scope.formFilter.endDate    = $scope.dateRangeValue.endDate.format('YYYY-MM-DD');
 		} else if ( $scope.dateRangeValueBreadcrum != undefined && report.name == 'breadcrumb_detail' && $scope.showCustomDate == true ) {
 			$scope.formFilter.startDate  = $scope.dateRangeValueBreadcrum.startDate;
 			$scope.formFilter.endDate    = $scope.dateRangeValueBreadcrum.endDate;
@@ -142,24 +168,26 @@ app.controller('reportsController', function(dataFactory,$scope,$http ,$rootScop
 			$scope.formFilter.endDate 	= '';
 		}
 
-			$scope.searchFilter = '';
-			$scope.isQueued = true; //Disable generate report btn
-			dataFactory.httpRequest(URL+'/reports/irp_'+report.name,'POST',{},{args:$scope.formFilter}).then(function(data){
-				$scope.isQueued = false; //Re-enable generate report btn
-				
-				if ( data.wPagination != undefined ) {
-					
-					$scope.showLoadWOPagination = true;
-					$scope.loadsListing = data.wPagination.loads;
-					$scope.loadsCount   = data.wPagination.total;
-				} else {
-					$scope.showLoadWOPagination = false;
-					$scope.columnMappings 	= data.column_mappings;
-					$scope.tCols 			= data.column_mappings.length;
+		$scope.searchFilter = '';
+		$scope.isQueued = true; //Disable generate report btn
+		dataFactory.httpRequest(URL+'/reports/irp_'+report.name,'POST',{},{args:$scope.formFilter}).then(function(data){
+		$scope.isQueued = false; //Re-enable generate report btn
+
+		if ( data.wPagination != undefined ) {
+
+			$scope.showLoadWOPagination = true;
+			$scope.loadsListing = data.wPagination.loads;
+			$scope.loadsCount   = data.wPagination.total;
+		} else {
+
+			$scope.showLoadWOPagination = false;
+			$scope.columnMappings 	= data.column_mappings;
+			$scope.tCols 			= data.column_mappings.length;
 					$scope.showTotals 		= false;					// showing total in case of performance only
 					$scope.showSecondTd 	= false;				// hiding second td in total in case of all groups selectd
 					
 					if(data.result){
+
 						if(report.name == "breadcrumb_detail"){
 							$scope.records 			= data.result;
 							$scope.totalBreadcrum	= data.total;
@@ -188,12 +216,10 @@ app.controller('reportsController', function(dataFactory,$scope,$http ,$rootScop
 					}
 				}
 				
-				$scope.noFilterYet = false;
-				$scope.filteredResults = true;
-				
-			});
-	
-
+				$scope.noFilterYet 		= false;
+				$scope.filteredResults 	= true;				
+			});	
+			$scope.autoFetchLoads = false;	
 	}
 
 	$scope.toggleRow = function($event,index){
@@ -201,12 +227,23 @@ app.controller('reportsController', function(dataFactory,$scope,$http ,$rootScop
 		angular.element($event.target).toggleClass("minus-1");
 	}
 
+	$scope.showReport = function(reportType){
+
+		// angular.element("#hblock"+index).slideToggle();
+		// angular.element($event.target).toggleClass("minus-1");
+		if(reportType =='breadcrumb'){
+			$scope.panelTransparent = false;
+
+		}
+		
+	}
+
 
 	$scope.itemsPerPage     = 20;
 	$scope.currentPage      = 1,
 	$scope.lastSortedColumn = '';
-    $scope.lastSortType 	= '';
-    $scope.searchFilter 	= '';
+	$scope.lastSortType 	= '';
+	$scope.searchFilter 	= '';
 
 	/**
 	* pagination 
@@ -216,24 +253,24 @@ app.controller('reportsController', function(dataFactory,$scope,$http ,$rootScop
 
 		$scope.action = '/reports/getReportRecords/';
 		$scope.currentPage = newPage;
-        $scope.loadNextPage(($scope.currentPage - 1),$scope.searchFilter,$scope.lastSortedColumn,$scope.lastSortType);
-    };
+		$scope.loadNextPage(($scope.currentPage - 1),$scope.searchFilter,$scope.lastSortedColumn,$scope.lastSortType);
+	};
 
-    $scope.breadcrumbPageChanged = function(newPage){
-    	$scope.action = '/reports/irp_breadcrumb_detail/';
+	$scope.breadcrumbPageChanged = function(newPage){
+		$scope.action = '/reports/irp_breadcrumb_detail/';
 		$scope.currentPage = newPage;
-        $scope.loadNextPage(($scope.currentPage - 1),$scope.searchFilter,'','');
-    };
+		$scope.loadNextPage(($scope.currentPage - 1),$scope.searchFilter,'','');
+	};
 
-    $scope.loadNextPage = function(pageNumber,search,sortColumn,sortType){
-    	
-    	$scope.autoFetchLoads = true;
-        dataFactory.httpRequest(URL+$scope.action,'Post',{} ,{ pageNo:pageNumber, itemsPerPage:$scope.itemsPerPage,searchQuery: search, sortColumn:sortColumn, sortType:sortType,formValue : $scope.formFilter, changeVariable : 1 }).then(function(data){
-        	
-        	if ( data.wPagination != undefined ) {
-	           	$scope.loadsListing 	= data.wPagination.loads;
+	$scope.loadNextPage = function(pageNumber,search,sortColumn,sortType){
+
+		$scope.autoFetchLoads = true;
+		dataFactory.httpRequest(URL+$scope.action,'Post',{} ,{ pageNo:pageNumber, itemsPerPage:$scope.itemsPerPage,searchQuery: search, sortColumn:sortColumn, sortType:sortType,formValue : $scope.formFilter, changeVariable : 1 }).then(function(data){
+
+			if ( data.wPagination != undefined ) {
+				$scope.loadsListing 	= data.wPagination.loads;
 				$scope.loadsCount   	= data.wPagination.total;
-	        	if(Object.keys($scope.loadsListing).length <= 0){
+				if(Object.keys($scope.loadsListing).length <= 0){
 					$scope.haveRecords = true;
 				}else{
 					$scope.haveRecords = false;
@@ -244,60 +281,60 @@ app.controller('reportsController', function(dataFactory,$scope,$http ,$rootScop
 			}
 
 			$scope.autoFetchLoads 	= false;
-        });
+		});
 	};
 
 	$scope.sortCustom = function(sortColumn,type) {
 		type = type == "ASC" ? "DESC" : "ASC";
 		$scope.lastSortedColumn = sortColumn;
-    	$scope.lastSortType 	= type;
-    	$scope.idSortType = ''; $scope.dispatcherSortType = ''; $scope.driverSortType = ''; $scope.brokerSortType = ''; $scope.paymentAmountSortType = ''; $scope.totalCostSortType = ''; $scope.overallTotalProfitSortType = ''; $scope.overallTotalProfitPercentSortType = ''; $scope.MileageSortType = ''; $scope.deadmilesSortType = ''; $scope.RpmSortType = ''; $scope.pickupDateSortType = ''; $scope.OriginCitySortType = ''; $scope.OriginStateSortType = '';$scope.DeliveryDateSortType = ''; $scope.DestinationCitySortType = ''; $scope.DestinationStateSortType = '';
+		$scope.lastSortType 	= type;
+		$scope.idSortType = ''; $scope.dispatcherSortType = ''; $scope.driverSortType = ''; $scope.brokerSortType = ''; $scope.paymentAmountSortType = ''; $scope.totalCostSortType = ''; $scope.overallTotalProfitSortType = ''; $scope.overallTotalProfitPercentSortType = ''; $scope.MileageSortType = ''; $scope.deadmilesSortType = ''; $scope.RpmSortType = ''; $scope.pickupDateSortType = ''; $scope.OriginCitySortType = ''; $scope.OriginStateSortType = '';$scope.DeliveryDateSortType = ''; $scope.DestinationCitySortType = ''; $scope.DestinationStateSortType = '';
 
-    	switch(sortColumn){
-    		case 'id' 							: $scope.idSortType 		= type;  break;
-    		case 'dispatcher'					: $scope.dispatcherSortType = type; break;
-    		case 'driver'						: $scope.driverSortType 	= type; break;
-    		case 'broker'			 			: $scope.brokerSortType 	= type; break;
-    		case 'PaymentAmount'				: $scope.paymentAmountSortType = type; break;
-    		case 'totalCost'					: $scope.totalCostSortType 	= type; break;
-    		case 'overallTotalProfit'			: $scope.overallTotalProfitSortType = type; break;
-    		case 'overallTotalProfitPercent'	: $scope.overallTotalProfitPercentSortType = type; break;
-    		case 'Mileage'						: $scope.MileageSortType 	= type; break;
-    		case 'deadmiles'					: $scope.deadmilesSortType 	= type; break;
-    		case 'PickupDate'					: $scope.pickupDateSortType = type; break;
-    		case 'PaymentAmount'				: $scope.PaymentAmountSortType = type; break;
-    		case 'OriginCity'		 			: $scope.OriginCitySortType = type; break;
-    		case 'rpm'			 				: $scope.RpmSortType 		= type; break;
-    		case 'OriginState'					: $scope.OriginStateSortType = type; break;
-    		case 'DeliveryDate'		 			: $scope.DeliveryDateSortType = type; break;
-    		case 'DestinationCity'	 			: $scope.DestinationCitySortType = type; break;
-    		case 'DestinationState' 			: $scope.DestinationStateSortType = type; break;
-    	}
-    	$scope.action = '/reports/getReportRecords/';
-    	$scope.loadNextPage(($scope.currentPage - 1), $scope.searchFilter, sortColumn, type);
-    }
+		switch(sortColumn){
+			case 'id' 							: $scope.idSortType 		= type;  break;
+			case 'dispatcher'					: $scope.dispatcherSortType = type; break;
+			case 'driver'						: $scope.driverSortType 	= type; break;
+			case 'broker'			 			: $scope.brokerSortType 	= type; break;
+			case 'PaymentAmount'				: $scope.paymentAmountSortType = type; break;
+			case 'totalCost'					: $scope.totalCostSortType 	= type; break;
+			case 'overallTotalProfit'			: $scope.overallTotalProfitSortType = type; break;
+			case 'overallTotalProfitPercent'	: $scope.overallTotalProfitPercentSortType = type; break;
+			case 'Mileage'						: $scope.MileageSortType 	= type; break;
+			case 'deadmiles'					: $scope.deadmilesSortType 	= type; break;
+			case 'PickupDate'					: $scope.pickupDateSortType = type; break;
+			case 'PaymentAmount'				: $scope.PaymentAmountSortType = type; break;
+			case 'OriginCity'		 			: $scope.OriginCitySortType = type; break;
+			case 'rpm'			 				: $scope.RpmSortType 		= type; break;
+			case 'OriginState'					: $scope.OriginStateSortType = type; break;
+			case 'DeliveryDate'		 			: $scope.DeliveryDateSortType = type; break;
+			case 'DestinationCity'	 			: $scope.DestinationCitySortType = type; break;
+			case 'DestinationState' 			: $scope.DestinationStateSortType = type; break;
+		}
+		$scope.action = '/reports/getReportRecords/';
+		$scope.loadNextPage(($scope.currentPage - 1), $scope.searchFilter, sortColumn, type);
+	}
 
-    $scope.callSearchFilter = function(query, actionName){
-    	$scope.searchFilter = query;
+	$scope.callSearchFilter = function(query, actionName){
+		$scope.searchFilter = query;
 
 		if ( actionName == 'breadcrumb_detail') 
 			$scope.action = '/reports/irp_breadcrumb_detail/';
 		else
 			$scope.action = '/reports/getReportRecords/';
 
-    	$scope.loadNextPage(($scope.currentPage - 1), query, '','');
-    };
+		$scope.loadNextPage(($scope.currentPage - 1), query, '','');
+	};
 
 	$scope.exportToPDF = function(report){
 		//if(report.name == "breadcrumb_detail"){
 			dataFactory.httpRequest(URL+'/reports/export_pdf_irp_'+report.name,'POST',{},{args:$scope.formFilter,report: report}).then(function(data){
 				var url = URL+'/assets/uploads/reports/'+data.output;
-                var a = document.createElement('a'),
-				    ev = document.createEvent("MouseEvents");
+				var a = document.createElement('a'),
+				ev = document.createEvent("MouseEvents");
 				a.href = url;
 				a.download = url.slice(url.lastIndexOf('/')+1);
 				ev.initMouseEvent("click", true, false, self, 0, 0, 0, 0, 0,
-				                  false, false, false, false, 0, null);
+					false, false, false, false, 0, null);
 				a.dispatchEvent(ev);
 				
 			});
@@ -306,104 +343,104 @@ app.controller('reportsController', function(dataFactory,$scope,$http ,$rootScop
 
 	$rootScope.exportToCSV = function(report){
 		
-			var csvString = [];
-			dataFactory.httpRequest(URL+'/reports/export_csv_irp_'+report.name,'POST',{},{args:$scope.formFilter,report: report}).then(function(data){
-				$scope.csvContent = data.column_mappings.join(", ");
-				$scope.csvContent += "\n";
-				var regex = new RegExp(',', 'g');
-				var result = data.result;
-				if(angular.isObject(result)){
-					angular.forEach(result, function(value, key) {
-						if(report.name == "breadcrumb_detail"){
-							$scope.csvContent += value.deviceID + "," + value.label + "," + value.driverName + "," + value.GMTTime + "," + value.eventType;
-							if(value.eventType.toLowerCase() == "moving"){
-								$scope.csvContent += " " + value.hdirection + ":" + value.vehicleSpeed+"mph";
-							}
-							if($scope.formFilter.includeLatLong){
-								$scope.csvContent += "," + value.latitude + "," + value.longitude;
-							}
-							$scope.csvContent += "," + value.location.replace(regex, ' ') + "," + value.vehicleSpeed + "," + value.odometer+"\n";
-						}else{
-							var colsVal = [];
-							for (var property in value) {
-							    if (value.hasOwnProperty(property)) {
-							    	var col = value[property];
-							    	if(col != null){
-							    		col = col.replace(/[,*{}★★★★★\n]/g,'');	
-							    	}
-							    	
-							        colsVal.push(col);
-							    }
-							    
-							}
-							$scope.csvContent += colsVal.join();
-							$scope.csvContent += "\n";
+		var csvString = [];
+		dataFactory.httpRequest(URL+'/reports/export_csv_irp_'+report.name,'POST',{},{args:$scope.formFilter,report: report}).then(function(data){
+			$scope.csvContent = data.column_mappings.join(", ");
+			$scope.csvContent += "\n";
+			var regex = new RegExp(',', 'g');
+			var result = data.result;
+			if(angular.isObject(result)){
+				angular.forEach(result, function(value, key) {
+					if(report.name == "breadcrumb_detail"){
+						$scope.csvContent += value.deviceID + "," + value.label + "," + value.driverName + "," + value.GMTTime + "," + value.eventType;
+						if(value.eventType.toLowerCase() == "moving"){
+							$scope.csvContent += " " + value.hdirection + ":" + value.vehicleSpeed+"mph";
 						}
-					});
-				}
-				var timestamp = Math.floor(Date.now() / 1000);
-				var fileName = "";
-				if($scope.formFilter.reportType == "individual"){
-					fileName = "CSV_Load_Details_"+timestamp;
-				}else if($scope.formFilter.reportType == "performance"){
-					fileName = "CSV_Load_Performance_"+timestamp;
-				}else{
-					fileName = report.name+"_"+timestamp;
-				}
-				
-				var downloadContainer = angular.element('<div data-tap-disabled="true"><a></a></div>');
-				var downloadLink = angular.element(downloadContainer.children()[0]);
-				downloadLink.attr('href', 'data:application/octet-stream;base64,'+btoa($scope.csvContent));
-				downloadLink.attr('download', fileName+".csv");
-				downloadLink.attr('target', '_blank');
-				angular.element('body').append(downloadContainer);
-				$timeout(function () {
-				  downloadLink[0].click();
-				  downloadLink.remove();
-				}, null);
-	        });
-	    
+						if($scope.formFilter.includeLatLong){
+							$scope.csvContent += "," + value.latitude + "," + value.longitude;
+						}
+						$scope.csvContent += "," + value.location.replace(regex, ' ') + "," + value.vehicleSpeed + "," + value.odometer+"\n";
+					}else{
+						var colsVal = [];
+						for (var property in value) {
+							if (value.hasOwnProperty(property)) {
+								var col = value[property];
+								if(col != null){
+									col = col.replace(/[,*{}★★★★★\n]/g,'');	
+								}
+
+								colsVal.push(col);
+							}
+
+						}
+						$scope.csvContent += colsVal.join();
+						$scope.csvContent += "\n";
+					}
+				});
+			}
+			var timestamp = Math.floor(Date.now() / 1000);
+			var fileName = "";
+			if($scope.formFilter.reportType == "individual"){
+				fileName = "CSV_Load_Details_"+timestamp;
+			}else if($scope.formFilter.reportType == "performance"){
+				fileName = "CSV_Load_Performance_"+timestamp;
+			}else{
+				fileName = report.name+"_"+timestamp;
+			}
+
+			var downloadContainer = angular.element('<div data-tap-disabled="true"><a></a></div>');
+			var downloadLink = angular.element(downloadContainer.children()[0]);
+			downloadLink.attr('href', 'data:application/octet-stream;base64,'+btoa($scope.csvContent));
+			downloadLink.attr('download', fileName+".csv");
+			downloadLink.attr('target', '_blank');
+			angular.element('body').append(downloadContainer);
+			$timeout(function () {
+				downloadLink[0].click();
+				downloadLink.remove();
+			}, null);
+		});
+
 		
-    }
+	}
 
 
 
-    $scope.exportToHTML = function(report,print){
-	   	if ( angular.isObject($scope.formFilter.startDate)) {
-    		$scope.formFilter.startDate = $scope.formFilter.startDate.format("YYYY-MM-DD");
+	$scope.exportToHTML = function(report,print){
+		if ( angular.isObject($scope.formFilter.startDate)) {
+			$scope.formFilter.startDate = $scope.formFilter.startDate.format("YYYY-MM-DD");
 			$scope.formFilter.endDate   = $scope.formFilter.endDate.format("YYYY-MM-DD");
-    	} else {
-    		$scope.formFilter.startDate = '';
+		} else {
+			$scope.formFilter.startDate = '';
 			$scope.formFilter.endDate   = '';
-    	}
+		}
 
-    	var url = URL+'/reports/export_html_irp_'+report.name+"/?";
-    	var queryArgs = $.param({args:$scope.formFilter,report: report});
-    	url +=queryArgs; 
-    	var winPrint = $window.open(url,'_blank');
-    	if(print){
-	    	winPrint.focus();
+		var url = URL+'/reports/export_html_irp_'+report.name+"/?";
+		var queryArgs = $.param({args:$scope.formFilter,report: report});
+		url +=queryArgs; 
+		var winPrint = $window.open(url,'_blank');
+		if(print){
+			winPrint.focus();
 			winPrint.print();
 		}
-    }
+	}
 
 
-    $scope.onSelectVehicleCallback = function (item, model){
-       	$scope.selectedScope = item.vid;
-       	if(item.vid == "" ){
+	$scope.onSelectVehicleCallback = function (item, model){
+		$scope.selectedScope = item.vid;
+		if(item.vid == "" ){
             //$scope.driversOnDashboard = [];
             $scope.formFilter.selScope = [];
             $scope.formFilter.scope = "all";
             $scope.formFilter.driverId = [];
-			$scope.formFilter.dispId = '';
+            $scope.formFilter.dispId = '';
         }else if(item.label == '_idispatcher'){
-            $scope.formFilter.selScope = [];
-            $scope.formFilter.scope = "dispatcher";
-            $scope.formFilter.dispId = item.dispId;
-            $scope.formFilter.driverId = '';
-            $scope.vtype = '_idispatcher';
-            angular.forEach($scope.vDriversList, function(value, key) {
-                if(value.username == item.username && value.label != '_idispatcher'){
+        	$scope.formFilter.selScope = [];
+        	$scope.formFilter.scope = "dispatcher";
+        	$scope.formFilter.dispId = item.dispId;
+        	$scope.formFilter.driverId = '';
+        	$scope.vtype = '_idispatcher';
+        	angular.forEach($scope.vDriversList, function(value, key) {
+        		if(value.username == item.username && value.label != '_idispatcher'){
                     $scope.formFilter.selScope.push(value.vid); //Added vehicle ids
                 }
             });
@@ -414,11 +451,11 @@ app.controller('reportsController', function(dataFactory,$scope,$http ,$rootScop
         	}else{
         		$scope.formFilter.scope = "driver";	
         	}
-    		
-    		$scope.formFilter.driverId = item.id;
-			$scope.formFilter.dispId = item.dispId;
+			$scope.formFilter.secondDriverId = item.team_driver_id;
 
-        	
+        	$scope.formFilter.driverId = item.id;
+        	$scope.formFilter.dispId = item.dispId;
+
             /*if($scope.formFilter.selScope.indexOf(item.vid) === -1) {
                 $scope.formFilter.selScope.push(item.vid);     
             }*/
@@ -428,11 +465,9 @@ app.controller('reportsController', function(dataFactory,$scope,$http ,$rootScop
     }
 
     $scope.groupFind = function(item){
-        if(item.username !== "")
-            return 'Dispatcher: '+item.username;
-        else
-            return item.username;
+    	if(item.username !== "")
+    		return 'Dispatcher: '+item.username;
+    	else
+    		return item.username;
     }
-
-
 });

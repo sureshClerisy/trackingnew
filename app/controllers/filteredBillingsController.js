@@ -36,7 +36,7 @@ app.controller('filteredBillingsController', ["dataFactory","$scope","$http","$r
 	
 	$rootScope.filteredBillingLoads = [];
 	$rootScope.Docs = [];
-	
+	$scope.dateRangeSelector = {};
 	$scope.noRecordFoundMessage = $rootScope.languageCommonVariables.noRecordFound;
 	$scope.filterArgs = getBillingData.filterArgs;
 	$scope.firstParam = getBillingData.filterArgs.firstParam;
@@ -45,9 +45,21 @@ app.controller('filteredBillingsController', ["dataFactory","$scope","$http","$r
 	$scope.DeliveryDateSortType = "DESC"; 					// intially setting delivery date column to desc		
 	$rootScope.saveTypeLoad = 'filteredBillingLoads';    			// setting the save type for dynamic changing the listing on routes
 	
+	if(Object.keys($rootScope.filteredBillingLoads).length <= 0){
+		$scope.haveRecords = true;
+	}else{
+		$scope.haveRecords = false;
+	}
 
 
-	if( $cookies.getObject('_gDateRange') ){
+	if(getBillingData.filterArgs.startDate != undefined){
+		$scope.dateRangeSelector.startDate = getBillingData.filterArgs.startDate; 	
+		$scope.dateRangeSelector.endDate = getBillingData.filterArgs.endDate; 	
+	}else{
+		$scope.dateRangeSelector = {startDate: moment().startOf('month').format('YYYY-MM-DD'), endDate: moment().format('YYYY-MM-DD')};    
+	}
+
+	/*if( $cookies.getObject('_gDateRange') ){
         $scope.dateRangeSelector = $cookies.getObject('_gDateRange');
         if($scope.dateRangeSelector.startDate == null || $scope.dateRangeSelector.endDate == null){
         	$scope.dateRangeSelector = {};
@@ -56,7 +68,7 @@ app.controller('filteredBillingsController', ["dataFactory","$scope","$http","$r
         $scope.dateRangeSelector = {startDate: moment().subtract(29, 'days'), endDate: moment()};    
         $cookies.putObject('_gDateRange', $scope.dateRangeSelector);  
     }
-
+*/
 
 	$scope.opts = {
 		opens:'left',
@@ -70,12 +82,17 @@ app.controller('filteredBillingsController', ["dataFactory","$scope","$http","$r
             cancelLabel: 'Clear',
         },
         eventHandlers: {
-            'apply.daterangepicker': function(ev, picker) {  
-                $scope.loadItems();
+            'apply.daterangepicker': function(ev, picker) { 
+            	if ( $scope.dateRangeSelector.startDate != null && $scope.dateRangeSelector != undefined && Object.keys($scope.dateRangeSelector).length > 0 ) { 
+	            	$scope.dateRangeSelector.startDate = $scope.dateRangeSelector.startDate.format('YYYY-MM-DD');
+	                $scope.dateRangeSelector.endDate = $scope.dateRangeSelector.endDate.format('YYYY-MM-DD');
+	            }else{
+	            	$scope.dateRangeSelector = {};
+	            }
+	            $scope.loadItems();
             },
             'cancel.daterangepicker': function(ev, picker) {  
                 $scope.dateRangeSelector = {};
-                $cookies.putObject('_gDateRange', {startDate:null,endDate:null});    
                 angular.element('#filteredLoadsDRPicker').data('daterangepicker').setStartDate(new Date());
                 angular.element('#filteredLoadsDRPicker').data('daterangepicker').setEndDate(new Date());
                 $scope.loadItems();
@@ -172,6 +189,11 @@ app.controller('filteredBillingsController', ["dataFactory","$scope","$http","$r
         	$rootScope.filteredBillingLoads = data.data;
 			$scope.total            = data.total;
             isSending = false;
+            if(Object.keys($rootScope.filteredBillingLoads).length <= 0){
+				$scope.haveRecords = true;
+			}else{
+				$scope.haveRecords = false;
+			}
         	return data;
 		});
 		//canceler.resolve();  // Aborts the $http request if it isn't finished.

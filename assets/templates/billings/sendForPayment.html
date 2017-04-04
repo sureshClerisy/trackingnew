@@ -52,22 +52,22 @@
 		
 <div ng-include src="'./assets/templates/billings/sendForPayment_Sidebar.html'" include-replace></div>
 <div ng-include src="'./assets/templates/truckstop/modals.html'" include-replace></div>
-	<div class="inner-content full-height sendforcover" >
+	<div class="inner-content full-height sendforcover no-h2-block" >
 		<div class="split-view">
 			<!-- START EMAILS LIST -->
 			<div class="split-list" > 
 				<!--a class="list-refresh" href=""><i class="fa fa-refresh"></i></a-->
 				<div data-email="list" ui-jq="ioslist">
 					<!-- START EMAIL LIST SORTED BY DATE -->
-						<div class="list-view-group-container">
+						<div class="list-view-group-container ">
 						<!--div class="list-view-group-container" ng-repeat="email in emails"-->
-							<div class="list-view-group-header"><span></span></div>
+							<!--div class="list-view-group-header"><span></span></div-->
 
-							<ul class="no-padding">
+							<ul class="no-padding no-sp-top ">
 								<li ng-repeat="value in SendLoads track by value.id" class="item padding-15" ng-click="showLoad(value.id,$index)" ng-class="{selectedLi: $index == selectedIndex}"> 
 									<div class="thumbnail-wrapper d32 circular bordered {{item.color}}" style="background: {{value.color}}"> 
 										<img width="40" height="40" alt="" ng-src="./assets/uploads/drivers/thumbnail/{{value.profile_image}}" onerror="this.style.display = 'none'"/>
-										<span class="text-image hide-1 sendpayment">
+										<span class="text-image hide-1 sendpayment" style="background: {{value.color}}">
 										{{value.first_name.substring(0, 1).toUpperCase()}}{{value.last_name.substring(0, 1).toUpperCase()}}
 										</span>
 									</div> 

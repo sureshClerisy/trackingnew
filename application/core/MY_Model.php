@@ -168,5 +168,84 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 			}
 		}
 
+		/*
+		* Method: Get
+		* Params: newDispatcherId, previousDispatcher
+		* Return: success or error
+		* Comment: Used for storing dispatcer driver assignments in disp_dri_logs
+		*/
+
+		public function addDispatcherDriverLog( $newDispatcherId = null, $oldDispatcherId = null, $parameter = '' ) {
+			for( $i = 0; $i < 2; $i++) {
+				if ( $i == 0 ) 
+					$dispatcherId = $newDispatcherId;
+				else
+					$dispatcherId = $oldDispatcherId;
+					
+				if ( !empty($dispatcherId) && $dispatcherId != 0 ) {
+					$driversList = $this->getDispatcherDriverList($dispatcherId);
+					$driver = array();
+					$teamArray = array();
+					$assignedDriverIds = array();
+					$assignedTeamIds = array();
+					$idleDrivers = array();
+					foreach( $driversList as $drivers ){
+						if ( $drivers['driver_type'] == 'team' && $drivers['team_driver_id'] != '') {
+							$teamArray[] = $drivers['team_driver_id'];
+							$driver['team'][] = $drivers;
+							$assignedTeamIds[] = $drivers['id'].':'.$drivers['team_driver_id'];
+						} else if( ($drivers['driver_type'] == 'single' || $drivers['driver_type'] == '') && $drivers['vehicleId'] != '' ) {
+							$teamArray[] = $drivers['team_driver_id'];
+							$driver['single'][] = $drivers;
+							$assignedDriverIds[] = $drivers['id'];
+						} else if ( !in_array($drivers['id'],$teamArray)){
+							$driver['others'][] = $drivers;
+							$idleDrivers[] = $drivers['id'];
+						}
+					}
+					
+					$singleDrivers 	= isset($driver['single']) ? count($driver['single']) : 0;
+					$idleCount      = isset($driver['others']) ? count($driver['others']) : 0;
+					$teamDrivers 	= isset($driver['team']) ? count($driver['team']) : 0;
+					$data = array(
+						'dispatcher_id' 	=> $dispatcherId,
+						'assigned_drivers'  => implode(',',$assignedDriverIds),
+						'assigned_team' 	=> implode(',',$assignedTeamIds),
+						'idle_drivers'		=> !empty($idleDrivers) ? implode(',',$idleDrivers) : '',
+						'single' 			=> $singleDrivers,
+						'team'				=> $teamDrivers,
+						'idle'				=> $idleCount,
+						'created'			=> date('Y-m-d H:i:s')
+					);
+					
+					$this->db->insert('disp_dri_logs',$data);
+				}
+			}
+			
+		}
+
+		/*
+		* method 	: Get
+		* Params 	: dispatcherId
+		* Return  	: return drivers list array
+		* Comment 	: used to fetch list of drivers to dispatcher
+		*/
+
+		public function getDispatcherDriverList( $dispatcherId = null ) {
+			$this->db->distinct('drivers.id,team_driver_id');
+			$this->db->select('drivers.id,vehicles.id as vehicleId,vehicles.team_driver_id,vehicles.driver_type');
+			$this->db->join('vehicles','drivers.id = vehicles.driver_id','LEFT');
+			
+			$this->db->where(array('drivers.user_id' => $dispatcherId));
+			$this->db->order_by('vehicles.driver_id','DESC');
+			$result = $this->db->get('drivers');
+			if( $result->num_rows() > 0 )
+				return $result->result_array();
+			else 
+				return array();
+
+		}
+
 		
+
 	}

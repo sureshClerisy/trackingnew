@@ -130,7 +130,7 @@ app.controller('trucksController', function(dataFactory,$scope, PubNub, $http ,$
 	}  		
 });
 
-app.controller('editTruckController', function(dataFactory,getTruckData,$sce,$scope,$http ,$rootScope , $location , $cookies, $stateParams){
+app.controller('editTruckController', function(dataFactory,getTruckData,$sce,$scope, PubNub, $http ,$rootScope , $location , $cookies, $stateParams){
 	if($rootScope.loggedInUser == false)
 	$location.path('logout');	
 	
@@ -404,7 +404,7 @@ app.controller('editTruckController', function(dataFactory,getTruckData,$sce,$sc
 });
 
  
- app.controller('addTruckController', function(dataFactory,getTruckData,$sce,$scope,$http ,$rootScope , $location , $cookies, $stateParams){
+ app.controller('addTruckController', function(dataFactory,getTruckData,$sce,$scope,PubNub, $http ,$rootScope , $location , $cookies, $stateParams){
 	if($rootScope.loggedInUser == false)
 		$location.path('logout');
 		

@@ -291,7 +291,8 @@ class Iterationloads extends Admin_Controller{
 			if ( $vehicleId != '' && $vehicleId != null ) {
 				$vehicle_details = $this->Vehicle->get_vehicles_fuel_consumption($this->userId,$vehicleId);
 				if ( !empty($vehicle_details) ) {
-					$truckAverage =(int)($vehicle_details[0]['fuel_consumption']/100);
+					$truckAverage =round( 100/$vehicle_details[0]['fuel_consumption'],2);
+					//$truckAverage =(int)($vehicle_details[0]['fuel_consumption']/100);
 					$defaultWeight = ( $vehicle_details[0]['cargo_capacity'] != '' ) ? $vehicle_details[0]['cargo_capacity'] : $defaultWeight;
 					$defaultLength = ( $vehicle_details[0]['cargo_bay_l'] != '' ) ? $vehicle_details[0]['cargo_bay_l'] : $defaultLength;
 				}

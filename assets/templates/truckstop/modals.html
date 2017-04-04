@@ -385,19 +385,22 @@
 					            </div>
 					           <!-- END PANEL -->
 					
-					<form method="POST" name="editLoad" role="form" ng-class="showFormClass == true ? 'saveform' : ''" ng-submit="editLoad.$valid &&  saveEditLoad(editSavedLoad)" id="theForm" novalidate>	
+					<!--form method="POST" name="editLoad" role="form" ng-class="showFormClass == true ? 'saveform' : ''" ng-submit="editLoad.$valid &&  saveEditLoad(editSavedLoad)" id="theForm" novalidate-->	
+					<form method="POST" name="editLoad" role="form" ng-class="showFormClass == true ? 'saveform' : ''" id="theForm" novalidate>	
 					<!-- end of location load section -->
 							<div class="col-xs-12">
 							<!--  Sheet ends-->
 								
 								<div class="popup-load-detail-section">
 									<div class="table-input-head">
-										<h1>{{ languageCommonVariables.popuploaddetails }}<span>(Posted: {{ editSavedLoad.Entered }})</span></h1>
+										<h1>{{ languageCommonVariables.popuploaddetails }}<span ng-if="editSavedLoad.PostedOn != ''">(Posted: {{ editSavedLoad.PostedOn }})</span></h1>
 											<button href="javascript:void(0);" ng-click="printLoadsInfo(editSavedLoad.ID,primaryLoadId)" class="edit-loadDetail edit1Load1 btn btn-info btn-info-print btn-cons m-b-10" type="button">
 												<i class="fa fa-print"></i> <span class="bold"> Print</span>
 											</button>
+
 											<div class="save-cancel" ng-show="save_cancel_div == true" >
-												 <button ng-click="submitted=true" class="save btn btn-primary btn-cons m-b-10" type="submit">
+												 <button ng-click="saveEditLoad(editSavedLoad)"  class="save btn btn-primary btn-cons m-b-10" type="button">
+												 <!--button ng-click="submitted=true"  class="save btn btn-primary btn-cons m-b-10" type="submit"-->
 												 	<i class="pg-form"></i> <span class="bold">Save</span>
 												</button>
 												<button href="javascript:void(0)" ng-click="changeSaveStatus()" class="cancelTheLoad1 btn btn-danger btn-cons m-b-10" type="button">
@@ -423,15 +426,17 @@
 										
 									<div class="vehicle-driver-found" ng-show="vehicleDriverFound == true">
 										<div class="popup-load-detail-grid driver-name-grid">
-											<span>
-												<figure class="driver-image">
-													<!--img ng-src="./pages/images/user.png" ng-if="defaultDriverImage == true"-->
-												<img src="./assets/uploads/drivers/thumbnail/{{vehicleInfo.profile_image}}" onerror="this.style.display = 'none'">
-												<span class="text-image hide-1" style="background: {{vehicleInfo.color}}">{{avatarText}}</span>
+											<div class="relative-box-left-main">
+												<span>
+													<figure class="driver-image">
+														<!--img ng-src="./pages/images/user.png" ng-if="defaultDriverImage == true"-->
+													<img class="showme" src="./assets/uploads/drivers/thumbnail/{{vehicleInfo.profile_image}}" onerror="this.style.display = 'none'">
+													<span class="text-image hide-1" style="background: {{vehicleInfo.color}}">{{avatarText}}</span>
 
-												</figure>{{ languageCommonVariables.truckdrivername }}
-											</span>
-											<p>{{ driverPlaceholder }} </p>
+													</figure>{{ languageCommonVariables.truckdrivername }}
+												</span>
+												<p>{{ driverPlaceholder }} </p>
+											</div>
 										</div>
 										<div class="popup-load-detail-grid select-driver-name truck-number">
 
@@ -958,6 +963,7 @@
 										</h4>
 										<button  style="float: right" ng-click="uploadBrokerDocument(primaryLoadId,editSavedLoad.broker_id)" ng-if="showUploadBrokerButton == true" class="ratesheet-tripDetail btn btn-success btn-cons m-b-10" type="button"><i class="fa fa-cloud-upload"></i> <span class="bold">Upload Document</span>
 										</button>
+
 											<div class="save-cancel" ng-show="save_cancel_div == true">
 												<button ng-click ="saveEditLoad(editSavedLoad)" ng-disabled="editLoad.$invalid" class="save btn btn-primary btn-cons m-b-10" type="button"><i class="pg-form"></i> <span class="bold">Save</span>
 												</button>
@@ -1486,7 +1492,7 @@
 						
 						<div class="popup-inner-content-main" ng-show="showhighlighted == 'timeline'">
 							<div class="col-xs-12 modals-search-timeline">
-								<i class="pg-search"></i><input ng-show="haveActivities == 'yes'" type="text" placeholder="Timeline Search" ng-model="search.text"><br><br>
+								<i class="pg-search" ng-show="haveActivities == 'yes'"></i><input ng-show="haveActivities == 'yes'" type="text" placeholder="Timeline Search" ng-model="search.text">
 								<div class="timeline-tab bg-master-lighter"  ng-show="haveActivities == 'yes'" data-jquery-scrollbar="jqueryScrollbarOptions">
 								    <div class="timeline-container top-circle">
 								        <section class="timeline">
@@ -1501,8 +1507,9 @@
 								                        </div> -->
 								                        <div class="card-header clearfix">
 								                            <div class="user-pic " style="background: {{activity.color}}">
+								                                
 								                                <img ng-show="activity.profile_image != null && activity!= ''" alt="Profile Image" width="33" height="33" ui-jq="unveil"  src="assets/uploads/users/{{activity.profile_image}}" onerror="this.style.display = 'none'" />
-																<span ng-show="activity.profile_image == null || activity == ''">{{activity.userIntial}}</span>
+																<span class="text-image hide-1" style="height: 30px;">{{activity.userIntial}}</span>
 																
 								                            </div>
 								                            <h5 class="text-{{activity.event_color}}" >{{activity.userName}}</h5>
@@ -1525,10 +1532,10 @@
 								    </div>
 								    <!-- -->
 								</div>
-								<div ng-show="haveActivities== 'no'" class="modal-alert alert alert-success no-top-margin" role="alert">
-									<button ng-click="hideloadmessage()" class="close"></button>
-									No recent activity on this ticket.
-								</div>	
+								 <div ng-show="haveActivities== 'no'" class="modal-alert alert alert-success no-top-margin" role="alert">
+											<button ng-click="hideloadmessage()" class="close"></button>
+											No recent activity on this ticket.
+										</div>	
 							</div>
 							<!-- END CONTAINER FLUID -->
 							<!-- -->

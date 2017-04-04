@@ -61,6 +61,15 @@ app.controller('loadsController', ["dataFactory","$scope","$http","$rootScope", 
 	$rootScope.tableTitle = [];
 	$rootScope.Docs = [];
 	$scope.vDriversList = [];
+	$scope.dateRangeSelector = {};
+	if(getAllLoads.filterArgs.startDate != undefined){
+		$scope.dateRangeSelector.startDate = getAllLoads.filterArgs.startDate; 	
+		$scope.dateRangeSelector.endDate = getAllLoads.filterArgs.endDate; 	
+	}else{
+		$scope.dateRangeSelector = {startDate: moment().startOf('month').format('YYYY-MM-DD'), endDate: moment().format('YYYY-MM-DD')};    
+	}
+
+	
 	
 	$scope.firstParam = (getAllLoads.filterArgs.firstParam != undefined ) ? getAllLoads.filterArgs.firstParam : 'all'; 
 	$rootScope.assignedLoads = (getAllLoads.assigned_loads != undefined ) ? getAllLoads.assigned_loads : [];
@@ -282,7 +291,7 @@ app.controller('loadsController', ["dataFactory","$scope","$http","$rootScope", 
 	
 	$rootScope.nonewRequest = false;
 	
-	$scope.showAssignedLoad = function( valueArray ) {
+	/*$scope.showAssignedLoad = function( valueArray ) {
 
 		$scope.showRouteOnMap = true;
 		$scope.showGantt = true;
@@ -353,14 +362,14 @@ app.controller('loadsController', ["dataFactory","$scope","$http","$rootScope", 
 			}
 		});
 		
-		/************* scroll down page to map -r288 *************/
+		/************* scroll down page to map -r288 *************
 		$timeout(function(){
 				$scope.header = angular.element($('#headerFixed')).height();
 				$scope.height = angular.element($('.show-map-on-top')).offset().top;
 				$('html,body').animate({scrollTop:$scope.height-($scope.header+25)}, 2000);
 			},2000);
-	/************* scroll down page to map -r288 *************/
-	}
+	/************* scroll down page to map -r288 *************
+	}*/
 
 	$scope.getImageMarker = function(text,type,fmap){
 		var returnImg = {};
@@ -576,15 +585,6 @@ app.controller('loadsController', ["dataFactory","$scope","$http","$rootScope", 
    	
    	
 	
-	if( $cookies.getObject('_gDateRange') ){
-        $scope.dateRangeSelector = $cookies.getObject('_gDateRange');
-        if($scope.dateRangeSelector.startDate == null || $scope.dateRangeSelector.endDate == null){
-        	$scope.dateRangeSelector = {};
-        }
-    }else{
-        $scope.dateRangeSelector = {startDate: moment().subtract(29, 'days'), endDate: moment()};    
-        $cookies.putObject('_gDateRange', $scope.dateRangeSelector);  
-    }
 
 	
      $scope.opts = {
@@ -600,11 +600,17 @@ app.controller('loadsController', ["dataFactory","$scope","$http","$rootScope", 
         },
         eventHandlers: {
             'apply.daterangepicker': function(ev, picker) {  
-                $scope.loadItems();
+            	if ( $scope.dateRangeSelector.startDate != null && $scope.dateRangeSelector != undefined && Object.keys($scope.dateRangeSelector).length > 0 ) {
+	            	$scope.dateRangeSelector.startDate = $scope.dateRangeSelector.startDate.format('YYYY-MM-DD');
+	                $scope.dateRangeSelector.endDate = $scope.dateRangeSelector.endDate.format('YYYY-MM-DD');
+	            }else{
+	            	$scope.dateRangeSelector = {};
+	            }
+	            $scope.loadItems();
             },
             'cancel.daterangepicker': function(ev, picker) {  
                 $scope.dateRangeSelector = {};
-                $cookies.putObject('_gDateRange', {startDate:null,endDate:null});    
+                //$cookies.putObject('_gDateRange', {startDate:null,endDate:null});    
                 angular.element('#myLoadsDRPicker').data('daterangepicker').setStartDate(new Date());
                 angular.element('#myLoadsDRPicker').data('daterangepicker').setEndDate(new Date());
                 $scope.loadItems();

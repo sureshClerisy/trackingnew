@@ -5,41 +5,30 @@ $rootScope.logoutmessage=false;
 	$scope.trustAsHtml = function(value) {
         return $sce.trustAsHtml(value);
     };
-/*
-	$rootScope.record = deepstream.record.getRecord('deepstream/lisetnActivity');   
 
-   $rootScope.record.subscribe("activity",function(value) {
-   	console.log("lisetnActivity");
-       $rootScope.getNotifications();
-        if( !$scope.$$phase ) {
-            $scope.$apply();
-        }
-    });*/
-	
 	$rootScope.notificationChannel = "notification";
 	PubNub.init({
-		publishKey: 'pub-c-f7a76c0e-01b3-42b8-be2d-769a2588a4e0',
-		subscribeKey: 'sub-c-d07294ba-1043-11e6-bb6c-02ee2ddab7fe',
-		//uuid: $rootScope.activeUser
+		publishKey  : "pub-c-22610cc5-0f26-47ad-bce5-5f768a26b9f7",
+		subscribeKey: "sub-c-3367f186-12ce-11e7-b568-0619f8945a4f",
+		ssl : true
 	});
 
 
 	//~~~~~~~~~~~~~~~~~~~~~~~ Pubnub Code ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	PubNub.ngSubscribe({ channel: $rootScope.notificationChannel });		
 	
-	if (typeof Notification !== 'undefined') {
+	/*if (typeof Notification !== 'undefined') {
 		Notification.requestPermission(function() {
 			if (Notification.permission === 'granted') {
 				// Now your page can send the user notifications!
 			}
 		});
-	}
+	}*/
 	// handle message events
 	$rootScope.$on(PubNub.ngMsgEv($rootScope.notificationChannel), function(event, payload) { 
-		console.log(payload);
 		if(payload.env[0][0].sender_uuid  != undefined && payload.env[0][0].sender_uuid != $rootScope.activeUser){
 			$rootScope.getNotifications();
-			if (Notification.permission === 'granted' && $scope.haveUnread > 0) {
+			/*if (Notification.permission === 'granted' && $scope.haveUnread > 0) {
 				console.log(payload);
 				var notification = new Notification('Yeah!', {
 					body: 'You got a new notification !!!' ,
@@ -50,7 +39,7 @@ $rootScope.logoutmessage=false;
 					setTimeout(notification.close, 30000);
 				};
 				
-			}
+			}*/
 		}
 	});
 	//~~~~~~~~~~~~~~~~~~~~~~~ Pubnub Code ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -83,17 +72,39 @@ $rootScope.logoutmessage=false;
         }, 50);
         //if($rootScope.ureadCount > 0){
 	        dataFactory.httpRequest(URL + '/login/flagAsRead').then(function(data) {
+	        	$scope.haveUnread        = data.ureadCount;
 	        	$rootScope.ureadCount = data.ureadCount;
 				$scope.notificationsList = [];
 	            $scope.notificationsList = data.notifications;
+
 	        });
 	    //}
     };
+
+    $scope.selectPortlet = function($event,widgetID) {
+    	visibility = 1;display ='block';
+		if(angular.element($event.currentTarget).children('img').is(':visible')){
+			visibility = 0;display ='none';
+		}		
+		angular.element($event.currentTarget).children('img').css('display',display);
 		
+		// console.log($state.current);
+		// console.log($state.current.url);
+		if($state.current == '/dashboard'){$state.reload();}else{$state.go('dashboard');}
+		$http.post(URL + '/dashboard/widgetVisibility',{'visibility':visibility,'widgetID':widgetID});
+
+    }
+		
+	$scope.hideMe = function(){
+		setTimeout(function() {
+            $('#modalSlideLeft').modal('hide');
+        }, 50);
+	}
 	/**Fetching content from common file*/
 	$rootScope.setInitialCommonLang($cookies.get('setLanguageGlobalVariable'),'common');
 
 	$rootScope.loginCheck = function( currentState ) {
+		angular.element("body").css("overflow","auto");
 		//~ if ( $cookies.get('userIsLoggedIn') == 1 ) {
 		dataFactory.httpRequest(URL + '/login/checkLogin').then(function(data) {
 			if ( data.success == true ) {
@@ -119,14 +130,6 @@ $rootScope.logoutmessage=false;
 						$location.path('dashboard');
 				}
 				$rootScope.previousUrl = ''; 
-
-				
-				
-
-
-
-
-				
 			} else {
 				if ( currentState != 'login') 
 					$rootScope.previousUrl = $location.absUrl();
@@ -141,7 +144,8 @@ $rootScope.logoutmessage=false;
 	}
 
 	$rootScope.getNotifications = function(){
-		dataFactory.httpRequest(URL + '/login/getNotifications').then(function(data) {
+		var tz = jstz.determine().name();
+		dataFactory.httpRequest(URL + '/login/getNotifications','POST',{},{tz:tz}).then(function(data) {
 			$rootScope.ureadCount    = (data.ureadCount > 99) ? "99+" : data.ureadCount;
 			$scope.haveUnread        = data.ureadCount;
 			$scope.notificationsList = [];
@@ -565,6 +569,8 @@ $rootScope.logoutmessage=false;
 		$rootScope.clearBuffer = function(){
 			$cookies.remove("_globalDropdown");
 			$cookies.remove("_gDateRange");
+			$cookies.remove("_gDateRangeDashboard");
+			$cookies.remove("_gDateRangeBilling");
 			$cookies.remove("printTicket");
 			PubNub.ngUnsubscribe({channel:$rootScope.channel})
 		}
@@ -908,7 +914,7 @@ $rootScope.logoutmessage=false;
 						$rootScope.vehicleIdRepeat = splitedArray[6];
 					}								
 				} else {
-					$rootScope.vehicleIdRepeat = '';
+					$rootScope.vehicleIdRepeat = 0;
 				} 
 				
 				var driverType = "driver";
@@ -1139,14 +1145,18 @@ $rootScope.logoutmessage=false;
 							if ( $rootScope.vehicleInfo.vehicle_image == '' ) 
 								$rootScope.defaultVehicleImage = true;
 							
-							if ( $rootScope.vehicleInfo.profile_image == '' ) 
+							if ( $rootScope.vehicleInfo.profile_image == '' ) {
 								$rootScope.defaultDriverImage = true;
+							}
 						}
 						
 						$rootScope.listDrivers = data.driversList;
+						if ( $rootScope.editSavedLoad.assignedDriverName != undefined && $rootScope.editSavedLoad.assignedDriverName != '' ) {
+							nameChunks = $rootScope.editSavedLoad.assignedDriverName.split(' ');
+							nameChunks = nameChunks.filter(function(v){return v!==''});
+							$rootScope.avatarText 	= nameChunks[0].trim().charAt(0) + nameChunks[1].trim().charAt(0);
+						}
 
-						nameChunks = $rootScope.editSavedLoad.assignedDriverName.split(' ');
-						$rootScope.avatarText 		= nameChunks[0].charAt(0) + nameChunks[1].charAt(0);
 
 						$rootScope.driverPlaceholder = ($rootScope.editSavedLoad.assignedDriverName != null && $rootScope.editSavedLoad.assignedDriverName != '' ) ? $rootScope.editSavedLoad.assignedDriverName : 'Unassign';
 						/** Three dropdowns on edit page use */
@@ -1342,6 +1352,7 @@ $rootScope.logoutmessage=false;
 	 * change driver dropdown
 	 **/
 	$rootScope.onSelectChangeDriverCallback = function (item, model, parameter){
+		
 		$rootScope.driverAssignType = "";
 		if ( item.id == '' || item.id == undefined ) {
 			
@@ -1395,6 +1406,11 @@ $rootScope.logoutmessage=false;
 				if ( dataRes ) {
 					
 					$rootScope.vehicleInfo = dataRes.vehicleDetail;
+					if ( $rootScope.vehicleInfo.profile_image == '' ) {
+						angular.element(".showme").hide();
+					}else{
+						angular.element(".showme").show();
+					}
 					if(item.label == "_team"){
 						$rootScope.vehicleInfo.dName = dataRes.vehicleDetail.driverName;
 						$rootScope.editSavedLoad.second_driver_id = dataRes.vehicleDetail.team_driver_id;
@@ -1408,19 +1424,19 @@ $rootScope.logoutmessage=false;
 					if ( $rootScope.vehicleInfo.vehicle_image == '' ) 
 						$rootScope.defaultVehicleImage = true;
 						
-					if ( $rootScope.vehicleInfo.profile_image == '' ) 
+					if ( $rootScope.vehicleInfo.profile_image == '' ) {
 						$rootScope.defaultDriverImage = true;
+					}
 						
 					$rootScope.vehicleDriverFound = true;
 					
 					$rootScope.globalVehicleId 		= dataRes.vehicleDetail.assignedVehicleId; 			// for billing load
 					$rootScope.selectedVehicleId 	= dataRes.vehicleDetail.assignedVehicleId; 			// for truckstop controller load
 					$rootScope.vehicleIdSelected 	= dataRes.vehicleDetail.assignedVehicleId; 			// for assigned loads controller and iterationsLoads controller
-					
-					$rootScope.avatarText = dataRes.vehicleDetail.first_name.charAt(0) + dataRes.vehicleDetail.last_name.charAt(0);
-					
-					$rootScope.avatarBackground = $rootScope.vehicleDetail.color;
-					
+
+
+					$rootScope.avatarText = dataRes.vehicleDetail.first_name.trim().charAt(0) + dataRes.vehicleDetail.last_name.trim().charAt(0);
+					$rootScope.avatarBackground = dataRes.vehicleDetail.color;
 					if ( parameter == 'addRequest' ) {   // for adding new Load
 						$rootScope.setAddVehicleId = dataRes.vehicleDetail.assignedVehicleId;   
 						$rootScope.changeAddMilesDistanceNew('origin','notSearchZip');	// notSearchZip is parameter to avoid hitting zip code api on change of truck or assigning truck
@@ -1516,6 +1532,9 @@ $rootScope.logoutmessage=false;
 		$rootScope.uploadBrokerDoc = false;
 		$rootScope.showUploadBrokerButton = true;
 		
+		$rootScope.save_cancel_div = false;
+		$rootScope.save_edit_div = true;
+
 		if ( $rootScope.editSavedLoad.broker_id != '' && $rootScope.editSavedLoad.broker_id != undefined && $rootScope.editSavedLoad.broker_id != null ) {
 			dataFactory.httpRequest(URL+'/brokers/getBrokerDocumentUploaded/'+$rootScope.editSavedLoad.broker_id).then(function(data) {					// Fetching broker document uploaded information
 				//~ $rootScope.BrokerDocUploaded = data.BrokerDocUploaded;
@@ -2343,8 +2362,9 @@ $rootScope.logoutmessage=false;
 							if ( $rootScope.vehicleInfo.vehicle_image == '' ) 
 								$rootScope.defaultVehicleImage = true;
 							
-							if ( $rootScope.vehicleInfo.profile_image == '' ) 
+							if ( $rootScope.vehicleInfo.profile_image == '' ) {
 								$rootScope.defaultDriverImage = true;
+							}
 						}
 						
 						$rootScope.listDrivers 		= data.driversList;
@@ -3016,10 +3036,11 @@ $rootScope.logoutmessage=false;
 				} else {
 					
 					if(from == 'statusChange') {
-						if ( $rootScope.editSavedLoad.JoabStatus != undefined  && $rootScope.editSavedLoad.JobStatus != '' ) 
+
+						if ( $rootScope.editSavedLoad.JobStatus != undefined  && $rootScope.editSavedLoad.JobStatus != '' ) 
 							statusmsgValue = $rootScope.languageCommonVariables[$rootScope.editSavedLoad.JobStatus];				
 						else
-							statusmsgValue = $rootScope.languageCommonVariables['noStatusValue'];				// status message to show success message on status change.
+							statusmsgValue = $rootScope.languageCommonVariables['noStatusValue'];		// status message to show success message on status change.
 						
 						$rootScope.Message = $rootScope.languageCommonVariables.LoadStatusUpdatedSuccMsg+" "+$rootScope.languageCommonVariables.from+" "+old.charAt(0).toUpperCase() + old.substr(1).toLowerCase()+"  "+$rootScope.languageCommonVariables.to +" "+ statusmsgValue.charAt(0).toUpperCase() + statusmsgValue.substr(1).toLowerCase()+".";
 					} else {
@@ -4232,3 +4253,5 @@ app.filter('thighlight', function($sce) {
 //     }
 //   }
 // });
+
+

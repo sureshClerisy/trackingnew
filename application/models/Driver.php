@@ -34,15 +34,22 @@ class Driver extends Parent_Model
     //~ public function fetchAllRecords($search = '', $page = null, $userId = null,$sort=null,$order=null) {
     public function fetchAllRecords($userId = null) {
         $data = array();
-        $this->db->select('drivers.first_name,drivers.last_name,drivers.phone,drivers.email,drivers.driver_license_number,drivers.id,drivers.status, CONCAT(users.first_name, " ", users.last_name) AS dispatcher, vehicles.label,vehicles.id as vehicle_id');
+        /*$this->db->select('drivers.first_name,drivers.last_name,drivers.phone,drivers.email,drivers.driver_license_number,drivers.id,drivers.status, CONCAT(users.first_name, " ", users.last_name) AS dispatcher, vehicles.label,vehicles.id as vehicle_id');
        	$this->db->join('vehicles','vehicles.driver_id = drivers.id','LEFT');
 		$this->db->join('users','drivers.user_id = users.id','LEFT');
-		$this->db->from('drivers');       
+		$this->db->from('drivers');       */
+
+		$this->db->select('CONCAT(SUBSTRING(d.first_name, 1, 1),SUBSTRING(d.last_name, 1, 1)) as userIntial, v.city, d.color,  d.id as driverId, d.first_name,d.last_name,d.phone,d.email,d.driver_license_number,d.id,d.status, CONCAT(u.first_name, " ", u.last_name) AS dispatcher, d.user_id as dispId, v.team_driver_id,  v.label,v.id as vehicle_id');
+		
+		$this->db->join("vehicles as v", "d.id = v.driver_id","Left");
+		$this->db->join('drivers as team','v.team_driver_id = team.id','left');	
+		$this->db->join('users as u','d.user_id = u.id','left');
 		
         if( $userId != null)
-			$this->db->where('drivers.user_id',$userId); 
+			$this->db->where('d.user_id',$userId); 
 			 
-        $query = $this->db->get();
+        $query = $this->db->get("drivers as d");
+        //echo $this->db->last_query();die;
 		if ($query->num_rows() > 0) {
             return $query->result_array();
         } else {
@@ -51,7 +58,7 @@ class Driver extends Parent_Model
     }
 
     public function getInfoByDriverId($driverId){
-    	$this->db->select("v.id as vehicleId, d.id as driverId, d.user_id as dispatcherId");
+    	$this->db->select("v.id as vehicleId, d.id as driverId, v.team_driver_id,d.user_id as dispatcherId");
     	$this->db->join('vehicles as v','d.id = v.driver_id','LEFT');
 		$this->db->join('users as u','d.user_id = u.id','LEFT');
 		$this->db->from('drivers as d');       
@@ -190,10 +197,12 @@ class Driver extends Parent_Model
 		if($driverNameWithoutCurrentAssignment){
 			$driverName = ', concat(drivers.first_name," ",drivers.last_name) as driverName, ';
 		}
-		$this->db->select('ABS( TIMESTAMPDIFF(MINUTE , Now( ) , vehicles.`modified` ) ) AS mintues_ago, telemetry, CONCAT(DATE_FORMAT( CONVERT_TZ( vehicles.`modified`, "+00:00", "-05:00" ) , "%d-%b-%Y %r" )," ","EST") AS timestamp, drivers.id, vehicles.tracker_id, drivers.profile_image, '.$driverName.'vehicles.label,users.username,users.id as dispId,vehicles.latitude, vehicles.longitude, vehicles.id as vid,vehicles.city,vehicles.vehicle_address, vehicles.state,vehicles.team_driver_id');
+		/*$this->db->select('ABS( TIMESTAMPDIFF(MINUTE , Now( ) , vehicles.`modified` ) ) AS mintues_ago, telemetry, CONCAT(DATE_FORMAT( CONVERT_TZ( vehicles.`modified`, "+00:00", "-05:00" ) , "%d-%b-%Y %r" )," ","EST") AS timestamp, drivers.id, vehicles.tracker_id, drivers.profile_image, '.$driverName.'vehicles.label,users.username,users.id as dispId,vehicles.latitude, vehicles.longitude, vehicles.id as vid,vehicles.city,vehicles.vehicle_address, vehicles.state,vehicles.team_driver_id');*/
+
+		$this->db->select('ABS( TIMESTAMPDIFF(MINUTE , Now( ) , vehicles.`modified` ) ) AS mintues_ago, telemetry, vehicles.`modified` AS timestamp, drivers.id, vehicles.tracker_id, drivers.profile_image, '.$driverName.'vehicles.label,users.username,users.id as dispId,vehicles.latitude, vehicles.longitude, vehicles.id as vid,vehicles.city,vehicles.vehicle_address, vehicles.state,vehicles.team_driver_id');
 		$this->db->join('vehicles','vehicles.driver_id = drivers.id');
 		$this->db->join('users','drivers.user_id = users.id');
-		$this->db->where(array('drivers.status' => 1, 'vehicles.vehicle_status' => 1) )->order_by("driverName","asc");
+		$this->db->where(array('drivers.status' => 1, 'vehicles.vehicle_status' => 1) )->order_by("drivers.first_name","asc");
 		if($userId){
 			$this->db->where('drivers.user_id',$userId);
 		}
@@ -243,7 +252,7 @@ class Driver extends Parent_Model
 			$driverName = ', CONCAT(drivers.first_name , " + ", team.first_name) as driverName, ';
 		}
 
-		$this->db->select('ABS( TIMESTAMPDIFF(MINUTE , Now( ) , vehicles.`modified` ) ) AS mintues_ago, telemetry, CONCAT(DATE_FORMAT( CONVERT_TZ( vehicles.`modified`, "+00:00", "-05:00" ) , "%d-%b-%Y %r" )," ","EST") AS timestamp, drivers.id, vehicles.tracker_id, drivers.profile_image'.$driverName.' vehicles.label,users.username,users.id as dispId,vehicles.latitude, vehicles.longitude, vehicles.id as vid,vehicles.city,vehicles.vehicle_address, vehicles.state');
+		$this->db->select('ABS( TIMESTAMPDIFF(MINUTE , Now( ) , vehicles.`modified` ) ) AS mintues_ago, telemetry, CONCAT(DATE_FORMAT( CONVERT_TZ( vehicles.`modified`, "+00:00", "-05:00" ) , "%d-%b-%Y %r" )," ","EST") AS timestamp, drivers.id, vehicles.tracker_id, drivers.profile_image'.$driverName.' vehicles.label,users.username,users.id as dispId,vehicles.latitude, vehicles.longitude, vehicles.id as vid,vehicles.city,vehicles.vehicle_address, vehicles.state,vehicles.team_driver_id');
 		$this->db->join('vehicles','vehicles.driver_id = drivers.id');
 		$this->db->join('users','drivers.user_id = users.id');
 		$this->db->join('drivers as team','vehicles.team_driver_id = team.id','left');
