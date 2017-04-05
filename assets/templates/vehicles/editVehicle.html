@@ -4,8 +4,9 @@
 	<!-- START PAGE CONTENT -->
 	<div class="content sm-gutter">
 	<!-- START CONTAINER FLUID -->
-		<div class="container-fluid padding-25 sm-padding-10">
-			<div ng-show="showErrorMessage == false" class="alert alert-danger" role="alert">
+		<div class="container-fluid padding-25 sm-padding-10"> 
+		
+			<div ng-show="showErrorMessage == true" class="alert alert-danger" role="alert">
 				<button ng-click = "hideloadmessage()" class="close"></button>
 				{{errorMessage}}
 			</div>
@@ -116,10 +117,12 @@
 										</div>
 									</div>
 									<div class="col-sm-6">
-										<div pg-form-group class="form-group form-group-default ">
+										<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':editTruck.vin.$invalid && !editTruck.vin.$pristine || editTruck.$submitted && editTruck.vin.$invalid, 'has-error-new': uniqueFieldsValue == false}">
 											<label>{{ languageArray.truckNumbetTableThvin }}</label>
-											<input type="text" class="form-control" name="vin" ng-model="truckData.vin" >
+											<input type="text" class="form-control" name="vin" ng-model="truckData.vin" required ng-blur="checkUniqueFields(truckData.vin,'vin','vehicles',truckData.id)">
 										</div>
+										<label class="error" ng-show="editTruck.vin.$invalid && !editTruck.vin.$pristine || editTruck.$submitted && editTruck.vin.$invalid">Please enter vehicle vin number.</label>
+										<label class="error" ng-if="uniqueFieldsValue == false">This vin number is already alloted to another truck.</label>
 									</div>
 								</div>
 								<!--row-end-->

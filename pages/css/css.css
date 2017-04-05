@@ -3241,7 +3241,7 @@ table.dataTable thead .sorting_desc:after{
   z-index: 9;
 }
 .no-margin-top {
-  margin-top: 0;
+  margin-top: 0 !important;
 }
 .pdf-cover {
   border: 1px solid #cccccc;
@@ -3565,7 +3565,8 @@ table.dataTable thead .sorting_desc:after{
   width: 9px;
 }
 .cart-color-size ul.print-listing li p {
-  font-size: 11px;
+    font-size: 13px;
+    line-height: 17px;
 }
 .invoice-block.invoice-block2 {
   border: 1px solid #bcbcbc;
@@ -5207,6 +5208,10 @@ table.row-click tbody tr { cursor: pointer; }
     border-bottom-color: red;
 }
 
+.form-group-default.has-error-new {
+    background-color: rgba(245, 87, 83, 0.1);
+}
+.has-error-new { border-bottom-color: red; }
 .loadpopup-container-wid .has-error { border-bottom-color: red; }
 .loadpopup-container-wid .has-error.se-driver .form-control {
     border: 1px solid rgba(0, 0, 0, 0.07);
@@ -6298,26 +6303,68 @@ span.goals-font.negativeGoal { color: red;}
 .col-xs-5.portrait-box {
   margin: 8px;
   position: relative;
-  min-height: 115px;
+  min-height: 100px;
   cursor: pointer;
+  overflow: hidden;
 }
 .col-xs-5.portrait-box img {
-  position: absolute;
-  right: 0;
-  top: -13px;
-}
-.col-xs-5.portrait-box h3 {
-  font-size: 16px;
-  line-height: 35px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    left: 0;
 }
 
+.lb{background:#34d6c7;color:#fff;}
+.db{background:#077ed0;color:#fff;}
+.gb{background:#626262;color:#fff;}
+.pl{background:#6d5cae ;color:#fff;}
+.rb{background:#f55753 ;color:#fff;}
+.safety-div {
+  background: rgba(0, 0, 0, 0.3) url("../../assets/images/check-mark.png") no-repeat scroll center center / 50% auto;
+  bottom: -100%;
+  height: 25px;
+  position: absolute;
+  right: 0;
+  top: 0;
+  transition: all 1s ease 0s;
+  width: 25px;
+  z-index: 1;
+}
+.port-box h3 {
+  font-size: 17px;
+  font-weight: bold;
+  margin-top: 30px;
+  /*text-transform: uppercase;*/
+}
+.port-box h3, .port-box p {
+  color: #fff;
+  line-height: 14px;
+  text-align: center;
+}
+.show-tick .safety-div{bottom:0;}
+.port-box .portrait-box {padding:0px 8px;}
+
+.cursor-class { cursor:pointer; }
+
+.bill-dash .panel .panel-heading + .panel-body {
+  height: calc(100% - 50px);
+}
 
 @media (min-width:2000px){
     .map-load-section .dataTables_wrapper.no-footer table thead tr th.billing-origin{
        width:200px;
    }
 }
-
+@media (min-width:1400px){
+    .tb-cell-gph:first-child {
+    width: 69%;
+}
+.tb-cell-gph:last-child {
+    width: 29%;
+}
+}
 @media (max-width:1400px){
     .itinery-distance-detail {
       padding: 12px 0 12px 20px;

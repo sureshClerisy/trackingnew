@@ -47,7 +47,7 @@ app.controller('loadsController', ["dataFactory","$scope","$http","$rootScope", 
 	$scope.showRouteOnMap = false;
 	$scope.showGantt = false;
 	$scope.mindate = new Date();
-	
+	$scope.showCalendar = true;
 	$rootScope.showHeader = true;
 	$rootScope.fetchnewsearch = false;
 	$rootScope.newIterationButtonShow = false;
@@ -62,6 +62,10 @@ app.controller('loadsController', ["dataFactory","$scope","$http","$rootScope", 
 	$rootScope.Docs = [];
 	$scope.vDriversList = [];
 	$scope.dateRangeSelector = {};
+	if(getAllLoads.filterArgs.requestFrom != undefined){
+		$scope.showCalendar = false;
+	}
+
 	if(getAllLoads.filterArgs.startDate != undefined){
 		$scope.dateRangeSelector.startDate = getAllLoads.filterArgs.startDate; 	
 		$scope.dateRangeSelector.endDate = getAllLoads.filterArgs.endDate; 	

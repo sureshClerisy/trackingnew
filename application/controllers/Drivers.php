@@ -386,6 +386,29 @@ class Drivers extends Admin_Controller
 			echo json_encode(array('success' => false));
 		}
 	}
+
+	/*
+	* Request URL: http://domain/drivers/checkLicenceNumber
+	* Method: get
+	* Params: licenceNo
+	* Return: array 
+	* Comment: Used to check duplicate driver licence number exist
+	*/
+
+	public function checkLicenceNumber( $entityId = null ) {
+		$_POST = json_decode(file_get_contents('php://input'), true);
+		if ( $_POST['value'] != '') {
+			$result = $this->Driver->checkLicenceNumberExist($_POST['value'], $_POST['name'], $_POST['tblName'], $entityId);
+			if ( $result )
+				$response = false;
+			else 
+				$response = true;
+		} else {
+			$response = true;
+		}
+
+		echo json_encode(array('response' => $response));
+	}
 	
 }
 

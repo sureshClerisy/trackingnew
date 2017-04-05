@@ -795,8 +795,8 @@ function pdfExtractText($psData){
 			$params["limitStart"] = ($params["pageNo"] * $params["itemsPerPage"] );	
 		}
 
-		if((isset($params["sortColumn"]) && empty($params["sortColumn"])) || !isset($params["sortColumn"])){ $params["sortColumn"] = "PickupDate"; }
-		if((isset($params["sortType"]) && empty($params["sortType"])) || !isset($params["sortType"])){ $params["sortType"] = "ASC"; }
+		if((isset($params["sortColumn"]) && empty($params["sortColumn"])) || !isset($params["sortColumn"])){ $params["sortColumn"] = "DeliveryDate"; }
+		if((isset($params["sortType"]) && empty($params["sortType"])) || !isset($params["sortType"])){ $params["sortType"] = "DESC"; }
 		if(!isset($params["startDate"])){ $params["startDate"] = ''; }
 		if(!isset($params["endDate"])){ $params["endDate"] = ''; }
 		if(isset($_COOKIE["_globalDropdown"]) && !empty($_COOKIE["_globalDropdown"])){

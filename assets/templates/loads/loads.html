@@ -21,22 +21,22 @@
 					</div>
 					<!-- END PANEL -->
                 </div>
-			<div class="row">
-				<div class="col-md-12 col-xlg-12">
-					<div class="commen-heading assigned-load-page">
-						<h2 class="oprate-dashbord">{{ languageArray.assignedLoadsHeading }} ({{tableTitle[0]}}) </h2>
-						<div class="label_select_box"> 
-							<div class="input-cal-block">
-								<div class="input-prepend input-group">
-									<span class="add-on input-group-addon"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i></span>
-								   <input date-range-picker id="myLoadsDRPicker" placeholder="Select date range" ng-change="selectDateRange(dateRangeSelector)" options="opts" class="form-control date-picker customDateRange" type="text" ng-model="dateRangeSelector" />
+				<div class="row">
+					<div class="col-md-12 col-xlg-12">
+						<div class="commen-heading assigned-load-page">
+							<h2 class="oprate-dashbord">Loads ({{tableTitle[0]}}) </h2>
+							<div class="label_select_box" ng-show="showCalendar"> 
+								<div class="input-cal-block">
+									<div class="input-prepend input-group">
+										<span class="add-on input-group-addon"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i></span>
+									   <input date-range-picker id="myLoadsDRPicker" placeholder="Select date range" ng-change="selectDateRange(dateRangeSelector)" options="opts" class="form-control date-picker customDateRange" type="text" ng-model="dateRangeSelector" />
 
+									</div>
 								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-			</div>
 			
 			<div class="row invocie-block-row">
 				<div class="col-md-12 col-xlg-12">

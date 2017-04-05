@@ -90,6 +90,8 @@ app.controller('addEditTrailerController', function(dataFactory, getAddTrailerDa
 	$scope.trailerData.truckName = '';
 	$scope.trucksList = getAddTrailerData.fetchTrucks;
 	$scope.trailerAddEditType = getAddTrailerData.trailerAddEdit;
+	$rootScope.uniqueFieldsValue = true;
+	$rootScope.dataNotFound = false;
 	
 	if(getAddTrailerData.trailerDocuments != undefined && getAddTrailerData.trailerDocuments.length > 0){
 		$scope.trailerDocs = getAddTrailerData.trailerDocuments;	
@@ -196,6 +198,10 @@ app.controller('addEditTrailerController', function(dataFactory, getAddTrailerDa
 	
 	
 	$scope.saveTrailer = function(submitType){
+		if ( $rootScope.uniqueFieldsValue == false ) {
+			return false;
+		}
+
 		dataFactory.httpRequest(URL+'/trailers/addEditTrailer/'+submitType,'POST',{},$scope.trailerData).then(function(data) {
 			PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
 			if ( data.success == true ) {

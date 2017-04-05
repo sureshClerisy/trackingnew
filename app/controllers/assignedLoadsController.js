@@ -136,6 +136,7 @@ app.controller('assignedLoadsController', ["dataFactory","$scope", "PubNub", "$h
 	//$scope.total            = 0;
 	$scope.lastSortedColumn = '';
     $scope.lastSortType 	= '';
+
     $scope.loadItems = function(){
         $scope.loadNextPage(($scope.currentPage - 1),$scope.searchFilter,$scope.lastSortedColumn,$scope.lastSortType);
     };

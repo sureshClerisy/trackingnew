@@ -463,7 +463,46 @@ class Billings extends Admin_Controller{
 		$total = $this->Billing->getInProgressLoads( $parameter,true ,$params);
 		
 		echo json_encode(array("data"=>$jobs,"total"=>$total));
+	}
+
+
+
+	/*
+	* Request URI : http://siteurl/billings/billingStats
+	* Method : POST
+	* Params : null
+	* Return : null
+	* Comment: get all stats for billing dashboard.
+	*/
+
+	public function billingStats(){
+		$date= date("Y-m-d");
+		$sentToTriumphToday = $this->Billing->sentForPaymentToday($date);
+		$expectedBilling 	= $this->Billing->expectedBilling($date);
+		echo json_encode(array("sentToTriumphToday"=>$sentToTriumphToday,"expectedBilling"=>$expectedBilling));
 	}	
+
+
+	/*
+	* Request URI : http://siteurl/billings/getSpecificStat
+	* Method : POST
+	* Params : null
+	* Return : null
+	* Comment: get specific stats for billing dashboard on refresh.
+	*/
+	public function getSpecificStat(){
+		$postObj = json_decode(file_get_contents("php://input"),true);
+		//$date= date("Y-m-d");
+		$date="2017-02-09";
+		$response= array();
+		if(isset($postObj["type"])){
+			switch ($postObj["type"]) {
+				case 'expected_billing': $response["expectedBilling"]    = $this->Billing->expectedBilling($date);	   break;
+				case 'sent_today'      : $response["sentToTriumphToday"] = $this->Billing->sentForPaymentToday($date); break;
+			}
+		}
+		echo json_encode($response);
+	}
 	
 }
 

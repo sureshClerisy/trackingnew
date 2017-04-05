@@ -437,24 +437,40 @@ class Report extends CI_Model {
 	}
 
 	/**
+	* Fetch dispatcher last log from start date
+	*/
+
+	public function getDispatcherLastLog( $dispatcherId = null, $startDate = '' ) {
+		$startDate = date('Y-m-d 23:59:59',strtotime($startDate));
+		$this->db->select('assigned_drivers,single,team,assigned_team,DATE(created) as createdDate');
+		$this->db->where(array('dispatcher_id' => $dispatcherId,'created <=' => $startDate));
+		$this->db->order_by('created','DESC');
+		$result = $this->db->get('disp_dri_logs');
+		if( $result->num_rows() > 0 )
+			return $result->row_array();
+		else 
+			return array();
+	}
+
+	/**
 	 * Getting list of dispatcher for job ticket page
 	 */
 	
 	public function getDispatchersListForGoals($args = array()) {
 		
-		$startDate = date('Y-m-d H:i:s',strtotime($args['startDate']));
-		$endDate  = date('Y-m-d 23:59:59',strtotime($args['endDate']));
+		// $startDate = date('Y-m-d H:i:s',strtotime($args['startDate']));
+		// $endDate  = date('Y-m-d 23:59:59',strtotime($args['endDate']));
 		
-		$this->db->distinct('dispatcher_id');
-		$this->db->select("dispatcher_id AS dispId,users.username,CONCAT( `users`.`first_name` , ' ', users.last_name ) AS dispatcher,");
-		$this->db->join('users','users.id = dispatcher_id');
-		$this->db->where('users.status',1);
-		$this->db->where(array('disp_dri_logs.created >=' => $startDate, 'disp_dri_logs.created <=' => $endDate));
+		// $this->db->distinct('dispatcher_id');
+		// $this->db->select("dispatcher_id AS dispId,users.username,CONCAT( `users`.`first_name` , ' ', users.last_name ) AS dispatcher,");
+		// $this->db->join('users','users.id = dispatcher_id');
+		// $this->db->where('users.status',1);
+		// $this->db->where(array('disp_dri_logs.created >=' => $startDate, 'disp_dri_logs.created <=' => $endDate));
 		
-		$result = $this->db->get('disp_dri_logs');
-		if ( $result->num_rows() > 0 ) {
-			return $result->result_array();
-		} else {
+		// $result = $this->db->get('disp_dri_logs');
+		// if ( $result->num_rows() > 0 ) {
+		// 	return $result->result_array();
+		// } else {
 			$inArray = array(2,5);					// role id for 2 for dispatchers and role id 5 for admin_dispatcher
 			$this->db->select("users.id AS dispId,users.username,CONCAT( `users`.`first_name` , ' ', users.last_name ) AS dispatcher,");
 			$this->db->where('users.status',1);
@@ -467,7 +483,7 @@ class Report extends CI_Model {
 				return array();
 			}
 			
-		}
+		// }
 	}
 
 	/**

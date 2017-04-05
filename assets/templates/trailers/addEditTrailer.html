@@ -71,11 +71,12 @@
 										<label class="error" for="year" ng-show="newTrailer.year.$error.pattern">Please enter valid year number.</label>
 									</div>
 									<div class="col-sm-6">
-										<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':newTrailer.vin.$invalid && !newTrailer.vin.$pristine || newTrailer.$submitted && newTrailer.vin.$invalid}">
+										<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':newTrailer.vin.$invalid && !newTrailer.vin.$pristine || newTrailer.$submitted && newTrailer.vin.$invalid, 'has-error-new': uniqueFieldsValue == false}">
 											<label>{{languageArray.trailerVin }}</label>
-											<input type="text" class="form-control" name="vin" ng-model="trailerData.vin" required />
+											<input type="text" class="form-control" name="vin" ng-model="trailerData.vin" required ng-blur="checkUniqueFields(trailerData.vin,'vin','trailers', trailerData.id)" />
 										</div>
-										<label class="error" ng-show="newTrailer.vin.$invalid && !newTrailer.vin.$pristine || newTrailer.$submitted && newTrailer.vin.$invalid">Please enter trailer vin.</label>
+										<label class="error" ng-show="newTrailer.vin.$invalid && !newTrailer.vin.$pristine || newTrailer.$submitted && newTrailer.vin.$invalid">Please enter trailer vin number.</label>
+										<label class="error" ng-if="uniqueFieldsValue == false">This vin number is already alloted to another trailer.</label>
 									</div>
 								</div>
 								<!--row-end-->

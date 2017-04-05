@@ -130,7 +130,7 @@ app.controller('editDriversController', function(dataFactory,getDriversData, $sc
 	}
 	
 	$scope.title = $rootScope.languageArray.editDriver ;
-
+	$rootScope.uniqueFieldsValue = true;
 	$scope.dropzoneConfigDriverEdit = {
 		parallelUploads: 5,
 		maxFileSize: 3,
@@ -192,6 +192,9 @@ app.controller('editDriversController', function(dataFactory,getDriversData, $sc
 	};
 		
 	$scope.saveDriver = function(){
+		if ( $rootScope.uniqueFieldsValue == false ) {
+			return false;
+		}
 		$scope.driversData.address=document.getElementById('pac-input').value;
 		var file = $scope.myFile;
 			var fd = new FormData();
@@ -225,6 +228,7 @@ app.controller('addDriversController', function(dataFactory,$scope, PubNub, $htt
 	
 	$scope.addDriversData = {};
 	$scope.title = $rootScope.languageArray.editDriver ;
+	$rootScope.uniqueFieldsValue = true;
 
 	$scope.dropzoneConfigDriverAdd = {
 		parallelUploads: 5,
@@ -269,6 +273,10 @@ app.controller('addDriversController', function(dataFactory,$scope, PubNub, $htt
 	};
 	/************ Dispatcher Dropdown ***************/
 	$scope.addDriver = function(){
+		if ( $rootScope.uniqueFieldsValue == false ) {
+			return false;
+		}
+
 		$scope.addDriversData.address=document.getElementById('pac-input').value;
 		var file = $scope.myFile;
 			var fd = new FormData();
@@ -289,6 +297,7 @@ app.controller('addDriversController', function(dataFactory,$scope, PubNub, $htt
 				$location.path('drivers');
 			});
 	}
+
 });
 
 app.directive('fileModel', ['$parse', function ($parse) {

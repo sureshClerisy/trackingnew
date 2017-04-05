@@ -2637,9 +2637,10 @@ class Truckstop extends Admin_Controller{
 												  break;
 
 							case 'broker_id'    : $bufferedInfo  = $this->Job->getEntityInfoById($value,"broker");
+
 												  $value = $bufferedInfo["TruckCompanyName"]; $key="broker";
 												  $bufferedInfo  = $this->Job->getEntityInfoById($prevField,"broker");
-												  $prevField = $oldDriverName["TruckCompanyName"];
+												  $prevField = $bufferedInfo["TruckCompanyName"];
 												  break;
 						}
 
@@ -2810,6 +2811,8 @@ class Truckstop extends Admin_Controller{
 		
 		$saveData['equipment_options'] = isset($saveData['EquipmentTypes']['Code']) ? $saveData['EquipmentTypes']['Code'] : '';
 		if ( $loadFrom == 'assignedLoads') {
+			$bufferedInfo  = $this->Job->getEntityInfoById($saveData["broker_id"],"broker");
+			$saveData["companyName"] = $bufferedInfo["TruckCompanyName"];
 			echo json_encode(array('id' => $result,'savedData' => $saveData, 'checkVehicleDriverFlag' => $vehicleDriverFlag, 'table_title' => $table_title));	
 		} else if ( $loadFrom == 'billingLoads' ) {
 			echo json_encode(array('id' => $result,'savedData' => $saveData));

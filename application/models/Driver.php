@@ -388,5 +388,25 @@ class Driver extends Parent_Model
         }
 
 	}
+
+	/*
+	* method  : Get
+	* params  : driverLicenceNo, driverId
+	* retrun  : true or false
+	* comment : used for checking duplicate entry for driver licence no 
+	*/
+
+	public function checkLicenceNumberExist( $entityValue = '', $entityName = '' , $table ='', $entityId = null ) {
+		$this->db->select('id');
+		if ( $entityId != '' && $entityId != null )
+			$this->db->where(array($entityName => $entityValue, 'id !=' => $entityId ));
+		else
+			$this->db->where($entityName, $entityValue);
+		$result = $this->db->get($table);
+		if ( $result->num_rows() > 0 )
+			return  true;
+		else
+			return false;
+	}
 	
 }

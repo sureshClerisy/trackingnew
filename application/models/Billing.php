@@ -538,5 +538,31 @@ class Billing extends CI_Model {
 		return $data['invoicedDate'];
 	}  
 
+	public function sentForPaymentToday($date = ''){
+		$this->db->select("sum( paymentamount ) as sentPayment");
+		$this->db->where("find_in_set( id, ( SELECT GROUP_CONCAT( sp.loadids ) AS id FROM `save_payment_confirmCode` AS `sp` WHERE DATE( sp.created ) = '".$date."'))");
+		$result = $this->db->get('loads');
+		if ( $result->num_rows() > 0 )
+			return $result->row_array()["sentPayment"];
+		else 
+			return array();
+	}
+
+	public function expectedBilling($date = ''){
+		$this->db->select(" sum( paymentAmount ) AS billing , DATE_ADD( deliverydate, INTERVAL 1 DAY )  AS date  ");
+		$this->db->where("date( deliveryDate ) >= '".$date."'");
+		$this->db->group_by("date ( deliveryDate ) ");
+		$this->db->order_by("date ( deliveryDate ) ");
+		$this->db->limit(7);		
+		$result = $this->db->get('loads');
+		//echo $this->db->last_query();die;
+		if ( $result->num_rows() > 0 ){
+			return $result->result_array();
+		}
+		else {
+			return array();
+		}
+	}
+
 }
 ?>

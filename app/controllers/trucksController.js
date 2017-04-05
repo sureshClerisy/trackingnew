@@ -16,6 +16,8 @@ app.controller('trucksController', function(dataFactory,$scope, PubNub, $http ,$
 		getResultsPage(newPage);
 	};
 
+	$rootScope.uniqueFieldsValue = true;	
+
   	$scope.Message = $rootScope.truckEditMessage;
 	if($scope.Message!== undefined){
 		$scope.alertmsg = true;
@@ -148,10 +150,10 @@ app.controller('editTruckController', function(dataFactory,getTruckData,$sce,$sc
 	$scope.driversList.push($scope.unassignedDriverData);
 	$scope.showimage = true;
 
+	$rootScope.showErrorMessage = false;
 	$scope.dtype = 'single';
 	$scope.truckData.driverType ='single';
-
-
+	
 	if($scope.truckData.team_driver_id != 0 && $scope.truckData.team_driver_id != "" && $scope.truckData.team_driver_id !== undefined){
 		$scope.truckData.driverType = "team";
 		$scope.dtype = 'team';	
@@ -353,7 +355,10 @@ app.controller('editTruckController', function(dataFactory,getTruckData,$sce,$sc
 	};
 	
 	$scope.saveTruck = function(from){
-		
+		if ( $rootScope.uniqueFieldsValue == false ) {
+			return false;
+		}
+
 		var file = $scope.myFile;
         $scope.name = $scope.truckData.vehicle_image;
         var fd = new FormData();
@@ -565,7 +570,11 @@ app.controller('editTruckController', function(dataFactory,getTruckData,$sce,$sc
 		},
 	};
 	
-	$scope.addTruck = function(){	
+	$scope.addTruck = function(){
+		if ( $rootScope.uniqueFieldsValue == false ) {
+			return false;
+		}
+
 		var file = $scope.myFile;
 		var fd = new FormData();
             fd.append('vehicle_image', file);

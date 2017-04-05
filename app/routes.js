@@ -603,17 +603,41 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
 				}
 			})
 			.state('notifications', {
-							url: '/notifications',
-							title: 'Notifications',
-							templateUrl: 'assets/templates/notifications.html',
-			                controller: 'notificationsController',
-			                moduleName: 'loads',
-			                resolve:{            
-								allNotifications: function(dataFactory, $stateParams) {
-									return dataFactory.httpRequest(URL+'/Login/notifications');
-								}
-							}
-						})
+				url: '/notifications',
+				title: 'Notifications',
+				templateUrl: 'assets/templates/notifications.html',
+                controller: 'notificationsController',
+                moduleName: 'loads',
+                resolve:{            
+					allNotifications: function(dataFactory, $stateParams) {
+						return dataFactory.httpRequest(URL+'/Login/notifications');
+					}
+				}
+			}).state('billingDashboard', {
+				url: '/billingDashboard',
+				title: 'Billing Dashboard',
+                templateUrl: 'assets/templates/billings/billingDashboard.html',
+                controller: 'billingDashboardController',
+                controllerAs: 'billDash',
+                moduleName: 'dashboard',
+                  resolve: {
+                  	billingStats: function(dataFactory, $stateParams) {
+						return dataFactory.httpRequest(URL+'/billings/billingStats');
+					},
+                    deps: ['$ocLazyLoad', function($ocLazyLoad) {
+                        return $ocLazyLoad.load([
+                                // 'metrojs',
+                                // 'sparkline',
+                                // 'skycons',
+                                // 'switchery'
+                                // 'markercluster',
+                                // 'tabcollapse'
+                                ], {
+                                insertBefore: '#lazyload_placeholder'
+                            })
+					}]
+                }
+            })
             
 
 }]);

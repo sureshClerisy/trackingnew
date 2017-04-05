@@ -941,7 +941,7 @@
 					
 					<div class="popup-inner-content-main"  ng-show="brokerDetailInfo == true">
 						<div class="col-xs-12">
-							<div class="form-group form-group-default th-select broker-detail-dropdown" ng-if="editSavedLoad.load_source == 'Vika Dispatch' && showBrokerDropdown == true">
+							<div class="form-group form-group-default th-select broker-detail-dropdown" ng-show="showBrokerDropdown == true">
 								<label>Select Broker</label>
 								<ui-select ng-disabled="disabledUISelect" ng-model="brokerSelectedId" theme="bootstrap" on-select="onSelectChangeBrokerCallback($item, $model)" >
 									<ui-select-match class="ui-select-match" placeholder="Select Broker">{{selectedBrokerName}}</ui-select-match>

@@ -66,6 +66,8 @@
                                                 <label>  {{ languageArray.driverhardwarekey }}</label>
                                                 <input type="text" class="form-control" name="hardware Key" ng-model="addDriversData.hardware_key"  >
                                             </div> 
+
+
                                             <p class="Summary-heading margin-top"> {{ languageArray.drivercontinfo }}</p>
                                             <div pg-form-group class="form-group form-group-default  "  >
                                                 <label>{{ languageCommonVariables.commonTableThPhone }}</label>
@@ -76,19 +78,20 @@
                                                 <input type="email" class="form-control" name="email" ng-model="addDriversData.email"  >
                                             </div>
                                             <label class="error" for="email" ng-show="addDrivers.email.$invalid && !addDrivers.email.$pristine">Please enter valid email address.</label>
-                                            
-                                           
-                                            
-                               
+                                      
                                       </div>
                                      
                                         <div class="col-sm-6 col-xs-12">
-                                             <p class="Summary-heading no-marign-top"> {{ languageArray.driverdl }}</p>
-                                            <div pg-form-group class="form-group form-group-default  "  >
+                                            <p class="Summary-heading no-marign-top"> {{ languageArray.driverdl }}</p>
+                                            <div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':addDrivers.driverlicencenumber.$invalid && !addDrivers.driverlicencenumber.$pristine || addDrivers.$submitted && addDrivers.driverlicencenumber.$invalid, 'has-error-new': uniqueFieldsValue == false}"  >
                                                 <label>  {{ languageArray.driverdlnum }}</label>
-                                                <input type="text" class="form-control" name="driverlicencenumber" ng-model="addDriversData.driver_license_number"  >
+                                                <input type="text" class="form-control" name="driverlicencenumber" ng-model="addDriversData.driver_license_number" required ng-blur="checkUniqueFields(addDriversData.driver_license_number,'driver_license_number','drivers')">
                                             </div>
-                                            <div pg-form-group class="form-group form-group-default  "  >
+                                            <label class="error" for="driverlicencenumber" ng-show="addDrivers.driverlicencenumber.$invalid && !addDrivers.driverlicencenumber.$pristine || addDrivers.$submitted && addDrivers.driverlicencenumber.$invalid">Please enter driver licence number.</label>
+
+                                            <label class="error" ng-if="uniqueFieldsValue == false">This licence number is already attached to another driver.</label>
+
+                                            <div pg-form-group class="form-group form-group-default"  >
                                                 <label>{{ languageArray.driverdlclass }}</label>
                                                 <input type="text" class="form-control" name="driverlicenceclass" ng-model="addDriversData.driver_license_cats"  >
                                             </div>
@@ -110,12 +113,6 @@
                                             </div>
                                             
                                             <div class="dropzone custom-height" ng-dropzone dropzone="dropzone" dropzone-config="dropzoneConfigDriverAdd" ></div>
-                                                
-
-
-
-
-
                                         
                                         </div>
                                         <div class="col-sm-12">
@@ -127,19 +124,11 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <!--div class="col-sm-7">
-                                            <div class="row">
-                                                <div id="map" style="height:550px;"></div>
-                                            </div>
-                                        </div-->
+                                     
                                     </div>
-                                    <!--row clearfix-->
-                                    <!--row-->
-                               
-                               
-                            </form>
+                              </form>
                         </div>
-                        <!---->
+                   
                     </div>
              
                 </div>

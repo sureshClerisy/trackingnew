@@ -13,7 +13,9 @@
 							
 							<div class="input-cal-block">
 								<div class="input-prepend input-group">
-									<span class="add-on input-group-addon"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i></span>
+									<span class="add-on input-group-addon">
+										<i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
+									</span>
 								   <input date-range-picker placeholder="Select date range" id="drpicker"  class="form-control date-picker customDateRange" type="text" options="opts" ng-model="dateRangeSelector" />
 								</div>
 							</div>
@@ -33,7 +35,8 @@
 					      <div class="alert alert-info">
 					         <div>
 					            <div class="pgn-thumbnail">
-					               <div><img style="display: inline-block;" src="assets/uploads/drivers/thumbnail/{{driver.profile_image}}" ui-jq="unveil" alt="" width="40" height="40" onerror="this.style.display = 'none'">
+					               <div>
+					               <img style="display: inline-block;" src="assets/uploads/drivers/thumbnail/{{driver.profile_image}}" ui-jq="unveil" alt="" width="40" height="40" onerror="this.style.display = 'none'">
 										<span class="text-image hide-1" style="background: {{color}};padding: 13px 0px;width:100%; height:100%;font-size:15px !important;text-align: center;">{{uInitial}}
 										</span>
 					               </div>
@@ -45,7 +48,9 @@
 					               </div>
 					            </div>
 					         </div>
-					         <button type="button" ng-click="removeDashboardView(driver)" class="close" data-dismiss="alert"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+					         <button type="button" ng-click="removeDashboardView(driver)" class="close" data-dismiss="alert">
+					         	<span aria-hidden="true">×</span><span class="sr-only">Close</span>
+					         </button>
 					      </div>
 					   </div>
 					</div>
@@ -60,18 +65,23 @@
 			            <div style="display: none;" id="left"></div>
 	    				<div style="display: none;" id="right"></div>
 			            <canvas id="viewport" style="display: none;"></canvas>
-		                <div class="col-md-6 sortable-column " id="placeholder_left" ui-jq="sortable" ui-options='sortableOptions'>
-		                    <div class="panel panel-default green-border wpanel" id="1" pg-portlet>
+		                <div class="col-md-6 sortable-column " id="placeholder_left" ui-jq="sortable" ui-options='sortableOptions' >
+		                    <div class="panel panel-default green-border wpanel vis-{{visibility[1]}}" id="1" ng-show ="visibility[1] ==1" pg-portlet >
 		                        <div class="panel-heading">
 		                            <div class="panel-title">{{ languageArray.bestSafetyHeading }}
 		                            </div>
 		                            <div class="panel-controls">
 		                                <ul>
 		                                    <li ng-show="otherIcon">
-		                                    	<a class="portlet-collapse" href="" data-toggle="collapse"><i class="portlet-icon portlet-icon-collapse"></i>
+		                                    	<a class="portlet-collapse" href="" data-toggle="collapse">
+		                                    		<i class="portlet-icon portlet-icon-collapse"></i>
 		                                    	</a>
 		                                    </li>
-		                                   <li><a href="" class="portlet-maximize" data-toggle="maximize" ng-click = "best_safety(); toggleIcon($event,'best_safety')"><i class="portlet-icon portlet-icon-maximize portlet-increase-size" ></i></a></li>
+		                                   <li>
+		                                   	<a href="" class="portlet-maximize" data-toggle="maximize" ng-click = "best_safety(); toggleIcon($event,'best_safety')">
+		                                   		<i class="portlet-icon portlet-icon-maximize portlet-increase-size" ></i>
+		                                   	</a>
+		                                   	</li>
 		                                </ul>
 		                            </div>
 		                        </div>
@@ -125,7 +135,7 @@
 									</div>
 		                        </div><!-- panel-body -->
 		                    </div>
-		                    <div class="panel panel-default black-border wpanel" id="2" pg-portlet>
+		                    <div class="panel panel-default black-border wpanel" id="2" ng-show ="visibility[2] ==1" pg-portlet>
 		                        <div class="panel-heading">
 		                            <div class="panel-title">{{ languageArray.capacityanalysis }}
 		                            </div>
@@ -145,15 +155,22 @@
 									<!-- </div> -->
 		                        </div><!-- panel-body -->
 		                    </div>
-		                    <div class="panel panel-default parpal-border wpanel" id="3" pg-portlet>
+		                    <div class="panel panel-default parpal-border wpanel" id="3" ng-show ="visibility[3] ==1" pg-portlet>
 		                        <div class="panel-heading">
 		                            <div class="panel-title">{{ languageArray.drivermsg }}
 		                            </div>
 		                            <div class="panel-controls">
 		                                <ul>
-		                                    <li ng-show="otherIcon"><a class="portlet-collapse" href="" data-toggle="collapse"><i class="portlet-icon portlet-icon-collapse"></i></a>
+		                                    <li ng-show="otherIcon">
+		                                    	<a class="portlet-collapse" href="" data-toggle="collapse">
+		                                    		<i class="portlet-icon portlet-icon-collapse"></i>
+		                                    	</a>
 		                                    </li>
-		                                   <li><a href="" class="portlet-maximize" data-toggle="maximize" ng-click="toggleIcon($event, 'driver_msg')"><i class="portlet-icon portlet-icon-maximize portlet-increase-size" ></i></a></li>
+		                                   <li>
+		                                   		<a href="" class="portlet-maximize" data-toggle="maximize" ng-click="toggleIcon($event, 'driver_msg')">
+		                                   			<i class="portlet-icon portlet-icon-maximize portlet-increase-size" ></i>
+		                                   		</a>
+		                                   	</li>
 		                                    <!-- <li><a class="portlet-close" href="" data-toggle="close"><i class="portlet-icon portlet-icon-close"></i></a>
 		                                    </li> -->
 		                                </ul>
@@ -180,7 +197,7 @@
 									</div>
 		                        </div><!-- panel-body -->
 		                    </div>
-		                    <div class="panel panel-default green-border wpanel"  id="4" pg-portlet>
+		                    <div class="panel panel-default green-border wpanel"  id="4" ng-show ="visibility[4] ==1" pg-portlet>
 		                        <div class="panel-heading">
 		                            <div class="panel-title">{{ languageArray.trucklocation }}
 		                            </div>
@@ -204,7 +221,7 @@
 									</div>
 		                        </div><!-- panel-body -->
 		                    </div>
-		                    <div class="panel panel-default bg-danger wpanel" id="5" pg-portlet>
+		                    <div class="panel panel-default bg-danger wpanel" id="5" ng-show ="visibility[5] ==1" pg-portlet>
 		                        <div class="panel-heading">
 		                            <div class="panel-title color-fff">{{ languageArray.newsfeed }}
 		                            </div>
@@ -249,7 +266,7 @@
 			                </div>
 		                </div>
 		                <div class="col-md-6 sortable-column " id="placeholder_right" ui-jq="sortable" ui-options='sortableOptions'>
-		                    <div class="panel panel-default red-border wpanel" id="6" pg-portlet>
+		                    <div class="panel panel-default red-border wpanel" id="6" ng-show ="visibility[6] ==1" pg-portlet>
 		                        <div class="panel-heading">
 		                            <div class="panel-title">{{ languageArray.topcustomer }}
 		                            </div>
@@ -258,15 +275,12 @@
 		                                    <li ng-show="otherIcon"><a class="portlet-collapse text-white" href="" data-toggle="collapse"><i class="portlet-icon portlet-icon-collapse"></i></a>
 		                                    </li>
 		                                    <li><a href="" class="portlet-maximize" data-toggle="maximize" ng-click="toggleIcon($event,'top_brokers')"><i class="portlet-icon portlet-icon-maximize portlet-increase-size" ></i> </a></li>
-		                                   <!--  <li><a class="portlet-close text-white" href="" data-toggle="close"><i class="portlet-icon portlet-icon-close"></i></a>
-		                                    </li> -->
 		                                </ul>
 		                            </div>
 		                        </div>
 
 		                        <div class="panel-body">
 		                       		<div class="row drive-msg-block" ng-if="dashboard.showTopCustomers == true" >
-										<!-- <div class="col-sm-12 col-md-12 col-xlg-12 chart-block"> -->
 										<div class="height-cart-main-block">
 											<div class="tb-cell-gph gp-mp-block1">
 											<div class="col-sm-12 col-md-12 col-xlg-12 chart-block11" >
@@ -279,7 +293,7 @@
 											<div class="col-sm-12 col-md-12 col-xlg-12  cart-color-size">
 												<div class="cart-color">
 													<ul class="print-listing chart-color"> 
-														<li ng-repeat="(key,value) in comp_name "><span style="background:{{barColors[$index]}}"></span><p>{{ value}}</p></li>
+														<li ng-repeat="(key,value) in comp_name.cmpName" ><span style="background:{{barColors[$index]}}"></span><p class="cursor-class" ng-click="showRecordsWithFilter('broker',comp_name.brokerIds[$index],'',valueIds.driverId, valueIds.dispatcherId, valueIds.secondDriverId)">{{ value }}</p></li>
 													</ul>
 												</div>
 											</div>
@@ -294,7 +308,7 @@
 		                        <div class="topfive_portlet-progress portlet-progress" style="background-color: rgba(255, 255, 255, 0.8); display: none;"><div class="topfive_portlet-progress portlet-progress progress-circle-indeterminate progress-circle-master" style="display: none;"></div>
 		                        </div>
 		                    </div>
-		                    <div class="panel panel-default green-border wpanel" id="7" pg-portlet>
+		                    <div class="panel panel-default green-border wpanel" id="7" ng-show ="visibility[7] ==1" pg-portlet>
 		                        <div class="panel-heading">
 		                            <div class="panel-title">Leader Board
 		                            </div>
@@ -303,16 +317,12 @@
 		                                    <li ng-show="otherIcon"><a class="portlet-collapse" href="" data-toggle="collapse"><i class="portlet-icon portlet-icon-collapse"></i></a></li>
 		                                    <li ng-show="otherIcon"><a href=""><i class="fa fa-print" ng-click="print_xl()"></i></a></li>
 		                                    <li><a href="" class="portlet-maximize" data-toggle="maximize" ng-click = "toggleIcon($event,'leaderboard')"><i class="portlet-icon portlet-icon-maximize portlet-increase-size" ></i></a></li>
-		                                    <!-- <li><a class="portlet-close" href="" data-toggle="close"><i class="portlet-icon portlet-icon-close"></i></a>
-		                                    </li> -->
 		                                </ul>
 		                            </div>
 		                        </div>
 		                        <div class="panel-body auto-overflow">
 		                           <div class="graph-block-tabel">
 										<div class="load-road-graph text-center ">
-											<!-- <div id="load_on_road" style="min-width: 400px; height:400px; margin: 0 auto"></div> -->
-											<!-- <hc-pie-chart title="Browser usage" data="pieData">Placeholder for pie chart</hc-pie-chart> -->
 											<div style="width: 100%;">
 												<highchart id="chart1" class="loads-tracking" config="chartConfig" class="span9" ></highchart>	
 											</div>
@@ -355,7 +365,6 @@
 															</td>
 															<td  class="text-center v-align-middle semi-bold">{{loads.miles | number:0}}</td>
 															<td  class="text-center v-align-middle">{{loads.deadmiles | number:0}}</td>
-															<!--td  class="text-center v-align-middle semi-bold">{{loads.invoice | currency:"$":2}}</td-->
 															<td  class="text-center v-align-middle semi-bold">{{loads.invoice | currency:"$":2}}</td>
 															<td  class="text-center v-align-middle">{{loads.charges | currency:"$":2}}</td>
 															<td  class="text-center v-align-middle">{{loads.profit | currency:"$":2}}</td>
@@ -387,7 +396,7 @@
 									</div>
 		                        </div> <!-- panel body -->
 		                    </div>
-		                    <div class="panel panel-default red-border wpanel pos-rel " id="8" pg-portlet>
+		                    <div class="panel panel-default red-border wpanel pos-rel " id="8" ng-show ="visibility[8] ==1" pg-portlet>
 								<div class="col-middle loader-outer weather-loader" ng-show = "weatherShow == false">
 									<!-- START PANEL -->
 									<div class="loader-inner">
@@ -412,8 +421,7 @@
 	                                        <li ng-show="otherIcon">
 	                                        	<a href="" ><i class="fa fa-print" ng-click = "print_weather()"></i></a></li>
                            					<li><a href="" class="portlet-maximize" data-toggle="maximize" ng-click="toggleIcon($event, 'weather')"><i class="portlet-icon portlet-icon-maximize portlet-increase-size" ></i></a></li>
-		                                    <!-- <li><a class="portlet-close text-white" href="" data-toggle="close"><i class="portlet-icon portlet-icon-close"></i></a>
-		                                    </li> -->
+
 		                                </ul>
 		                            </div>
 		                        </div>
@@ -523,7 +531,7 @@
 											                                    </div>
 											                                    <div class="col-md-6 text-center">
 											                                       <p class="small">{{ languageArray.wheathernight }}</p>
-											                                       <canvas class="{{daily.weather_class}}" width="25" height="25" skycons></canvas>
+											                                       <canvas class="{{daily.weather_class_night}}" width="25" height="25" skycons></canvas>
 											                                       <p class="text-danger bold">{{daily.night}}{{ languageArray.wheatherinfoscale }}</p>
 											                                    </div>
 											                                 </div>
@@ -546,7 +554,7 @@
 
 		                         <!-- panel-body -->
 		                    </div>
-		                    <div class="panel panel-default parpal-border wpanel" id="9" pg-portlet>
+		                    <div class="panel panel-default parpal-border wpanel" id="9" ng-show ="visibility[9] ==1" pg-portlet>
 		                        <div class="panel-heading">
 		                            <div class="panel-title">{{ languageArray.loadstatus }}
 		                            </div>
@@ -557,8 +565,7 @@
 		                                     <li ng-show="otherIcon"><a href="" class="portlet-refresh" data-toggle="refresh"><i class="portlet-icon portlet-icon-refresh" ng-click = "refresh_loadStatus()"></i></a></li>
 		                                     <li ng-show="otherIcon"><a href=""><i class="fa fa-print" ng-click = "load_status()"></i></a></li>
 		                                     <li><a href="" class="portlet-maximize" data-toggle="maximize" ng-click="toggleIcon($event,'load_status')" ><i class="portlet-icon portlet-icon-maximize portlet-increase-size" ></i></a></li>
-		                                    <!-- <li><a class="portlet-close" href="" data-toggle="close"><i class="portlet-icon portlet-icon-close"></i></a>
-		                                    </li> -->
+
 		                                </ul>
 		                            </div>
 		                        </div>
@@ -601,7 +608,7 @@
 		                        </div><!-- panel-body -->
 		                    </div>
 
-		                    <div class="panel panel-default blue-border wpanel" id="10" pg-portlet>
+		                    <div class="panel panel-default blue-border wpanel" id="10" ng-show ="visibility[10] ==1" pg-portlet>
 		                        <div class="panel-heading">
 		                            <div class="panel-title">Today Insights
 		                            </div>
@@ -612,8 +619,6 @@
 		                                    <li ng-show="otherIcon" ><a href = ""><i class="fa fa-print" ng-click ="print_todayInsights()"></i></a></li>
 		                                    <li><a class="portlet-maximize" href="" data-toggle="maximize" ng-click="toggleIcon($event,'today-insights')"><i class="portlet-icon portlet-icon-maximize portlet-increase-size"></i></a>
 		                                    </li>
-		                                    <!-- <li><a class="portlet-close" href="" data-toggle="close"><i class="portlet-icon portlet-icon-close"></i></a>
-		                                    </li> -->
 		                                </ul>
 		                            </div>
 		                        </div>

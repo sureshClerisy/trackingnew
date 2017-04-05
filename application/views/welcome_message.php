@@ -122,6 +122,7 @@
     <script src="app/controllers/trailersController.js"></script>
     <script src="app/controllers/sendPaymentController.js"></script>
     <script src="app/controllers/notificationsController.js"></script>
+    <script src="app/controllers/billingDashboardController.js"></script>
     <script src="login/loadLanguages"></script>
     <!--for footable-->
     

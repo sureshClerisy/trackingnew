@@ -218,11 +218,11 @@ class Dashboard extends CI_Controller {
 		$driversIdleVsActive = array();
 		for ($caIndex=0; $caIndex < 7 ; $caIndex++) { 
 			$driversIdleVsActive["xaxis"][] = date("l",strtotime($capcityDaysStart));
-			$driversIdleVsActive["active"][]   = (int)$this->Job->getTodayReport($rparam,$lPerformance, "exceptIdle", $capcityDaysStart);
-			$driversIdleVsActive["idle"][] = (int)$this->Job->getIdleDrivers($rparam,$lPerformance,'idle',$capcityDaysStart);
+			$driversIdleVsActive["active"][]   = array("y"=>(int)$this->Job->getTodayReport($rparam,$lPerformance, "exceptIdle", $capcityDaysStart),"date"=> $capcityDaysStart,"type"=>"active");
+			$driversIdleVsActive["idle"][] = array("y"=>(int)$this->Job->getIdleDrivers($rparam,$lPerformance,'idle',$capcityDaysStart),"date"=> $capcityDaysStart,"type"=>"idle");
 			$capcityDaysStart = date("Y-m-d", strtotime("+1 days", strtotime($capcityDaysStart)));
 		}
- 
+
 		$totals = array("PaymentAmount"=>0, "Mileage"=>0, "deadmiles"=>0);
 		foreach ($todayReport as $key => $value) {
 			$totals["PaymentAmount"] += $value["PaymentAmount"];
@@ -341,9 +341,10 @@ class Dashboard extends CI_Controller {
 	}
 
 	public function fetchWidgetsOrder(){
-		$widgetOrd = array();
-		$widgetsOrder = $this->Job->getWidgetsOrder($this->userId);
-		
+
+		$widgetOrd 		= array();
+		$widgetsOrder 	= $this->Job->getWidgetsOrder($this->userId);
+		$widgetVisibility = $this->Job->getPortletVisibility();
 
 		if ( !empty($widgetsOrder) ) {
 			$widgetsOrder 		= json_decode($widgetsOrder['widget_order'],true);
@@ -369,7 +370,7 @@ class Dashboard extends CI_Controller {
 				$vehicleInfo = $vehicleInfo[0];
 			}
 		}
-		echo json_encode(array('widgetsOrder'=>$widgetOrd,"selectedDriver"=>$vehicleInfo,"selDrivers"=>$userDrivers,"user_role"=>$this->userRoleId));
+		echo json_encode(array('widgetsOrder'=>$widgetOrd,"selectedDriver"=>$vehicleInfo,"selDrivers"=>$userDrivers,"user_role"=>$this->userRoleId,'widgetVisibility'=>$widgetVisibility));
 	}	
 
 	/**
@@ -381,8 +382,20 @@ class Dashboard extends CI_Controller {
 	public function widgetVisibility(){
 		
 		$args = json_decode(file_get_contents('php://input'),true);
-
 		$this->Job->widgetsVisibility($args);
+		$visibility = $this->Job->getPortletVisibility();
+		echo json_encode(array("visibility"=>$visibility,'success'=>true));
+	}
+
+	/**
+	* Method widgetVisibility
+	* @param widget ID,visibility(0 OR 1)
+	* @return NULL
+	* 
+	*/
+	public function getPortletVisibility(){
+		$visibility = $this->Job->getPortletVisibility();
+		echo json_encode(array("visibility"=>$visibility,'success'=>true));
 	}
 
 	
@@ -525,7 +538,7 @@ class Dashboard extends CI_Controller {
 
 
 
-	public function checkWeatherType($weather_type ,$weather_description){
+	public function checkWeatherType($weather_type ,$weather_description, $time = 'day'){
 		$weather = "partly-cloudy-day";
 		if(strtolower($weather_type) == 'rain' && ($weather_description == 'light rain' || $weather_description == 'moderate rain') ){
 			$weather = 'sleet';
@@ -533,19 +546,21 @@ class Dashboard extends CI_Controller {
 		elseif(strtolower($weather_type) == 'rain'){
 			$weather = 'rain';
 		}
-		elseif(strtolower($weather_type) == 'clouds' && $weather_description == 'few clouds'){
+		elseif(strtolower($weather_type) == 'clouds' && $weather_description == 'few clouds' && $time == "day"){
 			$weather = 'partly-cloudy-day';
-		}
-		elseif(strtolower($weather_type) == 'clouds'){
+		}elseif(strtolower($weather_type) == 'clouds' && $weather_description == 'few clouds' && $time == "night"){
+			$weather = 'partly-cloudy-night';
+		}elseif(strtolower($weather_type) == 'clouds'){
 			$weather = 'cloudy';
 		}
 		elseif(strtolower($weather_type) == 'snow'){
 			$weather = 'snow';
 		}
-		elseif(strtolower($weather_type) == 'clear'){
+		elseif(strtolower($weather_type) == 'clear' && $time == "night"){
+			$weather = 'clear-night';
+		}elseif(strtolower($weather_type) == 'clear' && $time == "day"){
 			$weather = 'clear-day';
-		}
-		else{
+		}else{
 			$weather = 'partly-cloudy-day';
 		}
 		return $weather;
@@ -702,7 +717,10 @@ class Dashboard extends CI_Controller {
 							$dailyForecast['list'][$key]['day'] = date('N',$day['dt']);
 							$dailyForecast['list'][$key]['date'] = date('dS F , Y', $day['dt']);
 							$dailyForecast['list'][$key]['today'] = date('l', $day['dt']);
-							$dailyForecast['list'][$key]['weather_class'] = $this->checkWeatherType($day['weather'][0]['main'],$day['weather'][0]['description'] );
+							$dailyForecast['list'][$key]['weather_class'] = $this->checkWeatherType($day['weather'][0]['main'],$day['weather'][0]['description'], 'day' );	
+							$dailyForecast['list'][$key]['weather_class_night'] = $this->checkWeatherType($day['weather'][0]['main'],$day['weather'][0]['description'], 'night' );	
+
+							
 							$dailyForecast['list'][$key]['weather_description'] = $day['weather'][0]['description'];
 
 							$dailyForecast['list'][$key]['current_temperature'] = $day['temp']['day'];
@@ -763,7 +781,7 @@ class Dashboard extends CI_Controller {
 
 		$this->load->model("Report");
 		$lPResult = array();
-		
+	
 		$chartStack = array();
 		$chartStack["xaxis"] = array();
 		$chartStack["charges"] = array();
@@ -850,7 +868,7 @@ class Dashboard extends CI_Controller {
 
 						$daysDriversList = array();
 					}
-								
+				
 				if ( !empty($getDrivers)) {			
 					$newArray = array();
 
@@ -1141,7 +1159,7 @@ class Dashboard extends CI_Controller {
 					}
 				break;
 				default				: 
-					$dispatchersList = $this->Report->getDispatchersListForGoals();
+					$dispatchersList = $this->Report->getDispatchersListForGoals($rparam);
 					$loadResult = $this->getPerformanceLoadsForAllDispatchers($dispatchersList,$rparam,$goalValues);
 					$lPResult 	= $loadResult['lPResult'];
 					$chartStack = $loadResult['chartStack'];
@@ -1239,31 +1257,71 @@ class Dashboard extends CI_Controller {
 		$chartStack["ppercent"] = array();
 		$chartStack["profitAmount"] = array();
 		$chartStack["goalsAchievement"] = array();	
+//pr($dispatchersList);
+		// $rparam['startDate'] = '2017-04-01';
+		// $rparam['endDate'] = '2017-04-02';
 
+		$goalLogStartDate = '2017-03-29';			// static date to consider the logs which are started from 29th march
 		foreach( $dispatchersList as $key => $dispatcher ) {
 			$this->teamFinancialGoal 				= 0;
 			$this->teamMilesGoal 					= 0;
 			$this->singleFinancialGoal				= 0;
 			$this->singleMilesGoal					= 0;
 			$showDispatcher							= 1;
-			$value = 	$this->Report->getLoadsTrackingAggregateDashboard($rparam,"dispatchers","dashboard", $dispatcher['dispId']);
-			$driversList = $this->Report->getTotalTeamDrivers($dispatcher['dispId'], $rparam['startDate'], $rparam['endDate'] );
+			$value 			= $this->Report->getLoadsTrackingAggregateDashboard($rparam,"dispatchers","dashboard", $dispatcher['dispId']);
+			$driversList    = $this->Report->getTotalTeamDrivers($dispatcher['dispId'], $rparam['startDate'], $rparam['endDate'] );
+			$driverLastLog  = $this->Report->getDispatcherLastLog($dispatcher['dispId'], $rparam['startDate']);
+			
 			if( !empty($driversList)) {
 				$driversList = $this->getUniqueDriverDate($driversList);
 				$driversList = array_values($driversList);
 				for( $i = 0; $i < count($driversList); $i++ ) {
 					if ( $i == 0 ) {
-						$sDate 			= new DateTime($rparam["startDate"]);
-						$eDate   		= new DateTime($driversList[$i]['createdDate']);
-						$newEndDate 	= $driversList[$i]['createdDate'];
-						$daysdiff 			= $eDate->diff($sDate)->format("%a");
-						if ( $i == 0 )
-							$daysdiff 	= $daysdiff + 1;
-						
-						$this->singleFinancialGoal 	+= $driversList[$i]['single'] * $goalValues['singleFinancial'] * $daysdiff;
-						$this->teamFinancialGoal	+= $driversList[$i]['team'] * $goalValues['teamFinancial'] * $daysdiff;
-						$this->singleMilesGoal		+= $driversList[$i]['single'] * $goalValues['singleMiles'] * $daysdiff;
-						$this->teamMilesGoal	 	+= $driversList[$i]['team'] * $goalValues['teamMiles'] * $daysdiff;
+						$daysdiff = 1;
+						if ( $driversList[$i]['createdDate'] <= $goalLogStartDate ) {				// check if log is before 29 march
+							$sDate 	 = new DateTime($rparam["startDate"]);
+							$singleDrivers = $driversList[$i]['single'];
+							$teamDrivers   = $driversList[$i]['team'];
+
+							$eDate   		= new DateTime($driversList[$i]['createdDate']);
+							$newEndDate 	= $driversList[$i]['createdDate'];
+							$daysdiff 	    += $eDate->diff($sDate)->format("%a");
+							$this->singleFinancialGoal 	+= $driversList[$i]['single'] * $goalValues['singleFinancial'] * $daysdiff;
+							$this->teamFinancialGoal	+= $driversList[$i]['team'] * $goalValues['teamFinancial'] * $daysdiff;
+							$this->singleMilesGoal		+= $driversList[$i]['single'] * $goalValues['singleMiles'] * $daysdiff;
+							$this->teamMilesGoal	 	+= $driversList[$i]['team'] * $goalValues['teamMiles'] * $daysdiff;
+						} else {
+							if ( !empty($driverLastLog) && count($driverLastLog) > 0 ) {	// check if previous log exist for dispatcher then calc from startdate
+								$sDate 		= new DateTime($rparam['startDate']);
+								$eDate   	= new DateTime($driversList[$i]['createdDate']);
+								$newEndDate = $driversList[$i]['createdDate'];
+								$daysdiff  += $eDate->diff($sDate)->format("%a");
+								$daysdiff = $daysdiff - 1;
+							
+								$this->singleFinancialGoal 	+= $driverLastLog['single'] * $goalValues['singleFinancial'] * $daysdiff;
+								$this->teamFinancialGoal	+= $driverLastLog['team'] * $goalValues['teamFinancial'] * $daysdiff;
+								$this->singleMilesGoal		+= $driverLastLog['single'] * $goalValues['singleMiles'] * $daysdiff;
+								$this->teamMilesGoal	 	+= $driverLastLog['team'] * $goalValues['teamMiles'] * $daysdiff;
+
+								$this->singleFinancialGoal 	+= $driversList[$i]['single'] * $goalValues['singleFinancial'];
+								$this->teamFinancialGoal	+= $driversList[$i]['team'] * $goalValues['teamFinancial'];
+								$this->singleMilesGoal		+= $driversList[$i]['single'] * $goalValues['singleMiles'];
+								$this->teamMilesGoal	 	+= $driversList[$i]['team'] * $goalValues['teamMiles'];
+							}
+							else {					// check if previous log does not exist for dispatcher then calc from logged start date
+								$sDate 			= new DateTime($driversList[$i]['createdDate']);
+								$eDate   		= new DateTime($driversList[$i]['createdDate']);
+								$newEndDate 	= $driversList[$i]['createdDate'];
+								$daysdiff 	   += $eDate->diff($sDate)->format("%a");
+
+								$this->singleFinancialGoal 	+= $driversList[$i]['single'] * $goalValues['singleFinancial'] * $daysdiff;
+								$this->teamFinancialGoal	+= $driversList[$i]['team'] * $goalValues['teamFinancial'] * $daysdiff;
+								$this->singleMilesGoal		+= $driversList[$i]['single'] * $goalValues['singleMiles'] * $daysdiff;
+								$this->teamMilesGoal	 	+= $driversList[$i]['team'] * $goalValues['teamMiles'] * $daysdiff;
+							}
+
+							
+						}
 					} else {
 						$endCreated = date('Y-m-d',(strtotime ( '-1 day' , strtotime ( $driversList[$i]['createdDate']) ) ));
 						$sDate 			= new DateTime($driversList[$i -1 ]['createdDate']);
@@ -1280,7 +1338,10 @@ class Dashboard extends CI_Controller {
 						$this->teamFinancialGoal   += $driversList[$i]['team'] * $goalValues['teamFinancial'];
 						$this->singleMilesGoal	   += $driversList[$i]['single'] * $goalValues['singleMiles'];
 						$this->teamMilesGoal	   += $driversList[$i]['team'] * $goalValues['teamMiles'];
-					}		
+					}
+
+					if ( $driversList[$i]['single'] <= 0 && $driversList[$i]['team'] <= 0 )
+					$showDispatcher = 0;		
 				}
 							
 				if( $newEndDate < $rparam['endDate'] ) {	
@@ -1295,14 +1356,20 @@ class Dashboard extends CI_Controller {
 					$this->singleMilesGoal	 	+= $driverList['single'] * $goalValues['singleMiles'] * $daysdiff;
 					$this->teamMilesGoal	 	+= $driverList['team'] * $goalValues['teamMiles'] * $daysdiff;
 				}
-			} else {			
+			} else {	
 				$driversList = $this->Report->getTotalDriversList($dispatcher['dispId'], $rparam['startDate'], $rparam['endDate'] );
-				
-				$sDate 		= new DateTime($rparam["startDate"]);
-				$eDate   	= new DateTime($rparam['endDate']);
-				$daysdiff 	= $eDate->diff($sDate)->format("%a");
-				$daysdiff 	= $daysdiff + 1;
-				
+				$daysdiff = 0;
+				if ( !empty($driversList)) {
+					if ( !empty($driverLastLog) && count($driverLastLog) > 0 )
+						$sDate 		= new DateTime($rparam["startDate"]);
+					else 
+						$sDate 		= new DateTime($driversList["createdDate"]);
+
+					$eDate   	= new DateTime($rparam['endDate']);
+					$daysdiff 	= $eDate->diff($sDate)->format("%a");
+					$daysdiff 	= $daysdiff + 1;
+				}
+
 				$single = isset($driversList['single']) ? $driversList['single'] : 0;
 				$team   = isset($driversList['team']) ? $driversList['team'] : 0;
 				$this->singleFinancialGoal  += $single * $goalValues['singleFinancial'] * $daysdiff;
@@ -1310,10 +1377,14 @@ class Dashboard extends CI_Controller {
 				$this->singleMilesGoal	    += $single * $goalValues['singleMiles'] * $daysdiff;
 				$this->teamMilesGoal	 	+= $team * $goalValues['teamMiles'] * $daysdiff;
 
-				$showDispatcher = 0;
+				if ( $driversList['createdDate'] > $rparam['endDate'] && empty($driverLastLog)) {
+					$showDispatcher = 0;
+				} else if( $driversList['single'] <= 0 && $driversList['team'] <= 0 ) {
+					$showDispatcher = 0;
+				}
 			}									
 			
-			if ( empty($value) && empty($driversList))
+			if ( empty($value) && $showDispatcher == 0)
 				continue;
 
 			$value['profit']     = isset($value['profit']) ? $value['profit'] : 0;
@@ -1368,8 +1439,11 @@ class Dashboard extends CI_Controller {
 			array_push($chartStack["ppercent"], (float) $value["profit"]);
 			array_push($chartStack["profitAmount"],  array("y"=> (float) $value["profit"], "clickType"=>"sendToDetail", "urlColumn"=>"dispatcher","username"=>$dispatcher["username"],"dispatcherId"=>$dispatcher['dispId'],"second_driver_id"=>''));
 			array_push($chartStack["goalsAchievement"],  array("y"=>(float) $this->totalFinancialGoal, "clickType"=>"sendToDetail", "urlColumn"=>"dispatcher","username"=>$dispatcher["username"],"dispatcherId"=>$dispatcher['dispId'],"second_driver_id"=>''));
-		}
+	
+		// die;
+			}
 
+		
 		if(isset($this->totalInvoices) && $this->totalInvoices > 0 ) {
 			$this->totalProfitPercent  = number_format((float)(($this->totalProfit/$this->totalInvoices) * 100),2);	
 		} else {
@@ -1418,20 +1492,34 @@ class Dashboard extends CI_Controller {
 
 	public function topFiveCustomer(){
 		$data = array();
+		$this->load->model('BrokersModel');
 		$args = json_decode(file_get_contents('php://input'),true);
-		$cmpName = $this->Job->getTopFiveCustomer($args);
+		$cmpName = $this->BrokersModel->getTopFiveCustomer($args);
 		$data["paymentAmount"] = array();
-		$data["cmpName"] = array();
-		$colors =  array('rgba(7, 126, 208, 1)','rgba(109,92,174,1)','rgba(52, 214, 199, 1)','rgba(245,87,83,1)','rgba(109,92,174,1)');
+		$data["cName"]['cmpName'] = array();
+		$data["cName"]['brokerIds'] = array();
+		$data["xAxis"] = array();
+		$data["valueIds"] = array();
+		$colors =  array('rgba(7, 126, 208, 1)','rgba(109,92,174,1)','rgba(52, 214, 199, 1)','rgba(245,87,83,1)','#626262');
+
+		$dispatcherId = isset($args['dispatcherId']) ? $args['dispatcherId'] : '';
+		$driverId = isset($args['driverId']) ? $args['driverId'] : '';
+		$secondDriverId = isset($args['secondDriverId']) ? $args['secondDriverId'] : '';
+
 		if ( !empty($cmpName)) {
 			$i = 0;
 			foreach( $cmpName as $cmp ) {
-				array_push($data["paymentAmount"],  array("y"=> (float) $cmp["Total"], 'color' => $colors[$i]));
-				array_push($data["cmpName"],   $cmp["TruckCompanyName"]);
+				array_push($data["paymentAmount"],  array("y"=> (float) $cmp["Total"], 'color' => $colors[$i], "urlColumn" => "broker" , "brokerId" => $cmp['broker_id'], "dispatcherId"=>$dispatcherId, 'driverId' => $driverId, 'second_driver_id' => $secondDriverId ));
+				array_push($data['cName']["cmpName"],   $cmp["TruckCompanyName"]);
+				array_push($data['cName']["brokerIds"],   $cmp["broker_id"]);
+				array_push($data["xAxis"],   '' );
 				$i++;
 			}
 		}
 		$data['colors'] = $colors;
+		$data['valueIds']['dispatcherId'] = $dispatcherId;
+		$data['valueIds']['driverId'] = $driverId;
+		$data['valueIds']['secondDriverId'] = $secondDriverId;
 
 		echo json_encode($data); 				
 	}

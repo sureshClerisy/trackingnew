@@ -21,7 +21,7 @@ app.controller('AdminController', function($scope,$interval, $document, $http,$r
     $scope.ifPre3 = true;
     $scope.ifPre4 = true;
     $scope.ifPre5 = true;
-    $scope.tSortableWidgets = 10;
+    $scope.tSortableWidgets = 9;
     
     Highcharts.setOptions({
         lang: {
@@ -74,52 +74,61 @@ app.controller('AdminController', function($scope,$interval, $document, $http,$r
     };
 
 
-   $scope.showRecordsWithFilter = function(type,page, disType, username, dispatcherId, secondDriverId){
-       if( $cookies.getObject('_globalDropdown') ){
-            var tempBuffer = $cookies.getObject('_globalDropdown');
-            var args = ""; var keyParam = "all";
+   $scope.showRecordsWithFilter = function(type,page, disType, username, dispatcherId, secondDriverId,extra){
+        if ( type != undefined && type == 'broker' ) {
+            var brokerId = page;
+            args = "userType="+type+"&userToken="+brokerId+"&dispatcherId="+dispatcherId+"&driverId="+username+"&secondDriverId="+secondDriverId+"&startDate="+$scope.dateRangeSelector.startDate+"&endDate="+$scope.dateRangeSelector.endDate;
+            $state.go('loads', { 'key': 'broker', q:args, type:true }, { reload: true } );
+        } else {
+           if( $cookies.getObject('_globalDropdown') ){
+                var tempBuffer = $cookies.getObject('_globalDropdown');
+                var args = ""; var keyParam = "all";
 
-            if(tempBuffer.label == "_iall" || tempBuffer.label == "" || tempBuffer.label == "all" ){
-                if ( type == 'reports') {
-                    args = "filterType="+type+"&userType="+disType+"&userToken="+dispatcherId;
-                     keyParam = username;
-                } else {
-                    args = "filterType="+type+"&userType=all";
-                     keyParam = "all";
-                }
-               
-            } else if (tempBuffer.label == "_idispatcher"){
-                console.log(secondDriverId);
-                if ( type == 'reports') {
-                    keyParam = username.toLowerCase().replace(/[\s]/g, '');
-                    if ( secondDriverId != undefined && secondDriverId  != '' && secondDriverId != 0 )
-                        args = "filterType="+type+"&userType=team&userToken="+dispatcherId+"&secondDriverId="+secondDriverId;
-                    else
+                if(tempBuffer.label == "_iall" || tempBuffer.label == "" || tempBuffer.label == "all" ){
+                    if ( type == 'reports') {
                         args = "filterType="+type+"&userType="+disType+"&userToken="+dispatcherId;
-                }
-                else {
-                    keyParam = tempBuffer.username.toLowerCase().replace(/[\s]/g, '');
-                    args = "filterType="+type+"&userType=dispatcher&userToken="+tempBuffer.dispId;
-                }
+                         keyParam = username;
+                    } else {
+                        args = "filterType="+type+"&userType=all";
+                         keyParam = "all";
+                    }
+                   
+                } else if (tempBuffer.label == "_idispatcher"){
+                    console.log(secondDriverId);
+                    if ( type == 'reports') {
+                        keyParam = username.toLowerCase().replace(/[\s]/g, '');
+                        if ( secondDriverId != undefined && secondDriverId  != '' && secondDriverId != 0 )
+                            args = "filterType="+type+"&userType=team&userToken="+dispatcherId+"&secondDriverId="+secondDriverId;
+                        else
+                            args = "filterType="+type+"&userType="+disType+"&userToken="+dispatcherId;
+                    }
+                    else {
+                        keyParam = tempBuffer.username.toLowerCase().replace(/[\s]/g, '');
+                        args = "filterType="+type+"&userType=dispatcher&userToken="+tempBuffer.dispId;
+                    }
 
-            }else  if(tempBuffer.vid !="" && tempBuffer.vid != undefined ){
-                keyParam = tempBuffer.driverName.toLowerCase().replace(/[\s+]/g, '');
-                if(tempBuffer.label == "_team"){
-                    args = "filterType="+type+"&userType=team&userToken="+tempBuffer.id+"&secondDriverId="+tempBuffer.team_driver_id;
+                }else  if(tempBuffer.vid !="" && tempBuffer.vid != undefined ){
+                    keyParam = tempBuffer.driverName.toLowerCase().replace(/[\s+]/g, '');
+                    if(tempBuffer.label == "_team"){
+                        args = "filterType="+type+"&userType=team&userToken="+tempBuffer.id+"&secondDriverId="+tempBuffer.team_driver_id+"&dispId="+tempBuffer.dispId;
+                    }else{
+                        args = "filterType="+type+"&userType=driver&userToken="+tempBuffer.id+"&dispId="+tempBuffer.dispId;
+                    }
                 }else{
-                    args = "filterType="+type+"&userType=driver&userToken="+tempBuffer.id;
+                    args = "filterType="+type+"&userType=all";keyParam = "all";
                 }
-            }else{
-                args = "filterType="+type+"&userType=all";keyParam = "all";
-            }
 
-            if(keyParam != ""){
+
+            if(keyParam != "" && extra == ""){
                 args += "&startDate="+$scope.dateRangeSelector.startDate+"&endDate="+$scope.dateRangeSelector.endDate;
-               $state.go(page, { 'key': keyParam, q:args, type:true }, { reload: true } );
+            }else{
+                args += "&fromDate="+extra.date ;
+                keyParam = "drivers";
             }
+            $state.go(page, { 'key': keyParam, q:args, type:true }, { reload: true } );
         }
     }
-
+}
 
     //------------------------- Stacked Bar Chart -------------------
     
@@ -180,19 +189,25 @@ app.controller('AdminController', function($scope,$interval, $document, $http,$r
             }
         },
         plotOptions: {
-          series: {
-             stacking: 'normal',
-             cursor: 'pointer',
+            series: {
+                stacking: 'normal',
+                cursor: 'pointer',
+                events: {
+                    click: function (event) {
+                       $scope.showRecordsWithFilter('broker', event.point.brokerId,'', event.point.driverId, event.point.dispatcherId, event.point.second_driver_id);
+                    }
+                }
            }
         },
         series: $scope.chartSeries,
-            title: { text: '' },
-            exporting: { enabled: false },
-            tooltip: {
-                headerFormat: '<b>{point.x}</b><br/>',
-                pointFormat: '<b>{point.y}</b>',
+        title: { text: '' },
+        exporting: { enabled: false },
+        tooltip: {
+            headerFormat: '{point.x}',
+            pointFormat: '<b>{point.y}</b>',
             valueDecimals: 2,
             valuePrefix: '$',
+            style: {fontSize: '17px'},
         },
     }
 
@@ -200,9 +215,7 @@ app.controller('AdminController', function($scope,$interval, $document, $http,$r
     * Top five customers records
     */
     function topFiveCustomer(){
-
         var tempBuffer = $cookies.getObject('_globalDropdown');
-       
         if ( tempBuffer != undefined ) {
             if ( tempBuffer.label == '' || tempBuffer.label == 'all' || tempBuffer.label == '_iall' )  
                 data = {'startDate':$scope.dateRangeSelector.startDate, 'endDate':$scope.dateRangeSelector.endDate};
@@ -223,8 +236,9 @@ app.controller('AdminController', function($scope,$interval, $document, $http,$r
 
             $scope.comp_name = [];
             $scope.barColors = data.colors;
-            $scope.topCustomersConfig.xAxis = {categories : data.cmpName };
-            $scope.comp_name = data.cmpName;   
+            $scope.topCustomersConfig.xAxis = {categories : data.xAxis };
+            $scope.comp_name = data.cName;   
+            $scope.valueIds = data.valueIds;  
             $scope.topCustomersConfig.series   = [
                 {"name": "TopCustomers",  "data" : data.paymentAmount, type: "column", id: 's55'}
             ];
@@ -241,10 +255,8 @@ app.controller('AdminController', function($scope,$interval, $document, $http,$r
         },
         title: {
                 text: ''
-            },
+        },
         exporting: { enabled: false },
-        
-        
         tooltip: {
             shared: true,
         },
@@ -254,9 +266,17 @@ app.controller('AdminController', function($scope,$interval, $document, $http,$r
         plotOptions: {
             areaspline: {
                 fillOpacity: 0.5
+            },
+            series: {
+                cursor:"pointer",
+                events: {
+                    click: function (event) {
+                        console.log(event.point.y + " - " + event.point.date);
+                        $scope.showRecordsWithFilter(event.point.type,"loads", "driver", "", "", "", event.point);
+                    }
+                }
             }
         },
-         series: $scope.activeVsIdleDrivers
     }
 
     //------- Dashboar drag drop options----------------
@@ -450,14 +470,17 @@ app.controller('AdminController', function($scope,$interval, $document, $http,$r
     $scope.selDrivers = []; //Dashboard drivers multiview && aggregated
     $scope.driverName = false;
     dataFactory.httpRequest(URL+'/dashboard/fetchWidgetsOrder').then(function(data){
-      if(data.widgetsOrder.length == 0 ) {
+        
+    if(data.widgetsOrder.length == 0 ) {
          $scope.tSortableWidgetsLeft  = '1,2,3,4,5';
-         $scope.tSortableWidgetsRight = '6,7,8,9,10';   
+         $scope.tSortableWidgetsRight = '6,7,8,9,10';
      } else {
          $scope.tSortableWidgetsLeft  = data.widgetsOrder.left;
          $scope.tSortableWidgetsRight = data.widgetsOrder.right;
      }
-     $scope.user_role = data.user_role;
+
+     $scope.visibility  = data.widgetVisibility;
+     $scope.user_role   = data.user_role;
 
      var orderArray = $scope.tSortableWidgetsLeft.split(',');
 
@@ -555,9 +578,9 @@ app.controller('AdminController', function($scope,$interval, $document, $http,$r
 
         dataFactory.httpRequest(URL+'/dashboard/index/'+ofDriver,'POST',{},$rootScope.ofFilter).then(function(data){
             $('a[href="#todayPickup"]').tab('show');
-             $scope.printloadchart = data.loadsChart;
-            $scope.uInitial     = data.selectedDriver.avtarText;
-            $scope.color          = data.selectedDriver.color;
+             $scope.printloadchart  = data.loadsChart;
+            $scope.uInitial         = data.selectedDriver.avtarText;
+            $scope.color            = data.selectedDriver.color;
 
             $rootScope.latitude = data.latitude;
             $rootScope.longitude = data.longitude;

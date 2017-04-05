@@ -83,16 +83,27 @@ $rootScope.logoutmessage=false;
 
     $scope.selectPortlet = function($event,widgetID) {
     	visibility = 1;display ='block';
-		if(angular.element($event.currentTarget).children('img').is(':visible')){
-			visibility = 0;display ='none';
-		}		
-		angular.element($event.currentTarget).children('img').css('display',display);
-		
-		// console.log($state.current);
-		// console.log($state.current.url);
-		if($state.current == '/dashboard'){$state.reload();}else{$state.go('dashboard');}
-		$http.post(URL + '/dashboard/widgetVisibility',{'visibility':visibility,'widgetID':widgetID});
+		if(angular.element($event.currentTarget).children('div').is(':visible')){
+			visibility = 0;
+		}
 
+		if($state.current.url == '/dashboard'){
+			$state.reload();
+		}else{
+			$state.go('dashboard');
+		}
+
+		$http.post(URL + '/dashboard/widgetVisibility',{'visibility':visibility,'widgetID':widgetID}).then(function(data){
+    		$scope.visibility = data.data.visibility;
+    	});;
+    }
+
+    $scope.showHidePortlet = function() {
+    	if(!angular.element('#appMenu').hasClass('show')){
+    		$http.get(URL + '/dashboard/getPortletVisibility').then(function(data){
+    			$scope.visibility = data.data.visibility;
+    		});
+    	}
     }
 		
 	$scope.hideMe = function(){
@@ -1434,8 +1445,19 @@ $rootScope.logoutmessage=false;
 					$rootScope.selectedVehicleId 	= dataRes.vehicleDetail.assignedVehicleId; 			// for truckstop controller load
 					$rootScope.vehicleIdSelected 	= dataRes.vehicleDetail.assignedVehicleId; 			// for assigned loads controller and iterationsLoads controller
 
+					if(item.driverName.indexOf("+") !== -1){
+						var nameChunks = item.driverName.split('+');
+						nameChunks = nameChunks.filter(function(v){return v!==''});
+						console.log(nameChunks);
+						$rootScope.avatarText = nameChunks[0].trim().charAt(0) + nameChunks[1].trim().charAt(0)	
+					}else{
+						$rootScope.avatarText = dataRes.vehicleDetail.first_name.trim().charAt(0) + dataRes.vehicleDetail.last_name.trim().charAt(0);	
+					}
+					
+					
+					
 
-					$rootScope.avatarText = dataRes.vehicleDetail.first_name.trim().charAt(0) + dataRes.vehicleDetail.last_name.trim().charAt(0);
+
 					$rootScope.avatarBackground = dataRes.vehicleDetail.color;
 					if ( parameter == 'addRequest' ) {   // for adding new Load
 						$rootScope.setAddVehicleId = dataRes.vehicleDetail.assignedVehicleId;   
@@ -1519,7 +1541,7 @@ $rootScope.logoutmessage=false;
 	 */
 	  
 	$scope.showBrokerInfo = function( truckstopId,loadId ) {
-			
+
 		$rootScope.alertloadmsg = false;
 		$rootScope.alertExceedMsg = false;
 		$rootScope.editLoads = false;
@@ -1534,7 +1556,10 @@ $rootScope.logoutmessage=false;
 		
 		$rootScope.save_cancel_div = false;
 		$rootScope.save_edit_div = true;
-
+		$rootScope.showBrokerDropdown = true;	
+		if ( loadId == "" || loadId == undefined || loadId == null ) {
+			$rootScope.showBrokerDropdown = false;
+		}
 		if ( $rootScope.editSavedLoad.broker_id != '' && $rootScope.editSavedLoad.broker_id != undefined && $rootScope.editSavedLoad.broker_id != null ) {
 			dataFactory.httpRequest(URL+'/brokers/getBrokerDocumentUploaded/'+$rootScope.editSavedLoad.broker_id).then(function(data) {					// Fetching broker document uploaded information
 				//~ $rootScope.BrokerDocUploaded = data.BrokerDocUploaded;
@@ -1546,8 +1571,8 @@ $rootScope.logoutmessage=false;
 			});
 		}
 		
-		$scope.showBrokerDropdown = true;				// showing broker dropdown on editing new load
-		if ( $rootScope.editSavedLoad.load_source != undefined && $rootScope.editSavedLoad.load_source != '' && $rootScope.editSavedLoad.load_source == 'Vika Dispatch' ) {
+		
+		if ( loadId != "" && loadId != undefined && loadId != null ) {
 			dataFactory.httpRequest(URL+'/assignedloads/getBrokersList/'+loadId).then(function(data) {					// Fetching brokers info to show in dropdown
 				$scope.brokersList = data.brokersList;
 				if ( data.brokerLoadDetail.length != 0 ) {
@@ -3000,7 +3025,7 @@ $rootScope.logoutmessage=false;
 				}
 			}
 		
-			//$scope.autoFetchLoads = true;
+			$scope.autoFetchLoads = true;
 			
 			if ( saveParameter == 'addRequest' ) {
 				$rootScope.primaryLoadId = 0;
@@ -3016,6 +3041,7 @@ $rootScope.logoutmessage=false;
 			
 			$rootScope.editedItem = {};
 			dataFactory.httpRequest(URL+'/truckstop/edit_live/'+$rootScope.primaryLoadId+'/'+saveType,'POST',{},{jobRecords: $rootScope.editSavedLoad, jobPrimary: $rootScope.primaryLoadId, jobDistance: $rootScope.editSavedDist, vehicleId : $rootScope.vehicleIdRepeat, extraStops : $rootScope.extraStops, timeStorage : $rootScope.tempstorage,  loadSource : $scope.loadSource,driverAssignType : $rootScope.driverAssignType, vehicleDriverFlag : $rootScope.setVehicleIdFlag, srcPage: srcPage}).then(function(data){
+				$scope.autoFetchLoads = false;
 				PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
 				
 				$rootScope.alertloadmsg = false;
@@ -3060,7 +3086,6 @@ $rootScope.logoutmessage=false;
 					} else if ( saveType != undefined && saveType == 'billingLoads' ) {
 						angular.copy(data.savedData, $rootScope.billingLoads[$rootScope.globalListingIndex]);
 					} else if ( saveType != undefined && saveType == 'assignedLoads' ) {
-						
 						if ( data.checkVehicleDriverFlag != undefined && data.checkVehicleDriverFlag == 0 ) {
 							$rootScope.assignedLoads.splice($rootScope.globalListingIndex,1);
 						} else {
@@ -3112,7 +3137,7 @@ $rootScope.logoutmessage=false;
 					}
 				}
 				
-				$scope.autoFetchLoads = false;		
+					
 							
 			});
 			$rootScope.firstTimeClick = true;
@@ -4194,6 +4219,22 @@ $rootScope.logoutmessage=false;
 		}
 	}
 	
+
+	/**
+	* check if unique fields are not duplicated in driver and vehicles
+	*/
+	$rootScope.uniqueFieldsValue = true;
+	$rootScope.checkUniqueFields = function( fieldValue, fieldName, table, fieldId ) {
+		if( fieldName != '' ) {
+			dataFactory.httpRequest(URL + '/drivers/checkLicenceNumber/'+fieldId,'POST',{}, { value : fieldValue, name : fieldName, tblName : table}).then(function(data) {
+				if ( data.response == false ){
+					$rootScope.uniqueFieldsValue = false;
+				} else {
+					$rootScope.uniqueFieldsValue = true;
+				}
+			});
+		}
+	}
 	/**
 	 * Hiding job ticket popup on outer click or cross click
 	 */

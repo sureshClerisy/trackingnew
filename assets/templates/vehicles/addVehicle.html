@@ -115,10 +115,12 @@
 											</div>
 										</div>
 										<div class="col-sm-6">
-											<div pg-form-group class="form-group form-group-default ">
+											<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':addtruckDataform.vin.$invalid && !addtruckDataform.vin.$pristine || addtruckDataform.$submitted && addtruckDataform.vin.$invalid, 'has-error-new': uniqueFieldsValue == false}">
 												<label>{{ languageArray.truckNumbetTableThvin }}</label>
-												<input type="text" class="form-control" name="vin" ng-model="addTruckData.vin" >
+												<input type="text" class="form-control" name="vin" ng-model="addTruckData.vin" required ng-blur="checkUniqueFields(addTruckData.vin,'vin','vehicles')">
 											</div>
+											<label class="error" ng-show="addtruckDataform.vin.$invalid && !addtruckDataform.vin.$pristine || addtruckDataform.$submitted && addtruckDataform.vin.$invalid">Please enter vehicle vin number.</label>
+											<label class="error" ng-if="uniqueFieldsValue == false">This vin number is already alloted to another truck.</label>
 										</div>
 									</div>
 									<!--row-end-->

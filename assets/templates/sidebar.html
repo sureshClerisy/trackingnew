@@ -1,66 +1,67 @@
 <!-- BEGIN SIDEBPANEL-->
 <nav class="page-sidebar" data-pages="sidebar" pg-sidebar>
 <!-- BEGIN SIDEBAR MENU TOP TRAY CONTENT-->
-  <div class="sidebar-overlay-slide from-top" id="appMenu">
+  <div class="sidebar-overlay-slide from-top port-box" id="appMenu">
     <div class="row">
-      <div class="col-xs-5 portrait-box" ng-click= "selectPortlet($event,'1')" style="background: #077ED0">
-        <h3>SAFETY</h3>
-        <img src="assets/images/check.png" alt = "Best Safety">
-        <p>Best Safety</p>
+      
+      <div class="col-xs-5 portrait-box vis-{{visibility[1]}} lb" ng-class = "visibility[1] ==1 ? 'show-tick' : ''" ng-click= "selectPortlet($event,'1')">
+        <h3>Best</h3>
+        <div class="safety-div" ng-show = "visibility[1] ==1"></div>
+        <p>Safety</p>
     </div>
-    <div class="col-xs-5 portrait-box" ng-click= "selectPortlet($event,'6')" style="background: #4DEFE0">
-        <h3>CUSTOMER</h3>
-        <p>Top 5 Customers</p>
-        <img src="assets/images/check.png" alt = "Top 5 Customers">
-    </div>
-</div>
-<div class="row">
-    <div class="col-xs-5 portrait-box" ng-click= "selectPortlet($event,'9')" style="background: #F0F0F0">
-        <h3>LOAD</h3>
-        <p>Load Status</p>
-        <img src="assets/images/check.png" alt = "Load Status">
-    </div>
-    <div class="col-xs-5 portrait-box" ng-click= "selectPortlet($event,'8')" style="background: #077ED0">
-        <h3>WHEATHER</h3>
-        <p>Wheather Info</p>
-        <img src="assets/images/check.png" alt = "Wheather Info">
+    <div class="col-xs-5 portrait-box vis-{{visibility[6]}} rb" ng-class = "visibility[6] ==1 ? 'show-tick' : ''" ng-click= "selectPortlet($event,'6')">
+        <h3>Top 5 </h3>
+        <div class="safety-div" ng-show = "visibility[6] ==1"></div>
+        <p>Customers</p>
     </div>
 </div>
 <div class="row">
-    <div class="col-xs-5 portrait-box" ng-click= "selectPortlet($event,'7')" style="background: #F0F0F0">
-        <h3>LEADER</h3>
-        <p>Leader Board</p>
-        <img src="assets/images/check.png" alt = "Leader Board">
+    <div class="col-xs-5 portrait-box vis-{{visibility[9]}} pl" ng-class = "visibility[9] ==1 ? 'show-tick' : ''" ng-click= "selectPortlet($event,'9')">
+        <h3>Load</h3>
+        <div class="safety-div" ng-show = "visibility[9] ==1"></div>
+        <p>Status</p>
     </div>
-    <div class="col-xs-5 portrait-box" ng-click= "selectPortlet($event,'4')" style="background: #077ED0">
-        <h3>LOCATION</h3>
-        <p>Truck Location</p>
-        <img src="assets/images/check.png" alt = "Truck Location">
+    <div class="col-xs-5 portrait-box vis-{{visibility[8]}} rb" ng-class = "visibility[8] ==1 ? 'show-tick' : ''" ng-click= "selectPortlet($event,'8')">
+        <h3>Info</h3>
+        <div class="safety-div" ng-show = "visibility[8] ==1"></div>
+        <p>Wheather</p>
     </div>
 </div>
 <div class="row">
-    <div class="col-xs-5 portrait-box" ng-click= "selectPortlet($event,'3')" style="background: #077ED0">
-        <h3>MESSAGE</h3>
-        <p>Driver Message</p>
-        <img src="assets/images/check.png" alt = "Driver Message">
+    <div class="col-xs-5 portrait-box vis-{{visibility[7]}} lb" ng-class = "visibility[7] ==1 ? 'show-tick' : ''" ng-click= "selectPortlet($event,'7')">
+        <h3>Leader</h3>
+        <div class="safety-div" ng-show = "visibility[7] ==1"></div>
+        <p>Board</p>
     </div>
-    <div class="col-xs-5 portrait-box" ng-click= "selectPortlet($event,'5')" style="background: #F0F0F0">
-        <h3>NEWS</h3>
-        <p>News Feeds</p>
-        <img src="assets/images/check.png" alt = "News Feeds">
+    <div class="col-xs-5 portrait-box vis-{{visibility[4]}} lb" ng-class = "visibility[4] ==1 ? 'show-tick' : ''" ng-click= "selectPortlet($event,'4')">
+        <h3>Truck</h3>
+        <div class="safety-div" ng-show = "visibility[4] ==1"></div>
+        <p>Location</p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-5 portrait-box vis-{{visibility[3]}} db" ng-class = "visibility[3] ==1 ? 'show-tick' : ''" ng-click= "selectPortlet($event,'3')">
+        <h3>Driver</h3>
+        <div class="safety-div" ng-show = "visibility[3] ==1"></div>
+        <p>Message</p>
+    </div>
+    <div class="col-xs-5 portrait-box vis-{{visibility[5]}} rb" ng-class = "visibility[5] ==1 ? 'show-tick' : ''" ng-click= "selectPortlet($event,'5')">
+        <h3>News</h3>
+        <div class="safety-div" ng-show = "visibility[5] ==1"></div>
+        <p>Feeds</p>
     </div>
 </div>
 
 <div class="row">
-    <div class="col-xs-5 portrait-box" ng-click= "selectPortlet($event,'2')" style="background: #F0F0F0">
-        <h3>CAPACITY</h3>
-        <p>Capacity Analysis</p>
-        <img src="assets/images/check.png" alt = "Driver Message">
+    <div class="col-xs-5 portrait-box vis-{{visibility[2]}} gb" ng-class = "visibility[2] ==1 ? 'show-tick' : ''" ng-click= "selectPortlet($event,'2')">
+        <h3>Capacity</h3>
+        <div class="safety-div" ng-show = "visibility[2] ==1"></div>
+        <p>Analysis</p>
     </div>
-    <div class="col-xs-5 portrait-box" ng-click= "selectPortlet($event,10)" style="background: #077ED0">
-        <h3>INSIGHTES</h3>
-        <p>Today Insights</p>
-        <img src="assets/images/check.png" alt = "Driver Message">
+    <div class="col-xs-5 portrait-box vis-{{visibility[10]}} db" ng-class = "visibility[10] ==1 ? 'show-tick' : ''" ng-click= "selectPortlet($event,10)">
+        <h3>Today</h3>
+        <div class="safety-div" ng-show = "visibility[10] ==1"></div>
+        <p>Insights</p>
     </div>
 </div>
 </div>
@@ -70,7 +71,8 @@
     <!--img src="assets/img/logo_white.png" alt="logo" class="brand" data-src="assets/img/logo_white.png" data-src-retina="assets/img/logo_white_2x.png" class="logo-main-block"-->
     <img src="assets/img/vikalogo2.png" alt="logo" class="brand" data-src="assets/img/vikalogo2.png" data-src-retina="assets/img/logo_white_2x.png" class="logo-main-block">
     <div class="sidebar-header-controls">
-      <button type="button" class="btn btn-xs sidebar-slide-toggle btn-link m-l-20" data-pages-toggle="#appMenu">
+      <!-- <button type="button" class="btn btn-xs sidebar-slide-toggle btn-link m-l-20" data-pages-toggle="#appMenu"> -->
+      <button type="button" class="btn btn-xs sidebar-slide-toggle btn-link m-l-20" data-pages-toggle="#appMenu" ng-click = "showHidePortlet()" title="Portlet">
         <i class="fa fa-angle-down fs-16"></i>
     </button>
           <!-- <button type="button" class="btn btn-link visible-lg-inline" data-toggle-pin="sidebar">
