@@ -115,7 +115,7 @@ $rootScope.logoutmessage=false;
 	$rootScope.setInitialCommonLang($cookies.get('setLanguageGlobalVariable'),'common');
 
 	$rootScope.loginCheck = function( currentState ) {
-		angular.element("body").css("overflow","auto");
+		angular.element("body").removeAttr("style");
 		//~ if ( $cookies.get('userIsLoggedIn') == 1 ) {
 		dataFactory.httpRequest(URL + '/login/checkLogin').then(function(data) {
 			if ( data.success == true ) {

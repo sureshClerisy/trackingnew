@@ -818,7 +818,7 @@ class Dashboard extends CI_Controller {
 					// $rparam['endDate']		= '2017-04-30';
 					$getDrivers = $this->Report->getDispatcherDriverDashboard($rparam);
 					$currentDrivers = $this->Report->getTotalTeamDrivers($rparam['dispId'], $rparam['startDate'], $rparam['endDate'] );
-
+					$driverLastLog  = $this->Report->getDispatcherLastLog($rparam['dispId'], $rparam['startDate']);
 					$val = array();
 					$arrSingle = array();
 					$arrTeam = array();
@@ -903,7 +903,14 @@ class Dashboard extends CI_Controller {
 								}
 								
 								if ( !empty($teamArray) && in_array($driver['driverId'],$teamArray['driversId']) && in_array($driver['second_driver_id'],$teamArray['teamsId'])) {
-									$startDate = new DateTime($rparam['startDate']);
+
+									if ( !empty($driverLastLog) && count($driverLastLog) > 0 ) {
+										$startDate = new DateTime($rparam['startDate']);
+									} else {	
+										$startDate 			= new DateTime($driversList[0]['createdDate']);
+									}
+
+									
 									if ( $driversList[$j]['createdDate'] < $rparam['startDate'] ) {		// check if start date is greater than logged date
 										$endDate   = new DateTime($rparam['endDate']);
 										$lastDate  = $rparam['endDate'];
@@ -927,7 +934,21 @@ class Dashboard extends CI_Controller {
 							} else {
 								$checkSingleArray = explode(',',$driversList[$j]['assigned_drivers']);
 								if ( in_array($driver['driverId'],$checkSingleArray)) {
-									$startDate = new DateTime($rparam['startDate']);
+
+									if ( !empty($driverLastLog) && count($driverLastLog) > 0 ) {
+										$startDate = new DateTime($rparam['startDate']);
+									} else {	
+										$checkSingleArraynew = array();
+										for( $n = 0; $n < count($driversList); $n++ ) {
+											$checkSingleArraynew = explode(',',$driversList[$n]['assigned_drivers']);
+											if ( in_array($driver['driverId'],$checkSingleArraynew)) {
+												$newSDate = $driversList[$n]['createdDate'];
+												break;
+											}
+										}
+										$startDate 	= new DateTime($newSDate);
+									}
+
 									if ( $driversList[$j]['createdDate'] < $rparam['startDate'] ) {			// check if start date is greater than logged date
 										$endDate   = new DateTime($rparam['endDate']);
 										$lastDate  = $rparam['endDate'];

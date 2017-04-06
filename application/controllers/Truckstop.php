@@ -2003,7 +2003,7 @@ class Truckstop extends Admin_Controller{
 					$brokerInfo = $this->BrokersModel->getBrokerInfo($_REQUEST['brokerId']);
 					$this->BrokersModel->uploadBrokerDocument($response['data']['file_name'], $_REQUEST['brokerId']);
 					$this->fetchBrokerDocuments($_REQUEST['brokerId']);
-					$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> uploaded a new document ( '.$response['data']['file_name'].' ) for broker <a class="notify-link" href="'.$this->serverAddr.'#/editbroker/'.$brokerInfo["id"].'">'.ucfirst($brokerInfo["TruckCompanyName"]).'</a> from ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$_REQUEST['loadId'].',\'\',\'\',\'\',\'\',0,\'\')">#'.$_REQUEST['loadId'].'</a>';
+					$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> uploaded a new document ('.$response['data']['file_name'].') for broker <a class="notify-link" href="'.$this->serverAddr.'#/editbroker/'.$brokerInfo["id"].'">'.ucfirst($brokerInfo["TruckCompanyName"]).'</a> from ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$_REQUEST['loadId'].',\'\',\'\',\'\',\'\',0,\'\')">#'.$_REQUEST['loadId'].'</a>';
 					logActivityEvent($brokerInfo['id'], $this->entity["broker"], $this->event["upload_doc"], $message, $this->Job, $_REQUEST['srcPage']);
 				}catch(Exception $e){
 					log_message('error','UPLOAD_BROKER_DOC_FROM_TICKET'.$e->getMessage());
@@ -2031,14 +2031,14 @@ class Truckstop extends Admin_Controller{
 		try{
 			if($docPrimaryId){
 				$docInfo = $this->Job->getDocDetail($docPrimaryId);
-				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> deleted/overwrote the '.$metaKey.' ( '.$docInfo["doc_name"].' ) from ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$loadId.',\'\',\'\',\'\',\'\',0,\'\')">#'.$loadId.'</a>';
+				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> deleted/overwrote the '.$metaKey.' ('.$docInfo["doc_name"].') from ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$loadId.',\'\',\'\',\'\',\'\',0,\'\')">#'.$loadId.'</a>';
 				logActivityEvent($loadId, $this->entity["ticket"], $this->event["overwrite_doc"], $message, $this->Job, $srcPage);
 			}
 
 			$this->Job->insertDocumentEntry($fileName, $loadId, $parameter, $docPrimaryId);	
 			
 			
-			$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> uploaded a new '.$metaKey.' ( '.$fileName.' ) for ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$loadId.',\'\',\'\',\'\',\'\',0,\'\')">#'.$loadId.'</a>';
+			$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> uploaded a new '.$metaKey.' ('.$fileName.') for ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$loadId.',\'\',\'\',\'\',\'\',0,\'\')">#'.$loadId.'</a>';
 			logActivityEvent($loadId, $this->entity["ticket"], $this->event["upload_doc"], $message, $this->Job, $srcPage);
 			$this->fetchDocuments($loadId);
 		}catch(Exception $e){
@@ -2290,7 +2290,7 @@ class Truckstop extends Admin_Controller{
 					unlink($bundleFile);
 				$docInfo = $this->Job->getDocDetail($bundleDocArray['id']);
 				$this->Job->deleteDocument($bundleDocArray['id']);
-				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> deleted the bundle document ( '.$docInfo["doc_name"].' ) from ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$_POST['loadId'].',\'\',\'\',\'\',\'\',0,\'\')">#'.$_POST['loadId'].'</a>';
+				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> deleted the bundle document ('.$docInfo["doc_name"].') from ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$_POST['loadId'].',\'\',\'\',\'\',\'\',0,\'\')">#'.$_POST['loadId'].'</a>';
 				logActivityEvent($_POST['loadId'], $this->entity["ticket"], $this->event["remove_doc"], $message, $this->Job,$_POST["srcPage"]);
 			}
 		}
@@ -2303,7 +2303,7 @@ class Truckstop extends Admin_Controller{
 				$this->BrokersModel->removeContractDocs($_POST['docId']);
 				$this->fetchBrokerDocuments($brokerId);
 
-				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> deleted a document ( '.$brokerInfo["document_name"].' ) of broker <a class="notify-link" href="'.$this->serverAddr.'#/editbroker/'.$brokerInfo["id"].'"> '.$brokerInfo["TruckCompanyName"].'</a>  from ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$_POST['bloadId'].',\'\',\'\',\'\',\'\',0,\'\')">#'.$_POST['bloadId'].'</a>';
+				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> deleted a document ('.$brokerInfo["document_name"].') of broker <a class="notify-link" href="'.$this->serverAddr.'#/editbroker/'.$brokerInfo["id"].'"> '.$brokerInfo["TruckCompanyName"].'</a>  from ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$_POST['bloadId'].',\'\',\'\',\'\',\'\',0,\'\')">#'.$_POST['bloadId'].'</a>';
 				logActivityEvent($brokerInfo['id'], $this->entity["broker"], $this->event["remove_doc"], $message, $this->Job);	
 			}catch(Exception $e){
 				log_message('error','DELETE_BROKER_DOCS_TICKET'.$e->getMessage());
@@ -2321,7 +2321,7 @@ class Truckstop extends Admin_Controller{
 				$docInfo = $this->Job->getDocDetail($_POST['docId']);
 				$this->Job->deleteDocument($_POST['docId'], $_POST['loadId'], $_POST['doc_type']);
 				
-				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> deleted the '.$metaKey.' ( '.$docInfo["doc_name"].' ) from ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$_POST['loadId'].',\'\',\'\',\'\',\'\',0,\'\')">#'.$_POST['loadId'].'</a>';
+				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> deleted the '.$metaKey.' ('.$docInfo["doc_name"].') from ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$_POST['loadId'].',\'\',\'\',\'\',\'\',0,\'\')">#'.$_POST['loadId'].'</a>';
 				logActivityEvent($_POST['loadId'], $this->entity["ticket"], $this->event["remove_doc"], $message, $this->Job,$_POST["srcPage"]);
 				$this->fetchDocuments(false, array(), $_POST['doc_type']);
 			}catch(Exception $e){

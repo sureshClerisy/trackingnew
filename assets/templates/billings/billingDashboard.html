@@ -1,0 +1,76 @@
+
+<div class="page-content-wrapper ">
+	<!-- START PAGE CONTENT -->
+	<div class="content sm-gutter">
+		<!-- START CONTAINER FLUID -->
+		<div class="container-fluid padding-25 sm-padding-10 sm-gutter bill-dash">
+		    <div class="row">
+		        <div class="col-md-12 col-xlg-12">
+		            <div class="row">
+		             	<div class="col-md-4 col-xlg-4">
+		             		<div class="ar-1-1">
+		                        <div class="panel no-border bg-master widget widget-6 widget-loader-circle-lg no-margin" pg-portlet progress="circle-lg" overlay-color='0,0,0' overlay-opacity="0.6" on-refresh="refreshTest('.widget-6','sent_today')">
+		                            <div class="panel-heading">
+		                                <div class="panel-controls">
+		                                    <ul>
+		                                        <li><a data-toggle="refresh" class="portlet-refresh" href=""><i class="portlet-icon portlet-icon-refresh-lg-white"></i></a>
+		                                        </li>
+		                                    </ul>
+		                                </div>
+		                            </div>
+		                            <div class="panel-body">
+		                                <div class=" bottom-left bottom-right padding-25">
+		                                    <h1 class="font-montserrat fs-11 all-caps 	text-white semi-bold">Sent Today</h1>
+		                                    <h3 class="no-margin p-b-5 text-white">{{billDash.sentTodayCount | currency:"$":2}}</h3>
+		                                </div>
+		                            </div>
+		                        </div>
+		                    </div>
+		             	</div>
+		             	<div class="col-md-4 col-xlg-4">
+		             		<div class="ar-2-3">
+				                <!-- START WIDGET -->
+				                <div class="widget-11 panel no-border  no-margin widget-loader-bar" pg-portlet progress="bar" on-refresh="refreshTest('.widget-11','expected_billing')">
+				                    <div class="panel-heading ">
+				                        <div class="panel-title">Expected Billing
+				                        </div>
+				                        <div class="panel-controls">
+				                            <ul>
+				                                <li><a data-toggle="refresh" class="portlet-refresh text-black" href=""><i class="portlet-icon portlet-icon-refresh"></i></a>
+				                                </li>
+				                            </ul>
+				                        </div>
+				                    </div>
+				                    <div class="widget-11-table auto-overflow" >
+				                        <table class="table table-condensed table-hover" >
+				                        	<thead>
+				                        		<tr>
+				                        			<th>Billing</th>
+				                        			<th>Date</th>
+				                        		</tr>
+				                        		
+				                        	</thead>
+				                            <tbody>
+				                                <tr ng-repeat="record in billDash.expectedBilling">
+					                                <td>
+				                                        <span class="font-montserrat fs-18">{{record.billing | currency:"$":2}}</span>
+				                                    </td>
+				                                    <td class="font-montserrat all-caps fs-12">{{record.date}}</td>
+				                                </tr>
+				                            </tbody>
+				                        </table>
+				                    </div>
+				                </div>
+				                <!-- END WIDGET -->
+				            </div>
+		             	</div>
+		             	<div class="col-md-4 col-xlg-4">dddd
+		             	</div>
+
+		            </div>
+		        </div>
+		    </div>
+		</div>
+		<!-- END CONTAINER FLUID -->
+	</div>
+</div>

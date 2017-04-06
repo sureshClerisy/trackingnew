@@ -1,5 +1,5 @@
 
-app.controller('AdminController', function($scope,$interval, $document, $http,$rootScope, $localStorage,$sce,$location, $window, $cookies, $state, $stateParams,dataFactory){
+app.controller('AdminController', function($scope,$interval, $document,$timeout, $http,$rootScope, $localStorage,$sce,$location, $window, $cookies, $state, $stateParams,dataFactory){
     $scope.fuelType = [{ 'val' : 'Diesel','key' : 'diesel'},{ 'val' : 'Petrol','key' : 'petrol'},{ 'val' : 'Gas','key' : 'gas'}];
     $scope.pools = [];
         $scope.printloadchart = "";
@@ -118,8 +118,7 @@ app.controller('AdminController', function($scope,$interval, $document, $http,$r
                     args = "filterType="+type+"&userType=all";keyParam = "all";
                 }
 
-
-            if(keyParam != "" && extra == ""){
+            if(keyParam != "" && ( extra == "" || extra == undefined )){
                 args += "&startDate="+$scope.dateRangeSelector.startDate+"&endDate="+$scope.dateRangeSelector.endDate;
             }else{
                 args += "&fromDate="+extra.date ;
@@ -251,12 +250,15 @@ app.controller('AdminController', function($scope,$interval, $document, $http,$r
 
     $scope.configActiveVsIdle = {
         chart: {
-            type: 'areaspline'
+            type: 'areaspline',
+
         },
+
         title: {
                 text: ''
         },
         exporting: { enabled: false },
+
         tooltip: {
             shared: true,
         },
@@ -718,20 +720,22 @@ $scope.toggleIcon = function($event,type){
     $scope.otherIcon = !$scope.otherIcon;  
     angular.element($event.currentTarget).closest(".wpanel").removeAttr('style');
     if( angular.element($event.currentTarget).closest(".wpanel").hasClass("panel-maximized")){ //code when minimized
-        angular.element("body").css("overflow","auto");
+        //angular.element("body").css("overflow","auto");
+        angular.element("body").removeAttr("style");
         if(type=="today-insights"){
             angular.element($event.currentTarget).closest(".wpanel").find(".table-scroll-custom.today-insights").removeAttr('style');
         }else if(type == "leaderboard"){
             angular.element($event.currentTarget).closest(".wpanel").find(".table-scroll-custom.max-leaderboard").removeAttr('style');
         }
-    }else{  //code when maximized
-        angular.element("body").css("overflow","hidden");
+    }else{  //code when maximized 
+        if(!angular.element($event.currentTarget).closest(".wpanel").hasClass("ui-sortable-helper")){
+            angular.element("body").css("overflow","hidden");
+        }
         if(type=="today-insights"){
             var setHeight = $window.innerHeight - 180;
             angular.element($event.currentTarget).closest(".wpanel").find(".scroll-wrapper.table-scroll-custom.today-insights.table-mainass.sroll-vertical").css("max-height",setHeight);
         }else if(type == "leaderboard"){
             var setHeight = $window.innerHeight - 550;
-            console.log(setHeight);
             angular.element($event.currentTarget).closest(".wpanel").find(".scroll-wrapper.table-scroll-custom.max-leaderboard.today-insights.sroll-vertical").css("max-height",setHeight);
         }
     }

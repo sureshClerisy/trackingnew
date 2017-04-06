@@ -128,7 +128,6 @@ class Billings extends Admin_Controller{
 			$saveIds = array();
 			$resultReturnedArray = $this->createMultipleInputs($objPost['selectedIds']);
 
-			pr($resultReturnedArray);
 			$resultReturnedIds = $resultReturnedArray[0];
 			$this->triumphToken = $resultReturnedArray[1];
 			
@@ -170,7 +169,6 @@ class Billings extends Admin_Controller{
 				$inputIdsForFinal[$i] = $genDocs[$i]['inputId'];
 				$saveIds[$i] = "'".$genDocs[$i]['inputId']."+".$objPost['selectedIds'][$i];
 
-				pr($genDocs);
 				$this->Billing->updatePaymentSent( $objPost['selectedIds'][$i] );
 			}
 		
@@ -348,7 +346,6 @@ class Billings extends Admin_Controller{
 
 		$url = 'v1Submit/CreateInputsFromArray';
 		$result = $this->commonTriumphCurlRequest( $url, $postData, $this->triumphToken);
-		pr($result); 
 		
 		if ( $result['Error'] == 1 && ( strpos($result['ErrorMessage'], 'No cookie named SessionToken was passed with the request or it was not in a valid format.') !== false) ) {
 			$token = $this->get_sessionToken();

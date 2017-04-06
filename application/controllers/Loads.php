@@ -74,7 +74,8 @@ class Loads extends Admin_Controller{
 
 				break;
 				case 'team': 
-				case 'driver': 
+				case 'driver':
+
 							$driverInfo = $this->Driver->getInfoByDriverId($_REQUEST["userToken"]);
 							if(isset($driverInfo[0])){ $driverInfo = $driverInfo[0]; }
 							$gVehicleId = isset($driverInfo["vehicleId"])  ? $driverInfo["vehicleId"] : '';
@@ -102,6 +103,7 @@ class Loads extends Admin_Controller{
 								$jobs = $this->getSingleVehicleLoads($tempUserId, $vehicleIdRepeat, "driver", $dispatcherId, $_REQUEST["userToken"], $secondDriverId,$startDate,$endDate,$filterArgs);	
 								$this->data["total"] = $this->Job->fetchSavedJobsTotal($this->userId,$vehicleIdRepeat,"driver",$dispatcherId,$_REQUEST["userToken"],$secondDriverId, $startDate,$endDate, $filterArgs); 
 							}
+				break;
 				case 'broker':
 					$filterArgs['dispatcherId']   = $_REQUEST['dispatcherId'];
 					$filterArgs['driverId']       = $_REQUEST['driverId'];
@@ -120,10 +122,18 @@ class Loads extends Admin_Controller{
 				$filters["sortColumn"] ="DeliveryDate"; 
 				$filters["sortType"] ="DESC"; 
 				$filters["status"] =""; 
-				$jobs = $this->Job->getActiveDrivers($filters,$_REQUEST["userType"],  $_REQUEST["fromDate"]);
-				$this->data["total"] = $this->Job->getActiveDrivers($filters,$_REQUEST["userType"],  $_REQUEST["fromDate"],true);
+				if($filters["filterType"] == "idle"){
+					$idleList = $this->Job->getIdleDrivers($filters,$_REQUEST["userType"], "getIdleIds",  $_REQUEST["fromDate"]);
+					$jobs     = $this->Job->getIdleDriversList($filters,$_REQUEST["userType"],  $idleList, $_REQUEST["fromDate"]);
+					$this->data["total"] = $this->Job->getIdleDriversList($filters,$_REQUEST["userType"],  $idleList, $_REQUEST["fromDate"],true);	
+				}else if($filters["filterType"] == "active"){
+					$jobs = $this->Job->getActiveDrivers($filters,$_REQUEST["userType"],  $_REQUEST["fromDate"]);
+					$this->data["total"] = $this->Job->getActiveDrivers($filters,$_REQUEST["userType"],  $_REQUEST["fromDate"],true);
+				}	
+
 				$_REQUEST["requestFrom"] = 'capacity_analysis';
-				$this->data['table_title'] = "Active Drivers";
+				$this->data['table_title'] = ucfirst($filters["filterType"])." Drivers";
+				
 		}
 
 
@@ -150,8 +160,8 @@ class Loads extends Admin_Controller{
 			$params["limitStart"] = ($params["pageNo"] * $params["itemsPerPage"] );	
 		}
 
-		if((isset($params["sortColumn"]) && empty($params["sortColumn"])) || !isset($params["sortColumn"])){ $params["sortColumn"] = "PickupDate"; }
-		if((isset($params["sortType"]) && empty($params["sortType"])) || !isset($params["sortType"])){ $params["sortType"] = "ASC"; }
+		if((isset($params["sortColumn"]) && empty($params["sortColumn"])) || !isset($params["sortColumn"])){ $params["sortColumn"] = "DeliveryDate"; }
+		if((isset($params["sortType"]) && empty($params["sortType"])) || !isset($params["sortType"])){ $params["sortType"] = "DESC"; }
 		if(!isset($params["startDate"])){ $params["startDate"] = ''; }
 		if(!isset($params["endDate"])){ $params["endDate"] = ''; }
 
@@ -162,8 +172,15 @@ class Loads extends Admin_Controller{
 		}
 
 		if(isset($params["filterArgs"]["requestFrom"]) && $params["filterArgs"]["requestFrom"] == "capacity_analysis"){
-			$jobs = $this->Job->getActiveDrivers($params,$params["filterArgs"]["userType"],  $params["filterArgs"]["fromDate"]);
-			$total = $this->Job->getActiveDrivers($params,$params["filterArgs"]["userType"],  $params["filterArgs"]["fromDate"],true);
+			if($params["filterArgs"]["filterType"] == "idle"){
+				$idleList = $this->Job->getIdleDrivers($params,$params["filterArgs"]["userType"], "getIdleIds", $params["filterArgs"]["fromDate"]);
+				    $jobs = $this->Job->getIdleDriversList($params,$params["filterArgs"]["userType"],  $idleList, $params["filterArgs"]["fromDate"]);
+				   $total = $this->Job->getIdleDriversList($params, $params["filterArgs"]["userType"],  $idleList, $params["filterArgs"]["fromDate"], true);	
+			}else if($params["filterArgs"]["filterType"] == "active"){
+				$jobs = $this->Job->getActiveDrivers($params,$params["filterArgs"]["userType"],  $params["filterArgs"]["fromDate"]);
+				$total = $this->Job->getActiveDrivers($params,$params["filterArgs"]["userType"],  $params["filterArgs"]["fromDate"],true);
+			}	
+
 		} else if (isset($params["filterArgs"]["userType"]) && $params["filterArgs"]["userType"] == "dispatcher") {  //A Dispatcher's All drivers
 			$dispId = isset($params["filterArgs"]['userToken']) ? $params["filterArgs"]['userToken'] : false;
 			$jobs = $this->getSingleVehicleLoads($this->userId,array(),"dispatcher", $dispId,false,false,$params["startDate"],$params["endDate"],$params);

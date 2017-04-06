@@ -65,7 +65,7 @@ class Job extends Parent_Model {
 		}else if($reportType == "inprogress"){
 			$this->db->where('loads.JobStatus',"inprogress");	
 		}else if($reportType == "exceptIdle"){
-			//$date = "'" . implode("','", $date) . "'";
+			$this->db->where("d.status",1);
 			$this->db->where( "(( DATE(loads.PickupDate)  = '".$date."' AND loads.JobStatus = 'booked')  OR (DATE(loads.DeliveryDate) = '".$date."' and loads.JobStatus IN ('completed','inprogress', 'booked', 'delayed', 'delivered', 'invoiced') )
 				OR (
 				  	loads.pickupdate <= '".$date."' AND loads.DeliveryDate >= '".$date."' AND loads.JobStatus IN('completed','inprogress','booked','delayed','delivered','invoiced')
@@ -73,7 +73,7 @@ class Job extends Parent_Model {
 
 				)");	
 		}
-		//$this->db->order_by("CONCAT(u.first_name, ' ', u.last_name)");loads.DeliveryDate
+
 		$this->db->order_by("loads.DeliveryDate DESC");
 		$query = $this->db->get('loads');
 		//echo $this->db->last_query()."<br/> <br/>";
@@ -90,7 +90,9 @@ class Job extends Parent_Model {
 	public function getIdleDrivers($args = null, $type ='', $rtype = '', $date = ''){
 
 		if(empty($date)){ $date = date("Y-m-d"); }
-		if($rtype=="idle"){
+		if($rtype == "getIdleIds" ){
+			$this->db->select("group_concat(d.id) as total");
+		}if($rtype=="idle"){
 			$this->db->select("count(DISTINCT d.id) as total");
 		}else{
 			$this->db->select("d.id,  CONCAT( 'Truck - ', v.label) AS truckName, CONCAT(u.first_name, ' ' , u.last_name) as dispatcher, CASE v.driver_type 
@@ -120,8 +122,8 @@ class Job extends Parent_Model {
 							  	loads.pickupdate <= '".$date."' AND loads.DeliveryDate >= '".$date."' AND loads.JobStatus IN('completed','inprogress','booked','delayed','delivered','invoiced')
 							  )
 						)) 
-						   AND d.id NOT IN (SELECT DISTINCT vehicles.team_driver_id FROM vehicles where vehicles.driver_type = 'team')
-
+						AND d.id IN (SELECT DISTINCT  driver_id  FROM `vehicles` where driver_id != '0' and driver_id is not null and driver_id != '')	
+						AND d.id NOT IN (SELECT DISTINCT vehicles.team_driver_id FROM vehicles where vehicles.driver_type = 'team')
 						");
 	
 		
@@ -130,7 +132,7 @@ class Job extends Parent_Model {
 		$query = $this->db->get('drivers as d');
 
 		//echo $this->db->last_query()."<br/><br/>";
-		if($rtype=="idle"){
+		if($rtype=="idle" || $rtype == "getIdleIds"){
 			return $query->row_array()["total"];
 		}
 		if ($query->num_rows() > 0) {
@@ -179,6 +181,100 @@ class Job extends Parent_Model {
 		} else {
 			return false;
 		}
+	}
+
+	public function getIdleDriversList($filters = array(), $type, $idleList, $date = '',$total = false){
+		if($total){
+			$this->db->select('count(loads.id) as total'); 
+		}else{
+			$this->db->select('CONCAT( d.first_name ," + " ,team.first_name) AS teamdriverName, 
+	    					CASE loads.driver_type 
+	    						WHEN "team" THEN CONCAT(d.first_name," + ",team.first_name) 
+									ELSE concat(d.first_name," ",d.last_name) 
+									END AS driverName, loads.driver_type, loads.id, loads.invoiceNo, loads.vehicle_id, loads.truckstopID,loads.Bond,loads.PointOfContactPhone,loads.equipment_options,loads.LoadType,loads.PickupDate,loads.DeliveryDate,loads.OriginCity,loads.OriginState,loads.DestinationCity,loads.DestinationState,loads.PickupAddress,loads.DestinationAddress,loads.PaymentAmount,loads.Mileage, (loads.PaymentAmount/loads.Mileage) as rpm, loads.deadmiles,loads.Weight,loads.Length,loads.JobStatus,loads.totalCost,loads.pickDate,loads.load_source,b.TruckCompanyName as companyName
+								');	
+		}
+		$this->db->join("vehicles as v", "loads.vehicle_id = v.id","Left");
+		$this->db->join("drivers as d", "loads.driver_id = d.id","Left");
+		$this->db->join('users as u', 'loads.dispatcher_id = u.id','Left');
+		$this->db->join("broker_info as b", "loads.broker_id = b.id","Left");
+		$this->db->join('drivers as team','loads.second_driver_id = team.id','left');	
+
+		$this->db->where(" loads.driver_id IN ( ".$idleList." )");
+
+		if($type == "_idispatcher" || $type == "dispatcher"){
+			$this->db->where_in('loads.dispatcher_id',$filters["userToken"]);
+		}else if($type == "_idriver" || $type == "driver" ) {
+			$this->db->where_in('loads.dispatcher_id',$filters["dispId"]);
+			$this->db->where_in('loads.driver_id',$filters["userToken"]);
+		} else if( $type == "_iteam" || $type == "team"){
+			$this->db->where(array("loads.driver_id" => $filters["userToken"], 'loads.second_driver_id' => $filters['secondDriverId'],'loads.dispatcher_id' => $filters["dispId"]));
+		}
+
+		if($type == "team" || $type == "_team" || $type == "_iteam"){
+			$this->db->where('loads.driver_type = ',"team");
+		}
+
+
+		if(isset($filters["searchQuery"]) && !empty($filters["searchQuery"])){
+
+            $this->db->group_start();
+            $this->db->like('LOWER(CONCAT(TRIM(d.first_name)," ",TRIM(d.last_name)))', strtolower($filters['searchQuery']));
+            $this->db->or_like('loads.id', $filters['searchQuery'] );
+            $this->db->or_like('loads.invoiceNo', $filters['searchQuery'] );
+            $this->db->or_like('loads.PointOfContactPhone', $filters['searchQuery'] );
+            $this->db->or_like('LOWER(loads.equipment_options)', strtolower($filters['searchQuery']) );
+            $this->db->or_like('LOWER(loads.LoadType)', strtolower($filters['searchQuery']) );
+            $this->db->or_like('loads.PickupDate', $filters['searchQuery'] );
+            $this->db->or_like('loads.DeliveryDate', $filters['searchQuery'] );
+            $this->db->or_like('LOWER(loads.OriginCity)', strtolower($filters['searchQuery']) );
+            $this->db->or_like('LOWER(loads.OriginState)', strtolower($filters['searchQuery']) );
+            $this->db->or_like('LOWER(loads.DestinationCity)', strtolower($filters['searchQuery']) );
+            $this->db->or_like('LOWER(loads.DestinationState)', strtolower($filters['searchQuery']) );
+            $this->db->or_like('LOWER(loads.PickupAddress)', strtolower($filters['searchQuery']) );
+            $this->db->or_like('LOWER(loads.DestinationAddress)', strtolower($filters['searchQuery']) );
+            $this->db->or_like('loads.PaymentAmount', $filters['searchQuery']);
+            $this->db->or_like('loads.Mileage', $filters['searchQuery']);
+            $this->db->or_like('loads.deadmiles', $filters['searchQuery']);
+            $this->db->or_like('loads.Weight', $filters['searchQuery']);
+            $this->db->or_like('loads.Length', $filters['searchQuery']);
+            $this->db->or_like('LOWER(loads.JobStatus)', strtolower($filters['searchQuery']) );
+            $this->db->or_like('LOWER(loads.load_source)', strtolower($filters['searchQuery']) );
+            $this->db->or_like('LOWER(b.TruckCompanyName)', strtolower($filters['searchQuery']) );
+            //$this->db->or_like('LOWER(CONCAT( d.first_name ," + " ,team.first_name))', strtolower($filters['searchQuery']));
+            $this->db->group_end();
+		}
+		$filters["limitStart"] = $filters["limitStart"] == 1 ? 0 : $filters["limitStart"];
+	
+		if(isset($filters["sortColumn"]) && $filters["sortColumn"] == "driverName"){
+			$this->db->order_by('CASE 
+								     WHEN loads.driver_type  = "team" THEN CONCAT(TRIM(d.first_name), " + ", TRIM(team.first_name)) 
+								     ELSE concat(d.first_name, " ", d.last_name) 
+								 END '.$filters["sortType"]);
+		}else if(in_array($filters["sortColumn"] ,array("TruckCompanyName"))){
+			$this->db->order_by("b.".$filters["sortColumn"],$filters["sortType"]);	
+		}else if($filters["sortColumn"] == "rpm"){
+			$this->db->order_by("(loads.PaymentAmount/loads.Mileage) ",$filters["sortType"]);	 
+		}else if($filters["sortColumn"] == "Weight"){
+			$this->db->order_by("CAST(loads.".$filters["sortColumn"]."  AS DECIMAL)",$filters["sortType"]);	
+		}else{
+			$this->db->order_by("loads.".$filters["sortColumn"],$filters["sortType"]);	
+		}
+		if(!$total){
+			$this->db->limit($filters["itemsPerPage"],$filters["limitStart"]);
+		}
+
+		$query = $this->db->get('loads');
+		//echo $this->db->last_query()."<br/> <br/>";die;
+		if($total){
+			return $query->row_array()["total"];
+		}
+		if ($query->num_rows() > 0) {
+			return $query->result_array();
+		} else {
+			return array();
+		}
+	
 	}
 	
 

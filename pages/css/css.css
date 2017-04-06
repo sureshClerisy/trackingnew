@@ -6351,6 +6351,9 @@ span.goals-font.negativeGoal { color: red;}
 .bill-dash .panel .panel-heading + .panel-body {
   height: calc(100% - 50px);
 }
+.live-tile-dash {
+    height: 60% !important;
+}
 
 @media (min-width:2000px){
     .map-load-section .dataTables_wrapper.no-footer table thead tr th.billing-origin{
