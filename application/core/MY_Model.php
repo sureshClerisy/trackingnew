@@ -93,6 +93,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 		* Comment: Used for getting entity info by document id
 		*/
 		public function getEntityInfoByDocId($docId,$entityType) {
+			
 			$table = "drivers";
 			switch ($entityType) {
 				case 'driver' : $this->db->select("drivers.id,contract_docs.document_name, drivers.first_name, drivers.last_name");
@@ -103,6 +104,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 							    $this->db->join("contract_docs","contract_docs.entity_id = trailers.id","inner"); 	$table = "trailers"; break;
 				case 'broker' : $this->db->select("broker_info.id, contract_docs.document_name, broker_info.TruckCompanyName");
 							    $this->db->join("contract_docs","contract_docs.entity_id = broker_info.id","inner"); 	$table = "broker_info"; break;
+				case 'shipper': $this->db->select("shippers.id, contract_docs.document_name, shippers.TruckCompanyName");
+							    $this->db->join("contract_docs","contract_docs.entity_id = shippers.id","inner"); 	$table = "shippers"; break;
 			}
 			$this->db->where('contract_docs.id', $docId);
 			$this->db->where('contract_docs.entity_type', $entityType);

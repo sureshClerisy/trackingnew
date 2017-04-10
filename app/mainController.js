@@ -81,21 +81,24 @@ $rootScope.logoutmessage=false;
 	    //}
     };
 
-    $scope.selectPortlet = function($event,widgetID) {
-    	visibility = 1;display ='block';
-		if(angular.element($event.currentTarget).children('div').is(':visible')){
+     $scope.selectPortlet = function($event,widgetID) {
+    	
+    	visibility = 1;
+    	$scope.autoFetchLoads = true;
+
+		if(angular.element($event.currentTarget).hasClass('vis-1')){
 			visibility = 0;
 		}
-
-		if($state.current.url == '/dashboard'){
+		$http.post(URL + '/dashboard/widgetVisibility',{'visibility':visibility,'widgetID':widgetID}).then(function(data){
+    		$scope.visibility = data.data.visibility;
+    	});
+    	
+    	if($state.current.url == '/dashboard'){
 			$state.reload();
 		}else{
 			$state.go('dashboard');
 		}
-
-		$http.post(URL + '/dashboard/widgetVisibility',{'visibility':visibility,'widgetID':widgetID}).then(function(data){
-    		$scope.visibility = data.data.visibility;
-    	});;
+		$scope.autoFetchLoads = false;
     }
 
     $scope.showHidePortlet = function() {
@@ -929,10 +932,13 @@ $rootScope.logoutmessage=false;
 				} 
 				
 				var driverType = "driver";
-				if ( splitedArray[7] != '' && splitedArray[7] != undefined )  {
+				$scope.setGlobalDuplicatedValue = 0;
+				if ( splitedArray[7] != '' && splitedArray[7] != undefined && splitedArray[7] != 'duplicated' )  {
 					driverType = splitedArray[7];
+				} else if ( splitedArray[7] != '' && splitedArray[7] != undefined && splitedArray[7] == 'duplicated') {
+					$scope.setGlobalDuplicatedValue = 1;
 				}
-				
+		
 				//------------------ Add class on job if open first time ---------------------------------
 				var pickDate = $("#testTable").find("div.tb-body[data-uinfo='"+truckstopId+"']").data('pickdate');
 				var rowClicked = $("#testTable").find("div.tb-body[data-uinfo='"+truckstopId+"']");
@@ -958,10 +964,7 @@ $rootScope.logoutmessage=false;
 				$rootScope.showMaps = false;
 				$rootScope.billingDetailsInfo = false;
 				$rootScope.brokerDetailInfo = false;
-				$rootScope.showhighlighted = 'loadDetail';
-				$rootScope.save_cancel_div = false;
-				$rootScope.save_edit_div = true;
-				$rootScope.showFormClass = true;
+				$rootScope.showhighlighted = 'loadDetail';				
 								
 				$rootScope.defaultDriverImage = false;
 				$rootScope.defaultVehicleImage = false;
@@ -978,8 +981,20 @@ $rootScope.logoutmessage=false;
 				$rootScope.showUploadRateSheetButton = true;
 				$rootScope.disabledUISelect = true;		
 				
+			if ( $scope.setGlobalDuplicatedValue == 1 ) {
+				$rootScope.save_cancel_div = true;
+				$rootScope.save_edit_div = false;
+				$rootScope.disableTemp = false;
+				$rootScope.disablePerm = false;				// setting fields to disable after status changed to booked
+				$rootScope.showFormClass = false;
+			} else {
+				$rootScope.save_cancel_div = false;
+				$rootScope.save_edit_div = true;
 				$rootScope.disableTemp = true;
-				$rootScope.disablePerm = true;			// setting fields to disable after status changed to booked
+				$rootScope.disablePerm = true;	
+				$rootScope.showFormClass = true;				
+			}
+
 				$rootScope.disableAnotherDropdowns = true;			// setting dropdowns to disable untill drive assigment is made
 				$scope.trailerTypes = [];
 				
@@ -987,7 +1002,7 @@ $rootScope.logoutmessage=false;
 				if ( $rootScope.deadMilesOriginLocation != undefined && $rootScope.deadMilesOriginLocation != '' )
 					deadMilesLocation = $rootScope.deadMilesOriginLocation;
 					
-					dataFactory.httpRequest(URL+'/truckstop/matchLoadDetail/'+truckstopId+'/'+$rootScope.vehicleIdRepeat+'/'+loadId,'POST',{},{ deadmiles: deadmile, calPayments: calPayment, totalCost: totalCost,originPickDate: orignPickDate,driverType:driverType, deadMilesLocation : deadMilesLocation}).then(function(data) {
+					dataFactory.httpRequest(URL+'/truckstop/matchLoadDetail/'+truckstopId+'/'+$rootScope.vehicleIdRepeat+'/'+loadId,'POST',{},{ deadmiles: deadmile, calPayments: calPayment, totalCost: totalCost,originPickDate: orignPickDate,driverType:driverType, deadMilesLocation : deadMilesLocation, duplicated : $scope.setGlobalDuplicatedValue }).then(function(data) {
 						
 						var modalElem = $('#edit-fetched-load');
 						$('#edit-fetched-load').modal('show');
@@ -1042,7 +1057,7 @@ $rootScope.logoutmessage=false;
 								}
 							}
 							
-							$rootScope.setVehicleIdFlag = $rootScope.editSavedLoad.vehicle_id;				// set flag for myLoad page to check if vehicle-driver assigment is changed or not				
+							$rootScope.setVehicleIdFlag = $rootScope.editSavedLoad.vehicle_id;	// set flag for myLoad page to check if vehicle-driver assigment is changed or not				
 						} else {
 							$rootScope.editSavedLoad.vehicle_id = '';
 							$rootScope.selectedVehicleId = '';
@@ -1057,7 +1072,6 @@ $rootScope.logoutmessage=false;
 							$rootScope.editSavedLoad.shipper_entity = 'shipper';	
 							$rootScope.shipperentity = 'shipper';	
 						}
-						
 						
 						if ( $rootScope.editSavedLoad.consignee_entity != undefined && $rootScope.editSavedLoad.consignee_entity != '' ) { // check value for consignee exist if not then assign initially
 							$rootScope.consigneeentity = $rootScope.editSavedLoad.consignee_entity;
@@ -1149,6 +1163,12 @@ $rootScope.logoutmessage=false;
 							
 						$rootScope.editSavedDist = data.distance;
 						$rootScope.primaryLoadId = data.primaryLoadId;
+
+						$scope.encodedUrl = '';
+						if ( $rootScope.editSavedLoad.id != undefined && $rootScope.editSavedLoad.id != '' && data.primaryLoadId != '' ) {
+							encodedUrl = btoa($rootScope.editSavedLoad.truckstopID+'-'+data.primaryLoadId+'-'+$rootScope.editSavedLoad.deadmiles+'-'+$rootScope.editSavedLoad.PaymentAmount+'-'+$rootScope.editSavedLoad.totalCost+'-'+$rootScope.editSavedLoad.pickDate+'-'+0+'-duplicated');
+							$scope.encodedUrl = '#/search/popup/2/'+encodedUrl;
+						}
 											
 						if (Object.keys($rootScope.vehicleInfo).length > 0 ) {
 							$rootScope.vehicleDriverFound = true;
@@ -1322,9 +1342,19 @@ $rootScope.logoutmessage=false;
 			$rootScope.billingDetailsInfo = false;
 			$rootScope.showhighlighted = 'loadDetail';
 			
-			$rootScope.save_cancel_div  = false;
-			$rootScope.save_edit_div = true;
-			$rootScope.showFormClass = true;
+			if ( $scope.setGlobalDuplicatedValue == 1 ) {
+				$rootScope.save_cancel_div = true;
+				$rootScope.save_edit_div = false;
+				$rootScope.disableTemp = false;
+				$rootScope.disablePerm = false;				// setting fields to disable after status changed to booked
+				$rootScope.showFormClass = false;
+			} else {
+				$rootScope.save_cancel_div = false;
+				$rootScope.save_edit_div = true;
+				$rootScope.disableTemp = true;
+				$rootScope.disablePerm = true;	
+				$rootScope.showFormClass = true;				
+			}
 			
 			initAutocomplete();
 			$rootScope.disableInputs();	
@@ -2213,7 +2243,8 @@ $rootScope.logoutmessage=false;
 	     * Adding new loads functionality start
 	     */
 	     
-		$rootScope.addNewGlobalLoad = function() {
+		$rootScope.addNewGlobalLoad = function(dupLoadId) {
+
 			$rootScope.alertloadmsg = false;
 			$rootScope.alertExceedMsg = false;
 			$rootScope.editLoads = true;
@@ -2266,6 +2297,12 @@ $rootScope.logoutmessage=false;
 				$('#add-load-details').modal('show');
 				
 			});
+
+			if ( dupLoadId != undefined && dupLoadId != '' ) {
+				duplicateId  = dupLoadId.split('-');
+				duplicateId =  duplicateId[1];
+				$scope.showAddLoadDetails(duplicateId);
+			}
 		}
 		
 		/**
@@ -2284,7 +2321,7 @@ $rootScope.logoutmessage=false;
 		$scope.add_load_div = true;			// for add load
 		$rootScope.disablePerm = false;
 		$rootScope.disableTemp = false;
-		
+		console.log(loadId);
 		if ( loadId != '' && loadId != undefined ) {
 			$scope.add_load_div = false;			// for add load
 			$rootScope.save_edit_div = true;			// for add load
@@ -2659,8 +2696,8 @@ $rootScope.logoutmessage=false;
 		$scope.add_broker_div = true;  			// for add load broker tab
 		$rootScope.save_edit_div = false;
 		$rootScope.showFormClass = false;
-		$rootScope.disabledUISelect = false;
-		if ( $rootScope.editSavedLoad.id < 9999  ) {
+		$rootScope.disabledUISelect = false;			
+		if ( $rootScope.editSavedLoad.id != '' && $rootScope.editSavedLoad.id < 9999  ) {
 			$rootScope.disablePerm = true;
 			$rootScope.disableAnotherDropdowns = true;
 		} else {
@@ -2997,7 +3034,6 @@ $rootScope.logoutmessage=false;
 		} 
 		
 		$rootScope.saveEditLoad = function(editSavedLoad, status,from,old , saveParameter) {
-			
 			var srcPage = "";
 			if ( saveParameter == 'addRequest' ) {
 				srcPage = $state.current.name;
@@ -3048,7 +3084,9 @@ $rootScope.logoutmessage=false;
 				if ( data.refStatus != undefined && data.refStatus == false ) {
 					angular.element($('#edit-fetched-load')).animate({ scrollTop: 0 }, 'slow');
 					$rootScope.alertExceedMsg = true;
-					$rootScope.ExceedMessage = $rootScope.languageCommonVariables.woNumberAlreadyExist+' '+data.loadIdNumber+'.';
+					encodedUrl = btoa(0+'-'+data.loadIdNumber+'-'+0+'-'+0+'-'+0+'-'+0+'-'+0);
+					encodedUrl = '#/search/popup/2/'+encodedUrl;
+					$rootScope.ExceedMessage = $rootScope.languageCommonVariables.woNumberAlreadyExist+' <a style="text-decoration:underline" href="'+encodedUrl+'" target="_blank">'+data.loadIdNumber+'</a>';
 				} else if( data.requiredFields != undefined && data.requiredFields == 1 ) {
 					$rootScope.alertExceedMsg = true;
 					$rootScope.ExceedMessage = data.errorMessage;
@@ -3130,9 +3168,14 @@ $rootScope.logoutmessage=false;
 					$rootScope.disableTemp = true;
 					$rootScope.disableAnotherDropdowns = true;	
 					
-					if ( saveParameter  == 'addRequest' ) {
+					if ( saveParameter  == 'addRequest' || $scope.setGlobalDuplicatedValue == 1 ) {
 						$('#add-load-details').modal('hide');
-						encodedUrl = btoa(0+'-'+data.id+'-'+data.savedData.deadmiles+'-'+data.savedData.PaymentAmount+'-'+data.savedData.totalCost+'-'+data.savedData.pickDate+'-'+data.savedData.vehicle_id);
+						if ( saveParameter == 'addRequest' )
+							truckStopId = 0;
+						else
+							truckStopId = data.savedData.truckstopID;
+
+						encodedUrl = btoa(truckStopId+'-'+data.id+'-'+data.savedData.deadmiles+'-'+data.savedData.PaymentAmount+'-'+data.savedData.totalCost+'-'+data.savedData.pickDate+'-'+data.savedData.vehicle_id);
 						$state.go('search.popup', {staticId:2,encodedurl:encodedUrl}, {notify: false,reloadOnSearch: false});
 					}
 				}
@@ -4167,16 +4210,6 @@ $rootScope.logoutmessage=false;
 	 */
 	
 	$scope.onPickupDateChangeExtraStop = function( index, parameter ) {
-		//~ if ( $rootScope.editSavedLoad.PickupDate == undefined || $rootScope.editSavedLoad.PickupDate == '' || $rootScope.editSaveLoad.PickupDate == '0000-00-00' ) {
-			//~ $rootScope.alertExceedMsg = true;
-			//~ $rootScope.alertloadmsg = false;
-			//~ $window.scrollTo(0, 0);
-			//~ $rootScope.ExceedMessage = 'Error !: Please enter pickup date in order to enter extra stop date.';
-			//~ $rootScope.extraStops['extraStopDate_'+index] = '';
-			//~ $("#extraStopDateId_"+index ).datepicker('setDate','');
-			//~ return false;
-		//~ }
-		
 		$scope.autoFetchLoads = true;
 		dataFactory.httpRequest(URL+'/truckstop/compareExtraStopDates/'+parameter,'POST',{},{ allData : $rootScope.editSavedLoad, index : index, extraStopsDate : $rootScope.extraStops }).then(function(dataRes) {
 			if ( dataRes.error != undefined && dataRes.error != '' ) {
@@ -4235,6 +4268,7 @@ $rootScope.logoutmessage=false;
 			});
 		}
 	}
+
 	/**
 	 * Hiding job ticket popup on outer click or cross click
 	 */
@@ -4242,7 +4276,7 @@ $rootScope.logoutmessage=false;
 	$scope.hideLoadDetailPopup = function() {
 		$rootScope.firstTimeClick = true;
 		var url = decodeURI($rootScope.absUrl.q);
-		
+		console.log(url);
 		if ( url != '' && url != undefined && url != 'undefined' ) {
 			$state.go('searchresults', {q:url}, {notify: false,reload: false});
 		} else {

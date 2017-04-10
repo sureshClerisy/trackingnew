@@ -411,6 +411,7 @@ class Truckstop extends Admin_Controller{
 	public function matchLoadDetail(  $truckStopId = null, $vehicleId = null, $loadId = null ) 
 	{
 		$_POST = json_decode(file_get_contents('php://input'), true);
+		
 		if ( $truckStopId != '' && $truckStopId != null && $truckStopId != 0 )
 			$loadIdArray = $this->Job->getTruckstopRelatedId( $truckStopId );
 		
@@ -461,14 +462,18 @@ class Truckstop extends Admin_Controller{
 			
 			$jobRecord['EquipmentTypes']['Code'] = $jobRecord['equipment_options'];
 			$jobRecord['EquipmentTypes']['Description'] = $jobRecord['equipment'];
-			$data['primaryLoadId'] = $loadId;
+			if ( !isset($_POST['duplicated']) || $_POST['duplicated'] != 1)
+				$data['primaryLoadId'] = $loadId;
+			else
+				$data['primaryLoadId'] = '';
+
 			$jobRecord['totalMiles'] = $jobRecord['deadmiles'] + $jobRecord['Mileage'];
 			
 			if ( $jobRecord['Stops'] > 0 ) {
 				$this->extraStopsDataArray = $this->Job->getExtraStops( $jobRecord['id']);
 			} 
 			
-			if ( $jobRecord['vehicle_id'] != ''  && $jobRecord['vehicle_id'] != null && $jobRecord['vehicle_id'] != 0 ) {
+			if ( $jobRecord['vehicle_id'] != ''  && $jobRecord['vehicle_id'] != null && $jobRecord['vehicle_id'] != 0 && (!isset($_POST['duplicated']) || $_POST['duplicated'] != '1')) {
 				if(isset($jobRecord["driver_type"]) && $jobRecord["driver_type"] == "team"){
 					$data['vehicleInfo'] = $this->Vehicle->getTeamVehicleInfo( $jobRecord['id']);	
 					$jobRecord['assignedDriverName'] = $data['vehicleInfo']['driverName'];
@@ -479,7 +484,8 @@ class Truckstop extends Admin_Controller{
 			}
 		
 			/**Check if rate sheet is uploaded for load or not */
-			$data['rateSheetUploaded'] = $this->Job->checkRateSheetUploaded($loadId,'rateSheet');
+			if ( !isset($_POST['duplicated']) || $_POST['duplicated'] != '1' )
+				$data['rateSheetUploaded'] = $this->Job->checkRateSheetUploaded($loadId,'rateSheet');
 		} else {
 						
 			$client   = new SOAPClient($this->wsdl_url);
@@ -647,6 +653,20 @@ class Truckstop extends Admin_Controller{
 			}
 		}
 		
+		if ( isset($_POST['duplicated']) && $_POST['duplicated'] == '1' ) {
+			$jobRecord['JobStatus']  = '';
+			$jobRecord['woRefno'] 	 = '';
+			$jobRecord['vehicle_id'] = '';
+			$jobRecord['driver_id']	 = '';
+			$jobRecord['second_driver_id']	 = '';
+			$jobRecord['driver_type'] = '';
+			$jobRecord['trailer_id'] = '';
+			$jobRecord['dispatcher_id'] = '';
+			$jobRecord['user_id'] = '';
+			$jobRecord['woRefno'] 	 = '';
+			$jobRecord['id'] 		 = '';
+		}
+
 		$data['encodedJobRecord'] 	= $jobRecord;
 		$data['truckStopId'] 		= $truckStopId;
 		$originCode 				= $data['encodedJobRecord']['OriginState'];

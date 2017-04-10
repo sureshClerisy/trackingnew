@@ -543,6 +543,7 @@ $config["entity"] = array("user"	=> "user",
 						  "driver" 	=> "driver", 
 						  "trailer" => "trailer", 
 						  "broker" 	=> "broker", 
+						  "shipper" => "shipper", 
 						  "ticket" 	=> "ticket", 
 						  "truimph" => "truimph");
 

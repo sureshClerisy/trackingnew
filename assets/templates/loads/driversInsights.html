@@ -1,0 +1,84 @@
+
+      <!-- START PAGE CONTENT WRAPPER -->
+      <div class="page-content-wrapper ">
+        <!-- START PAGE CONTENT -->
+        <div class="content sm-gutter">
+          <!-- START CONTAINER FLUID -->
+			<div class="container-fluid padding-25 sm-padding-10">
+				<canvas id="viewport" style="display: none;"></canvas>
+			   <div ng-show="alertdeletemsg == true" class="alert alert-success" role="alert">
+					<button ng-click = "hideloadmessage()" class="close"></button>
+					{{Message}}
+				</div>
+				<div class="col-middle loader-outer" ng-show="autoFetchLoads == true">
+					<!-- START PANEL -->
+					<div class="loader-inner">
+					<div class="full-height">
+						<div class="panel-body text-center">
+							<img class="image-responsive-height demo-mw-50" src="assets/img/demo/progress.svg" alt="Progress">
+						</div>
+					</div>
+					</div>
+					<!-- END PANEL -->
+                </div>
+				<div class="row">
+					<div class="col-md-12 col-xlg-12">
+						<div class="commen-heading assigned-load-page">
+							<h2 class="oprate-dashbord">Drivers Insights
+								<span ng-show="!showCalendar" class="small">{{ dInsights.filterArgs.forDate }}</span>
+							</h2>
+						</div>
+					</div>
+				</div>
+			
+			<div class="row invocie-block-row">
+				<div class="col-md-12 col-xlg-12">
+					<div class="load-new-block-table">
+						<div class="panel-body add-new-data">
+							<div class="load-tabe-auto job-list truckstopJobs map-load-section">
+								<div class="loadtable">
+									<div class="export-options-container"></div>
+									<div class="srpSearchDiv searchinput search-list-fix">
+										<div class="srpSearch1">
+											<label for="search" class="ng-binding">Search</label>
+											<input type="text" ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }" class="form-control" ng-model="dInsights.searchFilter" ng-change="dInsights.callSearchFilter(dInsights.searchFilter);" />
+										</div>
+									</div>
+									<div class="table-scroll-custom">
+										<table class="table driver-insights table-striped table-hover table-condensed">
+											<thead>
+												<tr>
+													<th class="bold text-black">Driver Name</th>
+													<th class="bold text-black">Truck</th>
+													<th class="bold text-black">Dispatcher</th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr dir-paginate="row in dInsights.drivers | itemsPerPage: dInsights.itemsPerPage"  total-items="dInsights.total" current-page="dInsights.currentPage" pagination-id="driverInsightPage" ng-click="dInsights.goToDriverLoads('drivers','loads', row)" >
+													<td>{{row.driverName}}</td>
+													<td>{{row.truckName}}</td>
+													<td>{{row.dispatcher}}</td>
+												</tr>
+												<tr ng-show="!dInsights.haveRecords" class="text-center">
+													<td colspan="3">Oops! No record found</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+						
+									<div class="dataTables_wrapper">
+									    <div class="dataTables_paginate">
+									        <dir-pagination-controls   pagination-id="driverInsightPage" template-url="./assets/templates/dirPagination.html" on-page-change="dInsights.pageChanged(newPageNumber)" direction-links="true" undary-links="true"></dir-pagination-controls>
+									    </div>
+									</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+ 
+<ng-include src="'./assets/templates/truckstop/modals.html'"></ng-include>
+

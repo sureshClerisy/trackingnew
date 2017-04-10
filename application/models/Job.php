@@ -95,7 +95,7 @@ class Job extends Parent_Model {
 		}if($rtype=="idle"){
 			$this->db->select("count(DISTINCT d.id) as total");
 		}else{
-			$this->db->select("d.id,  CONCAT( 'Truck - ', v.label) AS truckName, CONCAT(u.first_name, ' ' , u.last_name) as dispatcher, CASE v.driver_type 
+			$this->db->select("d.id as driver_id, v.team_driver_id,  CONCAT( 'Truck - ', v.label) AS truckName, CONCAT(u.first_name, ' ' , u.last_name) as dispatcher, CASE v.driver_type 
 							WHEN 'team' THEN CONCAT(d.first_name,' + ',team.first_name)  ELSE concat(d.first_name,' ',d.last_name)  END AS driverName");
 		}
 		
@@ -103,12 +103,26 @@ class Job extends Parent_Model {
 		$this->db->join("vehicles as v", "d.id = v.driver_id","Left");
 		$this->db->join('drivers as team','v.team_driver_id = team.id','left');	
 		$this->db->join('users as u','d.user_id = u.id','left');	
-		
-		if($type == "_idispatcher"){
-			$this->db->where_in('d.user_id',$args["dispId"]);
-		}else if($type == "_idriver" || $type == "driver" || $type == "_iteam" || $type == "team"){
-			$this->db->where_in('d.user_id',$args["dispId"]);
-			$this->db->where_in('d.id',$args["driverId"]);
+		if(isset($args["userToken"])){
+			$userToken = $args["userToken"];
+			$dispId = $args["userToken"];
+		}
+		if(isset($args["dispId"])){
+			$dispId = $args["dispId"];	
+		}
+		if(isset($args["driverId"])){
+			$userToken = $args["driverId"];	
+		}
+
+
+		if($type == "_idispatcher" || $type == "dispatcher"){
+			$this->db->where_in('d.user_id',$dispId);
+		}else if($type == "_idriver" || $type == "driver" ){
+			$this->db->where_in('d.user_id',$dispId);
+			$this->db->where_in('d.id',$userToken);
+		}else if( $type == "_iteam" || $type == "team"){
+			$this->db->where_in('d.user_id',$dispId);
+			$this->db->where(array("d.id" => $userToken, 'v.team_driver_id' => $args['secondDriverId']));
 		}
 
 		if($type == "team" || $type == "_team" || $type == "_iteam"){
@@ -131,7 +145,7 @@ class Job extends Parent_Model {
 
 		$query = $this->db->get('drivers as d');
 
-		//echo $this->db->last_query()."<br/><br/>";
+		//echo $this->db->last_query()."<br/><br/>";die;
 		if($rtype=="idle" || $rtype == "getIdleIds"){
 			return $query->row_array()["total"];
 		}
@@ -141,6 +155,106 @@ class Job extends Parent_Model {
 			return array();
 		}
 	}	
+
+
+	public function getDriversWithFilter($filters = array(), $type ='', $rtype = '', $date = '', $total = false){
+
+		if(empty($date)){ $date = date("Y-m-d"); }
+		if($rtype == "getIdleIds" ){
+			$this->db->select("group_concat(d.id) as total");
+		}if($rtype=="idle"){
+			$this->db->select("count(DISTINCT d.id) as total");
+		}else{
+			$this->db->select("d.id as driver_id, v.team_driver_id,  CONCAT( 'Truck - ', v.label) AS truckName, CONCAT(u.first_name, ' ' , u.last_name) as dispatcher, CASE v.driver_type 
+							WHEN 'team' THEN CONCAT(d.first_name,' + ',team.first_name)  ELSE concat(d.first_name,' ',d.last_name)  END AS driverName");
+		}
+		
+		
+		$this->db->join("vehicles as v", "d.id = v.driver_id","Left");
+		$this->db->join('drivers as team','v.team_driver_id = team.id','left');	
+		$this->db->join('users as u','d.user_id = u.id','left');
+
+		if(isset($filters["userToken"])){
+			$userToken = $filters["userToken"];
+		}
+		if(isset($filters["dispId"])){
+			$dispId = $filters["dispId"];	
+		}	
+
+		if(isset($filters["driverId"])){
+			$userToken = $filters["driverId"];	
+		}
+		if($type == "_idispatcher" || $type == "dispatcher"){
+			$this->db->where_in('d.user_id',$dispId);
+		}else if($type == "_idriver" || $type == "driver" ){
+			$this->db->where_in('d.user_id',$dispId);
+			$this->db->where_in('d.id',$userToken);
+		}else if( $type == "_iteam" || $type == "team"){
+			$this->db->where_in('d.user_id',$dispId);
+			$this->db->where(array("d.id" => $userToken, 'v.team_driver_id' => $filters['secondDriverId']));
+		}
+
+		if($type == "team" || $type == "_team" || $type == "_iteam"){
+			$this->db->where('v.driver_type ',"team");
+		}
+		
+		$this->db->where("d.status = 1 and d.id NOT IN (
+							  SELECT DISTINCT loads.driver_id FROM loads where loads.delete_status = 0  AND 
+							  ( (loads.pickupdate = '".$date."' AND loads.JobStatus = 'booked') OR (loads.DeliveryDate = '".$date."' AND loads.JobStatus IN('completed','inprogress', 'booked', 'delayed', 'delivered', 'invoiced'))
+							  OR (
+							  	loads.pickupdate <= '".$date."' AND loads.DeliveryDate >= '".$date."' AND loads.JobStatus IN('completed','inprogress','booked','delayed','delivered','invoiced')
+							  )
+						)) 
+						AND d.id IN (SELECT DISTINCT  driver_id  FROM `vehicles` where driver_id != '0' and driver_id is not null and driver_id != '')	
+						AND d.id NOT IN (SELECT DISTINCT vehicles.team_driver_id FROM vehicles where vehicles.driver_type = 'team')
+						");
+	
+		
+
+
+		if(isset($filters["searchQuery"]) && !empty($filters["searchQuery"])){
+
+            $this->db->group_start();
+            $this->db->like("LOWER(CONCAT( 'Truck - ', v.label))", strtolower($filters['searchQuery']));
+            $this->db->or_like("LOWER(CONCAT(TRIM(u.first_name), ' ' , TRIM(u.last_name)))", strtolower($filters['searchQuery']));
+            $this->db->or_like("LOWER(CONCAT(TRIM(d.first_name),' + ',TRIM(team.first_name)))", strtolower($filters['searchQuery']));
+            $this->db->or_like("LOWER(concat(TRIM(d.first_name),' ',TRIM(d.last_name)))", strtolower($filters['searchQuery']));
+            $this->db->group_end();
+		}
+		$filters["limitStart"] = $filters["limitStart"] == 1 ? 0 : $filters["limitStart"];
+	
+		if(isset($filters["sortColumn"]) && $filters["sortColumn"] == "driverName"){
+			$this->db->order_by('CASE 
+								     WHEN loads.driver_type  = "team" THEN CONCAT(TRIM(d.first_name),' + ',TRIM(team.first_name))  
+								     ELSE concat(TRIM(d.first_name), " ", TRIM(d.last_name)) 
+								 END '.$filters["sortType"]);
+		}else if(isset($filters["sortColumn"]) && $filters["sortColumn"] == "dispatcher"){
+			$this->db->order_by("CONCAT(u.first_name, ' ' , u.last_name) ".$filters["sortType"]);
+		}else{
+			$this->db->order_by("CONCAT(u.first_name, ' ' , u.last_name) ".$filters["sortType"]);
+			//$this->db->order_by("loads.".$filters["sortColumn"],$filters["sortType"]);	
+		}
+		if(!$total){
+			$this->db->limit($filters["itemsPerPage"],$filters["limitStart"]);
+		}
+
+		$query = $this->db->get('drivers as d');
+		//echo $this->db->last_query();die;
+		if($total){
+			return $query->row_array()["total"];
+		}
+
+
+		if($rtype=="idle" || $rtype == "getIdleIds"){
+			return $query->row_array()["total"];
+		}
+		if ($query->num_rows() > 0) {
+			return $query->result_array();
+		} else {
+			return array();
+		}
+	}	
+
 
 
 	/**
@@ -175,7 +289,6 @@ class Job extends Parent_Model {
 		
 		$this->db->order_by("loads.PickupDate",'ASC');
 		$query = $this->db->get('loads');
-		//echo $this->db->last_query();die;
 		if ($query->num_rows() > 0) {
 			return $query->result_array();
 		} else {
@@ -183,7 +296,7 @@ class Job extends Parent_Model {
 		}
 	}
 
-	public function getIdleDriversList($filters = array(), $type, $idleList, $date = '',$total = false){
+	public function getIdleDriversLoads($filters = array(), $type, $total = false){
 		if($total){
 			$this->db->select('count(loads.id) as total'); 
 		}else{
@@ -199,16 +312,13 @@ class Job extends Parent_Model {
 		$this->db->join('users as u', 'loads.dispatcher_id = u.id','Left');
 		$this->db->join("broker_info as b", "loads.broker_id = b.id","Left");
 		$this->db->join('drivers as team','loads.second_driver_id = team.id','left');	
-
-		$this->db->where(" loads.driver_id IN ( ".$idleList." )");
-
+		$this->db->where('loads.delete_status',0);
 		if($type == "_idispatcher" || $type == "dispatcher"){
 			$this->db->where_in('loads.dispatcher_id',$filters["userToken"]);
 		}else if($type == "_idriver" || $type == "driver" ) {
-			$this->db->where_in('loads.dispatcher_id',$filters["dispId"]);
-			$this->db->where_in('loads.driver_id',$filters["userToken"]);
+			$this->db->where_in('loads.driver_id',$filters["driverId"]);
 		} else if( $type == "_iteam" || $type == "team"){
-			$this->db->where(array("loads.driver_id" => $filters["userToken"], 'loads.second_driver_id' => $filters['secondDriverId'],'loads.dispatcher_id' => $filters["dispId"]));
+			$this->db->where(array("loads.driver_id" => $filters["driverId"], 'loads.second_driver_id' => $filters['secondDriverId']));
 		}
 
 		if($type == "team" || $type == "_team" || $type == "_iteam"){
@@ -265,7 +375,6 @@ class Job extends Parent_Model {
 		}
 
 		$query = $this->db->get('loads');
-		//echo $this->db->last_query()."<br/> <br/>";die;
 		if($total){
 			return $query->row_array()["total"];
 		}
@@ -377,7 +486,6 @@ class Job extends Parent_Model {
 		}
 
 		$query = $this->db->get('loads');
-		//echo $this->db->last_query()."<br/> <br/>";die;
 		if($total){
 			return $query->row_array()["total"];
 		}
@@ -479,7 +587,6 @@ class Job extends Parent_Model {
 
 		$this->db->limit($filters["itemsPerPage"],$filters["limitStart"]);
 		$query = $this->db->get('loads');
-		//echo $this->db->last_query();die;
 		if ($query->num_rows() > 0) {
 			return $query->result_array();
 		} else {
@@ -597,7 +704,6 @@ class Job extends Parent_Model {
 		$this->db->group_by('JobStatus');
 
 		$query = $this->db->get('loads');
-		//echo $this->db->last_query();die;
 		if ($query->num_rows() > 0) {
 			return $query->result_array();
 		} else {
@@ -653,7 +759,6 @@ class Job extends Parent_Model {
 		$this->db->order_by('loads.invoicedDate','DESC');
 
 		$query = $this->db->get('loads');
-		//echo $this->db->last_query();die;
 		if ($query->num_rows() > 0) {
 			return $query->row_array()["invoices"];
 		} else {
@@ -698,7 +803,6 @@ class Job extends Parent_Model {
 		$this->db->where(array('loads.sent_for_payment' => 0, 'loads.delete_status' => 0,'loads.ready_for_invoice' => 0));
 		$this->db->where("(SELECT  count(documents.load_id) as c FROM  documents WHERE  documents.load_id  =  loads.id and documents.doc_type in ('pod','rateSheet') )< 2  ");
 		$query = $this->db->get('loads');
-		//echo $this->db->last_query();die;
 		if ($query->num_rows() > 0) {
 			return $query->row_array()["waitingPaperwork"];
 		} else {
@@ -743,7 +847,6 @@ class Job extends Parent_Model {
 		$this->db->where(array('loads.sent_for_payment' => 1, 'loads.delete_status' => 0 ));
 		
 		$query = $this->db->get('loads');
-		//echo $this->db->last_query();die;
 		if ($query->num_rows() > 0) {
 			return $query->row_array()["sentForPaymentCount"];
 		} else {
@@ -876,51 +979,6 @@ class Job extends Parent_Model {
 	
 	// public function FindVehicles( $jobSpec = '', $jobCollect = '', $jobDeliver = '', $jobVehicle = '' ,$fetchAssignedTruck = null , $jobVehicleType = '' ,$jobId = null ,$loggedUserId = null, $jobWidth = 0, $jobLength = 0, $vehicleId = null) {
 	public function FindVehicles( $vehicleId = null ) {
-		
-		// $jobLength = (int)$jobLength;
-		// $fianlJobVehicle = array();
-		// $finalJobSpec = '';
-		// $jobSpec = trim($jobSpec);
-		// $truckStatus = 0;
-		// $vehicleMaxWidth = 8.5;
-		// if ( $jobId != '' && is_numeric($jobId) ) {
-		// 	if ( strpos($jobVehicle, ',') !== false ) {
-		// 		$vehicleArray = explode(',',$jobVehicle);
-		// 		$vehicleArrayLength = count($vehicleArray);
-		// 		for ($i = 0; $i < $vehicleArrayLength; $i++) {
-		// 			$fianlJobVehicle[] = $vehicleArray[$i];
-		// 		}
-		// 	} else {
-		// 		$fianlJobVehicle[0] = $jobVehicle;
-		// 	}
-		// } else {
-		// 		$equipmentOption = $jobVehicleType;
-		// 		$equipmentResult = $this->getRelatedEquipment( $equipmentOption);
-		// 		if ( strpos($equipmentResult, ',') !== false ) {
-		// 			$vehicleArray = explode(',',$equipmentResult);
-		// 			$vehicleArrayLength = count($vehicleArray);
-		// 			for ($i = 0; $i < $vehicleArrayLength; $i++) {
-		// 				$fianlJobVehicle[] = $vehicleArray[$i];
-		// 			}
-		// 		} else {
-		// 			$fianlJobVehicle[0] = $equipmentResult;
-		// 		}
-		// }
-				
-		// if ( strpos($jobSpec, 'TL ') !== false && strpos($jobSpec, 'Klbs') !== false) {
-		// 	preg_match_all('!\d+!', $jobSpec, $specMatches);
-		// 	$finalJobSpec = round($specMatches[0][0] * 1000);
-		// } else if ( is_numeric($jobSpec) ) {
-		// 	if( strlen($jobSpec) <= 2 ) {
-		// 		$jobSpec = $jobSpec * 1000;
-		// 	}
-		// 	$finalJobSpec = $jobSpec;
-		// } else if ( strpos($jobSpec, 'lbs') !== false ) {
-		// 	$jobSpec = str_replace(' ','',$jobSpec);
-		// 	preg_match_all('!\d+!', $jobSpec, $specMatches);
-		// 	$finalJobSpec = round($specMatches[0][0]);
-		// }
-
 		$this->db->select('vehicles.id,vehicles.fuel_consumption,vehicles.destination_address');
 		$this->db->join('drivers', 'drivers.id = vehicles.driver_id','LEFT');
 			
@@ -934,7 +992,6 @@ class Job extends Parent_Model {
 		$this->db->where($string);
 
 		$result = $this->db->get('vehicles');
-		//~ echo $this->db->last_query();die;
 		if ($result->num_rows() > 0) {
 			return $result->result_array();
 		} else {
@@ -942,15 +999,13 @@ class Job extends Parent_Model {
 		}
 	}
 	
-	public function FindJobVehicles( $vehicleId = null, $userId = null, $thirdParameter = '' ) {			// third parameter to save job from dispatcher having no truck assigned
-		
+	public function FindJobVehicles( $vehicleId = null, $userId = null, $thirdParameter = '' ) {	// third parameter to savejob frm disp having no truck assigned	
 		$this->db->select('vehicles.id,fuel_consumption,destination_address');
 		$this->db->join('drivers', 'drivers.id = vehicles.driver_id','LEFT');
 		$condition = array('vehicles.id' => $vehicleId);
 		$this->db->where($condition);
 
 		$result = $this->db->get('vehicles');
-		//~ echo $this->db->last_query();die;
 		if ($result->num_rows() > 0) {
 			return $result->result_array();
 		} else {
@@ -1103,23 +1158,13 @@ class Job extends Parent_Model {
 			$res = $this->db->update('loads',$saveData);
 			$last_id = $id;
 		} else {
-			$saveData['load_source'] = 'truckstop.com';
-			$this->db->select('id,invoiceNo');
-			$where = array('truckstopID' => $saveData['truckstopID'], 'pickDate' => $saveData['pickDate'] );
-			$this->db->where($where);
-			$result = $this->db->get('loads');
-			if( $result->num_rows() > 0 ) {
-				$finalResult = $result->row_array();
-				$primary_key = $finalResult['id'];
-				$this->db->where('loads.id',$primary_key);
-				$res = $this->db->update('loads',$saveData);
-				$last_id = $primary_key;
-			} else {
-				$saveData['user_id'] = $loggedUserId;
-				$saveData['created'] = date('Y-m-d H:i:s');
-				$res = $this->db->insert('loads',$saveData);
-				$last_id = $this->db->insert_id();
-			}
+			if ( !isset($saveData['load_source']) || $saveData['load_source'] == '' )
+				$saveData['load_source'] = 'truckstop.com';
+
+			$saveData['user_id'] = $loggedUserId;
+			$saveData['created'] = date('Y-m-d H:i:s');
+			$res = $this->db->insert('loads',$saveData);
+			$last_id = $this->db->insert_id();
 		}
 		
 		$extraStopIds = array();
@@ -1757,7 +1802,6 @@ class Job extends Parent_Model {
 		$this->db->select(array('id','chain_data'));
 		$gresult = $this->db->get_where('save_chains', $filter);
 		$found = $gresult->row_array();
-		//echo $this->db->last_query();die;
 		if($found){
 			$chainExistingData = unserialize($found['chain_data']);
 			if(!$this->in_array_r($chainData['truckstopID'], $chainExistingData, true) || (isset($chainExistingData[$objPost['divIndex']]['deleted']) && $chainExistingData[$objPost['divIndex']]['deleted'] == true)){
@@ -1832,7 +1876,6 @@ class Job extends Parent_Model {
 		$this->db->select(array('id','chain_data'));
 		$gresult = $this->db->get_where('save_chains', $filter);
 		$found = $gresult->row_array();
-		//echo $this->db->last_query();die;
 		if($found){
 			$chainExistingData = unserialize($found['chain_data']);
 			if($this->in_array_r($tstopid ,$chainExistingData)){
@@ -1863,7 +1906,6 @@ class Job extends Parent_Model {
 		$where = $cnt." (LOWER(city) LIKE LOWER('".$city."%') OR LOWER(state_code) LIKE LOWER('".$city."%'))";
 		$this->db->where($where);
 		$result = $this->db->get('cities');
-		//echo $this->db->last_query();die;
 		if ( $result->num_rows() > 0 ) {
 			return $result->result_array();
 		} else {
@@ -2010,7 +2052,6 @@ class Job extends Parent_Model {
 		$this->db->where(array('load_id' => $loadId, "doc_type"=>"invoice"));
 		
 		$result = $this->db->get('documents');
-		//echo $this->db->last_query();die;
 		if ( $result->num_rows() > 0 ) {
 			return $result->row_array()["haveInvoice"];
 		} else {
@@ -2073,12 +2114,11 @@ class Job extends Parent_Model {
 	 */
 	
 	public function checkWoNumberExist( $woRefno = '' , $primaryId = null ) {
+		$condition = array('woRefno' => $woRefno, 'delete_status' => 0);
 		if ( $primaryId  != null && $primaryId != '' ) {
-			$condition = array('woRefno' => $woRefno, 'id !=' => $primaryId, 'delete_status' => 0 );
-		} else {
-			$condition = array('woRefno' => $woRefno, 'delete_status' => 0);
-		}
-		
+			$condition['id !='] = $primaryId;
+		} 
+
 		$result = $this->db->select('id')->where($condition)->get('loads');
 		if ( $result->num_rows() > 0 ) {
 			$loadIdArr = $result->row_array();
@@ -2144,7 +2184,7 @@ class Job extends Parent_Model {
 				 	->get('widgets_visibility');
 	 	$result 	= $dataRow->result_array();
 
-	 	$widgetVisibility = [1=>1,2=>1,3=>1,4=>1,5=>1,6=>1,7=>1,8=>1,9=>1,10=>1];
+	 	$widgetVisibility = [1=>1,2=>1,3=>1,4=>1,5=>1,6=>1,7=>1,8=>1,9=>1,10=>1,11=>1];
 	 	foreach ($result as $key => $value) {
 	 		$widgetVisibility[$value['widget_id']] = $value['visibility']; 
 	 	}
@@ -2176,7 +2216,6 @@ class Job extends Parent_Model {
 		$this->db->order_by("commodity");
 		$this->db->limit(25);
 		$result = $this->db->get('loads');
-		//echo $this->db->last_query();die;
 		if ( $result->num_rows() > 0 ) {
 			return $result->result_array();
 		} else {
@@ -2216,7 +2255,6 @@ class Job extends Parent_Model {
          ->where('vehicles.id',$args['vehicleID'])
          ->order_by('avl_events.GMTTime','asc');
 		$result = $this->db->get();
-		//echo $this->db->last_query();die;
 		if ( $result->num_rows() > 0 ){
 			return $result->result_array();
 		} 
@@ -2234,7 +2272,6 @@ class Job extends Parent_Model {
          ->join('avl_events', 'vehicles.tracker_id = avl_events.deviceID'.$and)
          ->where('vehicles.id',$args['vehicleID']);
 		$result = $this->db->get();
-		//echo $this->db->last_query();die;
 		if ( $result->num_rows() > 0 ){
 			return $result->result_array();
 		} 
@@ -2267,7 +2304,6 @@ class Job extends Parent_Model {
 		$this->db->where($string);
 		$this->db->order_by('id','DESC');
 		$result = $this->db->get('loads');
-		//~ echo $this->db->last_query(); die;
 		if( $result->num_rows() > 0 ) {
 			return $result->row_array();
 		} else {
@@ -2398,7 +2434,7 @@ class Job extends Parent_Model {
 		
 		return $this->db->get('loads')->row_array();
 	}
-
+//http://localhost/trackingnew/dashboard/getPortletVisibility
 	/*
 	* method  : post
 	* params  : loadId

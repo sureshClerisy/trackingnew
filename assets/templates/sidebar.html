@@ -2,66 +2,55 @@
 <nav class="page-sidebar" data-pages="sidebar" pg-sidebar>
 <!-- BEGIN SIDEBAR MENU TOP TRAY CONTENT-->
   <div class="sidebar-overlay-slide from-top port-box" id="appMenu">
+    
     <div class="row">
-      
-      <div class="col-xs-5 portrait-box vis-{{visibility[1]}} lb" ng-class = "visibility[1] ==1 ? 'show-tick' : ''" ng-click= "selectPortlet($event,'1')">
-        <h3>Best</h3>
-        <div class="safety-div" ng-show = "visibility[1] ==1"></div>
-        <p>Safety</p>
+      <div class=" portrait-box vis-{{visibility[1]}}" ng-click= "selectPortlet($event,'1')">
+            <img src="assets/images/{{visibility[1] ==1 ? 'best-safety.jpg' : 'best-safety1.jpg'}}" alt="Best Safety">
     </div>
-    <div class="col-xs-5 portrait-box vis-{{visibility[6]}} rb" ng-class = "visibility[6] ==1 ? 'show-tick' : ''" ng-click= "selectPortlet($event,'6')">
-        <h3>Top 5 </h3>
-        <div class="safety-div" ng-show = "visibility[6] ==1"></div>
-        <p>Customers</p>
-    </div>
-</div>
-<div class="row">
-    <div class="col-xs-5 portrait-box vis-{{visibility[9]}} pl" ng-class = "visibility[9] ==1 ? 'show-tick' : ''" ng-click= "selectPortlet($event,'9')">
-        <h3>Load</h3>
-        <div class="safety-div" ng-show = "visibility[9] ==1"></div>
-        <p>Status</p>
-    </div>
-    <div class="col-xs-5 portrait-box vis-{{visibility[8]}} rb" ng-class = "visibility[8] ==1 ? 'show-tick' : ''" ng-click= "selectPortlet($event,'8')">
-        <h3>Info</h3>
-        <div class="safety-div" ng-show = "visibility[8] ==1"></div>
-        <p>Wheather</p>
-    </div>
-</div>
-<div class="row">
-    <div class="col-xs-5 portrait-box vis-{{visibility[7]}} lb" ng-class = "visibility[7] ==1 ? 'show-tick' : ''" ng-click= "selectPortlet($event,'7')">
-        <h3>Leader</h3>
-        <div class="safety-div" ng-show = "visibility[7] ==1"></div>
-        <p>Board</p>
-    </div>
-    <div class="col-xs-5 portrait-box vis-{{visibility[4]}} lb" ng-class = "visibility[4] ==1 ? 'show-tick' : ''" ng-click= "selectPortlet($event,'4')">
-        <h3>Truck</h3>
-        <div class="safety-div" ng-show = "visibility[4] ==1"></div>
-        <p>Location</p>
-    </div>
-</div>
-<div class="row">
-    <div class="col-xs-5 portrait-box vis-{{visibility[3]}} db" ng-class = "visibility[3] ==1 ? 'show-tick' : ''" ng-click= "selectPortlet($event,'3')">
-        <h3>Driver</h3>
-        <div class="safety-div" ng-show = "visibility[3] ==1"></div>
-        <p>Message</p>
-    </div>
-    <div class="col-xs-5 portrait-box vis-{{visibility[5]}} rb" ng-class = "visibility[5] ==1 ? 'show-tick' : ''" ng-click= "selectPortlet($event,'5')">
-        <h3>News</h3>
-        <div class="safety-div" ng-show = "visibility[5] ==1"></div>
-        <p>Feeds</p>
+    <div class=" portrait-box vis-{{visibility[6]}}" ng-click= "selectPortlet($event,'6')">
+        <img src="assets/images/{{visibility[6] ==1 ? 'top-customer.jpg' : 'top-customer1.jpg'}}" alt="Top five customer">
     </div>
 </div>
 
 <div class="row">
-    <div class="col-xs-5 portrait-box vis-{{visibility[2]}} gb" ng-class = "visibility[2] ==1 ? 'show-tick' : ''" ng-click= "selectPortlet($event,'2')">
-        <h3>Capacity</h3>
-        <div class="safety-div" ng-show = "visibility[2] ==1"></div>
-        <p>Analysis</p>
+    <div class=" portrait-box vis-{{visibility[9]}}" ng-click= "selectPortlet($event,'9')">
+        <img src="assets/images/{{visibility[9] ==1 ? 'Load-Status.jpg' : 'Load-Status1.jpg'}}" alt="Best Safety">
     </div>
-    <div class="col-xs-5 portrait-box vis-{{visibility[10]}} db" ng-class = "visibility[10] ==1 ? 'show-tick' : ''" ng-click= "selectPortlet($event,10)">
-        <h3>Today</h3>
-        <div class="safety-div" ng-show = "visibility[10] ==1"></div>
-        <p>Insights</p>
+    <div class=" portrait-box vis-{{visibility[8]}}" ng-click= "selectPortlet($event,'8')">
+        <img src="assets/images/{{visibility[8] ==1 ? 'weather-info.jpg' : 'weather-info1.jpg'}}" alt="Weather Info">
+    </div>
+</div>
+<div class="row">
+    <div class=" portrait-box vis-{{visibility[7]}}" ng-click= "selectPortlet($event,'7')">
+        <img src="assets/images/{{visibility[7] ==1 ? 'leader-boad.jpg' : 'leader-boad1.jpg'}}" alt="Leader Board">
+        
+    </div>
+    <div class=" portrait-box vis-{{visibility[4]}}" ng-click= "selectPortlet($event,'4')">
+        <img src="assets/images/{{visibility[4] ==1 ? 'truck-location.jpg' : 'truck-location1.jpg'}}" alt="Truck Location">
+    </div>
+</div>
+<div class="row">
+    <div class=" portrait-box vis-{{visibility[3]}}" ng-click= "selectPortlet($event,'3')">
+        <img src="assets/images/{{visibility[3] ==1 ? 'driver-messages.jpg' : 'driver-messages1.jpg'}}" alt="Driver Messages">
+        
+    </div>
+    <div class=" portrait-box vis-{{visibility[5]}}" ng-click= "selectPortlet($event,'5')">
+        <img src="assets/images/{{visibility[5] ==1 ? 'news-feed.jpg' : 'news-feed1.jpg'}}" alt="News Feed">
+    </div>
+</div>
+
+<div class="row">
+    <div class=" portrait-box vis-{{visibility[2]}}" ng-click= "selectPortlet($event,'2')">
+        <img src="assets/images/{{visibility[2] ==1 ? 'capacity.jpg' : 'capacity1.jpg'}}" alt="Capacity Analysis">        
+    </div>
+    <div class=" portrait-box vis-{{visibility[10]}}" ng-click= "selectPortlet($event,10)">
+        <img src="assets/images/{{visibility[10] ==1 ? 'today-insights.jpg' : 'today-insights1.jpg'}}" alt="Today Insights">
+    </div>
+</div>
+
+<div class="row">
+    <div class=" portrait-box vis-{{visibility[11]}}" ng-click= "selectPortlet($event,11)">
+        <img src="assets/images/{{visibility[11] ==1 ? 'quick-updates.jpg' : 'quick-updates1.jpg'}}" alt="Quick Updates">
     </div>
 </div>
 </div>
@@ -134,7 +123,7 @@
                             <li>
                                 <a  href="#/trailers">{{ languageCommonVariables.trailer }}
                                     <span class="icon-thumbnail">tl</span></a>
-                                </li>
+                            </li>
               <!-- <li>
                 <a  href="#/maintenance">{{ languageCommonVariables.maintenance }}</a>
                 <span class="icon-thumbnail">MN</span>
@@ -147,6 +136,12 @@
         </li>
         <li>
             <a class="test" href="#/broker"><span class="title">{{ languageCommonVariables.broker }}</span>
+                <span class="icon-thumbnail"><i class="fa fa-stack-exchange" aria-hidden="true"></i></span>
+            </a>
+
+        </li>
+        <li>
+            <a class="test" href="#/shipper"><span class="title">{{ languageCommonVariables.shipper }}</span>
                 <span class="icon-thumbnail"><i class="fa fa-stack-exchange" aria-hidden="true"></i></span>
             </a>
 

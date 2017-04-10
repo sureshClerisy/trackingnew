@@ -38,6 +38,7 @@ $lang['specialInfo'] = 'Special Information';
 $lang['exportCSV'] = 'Export as CSV';
 $lang['editBroker'] = 'Edit Broker';
 $lang['deleteBroker'] = 'Delete Broker';
+$lang['deleteShipper'] = 'Delete shipper';
 $lang['blackListBroker'] = 'Black List Broker';
 $lang['acceptBroker'] = 'Accept Broker';
 $lang['editDriver'] = 'Edit Driver';

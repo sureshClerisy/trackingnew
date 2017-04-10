@@ -16,20 +16,24 @@
     <link rel="icon" type="image/x-icon" href="pages/ico/favicon.ico" />
     
    
-   
-    <link href="pages/css/css.css" rel="stylesheet" type="text/css">
+    <?php 
+        createScriptOrLinkTag('pages/css/css.css');
+        createScriptOrLinkTag('pages/css/css-table.css');
+    ?>
+
     <link href="pages/css/css-table.css" rel="stylesheet" type="text/css">
     <link href="assets/plugins/pace/pace-theme-flash.css" rel="stylesheet" type="text/css" />
     <link href="assets/plugins/bootstrapv3/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
     <link href="assets/plugins/font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css" />
     <link href="assets/plugins/jquery-scrollbar/jquery.scrollbar.css" rel="stylesheet" type="text/css" media="screen" />
     <link href="pages/css/pages-icons.css" rel="stylesheet" type="text/css">
-    <link href="pages/css/pages.css" class="main-stylesheet" rel="stylesheet" type="text/css" />
+    <?php createScriptOrLinkTag('pages/css/pages.css');?>
+
     <link href="assets/plugins/dropzone/css/dropzone.css" class="main-stylesheet" rel="stylesheet" type="text/css" />  <!-- dropzone css -->
-	<link href="assets/plugins/angular-gantt/angular-gantt/assets/angular-gantt.css" rel="stylesheet" type="text/css" media="screen">
-	<link href="assets/plugins/angular-gantt/angular-gantt/assets/angular-gantt-plugins.css" rel="stylesheet" type="text/css" media="screen">
-	<link href="assets/plugins/angular-gantt/angular-ui-tree/dist/angular-ui-tree.css" rel="stylesheet" type="text/css" media="screen">
-	<link href="assets/plugins/angular-gantt/angular-gantt/src/plugins/tooltips/tooltips.css" rel="stylesheet" type="text/css" media="screen">
+    <link href="assets/plugins/angular-gantt/angular-gantt/assets/angular-gantt.css" rel="stylesheet" type="text/css" media="screen">
+    <link href="assets/plugins/angular-gantt/angular-gantt/assets/angular-gantt-plugins.css" rel="stylesheet" type="text/css" media="screen">
+    <link href="assets/plugins/angular-gantt/angular-ui-tree/dist/angular-ui-tree.css" rel="stylesheet" type="text/css" media="screen">
+    <link href="assets/plugins/angular-gantt/angular-gantt/src/plugins/tooltips/tooltips.css" rel="stylesheet" type="text/css" media="screen">
     <link href="assets/plugins/bootstrap-timepicker/bootstrap-timepicker.min.css" rel="stylesheet" type="text/css" />
     <link href="assets/plugins/bootstrap-select2/select2.css" rel="stylesheet" type="text/css" />
     <link href="assets/plugins/angular-ui-select/select.min.css" rel="stylesheet" type="text/css" />
@@ -37,7 +41,7 @@
     <link type="text/css" rel="stylesheet" href="assets/plugins/jquery-datatable/media/css/jquery.dataTables.css">
     <link type="text/css" rel="stylesheet" href="assets/plugins/jquery-datatable/extensions/fixedheader/css/fixedHeader.dataTables.min.css">
     <link type="text/css" rel="stylesheet" href="assets/plugins/jquery-datatable/extensions/RowReorder/css/rowReorder.dataTables.min.css">
-    <link type="text/css" rel="stylesheet" href="assets/plugins/jquery-datatable/extensions/Responsive/css/responsive.dataTables.min.css">
+    <link type="text/css" rel="stylesheet" href="assets/plugins/jquery-datatable/extensions/Responsive/css/responsive.dataTables.min.css">    
    <!-- BEGIN VENDOR JS -->
 
 
@@ -72,8 +76,10 @@
     <script src="//cdn.pubnub.com/pubnub.min.js"></script>
     <script src="app/dependecies.min.js"></script>
     <script src="//pubnub.github.io/angular-js/scripts/pubnub-angular.js"></script>
-    <script src="app/routes.js"></script>
-    <script src="app/mainController.js"></script>
+    <?php 
+    createScriptOrLinkTag('app/routes.js','script');
+    createScriptOrLinkTag('app/mainController.js','script');?>
+    
     <script src="app/config.lazyload.js" type="text/javascript"></script>
     <script src="assets/js/jstz.min.js" type="text/javascript"></script>
 
@@ -97,32 +103,36 @@
     <script src='assets/plugins/bootstrap-datepicker/js/bootstrap-datepicker.js'></script>
    
     <script src="app/packages/dirPagination.js"></script>
-    <script src="app/services/myServices.js"></script>
+    <?php createScriptOrLinkTag('app/services/myServices.js','script');?>
     <script src="app/services/sample.js"></script>
     <script src="app/helper/myHelper.js"></script>
     
 
     <!-- App Controller -->
-    <script src="app/controllers/ItemController.js"></script>
-    <script src="app/controllers/authCtrl.js"></script>
-    <script src="app/controllers/trucksController.js"></script>
-    <script src="app/controllers/truckstopController.js"></script>
-    <script src="app/controllers/driversController.js"></script>
-    <script src="app/controllers/loadsController.js"></script>
-    <script src="app/controllers/iterationLoadsController.js"></script>
-    <script src="app/controllers/autoLoadsController.js"></script>
-    <script src="app/controllers/assignedLoadsController.js"></script>
-    <script src="app/controllers/search.js"></script>
-    <script src="app/controllers/brockersController.js"></script>
-    <script src="app/controllers/docsController.js"></script>
-    <script src="app/controllers/billingsController.js"></script>
-    <script src="app/controllers/filteredBillingsController.js"></script>
-    <script src="app/controllers/reportsController.js"></script>
-    <script src="app/controllers/testController.js"></script>
-    <script src="app/controllers/trailersController.js"></script>
-    <script src="app/controllers/sendPaymentController.js"></script>
-    <script src="app/controllers/notificationsController.js"></script>
-    <script src="app/controllers/billingDashboardController.js"></script>
+    <?php 
+    createScriptOrLinkTag('app/controllers/ItemController.js','script');
+    createScriptOrLinkTag('app/controllers/authCtrl.js','script');
+    createScriptOrLinkTag('app/controllers/trucksController.js','script');
+    createScriptOrLinkTag('app/controllers/truckstopController.js','script');
+    createScriptOrLinkTag('app/controllers/driversController.js','script');
+    createScriptOrLinkTag('app/controllers/loadsController.js','script');
+    createScriptOrLinkTag('app/controllers/iterationLoadsController.js','script');
+    createScriptOrLinkTag('app/controllers/autoLoadsController.js','script');
+    createScriptOrLinkTag('app/controllers/assignedLoadsController.js','script');
+    createScriptOrLinkTag('app/controllers/search.js','script');
+    createScriptOrLinkTag('app/controllers/brockersController.js','script');
+    createScriptOrLinkTag('app/controllers/docsController.js','script');
+    createScriptOrLinkTag('app/controllers/billingsController.js','script');
+    createScriptOrLinkTag('app/controllers/filteredBillingsController.js','script');
+    createScriptOrLinkTag('app/controllers/reportsController.js','script');
+    createScriptOrLinkTag('app/controllers/testController.js','script');
+    createScriptOrLinkTag('app/controllers/trailersController.js','script');
+    createScriptOrLinkTag('app/controllers/sendPaymentController.js','script');
+    createScriptOrLinkTag('app/controllers/notificationsController.js','script');
+    createScriptOrLinkTag('app/controllers/billingDashboardController.js','script');
+    createScriptOrLinkTag('app/controllers/driversInsightsController.js','script');
+    //createScriptOrLinkTag('app/controllers/shipperController.js','script');
+    ?>
     <script src="login/loadLanguages"></script>
     <!--for footable-->
     

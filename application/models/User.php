@@ -193,6 +193,20 @@ class User extends CI_Model
 		$this->db->update("keys",array("key"=>$key));
 	}
 
+	/**
+	* Fetching list of logged dispatchers childrens
+	*/
+
+	public function fetchDispatchersChilds( $userId = null ) {
+		$this->db->select('id');
+		$this->db->where('users.childs_parent',$userId);
+		$result = $this->db->get('users');
+		if( $result->num_rows() > 0 )
+			return $result->result_array();
+		else
+			return array();
+	}
+
 }
 
 ?>

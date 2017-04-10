@@ -46,7 +46,7 @@ class Iterationloads extends Admin_Controller{
 		$this->pickupDate 		= date('Y-m-d');
 		$this->weekDays 		= $this->config->item('WEEKDAYS');	
 		
-		$this->load->model(array('Vehicle','Job','User'));
+		$this->load->model(array('Vehicle','Job','User','Driver'));
 		$this->load->helper('truckstop');
 		$this->userId 		= $this->session->loggedUser_id;
 		$this->origin_state  = $this->Vehicle->get_vehicles_state($this->session->admin_id);
@@ -82,6 +82,7 @@ class Iterationloads extends Admin_Controller{
 		
 		$userId = false;
 		$parentId = $this->userId;
+		$childIds  = array();
 		
 		if ( $this->userRoleId == 4 ) {
 			$parentIdCheck = $this->session->userdata('loggedUser_parentId');
@@ -90,12 +91,15 @@ class Iterationloads extends Admin_Controller{
 				$parentId = $parentIdCheck;
 			}
 		}
-		
+
+		$childIds = $this->User->fetchDispatchersChilds($this->userId);
+
 		$gVehicleId = false;
 		$driverType = "driver";
 		$gDropdown 	= array();
 	 
 		if(isset($_COOKIE["_globalDropdown"])){
+
 			$gDropdown = json_decode($_COOKIE["_globalDropdown"],true);
 			if ( isset($gDropdown["label"]) && $gDropdown["label"] == "_idispatcher" ) {
 				$gVehicleId = false;
@@ -104,11 +108,13 @@ class Iterationloads extends Admin_Controller{
 			} else {
 				$gVehicleId = $gDropdown["vid"];
 			}
+			$vehParentId = isset($gDropdown['dispId']) ? $gDropdown['dispId'] : '';
 		 $driverType = isset($gDropdown["label"]) && ($gDropdown["label"] == "team" || $gDropdown["label"] == "_team") ? "team" : "driver";
+		} else {
+			$vehParentId = $parentId;
 		}
-		
-		$statesAddress = $this->Vehicle->get_vehicles_address($parentId,$gVehicleId);
-
+	
+		$statesAddress = $this->Vehicle->get_vehicles_address($vehParentId,$gVehicleId);
 		if(!empty($statesAddress)){
 			if(!empty($statesAddress[0]["teamDriverName"])){
 				$driverType = "team";
@@ -132,17 +138,27 @@ class Iterationloads extends Admin_Controller{
 			} else if ( $this->userRoleId == 4 ) {
 				$userId = $parentId;
 			}
-			$this->load->model("Driver");
+			
 			$vehicleList 	= $this->Driver->getDriversList($userId,true);
 			$teamList 		= $this->Driver->getDriversListAsTeam($userId);
 			
+			if ( !empty($childIds)) {
+				foreach($childIds as $child ) {
+					$childVehicles = $this->Driver->getDriversList($child['id'],true);
+					$vehicleList = array_merge($vehicleList,$childVehicles);	
+					
+					$childVehicles = $this->Driver->getDriversListAsTeamNew($child['id']);
+					$teamList = array_merge($teamList,$childVehicles);
+				}
+			}
+
 			if(is_array($teamList) && count($teamList) > 0){
 				foreach ($teamList as $key => $value) {
 					$value["label"] = "_team";
 					array_unshift($vehicleList, $value);
 				}
 			}
-			
+
 			if (isset($gDropdown["label"]) && ($gDropdown["label"] != "_idispatcher" && $gDropdown["label"] != "_iall" && $gDropdown["label"] != ""))    {
 				$dName = $gDropdown["driverName"];
 			}else{ 
@@ -194,12 +210,9 @@ class Iterationloads extends Admin_Controller{
 				}
 			} else {
 				$pickupDateDest = $pickupDate 	= date('Y-m-d');
-				// $pickupDateDest = date('Y-m-d');
 			}
 
-			
 			$deadMilesOriginLocation = $this->origin_city.','.$this->origin_state.', '.$country; 
-			
 			$data['rows'] = $this->commonApiHits( $statesAddress['0']['vehicle_type'], $dateTime, $hoursOld);	
 				
 			$price = array();
@@ -228,7 +241,7 @@ class Iterationloads extends Admin_Controller{
 			$newData['driverType'] = $driverType;
 			
 			echo json_encode(array('loadsData'=> $newData));
-		}else{
+		} else {
 			echo json_encode(array('loadsData'=> false));
 		}
 	}

@@ -17,15 +17,10 @@ class Vehicles extends Admin_Controller {
 		$this->userId     = $this->session->loggedUser_id;
 		$this->roleId     = $this->session->role;	
 		$this->userName   = $this->session->loggedUser_username;
-		// $this->entity     = $this->config->item('entity');
-		// $this->event      = $this->config->item('event');
-		// $this->protocol   = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
-		// $this->serverAddr = $this->protocol.$_SERVER['HTTP_HOST'].'/trackingnew/';
-
 		$this->load->library('user_agent');
 		$this->load->model('Vehicle','vehicle');		
 		$this->load->model('Garage','garage');
-		$this->load->model('Job');
+		$this->load->model(array('Job','User'));
 		$this->load->helper('truckstop_helper');
 	}
 
@@ -35,6 +30,18 @@ class Vehicles extends Admin_Controller {
 		$parentIdCheck = $this->session->userdata('loggedUser_parentId');
 		if( isset($parentIdCheck) && $parentIdCheck != 0 ) {
 			$parent_id = $this->session->userdata('loggedUser_parentId');
+		}
+
+		if ( $this->roleId == 2 ) {
+			$parent_id = $this->userId;
+		}
+		$childIds = $this->User->fetchDispatchersChilds($this->userId);
+		if ( !empty($childIds) ) {
+			$parentId = array();
+			foreach($childIds as $child ) {
+				array_push($parentId,$child['id']);
+			}
+			$parent_id = array_merge($parentId,array($this->userId));
 		}
 		$data['rows'] = $this->vehicle->get_vechicls($parent_id);
 		$data['total_records'] = count($data['rows']);

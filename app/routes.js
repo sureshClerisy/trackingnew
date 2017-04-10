@@ -313,6 +313,45 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
 						}
 					},
 				},
+			}).state('driversInsights', {
+				url: '/driversInsights/:key/?:q',
+				title: "Drivers Insights",
+				templateUrl: 'assets/templates/loads/driversInsights.html',
+                controller: 'driversInsightsController',
+                controllerAs: 'dInsights',
+                moduleName: 'loads',
+                params: {
+                	type: true,
+                },
+                resolve:{
+					 deps: ['$ocLazyLoad', function($ocLazyLoad) {
+                            return $ocLazyLoad.load([
+                                    'datepicker',
+                                    'daterangepicker',
+									'timepicker',
+                                    'autonumeric',
+                                    'wysihtml5',
+                                    'signature',
+                                    'inputMask',
+                                    'telephonefilter',
+                                ], {
+                                    insertBefore: '#lazyload_placeholder'
+                                });
+                        }],
+					driverListing: function(dataFactory, $stateParams) {
+						var qstr = "";
+						if($stateParams.q != undefined){
+							 qstr = "/?"+$stateParams.q;
+						}
+						if ( $stateParams.type == true){
+							return dataFactory.httpRequest(URL+'/Loads/driversInsights/'+$stateParams.key+qstr);
+						}
+						else{
+							var response = {total: 0,drivers: [], filterArgs:[]};
+							return response;
+						}
+					},
+				},
 			}).state('myLoad', {
 				url: '/myLoad',
 				title: 'My Loads',
@@ -338,8 +377,10 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
                                     insertBefore: '#lazyload_placeholder'
                                 });
                         }],
+                   
+
 					getAllAssignedLoads: function(dataFactory, $stateParams) {
-						if ( $stateParams.type == true )
+						if ( $stateParams.type == true ) 
 							return dataFactory.httpRequest(URL+'/Assignedloads/index');
 						else
 							return [];
@@ -572,7 +613,7 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
 				templateUrl: 'assets/templates/trailers/trailersListing.html',
                 controller: 'trailersController',
                 moduleName: 'trailers',
-                resolve:{            
+                resolve:{
 					getTrailersListing: function(dataFactory, $stateParams) {
 						return dataFactory.httpRequest(URL+'/trailers');
 					}
@@ -638,8 +679,43 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
 					}]
                 }
             })
-            
-
+            .state('shipper', {
+                url: '/shipper',
+                title: 'Add Shipper',
+                templateUrl: 'assets/templates/shipper/shipperListing.html',
+                controller: 'shipperController',
+                moduleName: 'brokers',
+                resolve:{
+                    getShipperListing: function(dataFactory, $stateParams) {
+                        return dataFactory.httpRequest(URL+'/shippers');
+                    }
+                }
+            }).state('editshipper', {
+                url: '/editshipper/:id',
+                title: 'Edit Shipper',
+                templateUrl: 'assets/templates/shipper/editShipper.html',
+                controller: 'editShipperController',
+                moduleName: 'brokers',
+                resolve:{            
+                    getShipperData: function(dataFactory, $stateParams) {
+                        return dataFactory.httpRequest(URL+'/shippers/update/' + $stateParams.id);
+                    },
+                    deps: ['$ocLazyLoad', function($ocLazyLoad) {
+                        return $ocLazyLoad.load([
+                            'inputMask',
+                            ], {
+                            insertBefore: '#lazyload_placeholder'
+                        })
+                    }]
+                }
+            })
+            .state('addshipper', {
+                url: '/addshipper',
+                title: 'Add Shipper',
+                templateUrl: 'assets/templates/shipper/addShipper.html',
+                controller: 'addShipperController',
+                moduleName: 'brokers',
+            })
 }]);
 
 app.run(function ($rootScope,$location,$state,$cookies,dataFactory, $document) {

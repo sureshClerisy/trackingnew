@@ -20,9 +20,11 @@ class Vehicle extends Parent_Model
         $this->db->join('equipment_types',("FIND_IN_SET(equipment_types.abbrevation , vehicles.vehicle_type) > 0"), 'LEFT');
         $this->db->join('users',("drivers.user_id = users.id"), 'LEFT');
         $this->db->join('drivers as team','vehicles.team_driver_id = team.id','left');
-      
-        if($userId)
-			$this->db->where('vehicles.user_id',$userId);   
+        
+        if ( is_array($userId) && !empty($userId) ) {
+            $this->db->where_in('drivers.user_id',$userId); 
+        } else if($userId)
+			$this->db->where('drivers.user_id',$userId);   
 			
 		$this->db->Group_by('vehicles.id');
         $result = $this->db->get(); 
@@ -200,7 +202,7 @@ class Vehicle extends Parent_Model
         }
     }
 
-    public function get_vehicles_address($userid=null,$vehicleId = null){
+    public function get_vehicles_address($userid = null,$vehicleId = null){
 		$this->db->select('CONCAT( drivers.first_name ," + " ,team.first_name) AS teamDriverName , ABS( TIMESTAMPDIFF( MINUTE , Now( ) , vehicles.`modified` ) ) AS mintues_ago,  telemetry, CONCAT(DATE_FORMAT( CONVERT_TZ( vehicles.`modified`, "+00:00", "-05:00" ) , "%d-%b-%Y %r" )," ","EST") AS timestamp, vehicles.state,vehicles.tracker_id, vehicles.id, vehicles.city, vehicles.vehicle_address, vehicle_type, label, concat(drivers.first_name," ",drivers.last_name) as `driverName` ,users.username,destination_address,vehicles.latitude, vehicles.longitude,vehicles.user_id, drivers.id as driver_id');
         $this->db->join('vehicles','drivers.id = vehicles.driver_id');
         $this->db->join('users','drivers.user_id = users.id');

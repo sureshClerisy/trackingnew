@@ -15,18 +15,19 @@ class Billings extends Admin_Controller{
 	public $finalArray;
 	public $triumphToken;
 	public  $userName;
+	public $data;
 
 	function __construct(){
 		parent::__construct();
 		
+		$this->userRoleId  = $this->session->role;
 		$this->userId 		= $this->session->loggedUser_id;
 		$this->userName   	= $this->session->loggedUser_username;
-		$this->load->model('Vehicle');
-		$this->load->model('Job');
-		$this->load->model('Billing');
+		$this->load->model(array('Vehicle','Job','Billing'));
 		$this->load->helper('truckstop');
 		$this->load->helper('download');
 		
+		$this->data = array();
         if ( $this->config->item('triumph_environment') == 'production' ) {
 			$this->triuser  			= $this->config->item('triumph_user');
 			$this->password				= $this->config->item('triumph_pass');
@@ -44,7 +45,11 @@ class Billings extends Admin_Controller{
 	}
 	
 	public function index( $parameter = '' ) {
-		$data = array();
+		if ( !in_array($this->userRoleId, $this->config->item('with_admin_role')) ) {
+			echo json_encode($this->data);
+			exit();
+		}
+
 		$filters = array("itemsPerPage"=>20, "limitStart"=>1, "sortColumn"=>"DeliveryDate", "sortType"=>"DESC");
 		$filters["startDate"] = $filters["endDate"] = '';
 		if(isset($_COOKIE["_gDateRangeBilling"]) && !empty($_COOKIE["_gDateRangeBilling"])){
@@ -53,22 +58,22 @@ class Billings extends Admin_Controller{
 		}
 
 		$jobs = $this->Billing->getInProgressLoads( $parameter, false, $filters );
-		$data['total'] = $this->Billing->getInProgressLoads( $parameter, true, $filters );
+		$this->data['total'] = $this->Billing->getInProgressLoads( $parameter, true, $filters );
 		
-		$data['loads'] = $jobs;
-		$data['billType'] = 'billing';
+		$this->data['loads'] = $jobs;
+		$this->data['billType'] = 'billing';
 		
-		echo json_encode($data);
+		echo json_encode($this->data);
 	}
 		
 	public function fetchVehicleAddress( $vehicleId = null ) {
-		$data = array();
+		
 		$result = $this->Job->fetchVehicleAddress( $vehicleId);
 		if ( !empty($result) ) {
-			$data = $result;
+			$this->data = $result;
 		}
 		
-		echo json_encode($data);
+		echo json_encode($this->data);
 	}
 
 	/**
@@ -76,9 +81,13 @@ class Billings extends Admin_Controller{
 	*/ 
 	
 	public function sendForPayment() {
-		$data = $this->fetchingSentPaymentsInfo();
-		$data['billType'] = 'sendForPayment';
-		echo json_encode($data);
+		if ( !in_array($this->userRoleId, $this->config->item('with_admin_role')) ) {
+			echo json_encode($this->data);
+			exit();
+		}
+		$this->data = $this->fetchingSentPaymentsInfo();
+		$this->data['billType'] = 'sendForPayment';
+		echo json_encode($this->data);
 	}
 	
 	/**
@@ -86,11 +95,10 @@ class Billings extends Admin_Controller{
 	 */
 	  
 	public function fetchingSentPaymentsInfo() {
-		$data = array();
-		$data['loads'] = $this->Billing->fetchLoadsForPayment();
-		$data['sentPaymentCount'] = $this->Billing->sentPaymentCount();
-		$data['flaggedPaymentCount'] = $this->Billing->flaggedPaymentCount();
-		return $data;
+		$this->data['loads'] = $this->Billing->fetchLoadsForPayment();
+		$this->data['sentPaymentCount'] = $this->Billing->sentPaymentCount();
+		$this->data['flaggedPaymentCount'] = $this->Billing->flaggedPaymentCount();
+		return $this->data;
 	}
 	
 	/**
@@ -98,8 +106,12 @@ class Billings extends Admin_Controller{
 	 */
 	
 	public function fetchSentPaymentRecords() {
-		$data['loads'] = $this->Billing->fetchSentPaymentLoads();
-		echo json_encode($data);
+		if ( !in_array($this->userRoleId, $this->config->item('with_admin_role')) ) {
+			echo json_encode($this->data);
+			exit();
+		}
+		$this->data['loads'] = $this->Billing->fetchSentPaymentLoads();
+		echo json_encode($this->data);
 	} 	
 	
 	/**

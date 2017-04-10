@@ -16,12 +16,7 @@ app.controller('AdminController', function($scope,$interval, $document,$timeout,
     $scope.otherIcon = true;
 
     $scope.todayProgress = false;
-    $scope.ifPre1 = true;
-    $scope.ifPre2 = true;
-    $scope.ifPre3 = true;
-    $scope.ifPre4 = true;
-    $scope.ifPre5 = true;
-    $scope.tSortableWidgets = 9;
+    $scope.tSortableWidgets = 11;
     
     Highcharts.setOptions({
         lang: {
@@ -74,8 +69,22 @@ app.controller('AdminController', function($scope,$interval, $document,$timeout,
     };
 
 
+    $scope.refresh = function(portlet,src) {
+ 
+            $timeout(function() {
+                topFiveCustomer();
+                $(portlet).portlet({ refresh: false });
+            }, 500);
+  
+    }
+
+
    $scope.showRecordsWithFilter = function(type,page, disType, username, dispatcherId, secondDriverId,extra){
-        if ( type != undefined && type == 'broker' ) {
+        if(type != undefined && type == 'idleloads'){
+                disType = (extra.team_driver_id == 0 || extra.team_driver_id == "" ) ? 'driver' : 'team';
+            args = "filterType=idle&userType="+disType+"&driverId="+extra.driver_id+"&secondDriverId="+extra.team_driver_id+"&cilckedEntity="+extra.driverName;
+            $state.go(page, { 'key': 'drivers', q:args, type:true }, { reload: true } );
+        }else if ( type != undefined && type == 'broker' ) {
             var brokerId = page;
             args = "userType="+type+"&userToken="+brokerId+"&dispatcherId="+dispatcherId+"&driverId="+username+"&secondDriverId="+secondDriverId+"&startDate="+$scope.dateRangeSelector.startDate+"&endDate="+$scope.dateRangeSelector.endDate;
             $state.go('loads', { 'key': 'broker', q:args, type:true }, { reload: true } );
@@ -94,7 +103,6 @@ app.controller('AdminController', function($scope,$interval, $document,$timeout,
                     }
                    
                 } else if (tempBuffer.label == "_idispatcher"){
-                    console.log(secondDriverId);
                     if ( type == 'reports') {
                         keyParam = username.toLowerCase().replace(/[\s]/g, '');
                         if ( secondDriverId != undefined && secondDriverId  != '' && secondDriverId != 0 )
@@ -118,11 +126,17 @@ app.controller('AdminController', function($scope,$interval, $document,$timeout,
                     args = "filterType="+type+"&userType=all";keyParam = "all";
                 }
 
-            if(keyParam != "" && ( extra == "" || extra == undefined )){
+            if( type == "withoutTruck" ){
+                keyParam = type;    
+                args += "&fromDate="+extra ;
+            }if(keyParam != "" && ( extra == "" || extra == undefined )  ){
                 args += "&startDate="+$scope.dateRangeSelector.startDate+"&endDate="+$scope.dateRangeSelector.endDate;
-            }else{
+            }else if(extra != undefined){
                 args += "&fromDate="+extra.date ;
-                keyParam = "drivers";
+                keyParam = "drivers";    
+                if(extra.type == 'idle'){
+                    keyParam = extra.type;  
+                }
             }
             $state.go(page, { 'key': keyParam, q:args, type:true }, { reload: true } );
         }
@@ -242,6 +256,10 @@ app.controller('AdminController', function($scope,$interval, $document,$timeout,
                 {"name": "TopCustomers",  "data" : data.paymentAmount, type: "column", id: 's55'}
             ];
 
+            globalDash.activeDriversWTruck    = data.totalDrivers;
+            globalDash.activeDriversDate      = data.todayDate;
+            globalDash.trucksNotReporting     = data.trucksNotReporting;
+            globalDash.vehiclesWithoutDriver   = data.vehiclesWithoutDriver;
             
         });         
 
@@ -273,8 +291,12 @@ app.controller('AdminController', function($scope,$interval, $document,$timeout,
                 cursor:"pointer",
                 events: {
                     click: function (event) {
-                        console.log(event.point.y + " - " + event.point.date);
-                        $scope.showRecordsWithFilter(event.point.type,"loads", "driver", "", "", "", event.point);
+                        if(event.point.type == "idle"){
+                            $scope.showRecordsWithFilter(event.point.type,"driversInsights", "driver", "", "", "", event.point);
+                        }else{
+                            $scope.showRecordsWithFilter(event.point.type,"loads", "driver", "", "", "", event.point);
+                        }
+                        
                     }
                 }
             }
@@ -472,28 +494,40 @@ app.controller('AdminController', function($scope,$interval, $document,$timeout,
     $scope.selDrivers = []; //Dashboard drivers multiview && aggregated
     $scope.driverName = false;
     dataFactory.httpRequest(URL+'/dashboard/fetchWidgetsOrder').then(function(data){
-        
+    
+    console.log(data.widgetsOrder);
+
     if(data.widgetsOrder.length == 0 ) {
-         $scope.tSortableWidgetsLeft  = '1,2,3,4,5';
-         $scope.tSortableWidgetsRight = '6,7,8,9,10';
-     } else {
-         $scope.tSortableWidgetsLeft  = data.widgetsOrder.left;
-         $scope.tSortableWidgetsRight = data.widgetsOrder.right;
-     }
 
-     $scope.visibility  = data.widgetVisibility;
-     $scope.user_role   = data.user_role;
+        $scope.tSortableWidgetsLeft  = '1,2,3,4,5';
+        $scope.tSortableWidgetsRight = '6,7,8,9,10,11';
+    } else {
+        $scope.tSortableWidgetsLeft  = data.widgetsOrder.left;
+        $scope.tSortableWidgetsRight = data.widgetsOrder.right;
+    }
+    
+    $scope.visibility   = data.widgetVisibility;
+    $scope.user_role    = data.user_role;
 
-     var orderArray = $scope.tSortableWidgetsLeft.split(',');
+    var orderArray      = $scope.tSortableWidgetsLeft.split(',');
+    var listArray       = $('.widget_div .wpanel');
+    
+    console.log(listArray);
+    console.log('=======================');
+    
+    for (var i = 0; i < orderArray.length; i++) {
+        
+        console.log(listArray[orderArray[i]-1]);
 
-     var listArray = $('.widget_div .wpanel');
-     for (var i = 0; i < orderArray.length; i++) {
         $('#placeholder_left').append(listArray[orderArray[i]-1]);
     }
 
-    var orderArray = $scope.tSortableWidgetsRight.split(',');
-    for (var i = 0; i < orderArray.length; i++) {
-        $('#placeholder_right').append(listArray[orderArray[i]-1]);
+    var orderArray1 = $scope.tSortableWidgetsRight.split(',');
+    for (var i = 0; i < orderArray1.length; i++) {
+        
+        console.log(listArray[orderArray1[i]-1]);
+
+        $('#placeholder_right').append(listArray[orderArray1[i]-1]);
     } 
 
 
@@ -1333,6 +1367,11 @@ $scope.getWeatherInfo = function(){
         $scope.rssfeeds = data.feeds;
     });
 
+   /* dataFactory.httpRequest(URL+'/dashboard/fetchActiveDriversWithoutTruck').then(function(data){
+        globalDash.activeDriversWTruck = data.totalDrivers;
+        globalDash.activeDriversDate   = data.todayDate; 
+    });
+*/
 $rootScope.updateDashboard = function(){
   //  console.log($scope.dateRangeSelector);
     var sterm = '';

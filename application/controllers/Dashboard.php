@@ -22,10 +22,7 @@ class Dashboard extends CI_Controller {
 
 	function __construct() {
 		parent::__construct();
-		$this->load->library('Htmldom');
-		$this->load->model('Vehicle');
-		$this->load->model('Job');
-		$this->load->model('Driver');
+		$this->load->model(array('Vehicle','Job','Driver','User'));
 		$this->userId = $this->session->loggedUser_id;
 		$this->userRoleId = $this->session->role;
 
@@ -43,7 +40,6 @@ class Dashboard extends CI_Controller {
 		$this->teamMilesGoal 					= 0;
 		$this->singleFinancialGoal				= 0;
 		$this->singleMilesGoal				 	= 0;
-
 	}
 
 	public function getTodayReport($type){
@@ -274,6 +270,9 @@ class Dashboard extends CI_Controller {
 				}
 			}
 		}
+		
+		$childIds  = array();				// dispatchers child list
+		$childIds = $this->User->fetchDispatchersChilds($this->userId);
 
 		if(count($allVehicles) <= 0)
 			$allVehicles = $this->Driver->getDriversList($userId,true,true);
@@ -281,7 +280,22 @@ class Dashboard extends CI_Controller {
 		$teamList 		= $this->Driver->getDriversListAsTeam($userId,true);
 		$dispatcherList = $this->Driver->getDispatcherList($userId);
 		
+		if ( !empty($childIds)) {
+			$childVehicles = array();
+			foreach($childIds as $child ) {
+				$childVehicles = $this->Driver->getDriversList($child['id'],true,true);
+				$allVehicles = array_merge($allVehicles,$childVehicles);	
+				
+				$childVehicles = $this->Driver->getDriversListAsTeam($child['id'],true);
+				$teamList = array_merge($teamList,$childVehicles);
+
+				$childs = $this->Driver->getDispatcherList($child['id']);
+				$dispatcherList = array_merge($dispatcherList,$childs);
+			}
+		}
+
 		$vehicleList 	= array();
+
 		if(!empty($allVehicles) && is_array($allVehicles)){	
 			$vehicleList = $allVehicles;
 			if(is_array($teamList) && count($teamList) > 0){
@@ -1522,6 +1536,15 @@ class Dashboard extends CI_Controller {
 		$data["xAxis"] = array();
 		$data["valueIds"] = array();
 		$colors =  array('rgba(7, 126, 208, 1)','rgba(109,92,174,1)','rgba(52, 214, 199, 1)','rgba(245,87,83,1)','#626262');
+		$filters = $args;
+		$filters["itemsPerPage"] =20; 
+		$filters["limitStart"] =1; 
+		$filters["sortColumn"] ="DeliveryDate"; 
+		$filters["sortType"] ="DESC"; 
+
+		$driversWithoutTruck = $this->Driver->fetchDriversWithoutTruck($filters,true);
+		$trucksNotReporting = $this->Driver->trucksReporting($filters,true);
+		$vehiclesWithoutDriver = $this->Driver->fetchTrucksWithoutDriver($filters,true);
 
 		$dispatcherId = isset($args['dispatcherId']) ? $args['dispatcherId'] : '';
 		$driverId = isset($args['driverId']) ? $args['driverId'] : '';
@@ -1542,7 +1565,26 @@ class Dashboard extends CI_Controller {
 		$data['valueIds']['driverId'] = $driverId;
 		$data['valueIds']['secondDriverId'] = $secondDriverId;
 
+		$data['totalDrivers'] = $driversWithoutTruck;
+		$data['trucksNotReporting'] = $trucksNotReporting;
+		$data['vehiclesWithoutDriver'] = $vehiclesWithoutDriver;
+		$data['todayDate'] 	  = date('Y-m-d');
+
 		echo json_encode($data); 				
 	}
+
+	/**
+	* Fetch active drivers without truck assigned
+	*/
+
+	/*public function fetchActiveDriversWithoutTruck() {
+		$totalDrivers = 0;
+		$drivers = $this->Driver->fetchDriversWithoutTruck();
+		if ( !empty($drivers)) 
+			$totalDrivers = $drivers['totalCount'];
+
+		
+		echo json_encode($data);
+	}*/
 
 }

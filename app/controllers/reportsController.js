@@ -124,7 +124,6 @@ app.controller('reportsController', function(dataFactory,$scope,$http ,$rootScop
 	$scope.backToList = function() {
 		$scope.panelTransparent = true;
 		$scope.showTable 		= false;
-		// alert($scope.showTable);
 
 	}
 

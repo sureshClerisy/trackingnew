@@ -11,10 +11,8 @@ class Drivers extends Admin_Controller
 	{ 
 		parent::__construct();	
 		$this->userName = $this->session->loggedUser_username;
-		// $this->entity = $this->config->item('entity');
-		// $this->event = $this->config->item('event');
 		$this->pathGen = str_replace('application/', '', APPPATH);
-		$this->load->model(array('Driver',"Job"));
+		$this->load->model(array('Driver',"Job", 'User'));
 		$this->load->helper('truckstop_helper');		
 		$this->roleId = $this->session->role;
 		if($this->roleId != 1){
@@ -30,6 +28,18 @@ class Drivers extends Admin_Controller
 		$parentIdCheck = $this->session->userdata('loggedUser_parentId');
 		if( isset($parentIdCheck) && $parentIdCheck != 0 ) {
 			$parent_id = $this->session->userdata('loggedUser_parentId');
+		}
+		if ( $this->roleId == 2 ) {
+			$parent_id = $this->userId;
+		}
+
+		$childIds = $this->User->fetchDispatchersChilds($this->userId);
+		if ( !empty($childIds) ) {
+			$parentId = array();
+			foreach($childIds as $child ) {
+				array_push($parentId,$child['id']);
+			}
+			$parent_id = array_merge($parentId,array($this->userId));
 		}
 		
 		$data['rows'] = $this->Driver->fetchAllRecords($parent_id);		
@@ -337,7 +347,17 @@ class Drivers extends Admin_Controller
 	 public function dispatcherList($driver_id = null)
 	 {
 		$data['selected'] = ''; 
-		$data['list'] = $this->Driver->get_dispatcher_list();
+		if ( $this->roleId == 2 )
+			$userId = $this->userId;
+		else
+			$userId = false;
+
+		$data['list'] = $this->Driver->get_dispatcher_list($userId, false);
+		$childIds = $this->Driver->get_dispatcher_list($this->userId, true);
+		if ( !empty($childIds) ) {
+			$data['list'] = array_merge($data['list'],$childIds);
+		}
+		
 		$new = array("id"=>"","username"=>"Unassigned");
 		array_unshift($data['list'], $new);
 		if(!empty($driver_id)){

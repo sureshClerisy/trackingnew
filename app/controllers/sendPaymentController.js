@@ -5,6 +5,7 @@ app.controller('sendPaymentController', ["dataFactory","$scope","$http","$rootSc
 	//----------drop-down ---------------------------
     $rootScope.extraStops = '';
     $scope.duplicatejobstatus='';
+    window.scrollTo(0,0);
 	
 	//~ $scope.trustAsHtml = function(value) {
         //~ return $sce.trustAsHtml(value);

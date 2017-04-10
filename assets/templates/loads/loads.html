@@ -24,7 +24,9 @@
 				<div class="row">
 					<div class="col-md-12 col-xlg-12">
 						<div class="commen-heading assigned-load-page">
-							<h2 class="oprate-dashbord">Loads ({{tableTitle[0]}}) <span ng-show="!showCalendar" class="small">{{filterArgs.fromDate}}</span></h2>
+							<h2 class="oprate-dashbord">Loads ({{tableTitle[0]}}) 
+								<span ng-show="!showCalendar" class="small">{{filterArgs.fromDate}}</span>
+							</h2>
 							<div class="label_select_box" ng-show="showCalendar"> 
 								<div class="input-cal-block">
 									<div class="input-prepend input-group">
@@ -144,7 +146,7 @@
 													<span class="wid">{{ languageCommonVariables.commonTableThAction }}</span>
 												</div>
 											</div>
-											<div class="table-row-main1 tb-body" data-pickdate="{{value.pickDate}}" data-uinfo="{{value.ID}}" dir-paginate="value in assignedLoads | itemsPerPage: itemsPerPage"  total-items="total" current-page="currentPage" ng-click="clickMatchLoadDetail(value.truckstopID, value.id, value.deadmiles, value.PaymentAmount, value.totalCost, value.pickDate, value.vehicle_id , $index)">
+											<div class="table-row-main1 tb-body" data-pickdate="{{value.pickDate}}" data-uinfo="{{value.ID}}" pagination-id="loadsPage" dir-paginate="value in assignedLoads | itemsPerPage: itemsPerPage"  total-items="total" current-page="currentPage" ng-click="clickMatchLoadDetail(value.truckstopID, value.id, value.deadmiles, value.PaymentAmount, value.totalCost, value.pickDate, value.vehicle_id , $index)">
 												
 												<div class="tb-cell ld-id"> <span> <div class="plus-1" ng-click="$event.stopPropagation();toggleRow($event,$index);"></div>{{ value.id }}</span></div>
 												<div class="tb-cell ph"> <span> {{ value.PointOfContactPhone }}</span></div>
@@ -281,209 +283,14 @@
 												
 										</div>
 									</div><!-- table-structure-main-block -->
-									<!-- <div class="dataTables_wrapper no-footer table-scroll-custom">
-										<table id="data" width="100%" class="row-click table-hover tr-hover fixed-thead table table-striped" cell-padding="0" cell-spacing="0">
-											<thead>
-												
-												<tr>
-													<th ><a class="thead-fsort lode-arrow {{idSortType}}" ng-click="sortCustom('id', idSortType)" href="javascript:void(0);">{{ languageArray.popupLoadId }}</a></th>
-													<th class="phn-number-th">{{ languageCommonVariables.commonTableThPhone }}</th>
-													<th><a class="thead-fsort lode-arrow {{equipment_optionsSortType}}" ng-click="sortCustom('equipment_options', equipment_optionsSortType)" href="javascript:void(0);">{{ languageArray.trlrLoadTableThHeading }}</a></th>
-													<th><a class="thead-fsort lode-arrow {{LoadTypeSortType}}" ng-click="sortCustom('LoadType', LoadTypeSortType)" href="javascript:void(0);">{{ languageArray.planthfl }}</a></th>
-													<th><a class="thead-fsort lode-arrow {{PickupDateSortType}}" ng-click="sortCustom('PickupDate', PickupDateSortType)" href="javascript:void(0);">{{ languageArray.planthpickup }}</a></th> 
 
-													<th><a class="thead-fsort lode-arrow {{DeliveryDateSortType}}" ng-click="sortCustom('DeliveryDate', DeliveryDateSortType)" href="javascript:void(0);">{{ languageArray.popupdelivery }}</a></th>
-
-													<th><a class="thead-fsort lode-arrow {{OriginCitySortType}}" ng-click="sortCustom('OriginCity', OriginCitySortType)" href="javascript:void(0);">{{ languageCommonVariables.origin }}</a></th>
-
-													<th><a class="thead-fsort lode-arrow {{OriginStateSortType}}" ng-click="sortCustom('OriginState', OriginStateSortType)" href="javascript:void(0);">{{ languageArray.planthst }}</a></th>
-
-													<th><a class="thead-fsort lode-arrow {{DestinationCitySortType}}" ng-click="sortCustom('DestinationCity', DestinationCitySortType)" href="javascript:void(0);">{{ languageCommonVariables.destination }}</a></th>
-
-													<th><a class="thead-fsort lode-arrow {{DestinationStateSortType}}" ng-click="sortCustom('DestinationState', DestinationStateSortType)" href="javascript:void(0);">{{ languageArray.planthst }}</a></th>
-
-													<th>{{ languageArray.driver }}</th>
-
-													<th><a class="thead-fsort lode-arrow {{invoiceNoSortType}}" ng-click="sortCustom('invoiceNo', invoiceNoSortType)" href="javascript:void(0);">{{ languageCommonVariables.invoiceNo }}</a></th>
-
-													<th><a class="thead-fsort lode-arrow {{PaymentAmountSortType}}" ng-click="sortCustom('PaymentAmount', PaymentAmountSortType)" href="javascript:void(0);">{{ languageArray.planthpayment }}</a></th>
-													<th>{{ languageArray.planthrpm }}</th>
-
-													<th><a class="thead-fsort lode-arrow {{MileageSortType}}" ng-click="sortCustom('Mileage', MileageSortType)" href="javascript:void(0);">{{ languageArray.planthmiles }}</a></th>
-
-													<th><a class="thead-fsort lode-arrow {{deadmilesSortType}}" ng-click="sortCustom('deadmiles', deadmilesSortType)" href="javascript:void(0);">{{ languageArray.planthdeadmiles }}</a></th>
-
-
-													<th><a class="thead-fsort lode-arrow {{LengthSortType}}" ng-click="sortCustom('Length', LengthSortType)" href="javascript:void(0);">{{ languageArray.planthlength }}</a></th>
-
-													<th>{{ languageArray.planthweight }}</th>
-													<th>{{ languageArray.planthcompany }}</th>
-
-													<th><a class="thead-fsort lode-arrow {{load_sourceSortType}}" ng-click="sortCustom('load_source', load_sourceSortType)" href="javascript:void(0);">Source</a></th>
-
-													<th><a class="thead-fsort lode-arrow {{JobStatusSortType}} " ng-click="sortCustom('JobStatus', JobStatusSortType)" href="javascript:void(0);">{{ languageCommonVariables.commonTableThStatus }}</a></th>
-													<th class="text-center">{{ languageCommonVariables.commonTableThAction }}</th>
-												</tr>
-											</thead>
-											<tbody>
-												<tr ng-class="{'visited' : value.visited}" data-pickdate="{{value.pickDate}}" data-uinfo="{{value.ID}}" dir-paginate="value in assignedLoads | itemsPerPage: itemsPerPage" total-items="total" ng-click="clickMatchLoadDetail(value.truckstopID, value.id, value.deadmiles, value.PaymentAmount, value.totalCost, value.pickDate, value.vehicle_id , $index)">
-
-													<td>{{ value.id }}</td>
-													<td>{{ value.PointOfContactPhone }}</td>
-													<td>{{ value.equipment_options }}</td>
-													<td>{{ value.LoadType }} </td>
-													<td>{{ (value.PickupDate != '0000-00-00' && value.PickupDate != '' ) ? value.PickupDate : ''}}</td>
-													<td>{{ (value.DeliveryDate != '0000-00-00' && value.DeliveryDate != '' ) ? value.DeliveryDate : ''}}</td>	
-													<td class="text-same-lower">{{ value.OriginCity|capitalize}}</td>
-													<td class="state-capital">{{ value.OriginState }}</td>
-													<td class="text-same-lower" >{{ value.DestinationCity|capitalize}}</td>
-													<td class="state-capital">{{ value.DestinationState }}</td>
-													<td>{{ (value.driver_type == "team" ? value.teamdriverName : value.driverName) }}</td>
-													<td>{{ value.invoiceNo }} </td>
-													<td class="">{{ value.PaymentAmount | currency:"$":2 }}</td>
-													<td class="">{{ value.Mileage != 0 ? (value.PaymentAmount / value.Mileage | currency:"$":2) : '' }}</td>
-													<td class="">{{ value.Mileage }}</td>
-													<td class="">{{ value.deadmiles }}</td>
-													<td class="">{{ value.Length }}</td>
-													<td class="">{{ value.Weight }}</td>
-													<td class="company_name"><span class="text-comp-name">{{ value.companyName|capitalize }}</span></td>
-													<td>{{ value.load_source }}</td>
-													<td>{{ value.JobStatus }}</td>
-													
-													<td class="text-center action-btn-ryt" ng-click="$event.stopPropagation()"> 
-														<div class="export-options-container pull-right">
-															<div class="exportOptions">
-																<div class="DTTT btn-group">
-																	<a class="btn btn-default DTTT_button_xls" data-original-title="{{languageCommonVariables.truckRoute}}" ui-jq="tooltip" ng-click="showAssignedLoad(value)">
-																		<span><img src="pages/img/route.png"></span>
-																	</a>
-																	<a class="btn btn-default DTTT_button_copy" data-original-title="{{languageCommonVariables.deleteLoad}}" ui-jq="tooltip" ng-click="removeLoadDelete(value.id,$index)">
-																		<span><i class="fa fa-trash" aria-hidden="true"></i></span>
-																	</a>
-																	<a class="btn btn-default DTTT_button_csv" data-original-title="{{languageCommonVariables.exportCSV}}" ui-jq="tooltip" ng-click="exportCsv($event,'loads',value.id)">
-																		<span><i class="pg-grid"></i></span>
-																	</a>
-																</div>
-															</div>
-														</div>	
-														
-													</td>
-												</tr>
-											</tbody>
-										</table>
-									</div> -->
 									<div class="dataTables_wrapper">
 									    <div class="dataTables_paginate">
-									        <dir-pagination-controls template-url="./assets/templates/dirPagination.html" on-page-change="pageChanged(newPageNumber)" direction-links="true" undary-links="true"></dir-pagination-controls>
+									        <dir-pagination-controls pagination-id="loadsPage" template-url="./assets/templates/dirPagination.html" on-page-change="pageChanged(newPageNumber)" direction-links="true" undary-links="true"></dir-pagination-controls>
 									    </div>
 									</div>
 							</div>
 						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		
-		
-		
-		<!--start of map section-->
-		<div ng-show="showRouteOnMap == true"> 
-			<div class="commen-heading iteration-map show-map-on-top load-margin">
-				<h2 class="oprate-dashbord">{{languageArray.routeMap}}</h2>
-			</div>
-			<div class="show-load-map-section">
-				<div class="show-google-map-route assign-load-map-cover">
-					<div id="map_canvas" style="height:600px; position: relative; overflow: hidden;">
-						
-					</div>            
-				</div>
-				
-			</div>
-		</div>
-		<!--end of map section-->
-		
-		<div class="gantt-height"> 
-			<div  ng-show="showGantt == true">
-				<div class="commen-heading hos-heading load-margin">
-					<h2 class="oprate-dashbord">{{languageArray.hoursOfService}}<span class="hos-type">({{hosType}})</span></h2>
-				</div>
-
-				<!-- DatePicker -->
-				<div class="hos-daily" style="margin-top: 10px; float: left;width: 100%; text-align:right"  ng-show="showGantt == true">
-					<button type="button" ng-click="updateDashboard('prev')"><i class="fa fa-chevron-left"></i></button>
-					<div class="hos-selected-date" style="display: inline-block;">{{displayHOSDate}}</div>
-					<button type="button" ng-click="updateDashboard('next')"><i class="fa fa-chevron-right"></i></button>
-				</div>
-				<!-- DatePicker -->
-				<div id="gantt-height" ng-show="showGantt == true"> 
-					<div class="gantt-chart">
-						<div gantt
-							 data="data"
-							timespans="timespans"
-							show-side="options.labelsEnabled"
-							daily="options.daily"
-							filter-task="{'name': options.filterTask}"
-							filter-row="{'name': options.filterRow}"
-							sort-mode="options.sortMode"
-							view-scale="options.scale"
-							column-width="getColumnWidth(options.width, options.scale, options.zoom)"
-							auto-expand="options.autoExpand"
-							task-out-of-range="options.taskOutOfRange"
-							from-date = "options.fromDate"
-							to-date = "options.toDate"
-							allow-side-resizing = "options.allowSideResizing"
-							task-content = "options.taskContentEnabled ? options.taskContent : undefined"
-							row-content = "options.rowContentEnabled ? options.rowContent : undefined"
-							current-date="options.currentDate"
-							current-date-value="options.currentDateValue"
-							headers="options.width && options.shortHeaders || options.longHeaders"
-							headers-formats="headersFormats"
-							max-height="options.maxHeight && 300 || 0"
-							time-frames="options.timeFrames"
-							date-frames="options.dateFrames"
-							time-frames-non-working-mode="options.timeFramesNonWorkingMode"
-							time-frames-magnet="options.timeFramesMagnet"
-							api="options.api"
-							column-magnet="options.columnMagnet">
-							<gantt-tree enabled="options.sideMode === 'Tree' || options.sideMode === 'TreeTable'"
-										header-content="options.treeHeaderContent"
-										keep-ancestor-on-filter-row="true">
-							</gantt-tree>
-							<gantt-table enabled="options.sideMode === 'Table' || options.sideMode === 'TreeTable'"
-										 columns="options.sideMode === 'TreeTable' ? options.treeTableColumns : options.columns"
-										 headers="options.columnsHeaders"
-										 classes="options.columnsClasses"
-										 formatters="options.columnsFormatters"
-										 contents="options.columnsContents"
-										 header-contents="options.columnsHeaderContents">
-							</gantt-table>
-							<gantt-groups enabled="options.groupDisplayMode === 'group' || options.groupDisplayMode === 'overview' || options.groupDisplayMode === 'promote'" display="options.groupDisplayMode"></gantt-groups>
-							<gantt-tooltips template-url="assets/plugins/angular-gantt/angular-tooltip/tooltip.tmpl.html" ></gantt-tooltips>
-							<gantt-bounds></gantt-bounds>
-							<gantt-progress></gantt-progress>
-							<gantt-sortable></gantt-sortable>
-							<gantt-movable enabled="!options.readOnly"></gantt-movable>
-							<gantt-draw-task
-								enabled="options.canDraw"
-								move-threshold="2"
-								task-factory="options.drawTaskFactory">
-							</gantt-draw-task>
-							<gantt-overlap></gantt-overlap>
-							<gantt-resize-sensor></gantt-resize-sensor>
-						</div>
-					</div>
-					<div class="hos-totals">
-					<div class="trow">
-						<div class="total-duty-hrs">{{languageArray.totalHours}}</div>
-							<label>{{offDuty}}</label>
-							<label>{{SB}}</label>
-							<label>{{onDuty}}</label>
-							<label>{{driving}}</label>
-						</div>
-					</div>
-					<div class="last-row-custom">
-						<div class="remarks-bar">{{languageArray.remarks}}</div>
-						<div class="remarks-bar-right">{{thours}}</div>
 					</div>
 				</div>
 			</div>

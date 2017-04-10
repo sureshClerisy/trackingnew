@@ -27,35 +27,19 @@ class Assignedloads extends Admin_Controller{
 		$this->finalArray  = array();
 		$this->data        = array();
 		
-		$this->load->model('Vehicle');
-		$this->load->model('BrokersModel');
-		$this->load->model('Job');
-		$this->load->model('Billing');
-		$this->load->library('Htmldom');
+		$this->load->model(array('Vehicle','BrokersModel','Job','Billing','Driver','User'));
 		$this->load->helper('truckstop');
-		
-		
-	}
-
-	public function test(){
-		$this->load->library('realtime');
-		$pubnub = new Realtime();
-		// Use the publish command separately from the Subscribe code shown above. 
-		// Subscribe is not async and will block the execution until complete.
-		$publish_result = $pubnub->publish('hello_world','Hello PubNub!');
-		print_r($publish_result);
-		
 	}
 	
 	public function index() {
-		//List of all dispatchers with their drivers
-		$this->load->model("Driver");
 		$userId = false;
 		$parentId = false;
 		$tempUserId = $this->userId;
+		$childIds  = array();				// dispatchers child list
 		if($this->userRoleId == _DISPATCHER ){
 			$userId = $this->userId;
 			$parentId =  $this->userId;
+			$childIds = $this->User->fetchDispatchersChilds($userId);
 		} else if ( $this->userRoleId == 4 ) {
 			$parentIdCheck = $this->session->userdata('loggedUser_parentId');
 			if( isset($parentIdCheck) && $parentIdCheck != 0 ) {
@@ -68,7 +52,21 @@ class Assignedloads extends Admin_Controller{
 		$allVehicles = $this->Driver->getDriversListNew($userId);
 		$dispatcherList = $this->Driver->getDispatcherList($parentId); 	//for add all drivers under every dispatcher
 		$teamList = $this->Driver->getDriversListAsTeamNew($userId);
-		
+
+		if ( !empty($childIds)) {
+			$childVehicles = array();
+			foreach($childIds as $child ) {
+				$childVehicles = $this->Driver->getDriversListNew($child['id']);
+				$allVehicles = array_merge($allVehicles,$childVehicles);	
+				
+				$childVehicles = $this->Driver->getDriversListAsTeamNew($child['id']);
+				$teamList = array_merge($teamList,$childVehicles);
+
+				$childs = $this->Driver->getDispatcherList($child['id']);
+				$dispatcherList = array_merge($dispatcherList,$childs);
+			}
+		}
+
 		$vDriversList = array();
 		if(!empty($allVehicles) && is_array($allVehicles)){	
 			$vDriversList = $allVehicles;
@@ -89,6 +87,7 @@ class Assignedloads extends Admin_Controller{
 			}
 		}
 
+		// pr($vDriversList);
 		$newDestlabel = array();
 		$gVehicleId = false;
 		$startDate = $endDate = '' ;
@@ -139,10 +138,9 @@ class Assignedloads extends Admin_Controller{
 				}
 			}
 		} else {
-
 			if($this->userRoleId == _DISPATCHER || $this->userRoleId == 4 ){
-				$jobs = $this->getSingleVehicleLoads($userId,array(),"dispatcher",$gDropdown['dispId'],false,false,$startDate,$endDate); //Fetch Loads by vehicle id(s)
-				$this->data["total"] = $this->Job->fetchSavedJobsTotal($userId,array(),"dispatcher",$gDropdown['dispId'],false,false,$startDate,$endDate); 
+				$jobs = $this->getSingleVehicleLoads($userId,array(),"dispatcher",$userId,false,false,$startDate,$endDate); //Fetch Loads by vehicle id(s)
+				$this->data["total"] = $this->Job->fetchSavedJobsTotal($userId,array(),"dispatcher",$userId,false,false,$startDate,$endDate); 
 				$this->data['table_title'] =  "Dispatcher : ".$this->session->userdata('loggedUser_username');
 				$this->data['vehicleIdRepeat'] = '';
 			} else {
@@ -152,8 +150,7 @@ class Assignedloads extends Admin_Controller{
 				$this->data['vehicleIdRepeat'] = '';
 			}
 		}
-
-		
+			
 			$this->data['labelArray'] = $vDriversList;		
 			$this->data['loadSource'] = 'truckstop.com';
 			$this->data["selectedDriver"] = isset($gDropdown) ? $gDropdown : "";
@@ -163,7 +160,6 @@ class Assignedloads extends Admin_Controller{
 			$this->data['assigned_loads'] = array();
 			$this->data['vehicleIdRepeat'] = '';
 		}
-		$this->data['dateRangeValue'] = '2017-02-21 - 2017-02-24';
 		echo json_encode($this->data);
 	}
 	
@@ -823,7 +819,13 @@ function pdfExtractText($psData){
 				}
 			}
 		} else {
-			
+			if($this->userRoleId == _DISPATCHER || $this->userRoleId == 4 ){
+				$jobs  = $this->getSingleVehicleLoads($this->userId,array(),"dispatcher",$this->userId,false,false,$params["startDate"],$params["endDate"],$params); //Fetch Loads by vehicle id(s)
+				$total = $this->Job->fetchSavedJobsTotal($this->userId,array(),"dispatcher",$this->userId,false,false,$params["startDate"],$params["endDate"],$params); 
+			} else {
+				$jobs  = $this->getSingleVehicleLoads($this->userId,array(),"all",false,false,false,$params["startDate"],$params["endDate"],$params); 
+				$total = $this->Job->fetchSavedJobsTotal($this->userId,array(),"all",false,false,false,$params["startDate"],$params["endDate"],$params); 
+			}
 		}
 
 		echo json_encode(array("data"=>$jobs,"total"=>$total));
