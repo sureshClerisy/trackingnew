@@ -110,7 +110,7 @@ class Driver extends Parent_Model
 	}
 	
 	public function update( $data = array(),$id=null ){
-		//echo '<pre>';print_r($data);print_r($id);
+
 		$result = $this->db->update('drivers',$data,"id={$id}");
 		
 		if ($result) {
@@ -476,7 +476,9 @@ class Driver extends Parent_Model
 			//$this->db->order_by("loads.".$filters["sortColumn"],$filters["sortType"]);	
 		}
 		if(!$total){
-			$this->db->limit($filters["itemsPerPage"],$filters["limitStart"]);
+			if(empty($filters['export'])){
+				$this->db->limit($filters["itemsPerPage"],$filters["limitStart"]);
+			}
 		}
 
 
@@ -494,8 +496,7 @@ class Driver extends Parent_Model
 
 	}
 	public function fetchTrucksWithoutDriver( $filters = array(),$total = false ) {
-
-		if(isset($filters["driverId"])){ //Show 0 active driver without truck if driver selected
+		if(isset($filters["driverId"]) || (isset($filters["userToken"]) && isset($filters["dispId"]))){ //Show 0 active driver without truck if driver selected
 			return 0;
 		}
 
@@ -503,16 +504,33 @@ class Driver extends Parent_Model
 		if($total){
 			$this->db->select('count(v.id) as totalCount');	
 		}else{
-			$this->db->select("d.id as driver_id, 'withoutTruck' as recordType,  v.team_driver_id,  CONCAT( 'Truck - ', v.label) AS truckName, CONCAT(u.first_name, ' ' , u.last_name) as dispatcher, CASE v.driver_type 
-							WHEN 'team' THEN CONCAT(d.first_name,' + ',team.first_name)  ELSE concat(d.first_name,' ',d.last_name)  END AS driverName");	
-				
+			$this->db->select("v.id as vehicleId, 'trucksWithoutDriver' as recordType,  v.label, v.vin, v.model");	
 		}
 
 		$this->db->where('v.vehicle_status',1);
+		$this->db->group_start();
+		$this->db->where("v.driver_id = 0 OR v.driver_id IS NULL OR  v.driver_id = ''");
+		$this->db->group_end();
 
 
+		if(isset($filters["searchQuery"]) && !empty($filters["searchQuery"])){
+            $this->db->group_start();
+            $this->db->like("LOWER(v.label)", strtolower($filters['searchQuery']));
+            $this->db->or_like("LOWER(v.vin)", strtolower($filters['searchQuery']));
+            $this->db->or_like("LOWER(v.model)", strtolower($filters['searchQuery']));
+            $this->db->group_end();
+		}
+
+		$filters["limitStart"] = $filters["limitStart"] == 1 ? 0 : $filters["limitStart"];
+		$this->db->order_by("v.label ".$filters["sortType"]);
+		if(!$total){
+			if(empty($filters["export"])){
+				$this->db->limit($filters["itemsPerPage"],$filters["limitStart"]);
+			}
+		}
 
 		$result = $this->db->get('vehicles as v');
+		//echo $this->db->last_query();die;
 		if($total){
 			return $result->row_array()["totalCount"];
 		}
@@ -583,8 +601,12 @@ class Driver extends Parent_Model
 		}else{
 			$this->db->order_by("CONCAT(u.first_name, ' ' , u.last_name) ".$filters["sortType"]);
 		}
+
 		if(!$total){
-			$this->db->limit($filters["itemsPerPage"],$filters["limitStart"]);
+			if(empty($filters['export'])){
+				$this->db->limit($filters["itemsPerPage"],$filters["limitStart"]);
+			}
+
 		}
 
 
@@ -599,5 +621,76 @@ class Driver extends Parent_Model
 			return array();
 		}
 	}
+
+
+	public function fetchDriversLoad( $driverId = null, $type = '' ) {
+		$todayDate = date('Y-m-d');
+		$this->db->select("loads.id,driver_id,dispatcher_id,second_driver_id,driver_type,PickupDate,DeliveryDate,delete_status,CONCAT(d.first_name,' + ',team.first_name) as teamName, concat(d.first_name,' ',d.last_name) as driverName");
+		$this->db->join("drivers as d", "loads.driver_id = d.id","Left");
+		$this->db->join('drivers as team','loads.second_driver_id = team.id','left');	
+		$this->db->where('loads.driver_id',$driverId);
+		$where = "(loads.PickupDate >= '$todayDate' OR loads.DeliveryDate >= '$todayDate')";
+		$this->db->where($where);
+
+		if( $type != '' )
+			$this->db->where('loads.driver_type',$type);
+
+		$result= $this->db->get('loads');
+		
+		if($result->num_rows() > 0 ) {
+			return $result->result_array();
+		} else {
+			return array();
+		}
+
+	}
+
+	public function updateLoadsAssignments($data = array() ) {
+		// $this->db->where('loads.id',$id);
+		// $this->db->update('loads',$data);
+		$this->db->update_batch('loads', $data, 'id'); 
+		return true;
+	}
+
+	public function updateDriver($data = array()) {
+		$id = $data['id'];
+		unset($data['id']);
+		$this->db->where('id',$id);
+		$this->db->update('loads',$data);
+		return true;
+	}
 	
+	public function fetchDriversForCSV($userId = null,$search = null){
+        
+        $this->db->select('d.first_name,d.last_name,d.email,v.label,d.driver_license_number,CONCAT(u.first_name, " ", u.last_name) AS dispatcher,d.phone,d.status,d.date_of_birth as dob,v.city,v.id as vehicle_id');
+		
+		$this->db->join("vehicles as v", "d.id = v.driver_id","Left");
+		$this->db->join('drivers as team','v.team_driver_id = team.id','left');	
+		$this->db->join('users as u','d.user_id = u.id','left');
+
+		if ( is_array($userId) && !empty($userId) ) {
+			$this->db->where_in('d.user_id',$userId); 
+		} else if( $userId != null)
+			$this->db->where('d.user_id',$userId);
+
+		if(!empty($search['searchText'])){
+			$this->db->like('d.first_name',$search['searchText']); 
+			$this->db->or_like('d.last_name',$search['searchText']);
+
+			$this->db->like('u.first_name',$search['searchText']); 
+			$this->db->or_like('u.last_name',$search['searchText']); 
+			
+			$this->db->or_like('d.email',$search['searchText']); 
+			$this->db->or_like('d.email',$search['searchText']); 
+			$this->db->or_like('d.driver_license_number',$search['searchText']); 
+		}
+			 
+        $query = $this->db->get("drivers as d");
+
+		if ($query->num_rows() > 0) {
+            return $query->result_array();
+        } else {
+            return false;
+        }
+	}
 }

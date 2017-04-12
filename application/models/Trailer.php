@@ -131,5 +131,26 @@ class Trailer extends Parent_Model {
 		} else {
 			return array();
 		}
-	} 
+	}
+
+	 public function fetchDriversForCSV($search) {
+		$this->db->select('trailers.truck_id,trailers.unit_id,trailers.vin,trailers.owner,trailers.type,trailers.description,trailers.monthly_payment,trailers.due_date,trailers.purchase_price,trailers.interest_rate,trailers.notes,trailers.status,trailers.created');
+		
+		if(!empty($search['searchText'])){
+			$this->db->like('trailers.unit_id',$search['searchText']); 
+			$this->db->or_like('trailers.vin',$search['searchText']);
+			$this->db->or_like('trailers.owner',$search['searchText']);
+			$this->db->or_like('trailers.type',$search['searchText']);
+			$this->db->or_like('trailers.description',$search['searchText']);
+		}
+
+        $result = $this->db->get('trailers');
+        // echo $this->db->last_query();
+        
+        if( $result->num_rows() > 0){
+			return $result->result_array();
+        } else {
+			return array();
+		}
+    }  
 }

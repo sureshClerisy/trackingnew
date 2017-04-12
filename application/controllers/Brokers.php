@@ -151,7 +151,7 @@ class Brokers extends Admin_Controller {
 			} else {
 				$type = "add";
 				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> added a new broker <a class="notify-link" href="'.$this->serverAddr.'#/editbroker/'.$result[1].'">'.$_POST["TruckCompanyName"]."</a>";
-				logActivityEvent($result[1], $this->entity["broker"], $this->event["add"], $message, $this->Job, $srcPage);	
+				logActivityEvent($result[1], $this->entity["shipper"], $this->event["add"], $message, $this->Job, $srcPage);	
 				echo json_encode(array('success' => true,'update'=>false, 'lastInsertId' => $result[1]));
 			}
 		}catch(Exception $e){
@@ -323,5 +323,26 @@ class Brokers extends Admin_Controller {
 			log_message('error','DELETE_BROKER_DOC'.$e->getMessage());
 			echo json_encode(array("success" => false));
 		}
+	}
+
+	public function fetchDataForCsv() {
+		$content = '';
+		$searchText 	= json_decode(file_get_contents('php://input'), true);
+		$keys 	= [['TruckCompanyName','PointOfContact','PointOfContactPhone','TruckCompanyEmail','TruckCompanyPhone','TruckCompanyFax','PostingAddress','City','State','Zipcode','MCNumber','CarrierMC','DOTNumber','BrokerStatus','DebtorKey','Black List','Rating','Delete Broker']];
+
+		$dataRow = $this->BrokersModel->fetchDriversForCSV($searchText);
+		
+		foreach ($dataRow as $key => $value) {
+			
+			unset($dataRow[$key]['id']);
+			$dataRow[$key]['CarrierMC'] = ($value['CarrierMC'] == 0 )?'NA':$value['CarrierMC'];
+			$dataRow[$key]['DOTNumber'] = ($value['DOTNumber'] == 0 )?'NA':$value['DOTNumber'];
+			$dataRow[$key]['MCNumber']  = ($value['MCNumber'] == 0 )?'NA':$value['MCNumber'];
+			$dataRow[$key]['black_list'] = ($value['black_list'] == 0 )?'No':'Yes';
+			$dataRow[$key]['delete_broker'] = ($value['delete_broker'] == 0 )?'No':'Yes';
+		}
+
+		$data 	= array_merge($keys,$dataRow);
+		echo json_encode(array('fileName'=>$this->createExcell('brokers',$data)));
 	}
 }

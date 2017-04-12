@@ -776,4 +776,38 @@ class Vehicle extends Parent_Model
         else
             return false;
     }
+
+    public function fetchVehiclesForCSV( $userId = false ,$search = null) {   
+        $this->db->DISTINCT();
+        $this->db->select('vehicles.label,vehicles.model,vehicles.vehicle_type,vehicles.tracker_id,CONCAT(drivers.first_name, " ", `drivers`.`last_name` ),CONCAT(users.first_name, " ", `users`.`last_name` ),vehicles.registration_plate,vehicles.vin,vehicles.permitted_speed,vehicles.cargo_capacity,vehicles.cargo_bay_l,vehicles.cargo_bay_w,vehicles.fuel_type,vehicles.fuel_consumption,vehicles.tank_capactiy,vehicles.tyres_size,vehicles.tyres_number,vehicles.state,vehicles.city,vehicles.vehicle_address,vehicles.unit')
+        ->from('vehicles');
+        $this->db->join('drivers','drivers.id=vehicles.driver_id','LEFT');
+        $this->db->join('equipment_types',("FIND_IN_SET(equipment_types.abbrevation , vehicles.vehicle_type) > 0"), 'LEFT');
+        $this->db->join('users',("drivers.user_id = users.id"), 'LEFT');
+        $this->db->join('drivers as team','vehicles.team_driver_id = team.id','left');
+        
+        if ( is_array($userId) && !empty($userId) ) {
+            $this->db->where_in('drivers.user_id',$userId); 
+        } else if($userId)
+            $this->db->where('drivers.user_id',$userId);   
+        
+        if(!empty($search['searchText'])){
+            $this->db->like('vehicles.vin',$search['searchText']); 
+            $this->db->or_like('vehicles.label',$search['searchText']); 
+            $this->db->or_like('vehicles.model',$search['searchText']); 
+            $this->db->or_like('drivers.first_name',$search['searchText']); 
+            $this->db->or_like('drivers.last_name',$search['searchText']); 
+            $this->db->or_like('vehicles.vehicle_type',$search['searchText']); 
+            $this->db->or_like('vehicles.cargo_bay_l',$search['searchText']); 
+            $this->db->or_like('vehicles.cargo_capacity',$search['searchText']); 
+        }
+
+        $this->db->Group_by('vehicles.id');
+        $result = $this->db->get(); 
+        if($result->num_rows()>0){
+            return $result->result_array();
+        } else {
+            return false;
+        }
+    } 
 }

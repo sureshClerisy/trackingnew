@@ -46,7 +46,7 @@
 
 
 </head>
-<body class="fixed-header" ng-class="showBackground == true ? 'login-bg-head' : ''" ng-controller="mainController as mc">
+<body class="fixed-header" ng-class="showBackground == true ? 'login-bg-head' : ''" ng-controller="mainController as mctrl">
    
     <div ng-if="showHeader == true">
         <ng-include src="'./assets/templates/sidebar.html'"></ng-include>
@@ -131,7 +131,10 @@
     createScriptOrLinkTag('app/controllers/notificationsController.js','script');
     createScriptOrLinkTag('app/controllers/billingDashboardController.js','script');
     createScriptOrLinkTag('app/controllers/driversInsightsController.js','script');
-    //createScriptOrLinkTag('app/controllers/shipperController.js','script');
+    createScriptOrLinkTag('app/controllers/truckInsightsController.js','script');
+    createScriptOrLinkTag('app/controllers/shipperController.js','script');
+    createScriptOrLinkTag('app/services/shipperService.js','script');
+    createScriptOrLinkTag('app/services/environmentconfig.js','script');
     ?>
     <script src="login/loadLanguages"></script>
     <!--for footable-->

@@ -4,36 +4,204 @@
 	<div class="content sm-gutter">
 		<!-- START CONTAINER FLUID -->
 		<div class="container-fluid padding-25 sm-padding-10 sm-gutter bill-dash">
+			<div class="row">
+				<div class="col-md-12 col-xlg-12">
+					<div class="commen-heading dashboard-page">
+						<h2 class="oprate-dashbord">Billing Dashboard</h2>
+						<div class="label_select_box m-b-10">
+							
+							<a  href="#/billing" class="cgreen btn btn-info btn-cons " type="button"><i class="fa  fa-file-text "></i> <span class="bold">Billable</span></a>
+							<a  href="#/sendForPayment" class="red btn btn-info btn-cons " type="button"><i class="fa fa-credit-card-alt"></i> <span class="bold">Send for payment</span></a>
+						</div>
+					</div>
+				</div>
+			</div>
 		    <div class="row">
 		        <div class="col-md-12 col-xlg-12">
 		            <div class="row">
 		             	<div class="col-md-4 col-xlg-4">
-		             		<div class="ar-1-1">
-		                        <div class="panel no-border bg-master widget widget-6 widget-loader-circle-lg no-margin" pg-portlet progress="circle-lg" overlay-color='0,0,0' overlay-opacity="0.6" on-refresh="refreshTest('.widget-6','sent_today')">
-		                            <div class="panel-heading">
-		                                <div class="panel-controls">
-		                                    <ul>
-		                                        <li><a data-toggle="refresh" class="portlet-refresh" href=""><i class="portlet-icon portlet-icon-refresh-lg-white"></i></a>
-		                                        </li>
-		                                    </ul>
-		                                </div>
-		                            </div>
-		                            <div class="panel-body">
-		                                <div class=" bottom-left bottom-right padding-25">
-		                                    <h1 class="font-montserrat fs-11 all-caps 	text-white semi-bold">Sent Today</h1>
-		                                    <h3 class="no-margin p-b-5 text-white">{{billDash.sentTodayCount | currency:"$":2}}</h3>
-		                                </div>
-		                            </div>
-		                        </div>
+		             		<div class="box-move-able m-b-20">
+			             		<div class="ar-1-1">
+			                        <div class="panel no-border bg-master widget widget-6 widget-loader-circle no-margin" pg-portlet progress="circle-lg" overlay-color='0,0,0' overlay-opacity="0.6" on-refresh="billDash.refreshTest('.widget-6','sent_today')">
+			                            <div class="panel-heading">
+			                                <div class="panel-controls">
+			                                    <ul>
+			                                        <li><a data-toggle="refresh" class="portlet-refresh" href=""><i class="portlet-icon portlet-icon-refresh text-white"></i></a>
+			                                        </li>
+			                                    </ul>
+			                                </div>
+			                            </div>
+			                            <div class="panel-body">
+			                            	<h3 class="no-margin p-b-5 text-white p-b-25 today-block">Sent Today</h3>
+			                                <div class=" bottom-left bottom-right padding-25 m-b-2	5 ">
+			                                	<div class="block-dash-content1">
+				                                    <!-- <h1 class="font-montserrat fs-16 all-caps 	text-white semi-bold p-b-15 no-margin semi-bold">Sent Today</h1> -->
+				                                    <h3 ng-click="billDash.goForDetails('sent_today','billings')" class="no-margin p-b-5 cursor text-white p-b-25 ng-binding">{{billDash.sentTodayCount | currency:"$":2}}</h3>
+				                                    <span ng-click="billDash.goForDetails('sent_today_expected','billings')" class="font-montserrat fs-16 all-caps cursor	text-white  text-white small semi-bold"> out of {{billDash.expectedBillingToday | currency:"$":2}}</span>
+				                                </div>
+			                                </div>
+			                            </div>
+			                        </div>
+			                    </div>
 		                    </div>
 		             	</div>
 		             	<div class="col-md-4 col-xlg-4">
-		             		<div class="ar-2-3">
-				                <!-- START WIDGET -->
-				                <div class="widget-11 panel no-border  no-margin widget-loader-bar" pg-portlet progress="bar" on-refresh="refreshTest('.widget-11','expected_billing')">
-				                    <div class="panel-heading ">
-				                        <div class="panel-title">Expected Billing
-				                        </div>
+		             		<div class="box-move-able m-b-20">
+			             		<div class="row">
+					                <div class="col-md-12 m-b-10">
+					                    <!-- START WIDGET -->
+					                    <div class="widget-8  half-height-block panel no-border bg-success no-margin widget-loader-bar" pg-portlet progress="bar" on-refresh="billDash.refreshTest('.widget-8','last_week_sale')">
+					                        <div class="container-xs-height full-height">
+					                            <div class="row-xs-height">
+					                                <div class="col-xs-height col-top">
+					                                    <div class="panel-heading top-left top-right">
+					                                        <div class="panel-controls">
+					                                            <ul>
+					                                                <li>
+					                                                    <a data-toggle="refresh" class="portlet-refresh text-white" ng-click="refresh()"><i class="portlet-icon portlet-icon-refresh text-white"></i></a>
+					                                                </li>
+					                                            </ul>
+					                                        </div>
+					                                    </div>
+					                                </div>
+					                            </div>
+					                            <div class="row-xs-height ">
+					                                <div class="col-xs-height col-top relative">
+					                                    <div class="row">
+					                                        <div class="col-sm-6">
+					                                            <div class="p-l-20">
+					                                            	<div class="block-dash-content1">
+								                                        <h1 class="font-montserrat fs-16  	text-white semi-bold p-b-15 no-margin semi-bold">Last Week Sales </h1>
+						                                                <h3 ng-click="billDash.goForDetails('last_week_sale','billings')" class="cursor no-margin p-b-5 text-white p-b-20 ng-binding">{{billDash.lastWeek.sentToTriumph | currency:"$":2}}</h3>
+						                                                <span class="font-montserrat fs-16   text-white  text-white small semi-bold ng-binding">{{billDash.lastWeek.goalCompleted | number:2 }}% of Goal</span>
+						                                            </div>
+					                                            </div>
+					                                        </div>
+					                                        <div class="col-sm-6">
+					                                        </div>
+					                                    </div>
+					                                    <nvd3 options='widget_8_options' class="widget-8-chart line-chart" data='widget_8_data' data-line-color="black" data-points="true" data-point-color="success" data-stroke-width="2"></nvd3>
+					                                </div>
+					                            </div>
+					                        </div>
+					                    </div>
+					                    <!-- END WIDGET -->
+					                </div>
+					            </div>
+					            <div class="row">
+					                <div class="col-md-12 m-b-10">
+					                    <!-- START WIDGET -->
+					                    <div class="widget-9 half-height-block panel no-border bg-primary no-margin widget-loader-bar" pg-portlet progress="bar" on-refresh="billDash.refreshTest('.widget-9', 'week_till_today_sale')">
+					                        <div class="container-xs-height full-height">
+					                            <div class="row-xs-height">
+					                                <div class="col-xs-height col-top">
+					                                    <div class="panel-heading  top-left top-right">
+					                                        <!-- div class="panel-title text-black">
+					                                            <span class="font-montserrat fs-11 all-caps">This Week <i class="fa fa-chevron-right"></i>
+					                                                    </span>
+					                                        </div> -->
+					                                        <div class="panel-controls">
+					                                            <ul>
+					                                                <li><a ng-click="refresh()" class="portlet-refresh text-black" data-toggle="refresh"><i class="portlet-icon portlet-icon-refresh text-white"></i></a>
+					                                                </li>
+					                                            </ul>
+					                                        </div>
+					                                    </div>
+					                                </div>
+					                            </div>
+					                            <div class="row-xs-height">
+					                                <div class="col-xs-height col-top">
+					                                    <div class="p-l-20 p-r-20 p-t-15">
+					                                    	<div class="block-dash-content1">
+						                                        <h1 class="font-montserrat fs-16 text-right	text-white semi-bold p-b-15 no-margin semi-bold">This Week
+						                                                    </h1>
+				                                                <h3 ng-click="billDash.goForDetails('this_week_sale','billings')" class=" cursor no-margin p-b-5 text-white text-right p-b-20 ng-binding">{{billDash.thisWeek.sentToTriumph | currency :"$": 2}}</h3>
+				                                                <span  class="font-montserrat fs-16 text-right   text-white  text-white small semi-bold ng-binding">{{billDash.thisWeek.target | number : 2}}% {{billDash.thisWeek.targetType}} week's target </span>
+				                                            </div>
+					                                    </div>
+					                                </div>
+					                            </div>
+					                            <div class="row-xs-height">
+					                                <div class="col-xs-height col-bottom">
+					                                    <div class="progress progress-small m-b-20">
+					                                        <div class="progress-bar progress-bar-white" style="width:{{billDash.thisWeek.goalCompleted | number:2;}}%"></div>
+					                                    </div>
+					                                </div>
+					                            </div>
+					                        </div>
+					                    </div>
+					                    <!-- END WIDGET -->
+					                </div>
+					            </div>
+					         </div>
+		             	</div>
+		             	<div class="col-md-4 col-xlg-4">
+		             		<div class="box-move-able m-b-20">
+			             		<d  iv class="">
+					                <!-- START WIDGET -->
+					                <div class="widget-11 panel no-border  no-margin widget-loader-bar" pg-portlet progress="bar" on-refresh="billDash.refreshTest('.widget-11','expected_billing')">
+					                    <div class="panel-heading heading-tb-moveable ">
+					                        <div class="panel-title font-montserrat bold">Expected Billing
+					                        </div>
+					                        <div class="panel-controls">
+					                            <ul>
+					                                <li><a data-toggle="refresh" class="portlet-refresh text-black" href=""><i class="portlet-icon portlet-icon-refresh"></i></a>
+					                                </li>
+					                            </ul>
+					                        </div>
+					                    </div>
+					                    <div class="widget-11-table1 auto-overflow p-l-20 p-r-20" >
+					                        <table class="table cursor table-condensed table-hover table-striped my-table-move" >
+					                        	<thead>
+					                        		<tr>
+					                        			<th>Billing</th>
+					                        			<th>Date</th>
+					                        		</tr>
+					                        		
+					                        	</thead>
+					                            <tbody>
+					                                <tr ng-click="billDash.goForDetails('expected_billing','billings', record)" ng-repeat="record in billDash.expectedBilling">
+						                                <td>
+					                                        <span class="font-montserrat fs-18">{{record.billing | currency:"$":2}}</span>
+					                                    </td>
+					                                    <td class="font-montserrat all-caps fs-12">{{record.date}}</td>
+					                                </tr>
+					                            </tbody>
+					                        </table>
+					                    </div>
+					                </div>
+					                <!-- END WIDGET -->
+					            </div>
+					        </div>
+		             	
+		             	
+		             	<div class="col-md-4 col-xlg-4">
+		             		<div class="box-move-able m-b-20 text-center-block-move">
+
+		             		<div class="panel pie-jobs" pg-portlet progress="bar" on-refresh="billDash.refreshTest('.pie-jobs','job_status')">
+		             			
+		             			<div class="panel-heading main-control-move1 heading-tb-moveable ">
+		             				<div class="panel-title font-montserrat bold">Job Ticket Status</div>
+		             				<div class="panel-controls " >
+	                                    <ul>
+	                                        <li><a  class="portlet-refresh text-black" data-toggle="refresh"><i class="portlet-icon portlet-icon-refresh text-black"></i></a>
+	                                        </li>
+	                                    </ul>
+	                                </div>	
+	                            </div>
+	                            <div class="panel-body">
+		             				<highchart id="job_status" config="billDash.JobStatusPieConfig" class="heighchar-block-css"></highchart>
+	                            </div>
+                            </div>
+
+		             		</div>
+		             	</div>
+		             	<div class="col-md-8 col-xlg-8">
+		             		 <!-- START WIDGET -->
+		             		 <div class="box-move-able m-b-20">
+				                <div class="widget-11 recent-transactions panel no-border  no-margin widget-loader-bar" pg-portlet progress="bar" on-refresh="billDash.refreshTest('.recent-transactions','recent_transactions')">
+				                    <div class="panel-heading heading-tb-moveablepl">
+				                        <div class="panel-title font-montserrat bold">Recent Transmissions</div>
 				                        <div class="panel-controls">
 				                            <ul>
 				                                <li><a data-toggle="refresh" class="portlet-refresh text-black" href=""><i class="portlet-icon portlet-icon-refresh"></i></a>
@@ -41,35 +209,44 @@
 				                            </ul>
 				                        </div>
 				                    </div>
-				                    <div class="widget-11-table auto-overflow" >
-				                        <table class="table table-condensed table-hover" >
+				                    <div class="widget-11-table1 auto-overflow p-l-20 p-r-20" >
+				                        <table class="table table-condensed table-hover table-striped my-table-move my-table-pl" >
 				                        	<thead>
 				                        		<tr>
-				                        			<th>Billing</th>
 				                        			<th>Date</th>
+				                        			<th>Conf No.</th>
+				                        			<th>Inv	</th>
+				                        			<th>Type</th>
+				                        			<th>Amount</th>
+				                        			<th>Payout</th>
 				                        		</tr>
 				                        		
 				                        	</thead>
 				                            <tbody>
-				                                <tr ng-repeat="record in billDash.expectedBilling">
+				                                <tr ng-repeat="record in billDash.recentTransactions">
 					                                <td>
-				                                        <span class="font-montserrat fs-18">{{record.billing | currency:"$":2}}</span>
+				                                        <span class="font-montserrat fs-18">{{record.date}}</span>
 				                                    </td>
-				                                    <td class="font-montserrat all-caps fs-12">{{record.date}}</td>
+				                                    <td class="font-montserrat all-caps fs-12">{{record.confirmationCode}}</td>
+				                                    <td class="font-montserrat all-caps fs-12">{{record.inv}}</td>
+				                                    <td class="font-montserrat all-caps fs-12">Purchase</td>
+				                                    <td class="font-montserrat all-caps fs-12">{{record.amount | currency:"$":2 }}</td>
+				                                    <td class="font-montserrat all-caps fs-12">WIRE*9995</td>
 				                                </tr>
 				                            </tbody>
 				                        </table>
 				                    </div>
 				                </div>
+				             </div>
 				                <!-- END WIDGET -->
-				            </div>
-		             	</div>
-		             	<div class="col-md-4 col-xlg-4">dddd
 		             	</div>
 
+
 		            </div>
+		        
 		        </div>
 		    </div>
+		   
 		</div>
 		<!-- END CONTAINER FLUID -->
 	</div>

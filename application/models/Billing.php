@@ -97,8 +97,31 @@ class Billing extends CI_Model {
 			$this->db->where("(SELECT  count(documents.load_id) as c FROM  documents WHERE  documents.load_id  =  loads.id and documents.doc_type in ('pod','rateSheet') )< 2  ");
 		}else if ( isset($filters["filterType"]) && $filters["filterType"] == 'sentForPayment' ) {	
 			$this->db->where(array('loads.sent_for_payment' => 1, 'loads.delete_status' => 0));
+		}else if ( isset($filters["filterType"]) && $filters["filterType"] == 'expected_billing' ) {	
+			if(isset($filters["deliveryDate"]) && !empty($filters["deliveryDate"])){
+				$this->db->where(array('loads.DeliveryDate' => $filters["deliveryDate"], 'loads.delete_status' => 0, "loads.sent_for_payment" => 0));	
+				$this->db->where_IN('loads.JobStatus',$this->config->item('loadStatus'));
+			}
+		}else if ( isset($filters["filterType"]) && $filters["filterType"] == 'last_week_sale' ) {	
+			$lastWeekStartDay   = date("Y-m-d", strtotime('monday last week'));
+			$lastWeekEndDay     = date("Y-m-d", strtotime('sunday last week'));
+			$this->db->where("FIND_IN_SET( loads.id, ( SELECT GROUP_CONCAT( sp.loadids ) AS id FROM `save_payment_confirmCode` AS `sp` WHERE DATE( sp.created ) >= '".$lastWeekStartDay."' AND DATE( sp.created ) <= '".$lastWeekEndDay."'))");
+		}else if ( isset($filters["filterType"]) && $filters["filterType"] == 'this_week_sale' ) {	
+			$thisWeekStartDay   = date("Y-m-d", strtotime('monday this week'));
+			$thisWeekToday      = date("Y-m-d");
+			$this->db->where("FIND_IN_SET( loads.id, ( SELECT GROUP_CONCAT( sp.loadids ) AS id FROM `save_payment_confirmCode` AS `sp` WHERE DATE( sp.created ) >= '".$thisWeekStartDay."' AND DATE( sp.created ) <= '".$thisWeekToday."'))");
+		}else if ( isset($filters["filterType"]) && $filters["filterType"] == 'sent_today_expected' ) {	
+			$dateFrom = $dateTo  = date("Y-m-d", strtotime("yesterday"));
+			if( isset($filters["dateFrom"]) && !empty($filters["dateFrom"])) { $dateFrom = $filters["dateFrom"]; }
+			$this->db->where("date( loads.DeliveryDate ) >= '".$dateFrom."' AND date( loads.DeliveryDate ) <='".$dateTo."'");
+			$this->db->where_IN('loads.JobStatus',$this->config->item('loadStatus'));
+			$this->db->where('loads.sent_for_payment!=',1);
+		}else if ( isset($filters["filterType"]) && $filters["filterType"] == 'sent_today' ) {	
+			$dateFrom = $dateTo = date("Y-m-d");
+			$this->db->where("FIND_IN_SET( loads.id, ( SELECT GROUP_CONCAT( sp.loadids ) AS id FROM `save_payment_confirmCode` AS `sp` WHERE DATE( sp.created ) >= '".$dateFrom."' AND DATE( sp.created ) <= '".$dateTo."'))");
+			//$this->db->where_IN('loads.JobStatus',$this->config->item('loadStatus'));
+			//$this->db->where('loads.sent_for_payment!=',1);
 		}
-		//$this->db->order_by("loads.".$filters["sortColumn"],$filters["sortType"]);
 
 		if(isset($filters["sortColumn"]) && $filters["sortColumn"] == "driverName"){
 			$this->db->order_by('CASE 
@@ -113,7 +136,6 @@ class Billing extends CI_Model {
 			$this->db->order_by("loads.".$filters["sortColumn"],$filters["sortType"]);	
 		}
 
-		
 		if(!$total){
 			$filters["limitStart"] = $filters["limitStart"] == 1 ? 0 : $filters["limitStart"];
 			$this->db->limit($filters["itemsPerPage"],$filters["limitStart"]);
@@ -137,9 +159,10 @@ class Billing extends CI_Model {
 	 * Fetching only In progress loads
 	 */
 	
-	public function getInProgressLoads( $parameter = '',$total=false, $filters = array()  ) {
+	public function getInProgressLoads( $parameter = '',$total=false, $filters = array() ,$exportRequest=false) {
 		$inarray = $this->db->distinct()->select('documents.load_id')->where('doc_type','invoice')->get('documents')->result_array();
 		$in_aray =array('');
+		$ohterColumns ='';
 		if ( !empty($inarray) ) {
 			$in_aray =array();
 			foreach( $inarray as $inarr ) {
@@ -151,17 +174,27 @@ class Billing extends CI_Model {
 			$filters = array("itemsPerPage"=>20, "limitStart"=>1, "sortColumn"=>"DeliveryDate", "sortType"=>"DESC");
 		}
 
-		$this->db->select('
+		if(!$exportRequest){
+	
+			$ohterColumns = ',loads.LoadType,loads.DeliveryDate,loads.PickupAddress, loads.OriginCity, loads.OriginState, loads.DestinationCity, loads.DestinationState, loads.DestinationAddress, loads.PaymentAmount, loads.Mileage,loads.DeliveryDate,  loads.truckstopID,  loads.deadmiles, loads.PickupDate, loads.load_source,loads.ready_for_invoice,vehicles.id as vehicleID';
+		}
+
+		$this->db->select('DATE_FORMAT(loads.created,"%m/%d") as date,broker_info.TruckCompanyName,
 		case loads.driver_type
 			when "team" then concat(drivers.first_name," + ",team.first_name,"-",vehicles.label)
 			ELSE concat(drivers.first_name," ",drivers.last_name,"-",vehicles.label)
-		end as driverName,loads.LoadType, loads.PickupDate, loads.PickupAddress, loads.OriginCity, loads.OriginState, loads.DestinationCity, loads.DestinationState, loads.DestinationAddress, loads.PaymentAmount, loads.Mileage, (loads.PaymentAmount/loads.Mileage) as rpm, loads.deadmiles, loads.DeliveryDate, loads.JobStatus, loads.truckstopID, loads.id, loads.deadmiles, loads.totalCost, loads.pickDate, loads.invoiceNo, loads.load_source,loads.ready_for_invoice,broker_info.TruckCompanyName,vehicles.id as vehicleID');
+		end as driverName,loads.invoiceNo,loads.totalCost,loads.overallTotalProfit,loads.overallTotalProfitPercent,loads.Mileage,loads.deadmiles, (loads.PaymentAmount/loads.Mileage) as rpm,DATE_FORMAT(loads.pickDate,"%m/%d") as lp,concat(loads.OriginCity," ,",loads.OriginState) as pickup,DATE_FORMAT(loads.DeliveryDate,"%m/%d") as ld,concat(loads.DestinationCity," ,",loads.DestinationState) as delivery,loads.id,loads.JobStatus'.$ohterColumns);
+
+	
+
 		$this->db->join('broker_info','broker_info.id = loads.broker_id','LEFT');
 		$this->db->join('drivers','drivers.id = loads.driver_id','LEFT');
 		$this->db->join('drivers as team','team.id = loads.second_driver_id','LEFT');
 		$this->db->join('vehicles','vehicles.id = loads.vehicle_id','LEFT');
 		
-		if ( $parameter == 'invoice' ) {			// for showing loads which have all required fields for generating invoice are filled
+		if ( $parameter == 'invoice' ) {
+
+			// for showing loads which have all required fields for generating invoice are filled
 			$this->db->join('documents','documents.load_id = loads.id','LEFT');
 			$this->db->where(array('loads.vehicle_id != ' => null, 'loads.vehicle_id != ' => 0, 'loads.delete_status' => 0, 'broker_info.TruckCompanyName !=' => '', 'loads.JobStatus' => 'completed'));
 			$this->db->where_not_in('loads.id', $in_aray);
@@ -256,12 +289,15 @@ class Billing extends CI_Model {
 
 		if(!$total){
 			$filters["limitStart"] = $filters["limitStart"] == 1 ? 0 : $filters["limitStart"];
-			$this->db->limit($filters["itemsPerPage"],$filters["limitStart"]);
+			//Get All records for excell file while export data based on $exportRequest
+			if(!$exportRequest){
+				$this->db->limit($filters["itemsPerPage"],$filters["limitStart"]);
+			}
+
 		}
 
 		$this->db->where_IN('loads.JobStatus',$this->config->item('loadStatus'));
 		$result = $this->db->get('loads');
-		//echo $this->db->last_query(); die;
 		if($total){
 			return $result->num_rows();
 		}
@@ -538,29 +574,64 @@ class Billing extends CI_Model {
 		return $data['invoicedDate'];
 	}  
 
-	public function sentForPaymentToday($date = ''){
-		$this->db->select("sum( paymentamount ) as sentPayment");
-		$this->db->where("find_in_set( id, ( SELECT GROUP_CONCAT( sp.loadids ) AS id FROM `save_payment_confirmCode` AS `sp` WHERE DATE( sp.created ) = '".$date."'))");
+	public function sentForPaymentWithFilter($fromDate, $toDate){
+		$this->db->select("SUM( paymentamount )  as sentPayment");
+		$this->db->where("FIND_IN_SET( id, ( SELECT GROUP_CONCAT( sp.loadids ) AS id FROM `save_payment_confirmCode` AS `sp` WHERE DATE( sp.created ) >= '".$fromDate."' AND DATE( sp.created ) <= '".$toDate."'))");
+		$this->db->where("loads.delete_status", 0);
 		$result = $this->db->get('loads');
+		//echo $this->db->last_query()."<br/><br/>";
 		if ( $result->num_rows() > 0 )
 			return $result->row_array()["sentPayment"];
 		else 
 			return array();
 	}
 
-	public function expectedBilling($date = ''){
+	public function getRecentTransactions($limit = 5){
+		$this->db->select(array("confirmationCode, DATE( created ) as date, (CHAR_LENGTH(loadIds) - CHAR_LENGTH(REPLACE(loadIds, ',', '')) + 1) as inv, ( SELECT SUM( paymentamount ) FROM loads WHERE FIND_IN_SET( id, ( SELECT GROUP_CONCAT( sp.loadids ) AS id FROM `save_payment_confirmCode` AS `sp` where id = spCode.id))) as amount"),false);
+		$this->db->limit($limit);		
+		$this->db->order_by("created","DESC");
+		$result = $this->db->get('save_payment_confirmCode as spCode');
+
+		//echo $this->db->last_query();die;
+		if ( $result->num_rows() > 0 )
+			return $result->result_array();
+		else 
+			return array();
+	}
+
+	public function expectedBilling($date = '',$limit = 7){
 		$this->db->select(" sum( paymentAmount ) AS billing , DATE_ADD( deliverydate, INTERVAL 1 DAY )  AS date  ");
 		$this->db->where("date( deliveryDate ) >= '".$date."'");
+		$this->db->where("loads.delete_status", 0);
+		$this->db->where('sent_for_payment!=',1);
+		$this->db->where_IN('loads.JobStatus',$this->config->item('loadStatus'));
+
 		$this->db->group_by("date ( deliveryDate ) ");
 		$this->db->order_by("date ( deliveryDate ) ");
-		$this->db->limit(7);		
+		$this->db->limit($limit);		
+
 		$result = $this->db->get('loads');
 		//echo $this->db->last_query();die;
 		if ( $result->num_rows() > 0 ){
 			return $result->result_array();
-		}
-		else {
+		}else {
 			return array();
+		}
+	}
+
+	public function expectedBillingOnDate($dateFrom = '', $dateTo = ''){
+		$this->db->select(" sum( paymentAmount ) AS billing");
+		$this->db->where("date( deliveryDate ) >= '".$dateFrom."' AND date( deliveryDate ) <='".$dateTo."'");
+		$this->db->where("loads.delete_status", 0);
+		$this->db->where_IN('loads.JobStatus',$this->config->item('loadStatus'));
+		$this->db->where('sent_for_payment!=',1);
+		$result = $this->db->get('loads');
+		
+		//echo $this->db->last_query();die;
+		if ( $result->num_rows() > 0 ){
+			return $result->row_array()["billing"];
+		}else {
+			return 0;
 		}
 	}
 

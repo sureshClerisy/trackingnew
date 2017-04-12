@@ -1,3 +1,4 @@
+
       <!-- START PAGE CONTENT WRAPPER -->
       <div class="page-content-wrapper ">
         <!-- START PAGE CONTENT -->
@@ -23,8 +24,8 @@
 				<div class="row">
 					<div class="col-md-12 col-xlg-12">
 						<div class="commen-heading assigned-load-page">
-							<h2 class="oprate-dashbord">Drivers Insights
-								<span ng-show="!showCalendar" class="small">{{ dInsights.filterArgs.forDate }}</span>
+							<h2 class="oprate-dashbord">Truck Insights
+								<span ng-show="!showCalendar" class="small">{{ tInsights.filterArgs.forDate }}</span>
 							</h2>
 						</div>
 					</div>
@@ -40,11 +41,11 @@
 									<div class="srpSearchDiv searchinput search-list-fix">
 										<div class="srpSearch1">
 											<label for="search" class="ng-binding">Search</label>
-											<input type="text" ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }" class="form-control" ng-model="dInsights.searchFilter" ng-change="dInsights.callSearchFilter(dInsights.searchFilter);" />
+											<input type="text" ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }" class="form-control" ng-model="tInsights.searchFilter" ng-change="tInsights.callSearchFilter(tInsights.searchFilter);" />
 										</div>
 									</div>
 									<div class="pull-right">
-										<a href="" class="add-new-data-button" ng-click="dInsights.exportInsights(dInsights.searchFilter)">
+										<a href="" class="add-new-data-button" ng-click="tInsights.truckInsights(tInsights.searchFilter)">
 		  									<button title="Export Drivers" class="btn btn-primary btn-cons m-b-10" type="button">
 		  										<i class="fa fa-file-excel-o"></i> 
 		  										<span class="bold">Export</span>
@@ -54,19 +55,30 @@
 									<div class="table-scroll-custom">
 										<table class="table driver-insights table-striped table-hover table-condensed">
 											<thead>
-												<tr>
+												<tr ng-if="tInsights.filterArgs.filterType == 'trucksWithoutDriver'" >
+													<th class="bold text-black">Truck Number</th>
+													<th class="bold text-black">VIN</th>
+													<th class="bold text-black">Model</th>
+												</tr>
+												
+												<tr ng-if="tInsights.filterArgs.filterType == 'trucksReporting'" >
 													<th class="bold text-black">Driver Name</th>
 													<th class="bold text-black">Truck</th>
 													<th class="bold text-black">Dispatcher</th>
 												</tr>
 											</thead>
 											<tbody>
-												<tr dir-paginate="row in dInsights.drivers | itemsPerPage: dInsights.itemsPerPage"  total-items="dInsights.total" current-page="dInsights.currentPage" pagination-id="driverInsightPage" ng-click="dInsights.goToDriverLoads('drivers','loads', row)" >
+												<tr ng-if="tInsights.filterArgs.filterType == 'trucksWithoutDriver'" dir-paginate="row in tInsights.trucks | itemsPerPage: tInsights.itemsPerPage"  total-items="tInsights.total" current-page="tInsights.currentPage" pagination-id="truckInsightPage" ng-click="tInsights.goToTrucks('trucks','loads', row)" >
+													<td>{{row.label}}</td>
+													<td>{{row.vin}}</td>
+													<td>{{row.model}}</td>
+												</tr>
+												<tr ng-if="tInsights.filterArgs.filterType == 'trucksReporting'"  dir-paginate="row in tInsights.trucks | itemsPerPage: tInsights.itemsPerPage"  total-items="tInsights.total" current-page="tInsights.currentPage" pagination-id="truckInsightPage" ng-click="tInsights.goToTrucks('trucks','loads', row)" >
 													<td>{{row.driverName}}</td>
 													<td>{{row.truckName}}</td>
 													<td>{{row.dispatcher}}</td>
 												</tr>
-												<tr ng-show="!dInsights.haveRecords" class="text-center">
+												<tr ng-show="!tInsights.haveRecords" class="text-center">
 													<td colspan="3">Oops! No record found</td>
 												</tr>
 											</tbody>
@@ -75,7 +87,7 @@
 						
 									<div class="dataTables_wrapper">
 									    <div class="dataTables_paginate">
-									        <dir-pagination-controls   pagination-id="driverInsightPage" template-url="./assets/templates/dirPagination.html" on-page-change="dInsights.pageChanged(newPageNumber)" direction-links="true" undary-links="true"></dir-pagination-controls>
+									        <dir-pagination-controls   pagination-id="truckInsightPage" template-url="./assets/templates/dirPagination.html" on-page-change="tInsights.pageChanged(newPageNumber)" direction-links="true" undary-links="true"></dir-pagination-controls>
 									    </div>
 									</div>
 							</div>

@@ -51,9 +51,17 @@
 							<div class="srpSearchDiv searchinput search-list-fix">
 									<div class="srpSearch1">
 										<label for="search" class="ng-binding">Search</label>
-										<input type="text" ng-model-options="{ updateOn: 'default blur', debounce: { default: 300, blur: 0 } }" class="form-control" ng-model="searchFilter" ng-change="callSearchFilter(searchFilter);" />
+										<input type="search" ng-model-options="{ updateOn: 'default blur', debounce: { default: 300, blur: 0 } }" class="form-control" ng-model="searchFilter" ng-change="callSearchFilter(searchFilter);" />
 									</div>
 								</div>
+									<div class="pull-right">
+										<a href="" class="add-new-data-button" ng-click="exportBillingData('billings')">
+		  									<button title="Export Drivers" class="btn btn-primary btn-cons m-b-10" type="button">
+		  										<i class="fa fa-file-excel-o"></i> 
+		  										<span class="bold">Export</span>
+		  									</button>
+		      							</a>
+										</div>
 								<div class="table-structure-main-block tb-my">
 									<div class="table-res-1">
 										<div class="table-row-main1 tb-head">

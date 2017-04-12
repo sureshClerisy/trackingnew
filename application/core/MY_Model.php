@@ -104,7 +104,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 							    $this->db->join("contract_docs","contract_docs.entity_id = trailers.id","inner"); 	$table = "trailers"; break;
 				case 'broker' : $this->db->select("broker_info.id, contract_docs.document_name, broker_info.TruckCompanyName");
 							    $this->db->join("contract_docs","contract_docs.entity_id = broker_info.id","inner"); 	$table = "broker_info"; break;
-				case 'shipper': $this->db->select("shippers.id, contract_docs.document_name, shippers.TruckCompanyName");
+				case 'shipper': $this->db->select("shippers.id, contract_docs.document_name, shippers.shipperCompanyName");
 							    $this->db->join("contract_docs","contract_docs.entity_id = shippers.id","inner"); 	$table = "shippers"; break;
 			}
 			$this->db->where('contract_docs.id', $docId);

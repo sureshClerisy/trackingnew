@@ -126,6 +126,29 @@ app.controller('assignedLoadsController', ["dataFactory","$scope", "PubNub", "$h
             return item.username;
     }
 
+    $scope.exportMyloadData = function(){
+    	
+    	search = angular.element('.srpSearch1 input').val();
+		// $scope.autoFetchLoads = true;
+        dataFactory.httpRequest(URL+'/Assignedloads/getRecords/','Post',{} ,{searchQuery: search,startDate: $scope.dateRangeSelector.startDate, endDate:$scope.dateRangeSelector.endDate,'export':'1' }).then(function(data){
+        	
+            var url = URL+'/assets/ExportExcel/'+data.fileName;
+			var timestamp = Math.floor(Date.now() / 1000);
+			var downloadContainer 	= angular.element('<div data-tap-disabled="true"><a></a></div>');
+			var downloadLink 		= angular.element(downloadContainer.children()[0]);
+			downloadLink.attr('href',url);
+			downloadLink.attr('download', data.fileName);
+			downloadLink.attr('target', '_blank');
+			angular.element('body').append(downloadContainer);
+			$timeout(function () {
+			  downloadLink[0].click();
+			  downloadLink.remove();
+			}, null);
+            // $scope.total = data.total;
+        	// return data;
+		});
+    };
+
 
     //-------------- Pagination functions ------------------------- 
 

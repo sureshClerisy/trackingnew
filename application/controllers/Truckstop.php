@@ -2135,7 +2135,8 @@ class Truckstop extends Admin_Controller{
 			
 			if ( $parameter == '' ) 
 				$parameter = 'docs';
-				
+			
+			
 			if($_FILES['file']['error'] == 0 ){
 
 				$extArr 						= explode('.',$_FILES['file']['name']);
@@ -2154,10 +2155,10 @@ class Truckstop extends Admin_Controller{
 					$response['error'] 		= false;
 					$response['data'] 		= $this->upload->data();
 					
-					if ( ($parameter == 'rateSheet' || $parameter == 'pod') &&  $extension == 'pdf' ) {
-						$fileCheck = $this->CheckPdfNotCompressed($response['data']['file_name'], $parameter);		// code to check uploaded pdf file is compressed or not
-						
-						if ( $fileCheck == 'pdfCompression' ) {
+					if ( ($parameter == 'rateSheet' || $parameter == 'pod') &&  strtolower($extension) == 'pdf' ) {
+						 // $fileCheck = $this->CheckPdfNotCompressed($response['data']['file_name'], $parameter);		// code to check uploaded pdf file is compressed or not
+												
+						 // if ( $fileCheck == 'pdfCompression' ) {
 							// $degradedFileName = $this->degradePdfVersion($response['data']);
 							$response['data']['file_name'] = $this->degradePdfVersion($response['data']);
 							$response['data']['raw_name']  = $response['data']['raw_name'].'_1';
@@ -2165,7 +2166,7 @@ class Truckstop extends Admin_Controller{
 							// $response['compressionError'] = 1;
 							// $response['compressionError'] = 0;
 							// return $response;					// return error response if file is compressed
-						}
+						 // }
 					}
 					
 					if (substr(php_uname(), 0, 7) == "Windows"){ 

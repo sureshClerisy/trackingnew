@@ -22,7 +22,7 @@
 									<div class="col-sm-6">
 										<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':newbroker.companyname.$invalid && !newbroker.companyname.$pristine || newbroker.$submitted && newbroker.companyname.$invalid}">
 											<label>{{ languageArray.brokerListingTableThName }}</label>
-											<input type="text" class="form-control" name="companyname" ng-model="brokersData.TruckCompanyName" required>
+											<input type="text" class="form-control" name="companyname" ng-model="brokersData.shipperCompanyName" required>
 										</div>
 										<label class="error" for="companyname" ng-show="newbroker.companyname.$invalid && !newbroker.companyname.$pristine || newbroker.$submitted && newbroker.companyname.$invalid">Please enter shipper name.</label>
 									</div>
@@ -47,9 +47,14 @@
 										<label class="error" for="city" ng-show="newbroker.city.$invalid && !newbroker.city.$pristine || newbroker.$submitted && newbroker.city.$invalid">Please enter city.</label>
 									</div>
 									<div class="col-sm-6">
-										<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':newbroker.state.$invalid && !newbroker.state.$pristine || newbroker.$submitted && newbroker.state.$invalid}">
+										<div pg-form-group class="form-group form-group-default required th-select" ng-class="{'has-error':newbroker.state.$invalid && !newbroker.state.$pristine || newbroker.$submitted && newbroker.state.$invalid}">
 											<label>{{languageArray.brokerListingTableThState}}</label>
-											<input type="text" class="form-control" name="state" ng-model="brokersData.state" required />
+											<ui-select name="state" ng-model="brokersData.state" theme="bootstrap" on-select="onSelectStateCallback($item, $model)" required >
+												<ui-select-match class="ui-select-match" placeholder="select state">{{stateSelected}}</ui-select-match>
+												<ui-select-choices class="ui-select-choices" repeat="item in states_data | filter: $select.search">
+													<div ng-bind-html="trustAsHtml((item.label | highlight: $select.search))"></div>
+												</ui-select-choices>
+											</ui-select>
 										</div>
 										<label class="error" for="state" ng-show="newbroker.state.$invalid && !newbroker.state.$pristine || newbroker.$submitted && newbroker.state.$invalid">Please enter state.</label>
 									</div>				
@@ -67,28 +72,15 @@
 									</div>
 									<div class="col-sm-6">
 										<div pg-form-group class="form-group form-group-default">
-											<label>{{ languageArray.brokerListingTableThstatus }}</label>
-											<input type="text" class="form-control" name="status" ng-model="brokersData.brokerStatus">
-										</div>
-									</div>
-								</div>
-								<!--row-end-->
-								
-								<!--row-->
-								<div class="row clearfix">
-									
-									<div class="col-sm-6">
-										<div pg-form-group class="form-group form-group-default">
 											<label>{{ languageArray.brokerListingTableThrating }}</label>
 											<div ng-init="rating = changedRating "></div>
 											<div class="star-rating"  star-rating rating-value="rating" data-max="5" on-rating-selected="rateFunction(rating)"></div>
 										</div>
 									</div>
-
-									<div class="col-sm-6">&nbsp;</div>
 								</div>
 								<!--row-end-->
 								
+															
 								<div class="row clearfix">
 									<div class="col-sm-6">
 										<div class="dropzone" ng-dropzone dropzone="dropzone" dropzone-config="dropzoneConfigBrokerEdit" ></div>
@@ -98,12 +90,10 @@
                                             <div class="truck-load-pdf-left" ng-repeat="docs in brokerDocs">
 												<div class="row1">
 													<button class="btn btn-danger" type="button" ng-click="deleteDocument(docs.id,docs.document_name, $index);">X</button>
-													<div class="pdf-cover" data-url="assets/uploads/documents/broker/{{docs.document_name}}" ng-click="perviewDoc($event)">
-														<img ng-src="assets/uploads/documents/thumb_broker/thumb_{{docs.document_name | filetoimg}} " on-error-src="pages/img/pdf.png" />
+													<div class="pdf-cover" data-url="assets/uploads/documents/shipper/{{docs.document_name}}" ng-click="perviewDoc($event)">
+														<img ng-src="assets/uploads/documents/thumb_shipper/thumb_{{docs.document_name | filetoimg}} " on-error-src="pages/img/pdf.png" />
 													</div>
 												</div>
-												
-												
 											</div>
 										</section>
 									</div>
@@ -112,7 +102,7 @@
 								<div class="update-truck-block-btn">
 									<button ng-click="submitted=true" class="btn btn-primary btn-cons m-b-10" type="submit"><i class="fa fa-pencil-square-o"></i><span class="bold"> {{ languageArray.brokerListingTableupdatebutton|capitalize }} </span>
 									</button>
-									<a href="#/broker"><button class="btn btn-danger btn-cons m-b-10" type="button"><i class="fa fa-ban"></i><span class="bold"> {{ languageCommonVariables.cancelbutton|capitalize }} </span></button></a>
+									<a href="#/shipper"><button class="btn btn-danger btn-cons m-b-10" type="button"><i class="fa fa-ban"></i><span class="bold"> {{ languageCommonVariables.cancelbutton|capitalize }} </span></button></a>
 								</div>
 							</form>
 						</div>

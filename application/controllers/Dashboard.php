@@ -2,7 +2,7 @@
 
 ini_set('max_execution_time', 300); 
 
-class Dashboard extends CI_Controller {
+class Dashboard extends Admin_Controller {
 
 	public $userId;
 	public $totalInvoices;
@@ -43,8 +43,12 @@ class Dashboard extends CI_Controller {
 	}
 
 	public function getTodayReport($type){
-		$gDropdown = $vList = $rparam = array(); $lPerformance = '';
+		
+		$gDropdown = $vList = $rparam = array(); 
+		$lPerformance = '';
+		
 		$args = json_decode(file_get_contents('php://input'),true);
+
 		if(isset($_COOKIE["_globalDropdown"])){
 			$gDropdown = json_decode($_COOKIE["_globalDropdown"],true);
 		}
@@ -85,6 +89,27 @@ class Dashboard extends CI_Controller {
 				$totals["deadmiles"]     += $value["deadmiles"];
 			}
 		}
+		
+		// ex($todayReport);
+
+		//For export data to excell file..
+		if(!empty($args['export'])){
+			
+			$keys 	= [['DATE','CUSTOMER NAME','DRIVERS','INVOICE','CHARGES','PROFIT','%PROFIT','MILES','DEAD MILES','RATE/MILE','DATE P/U','PICK UP','DATE DE','DELIVERY','LOLAD ID','STATUS']];
+			
+			if($type == 'idle'){
+				$keys = [['DriverID','Truck','Dispatcher','Driver Name']];
+				foreach ($todayReport as $key => $value) {
+					unset($todayReport[$key]['team_driver_id']);
+				}
+			}else{
+				//Created a common function in my_controller for all load data for excell file
+				$todayReport = $this->buildExportLoadData($todayReport);
+			}
+
+			$data = array_merge($keys,$todayReport);
+			echo json_encode(array('fileName'=>$this->createExcell($type,$data)));die();
+		}
 		echo json_encode(array("success"=>true,"todayReport"=>$todayReport,"totals"=>$totals));
 	}
 
@@ -97,6 +122,8 @@ class Dashboard extends CI_Controller {
 		$gDropdown 	= array();$rparam = array();
 		$lPerformance = '';
 		$args = json_decode(file_get_contents('php://input'),true);
+		
+		// ex($args);
 
 		if(isset($_COOKIE["_globalDropdown"])){
 			$gDropdown = json_decode($_COOKIE["_globalDropdown"],true);
@@ -414,10 +441,12 @@ class Dashboard extends CI_Controller {
 
 	
 	public function updateDashboardOnLoadEdit(){
-		$gDropdown = array();$rparam = array();
-		$lPerformance = '';
-		$args = json_decode(file_get_contents('php://input'),true);
 		
+		$gDropdown 	= array();
+		$rparam 	= array();
+		$lPerformance = '';
+		$args 	= json_decode(file_get_contents('php://input'),true);
+
 		if(isset($_COOKIE["_globalDropdown"])){
 			$gDropdown = json_decode($_COOKIE["_globalDropdown"],true);
 		}

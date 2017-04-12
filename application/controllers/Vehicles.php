@@ -464,4 +464,34 @@ class Vehicles extends Admin_Controller {
 
 		}
 	}
+
+	public function fetchDataForCsv() {
+		$data = array();
+		$parent_id = null;
+		$content ='';
+		$parentIdCheck = $this->session->userdata('loggedUser_parentId');
+	
+		if( isset($parentIdCheck) && $parentIdCheck != 0 ) {
+			$parent_id = $this->session->userdata('loggedUser_parentId');
+		}
+
+		if ( $this->roleId == 2 ) {
+			$parent_id = $this->userId;
+		}
+		$childIds = $this->User->fetchDispatchersChilds($this->userId);
+		if ( !empty($childIds) ) {
+			$parentId = array();
+			foreach($childIds as $child ) {
+				array_push($parentId,$child['id']);
+			}
+			$parent_id = array_merge($parentId,array($this->userId));
+		}
+
+		$keys = [['Label','Model','Vehicle Type','Tracker ID','Driver Name','Dispatcher','Registration Plate','VIN','Permitted Speed','Cargo Capacity','Cargo Bay Length','Cargo Bay Width','Fuel Type','Fuel Consumption','Tank Capacity','Tyres Size','Tyres Number','State','City','Vehicle Address','Owner','Unit']];
+		
+		$searchText 	= json_decode(file_get_contents('php://input'), true);		
+		$dataRow 		= $this->vehicle->fetchVehiclesForCSV($parent_id,$searchText);
+		$data 			= array_merge($keys,$dataRow);
+		echo json_encode(array('fileName'=>$this->createExcell('vehicles',$data)));
+	}
 }

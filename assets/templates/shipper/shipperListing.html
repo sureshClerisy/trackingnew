@@ -11,12 +11,19 @@
 						<button ng-click = "hidedeletemessage()" class="close"></button>
 						{{brokerdeleteMessage}}
 					</div>
+
+					<div ng-if="shipper.type == 'success'" class="alert alert-success" role="alert">
+						<button class="close" data-dismiss="alert"></button>						
+						{{shipper.message}}
+					</div>
+
+
 					<div class="commen-heading">
 						<h2 class="oprate-dashbord"> {{ languageArray.shipperListingHeading }}</h2>
 					</div>
 				</div>
 			</div>
-			<div class="row invocie-block-row ">
+			<div class="row invocie-block-row shipper-control-table">
 				<div class="col-md-12 col-xlg-12">
 					<div class="load-new-block-table">
 						<div class="panel-body add-new-data fix-page">
@@ -27,62 +34,197 @@
 										<span class="bold">{{ languageArray.shipperListingAddButton }}</span>
 									</button>
 								</a>
-								<table datatable="ng" dt-options="dtOptions" class="table tr-hover table-hover table-striped driver-table" id="tableWithExportOptions">
-									<thead>
-										<tr>
-											<th>{{ languageArray.brokerListingTableThName }}</th>
-											<th class="rating-alignment">{{ languageArray.brokerListingTableRatings }}</th>
-											<th>{{ languageArray.brokerListingTableThStreetAddress }}</th>
-											<th>{{ languageArray.brokerListingTableThCity }}</th>
-											<th>{{ languageArray.brokerListingTableThState }}</th>
-											<th>{{ languageArray.brokerListingTableThZipCode }}</th>
-											<th>{{ languageCommonVariables.commonTableThStatus }}</th>
-											<th class="text-center">{{ languageCommonVariables.commonTableThAction }}</th>
-										</tr>
-									</thead>
-									<tbody>
-										<tr ng-repeat="value in data track by value.id">
-											<td>{{ value.TruckCompanyName }}</td>
-											<td class="rating-alignment">
+								<a href="" class="add-new-data-button" style="right: 156px;" ng-click="exportCsvData('shippers')">
+  									<button title="Export Drivers" class="btn btn-primary btn-cons m-b-10" type="button">
+  										<i class="fa fa-file-excel-o"></i> 
+  										<span class="bold">Export</span>
+  									</button>
+      							</a>
+
+								<div class="srpSearchDiv searchinput search-list-fix">
+									<div class="srpSearch1">
+										<label for="search" class="ng-binding">Search</label>
+										<input type="search" ng-model-options="{ updateOn: 'default blur', debounce: { default: 300, blur: 0 } }" class="form-control" ng-model="shipper.searchFilter" ng-change="shipper.callSearchFilter(shipper.searchFilter);" />
+									</div>
+								</div>
+
+								<div class="table-structure-main-block tb-my">
+									<div class="table-res-1">
+										<div class="table-row-main1 tb-head">
+											<div class="tb-cell shipper-new-col stype" ng-click="shipper.sortCustom('shipperCompanyName', shipper.shipperNameType)"> 
+												<span class="lode-arrow {{shipper.shipperNameType}}">{{ languageArray.brokerListingTableThName }}</span>
+											</div>
+
+											<div class="tb-cell  Invoice-No-bill shipper-rating" >
+												<span>{{  languageArray.brokerListingTableRatings }}</span>
+											</div>
+
+											<div class="tb-cell shipper-name-street stype" ng-click="shipper.sortCustom('postingAddress', shipper.postAddressType)"> 
+												<span class="lode-arrow {{shipper.postAddressType}}">{{ languageArray.brokerListingTableThStreetAddress }}</span>
+											</div>
+
+											<div class="tb-cell city-shipper ld-id-bill stype" ng-click="shipper.sortCustom('city', shipper.cityType)" >
+												<span class="lode-arrow {{shipper.cityType}}">{{  languageArray.brokerListingTableThCity }}</span>
+											</div>
+
+											<div class="tb-cell shipper-state stype" ng-click="shipper.sortCustom('state', shipper.stateType)"> 
+												<span class="lode-arrow {{shipper.stateType}}">{{ languageArray.brokerListingTableThState }}</span>
+											</div>
+
+											<div class="tb-cell shipper-zipcode stype" ng-click="shipper.sortCustom('zipcode', shipper.zipCodeType)" >
+												<span class="lode-arrow {{shipper.zipCodeType}}">{{  languageArray.brokerListingTableThZipCode }}</span>
+											</div>
+
+											<!--div class="tb-cell shipper-status stype" ng-click="shipper.sortCustom('status', shipper.statusType)"> 
+												<span class="lode-arrow {{shipper.statusType}}">{{ languageCommonVariables.commonTableThStatus }}</span>
+											</div-->
+
+											<div class="tb-cell action" >
+												<span>{{  languageCommonVariables.commonTableThAction }}</span>
+											</div>
+										</div>
+
+										<div class="table-row-main1 tb-body" dir-paginate="value in shipper.shipperData | itemsPerPage: mctrl.itemsPerPage track by value.id" total-items="shipper.totalRecords" current-page="currentPage" pagination-id="shipperPage">
+
+											<div class="tb-cell shipper-new-col"> 
+												<span>
+													<div class="plus-1" ng-click="$event.stopPropagation();toggleRow($event,$index);"></div>
+													{{ value.shipperCompanyName }}
+												</span>
+											</div>
+											
+											<div class="tb-cell Invoice-No-bill  shipper-rating "> 
 												<div ng-init="rating = value.rating "></div>
 												<div class="star-rating show-rating" star-rating rating-value="rating" data-max="5"></div>
-											</td>
-											<td>{{ value.postingAddress }}</td>
-											<td>{{ value.city }}</td>
-											<td>{{ value.state }}</td>
-											<td>{{ value.zipcode }}</td>
-											<td>{{ value.brokerStatus }}</td>
-											<td class="text-center action-btn-ryt"> 
-												<div class="export-options-container">
-													<div class="exportOptions">
-														<div class="DTTT btn-group">
-														<a href="#/editshipper/{{value.id}}" class="btn btn-default DTTT_button_pdf" data-original-title="{{languageCommonVariables.editBroker}}" ui-jq="tooltip" >
-																<span>
-																	<i class="fa fa-edit" aria-hidden="true"></i>
-																</span>
-															</a>
-															<a class="btn btn-default DTTT_button_copy" title="{{languageCommonVariables.deleteShipper}}" ui-jq="tooltip" ng-click='removeShipper(value.id,$index)' >
-																<span>
-																	<i class="fa fa-trash" aria-hidden="true"></i>
-																</span>
-															</a>
-															<!-- <a class="btn btn-default DTTT_button_csv" title="{{languageCommonVariables.blackListBroker}}" ui-jq="tooltip" ng-click="blackListBroker(value.id,value.black_list,$index)" ng-if="value.black_list == 0 || value.black_list == ''">
-																<span><i class="fa fa-thumbs-o-up"></i></span>
-															</a> -->
-															<!-- <a class="btn btn-default DTTT_button_csv" title="{{languageCommonVariables.acceptBroker}}" ui-jq="tooltip" ng-click="blackListBroker(value.id,value.black_list,$index)" ng-if="value.black_list == 1">
-																<span><i class="fa fa-thumbs-down"></i></span>
-															</a> -->
-															<a class="btn btn-default DTTT_button_csv" data-original-title="{{languageCommonVariables.exportCSV}}" ui-jq="tooltip" ng-click="exportCsv($event,'shippers',value.id)">
-																<span><i class="pg-grid"></i></span>
-															</a>
-														</div>
-													</div>
+											</div>
+
+											<div class="tb-cell shipper-name-street">
+												<span>{{ value.postingAddress }}</span>
+											</div>
+
+											<div class="tb-cell city-shipper ld-id-bill">
+												<span>{{ value.city }}</span>
+											</div>
+
+											<div class="tb-cell shipper-state">
+												<span>{{ value.state }}</span>
+											</div>
+
+											<div class="tb-cell shipper-zipcode">
+												<span>{{ value.zipcode }}</span>
+											</div>
+
+											<!--div class="tb-cell shipper-status">
+												<span>{{ (value.status == 1 ) ? 'Active' : 'Inactive'  }}</span>
+											</div-->
+
+											<div class="tb-cell action" ng-click="$event.stopPropagation()">
+												<span class="wid">
+													<a href="#/editshipper/{{value.id}}" class="btn btn-default DTTT_button_copy" data-original-title="{{languageCommonVariables.editShipper}}" ui-jq="tooltip" >
+														<span><i class="fa fa-edit" aria-hidden="true"></i></span>
+													</a>
+													<a class="btn btn-default DTTT_button_csv" title="Deactivate Shipper" ui-jq="tooltip" ng-click="shipper.changeShipperStatus(value.id,value.status,$index)" ng-if="value.status == 1">
+														<span><i class="fa fa-check-square"></i></span>
+													</a>
+													<a class="btn btn-default DTTT_button_csv" title="Activate Shipper" ui-jq="tooltip" ng-click="shipper.changeShipperStatus(value.id,value.status,$index)" ng-if="value.status == 0 || value.status == ''">
+														<span><i class="fa fa-square-o"></i></span>
+													</a>
+													<a class="btn btn-default DTTT_button_copy" title="{{languageCommonVariables.deleteShipper}}" ui-jq="tooltip" ng-click='shipper.removeShipper(value.id,$index)' >
+														<span><i class="fa fa-trash" aria-hidden="true"></i></span>
+													</a>
+
+													<a class="btn btn-default DTTT_button_csv" data-original-title="{{languageCommonVariables.exportCSV}}" ui-jq="tooltip" ng-click="exportCsv($event,'shippers',value.id)">
+														<span><i class="pg-grid"></i></span>
+													</a>
+												</span>
+											</div>
+
+										<!--open-block-->
+											<div class="open-block" id="hblock{{$index}}" style="display:none"> 
+												<div class="tb-cell text-center">
+													<span> 
+														<div class="heading"> {{ languageArray.brokerListingTableThName }} <b>:</b></div>
+														<div class="value">{{ value.shipperCompanyName }} </div>
+													</span>
 												</div>
 
-											</td>
-										</tr>
-									</tbody>
-								</table>
+												<div class="tb-cell text-center">
+													<span> 
+														<div ng-init="rating = value.rating "></div>
+														<div class="star-rating show-rating" star-rating rating-value="rating" data-max="5"></div>
+													</span>
+												</div>
+
+												
+												<div class="tb-cell shipper-rating">
+													<span>
+														<div ng-init="rating = value.rating "></div>
+														<div class="star-rating show-rating" star-rating rating-value="rating" data-max="5"></div>
+													</span>
+												</div>
+												<div class="tb-cell shipper-name-street">
+													<span>
+														<div class="heading">{{ languageArray.brokerListingTableThStreetAddress }}<b>:</b></div>
+														<div class="value">{{ value.postingAddress }}</div>
+													</span>
+												</div>
+													<div class="tb-cell city-shipper">
+													<span>
+														<div class="heading">{{ languageArray.brokerListingTableThCity }}<b>:</b></div>
+														<div class="value">{{ value.city }}</div> 
+													</span>
+												</div>
+												<div class="tb-cell shipper-state">
+													<span>
+														<div class="heading">{{ languageArray.brokerListingTableThState }}<b>:</b></div>
+														<div class="value">{{ value.state }}</div> 
+													</span>
+												</div>
+												<div class="tb-cell shipper-zipcode">
+													<span>
+														<div class="heading">{{  languageArray.brokerListingTableThZipCode }}<b>:</b></div>
+														<div class="value">{{ value.zipcode }}</div> 
+													</span>
+												</div>
+
+												<!--div class="tb-cell shipper-status">
+													<span>
+														<div class="heading">{{ languageCommonVariables.commonTableThStatus }} <b>:</b></div>
+														<div class="value">{{ (value.status == 1 ) ? 'Active' : 'Inactive'  }}</div> 
+													</span>
+												</div-->
+
+												<div class="tb-cell action">
+													<span >
+														<a href="#/editshipper/{{value.id}}" class="btn btn-default DTTT_button_copy" data-original-title="{{languageCommonVariables.editShipper}}" ui-jq="tooltip" >
+															<span><i class="fa fa-edit" aria-hidden="true"></i></span>
+														</a>
+														<a class="btn btn-default DTTT_button_csv" title="Deactivate Shipper" ui-jq="tooltip" ng-click="shipper.changeShipperStatus(value.id,value.status,$index)" ng-if="value.status == 1">
+															<span><i class="fa fa-check-square"></i></span>
+														</a>
+														<a class="btn btn-default DTTT_button_csv" title="Activate Shipper" ui-jq="tooltip" ng-click="shipper.changeShipperStatus(value.id,value.status,$index)" ng-if="value.status == 0 || value.status == ''">
+															<span><i class="fa fa-square-o"></i></span>
+														</a>
+														<a class="btn btn-default DTTT_button_copy" title="{{languageCommonVariables.deleteShipper}}" ui-jq="tooltip" ng-click='shipper.removeShipper(value.id,$index)' >
+															<span><i class="fa fa-trash" aria-hidden="true"></i></span>
+														</a>														
+														<a class="btn btn-default DTTT_button_csv" data-original-title="{{languageCommonVariables.exportCSV}}" ui-jq="tooltip" ng-click="exportCsv($event,'shippers',value.id)">
+															<span><i class="pg-grid"></i></span>
+														</a>
+													</span>
+												</div>
+											</div>
+										</div>
+										<div ng-show="haveRecords" class="no-record-found">Oops! No record found</div>
+									</div>
+								</div><!-- table-structure-main-block -->
+								
+								<div class="dataTables_wrapper">
+								    <div class="dataTables_paginate">
+								        <dir-pagination-controls pagination-id="shipperPage" template-url="./assets/templates/dirPagination.html" on-page-change="shipper.pageChanged(newPageNumber)" direction-links="true" undary-links="true"></dir-pagination-controls>
+								    </div>
+								</div>
+
 							</div>
 						</div>
 					</div>

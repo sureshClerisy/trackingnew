@@ -14,6 +14,7 @@ app.controller('AdminController', function($scope,$interval, $document,$timeout,
     $scope.country_name = "";
     $scope.today_insight = "";
     $scope.otherIcon = true;
+    $rootScope.todayInsightActive ='booked';
 
     $scope.todayProgress = false;
     $scope.tSortableWidgets = 11;
@@ -69,13 +70,11 @@ app.controller('AdminController', function($scope,$interval, $document,$timeout,
     };
 
 
-    $scope.refresh = function(portlet,src) {
- 
-            $timeout(function() {
-                topFiveCustomer();
-                $(portlet).portlet({ refresh: false });
-            }, 500);
-  
+    $scope.refreshTest = function(portlet,src) {
+        topFiveCustomer();
+        $timeout(function() {
+            $(portlet).portlet({ refresh: false });
+        }, 1000);
     }
 
 
@@ -126,10 +125,10 @@ app.controller('AdminController', function($scope,$interval, $document,$timeout,
                     args = "filterType="+type+"&userType=all";keyParam = "all";
                 }
 
-            if( type == "withoutTruck" ){
+            if( type == "withoutTruck"  || type == "trucksWithoutDriver" || type == "trucksReporting"){
                 keyParam = type;    
-                args += "&fromDate="+extra ;
-            }if(keyParam != "" && ( extra == "" || extra == undefined )  ){
+                //args += "&fromDate="+extra ;
+            }else if(keyParam != "" && ( extra == "" || extra == undefined )  ){
                 args += "&startDate="+$scope.dateRangeSelector.startDate+"&endDate="+$scope.dateRangeSelector.endDate;
             }else if(extra != undefined){
                 args += "&fromDate="+extra.date ;
@@ -399,6 +398,9 @@ app.controller('AdminController', function($scope,$interval, $document,$timeout,
 
     $scope.onSelectVehicleCallback = function (item, model){
         $scope.search_vehicle = item.vid;
+        
+        alert($scope.search_vehicle);
+
         $cookies.remove("_globalDropdown");
         $cookies.putObject('_globalDropdown', item);    
         if(item.vid == "" ) {
@@ -495,7 +497,7 @@ app.controller('AdminController', function($scope,$interval, $document,$timeout,
     $scope.driverName = false;
     dataFactory.httpRequest(URL+'/dashboard/fetchWidgetsOrder').then(function(data){
     
-    console.log(data.widgetsOrder);
+    
 
     if(data.widgetsOrder.length == 0 ) {
 
@@ -508,24 +510,16 @@ app.controller('AdminController', function($scope,$interval, $document,$timeout,
     
     $scope.visibility   = data.widgetVisibility;
     $scope.user_role    = data.user_role;
-
     var orderArray      = $scope.tSortableWidgetsLeft.split(',');
     var listArray       = $('.widget_div .wpanel');
     
-    console.log(listArray);
-    console.log('=======================');
-    
     for (var i = 0; i < orderArray.length; i++) {
         
-        console.log(listArray[orderArray[i]-1]);
-
         $('#placeholder_left').append(listArray[orderArray[i]-1]);
     }
 
     var orderArray1 = $scope.tSortableWidgetsRight.split(',');
     for (var i = 0; i < orderArray1.length; i++) {
-        
-        console.log(listArray[orderArray1[i]-1]);
 
         $('#placeholder_right').append(listArray[orderArray1[i]-1]);
     } 
@@ -618,13 +612,12 @@ app.controller('AdminController', function($scope,$interval, $document,$timeout,
             $scope.uInitial         = data.selectedDriver.avtarText;
             $scope.color            = data.selectedDriver.color;
 
-            $rootScope.latitude = data.latitude;
-            $rootScope.longitude = data.longitude;
-            $rootScope.curAdd = data.address;
-            $scope.PrintchartStack = data.chartStack.trecords;
-
-            $scope.city_name = data.weatherNotFound.name;
-            $scope.country_name = data.weatherNotFound.country;
+            $rootScope.latitude     = data.latitude;
+            $rootScope.longitude    = data.longitude;
+            $rootScope.curAdd       = data.address;
+            $scope.PrintchartStack  = data.chartStack.trecords;
+            $scope.city_name        = data.weatherNotFound.name;
+            $scope.country_name     = data.weatherNotFound.country;
             $scope.update_weather(data.latitude , data.longitude , data.address);
 
             $scope.CurVehicleId = data.vehicleID;
@@ -776,11 +769,11 @@ $scope.toggleIcon = function($event,type){
 }
 
 $scope.print_xl =function(){
-    var ext_head = "";
-    var ext_foot = "";
-    var if_driver = 1;
-    var tot_var = 'Total';
-    var total_row = '<tr  style="  text-transform: uppercase;font-size:12px;font-weight: bold;">';
+    var ext_head    = "";
+    var ext_foot    = "";
+    var if_driver   = 1;
+    var tot_var     = 'Total';
+    var total_row   = '<tr  style="text-transform: uppercase;font-size:12px;font-weight: bold;">';
     
     if ($scope.typeOfData == '_idriver' || $scope.typeOfData == '_iteam') {
         if_driver = 0;
@@ -811,11 +804,11 @@ $scope.print_xl =function(){
 
     if (typeof $scope.PrintchartStack[0].pickDate !== 'undefined') {
         angular.forEach($scope.PrintchartStack, function(value, key) {
-            miles = miles + parseFloat(value.miles);
-            deadMiles = deadMiles + parseFloat(value.deadmiles);
-            booked = booked + parseFloat(value.invoice);
-            charged = charged + parseFloat(value.charges);
-            profit = profit + parseFloat(value.profit);
+            miles       = miles + parseFloat(value.miles);
+            deadMiles   = deadMiles + parseFloat(value.deadmiles);
+            booked      = booked + parseFloat(value.invoice);
+            charged     = charged + parseFloat(value.charges);
+            profit      = profit + parseFloat(value.profit);
             profitPercent = profitPercent + parseFloat(value.ppercent);
 
             innerContents = innerContents + '<tr style="  text-transform: uppercase;font-size:12px; "><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + value.loadid + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + value.pickDate + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + value.DeliveryDate + '</td>';
@@ -856,11 +849,11 @@ $scope.print_xl =function(){
     } else {
         
         angular.forEach($scope.PrintchartStack, function(value, key) {
-            miles = miles + parseFloat(value.miles);
-            deadMiles = deadMiles + parseFloat(value.deadmiles);
-            booked = booked + parseFloat(value.invoice);
-            charged = charged + parseFloat(value.charges);
-            profit = profit + parseFloat(value.profit);
+            miles       = miles + parseFloat(value.miles);
+            deadMiles   = deadMiles + parseFloat(value.deadmiles);
+            booked      = booked + parseFloat(value.invoice);
+            charged     = charged + parseFloat(value.charges);
+            profit      = profit + parseFloat(value.profit);
             profitPercent = profitPercent + parseFloat(value.ppercent);
 
             innerContents = innerContents + '<tr style="  text-transform: uppercase;font-size:12px; ">';
@@ -1270,6 +1263,56 @@ $rootScope.getTodayReport = function(reporttype){
     });
 }
 
+$rootScope.exportTodayReport = function(){
+    
+    reporttype = ($rootScope.todayInsightActive === 'undefined' )?'booked':$rootScope.todayInsightActive;
+    data = {'export':1};
+
+    dataFactory.httpRequest(URL+'/dashboard/getTodayReport/'+reporttype,'POST',{},data).then(function(data){
+            
+            var url = URL+'/assets/ExportExcel/'+data.fileName;
+            var downloadContainer   = angular.element('<div data-tap-disabled="true"><a></a></div>');
+            var downloadLink        = angular.element(downloadContainer.children()[0]);
+            downloadLink.attr('href', url);
+            downloadLink.attr('download', data.filename);
+            angular.element('body').append(downloadContainer);
+            $timeout(function () {
+              downloadLink[0].click();
+              downloadLink.remove();
+            }, null);
+
+    });
+}
+
+$rootScope.exportLeaderBoard = function(item,model,type){
+    
+    alert(model);
+    
+    alert(type);
+
+    $rootScope.ofFilter.startDate = $scope.dateRangeSelector.startDate;
+    $rootScope.ofFilter.endDate = $scope.dateRangeSelector.endDate;
+
+    /*reporttype = ($rootScope.todayInsightActive === 'undefined' )?'booked':$rootScope.todayInsightActive;
+    data = {'export':1};
+
+    dataFactory.httpRequest(URL+'/dashboard/getTodayReport/'+reporttype,'POST',{},data).then(function(data){
+            
+            var url = URL+'/assets/ExportExcel/'+data.fileName;
+            var downloadContainer   = angular.element('<div data-tap-disabled="true"><a></a></div>');
+            var downloadLink        = angular.element(downloadContainer.children()[0]);
+            downloadLink.attr('href', url);
+            downloadLink.attr('download', data.filename);
+            angular.element('body').append(downloadContainer);
+            $timeout(function () {
+              downloadLink[0].click();
+              downloadLink.remove();
+            }, null);
+
+    });*/
+}
+
+
 
 $scope.getWeatherInfo = function(){
     var sterm = '';
@@ -1567,6 +1610,7 @@ $rootScope.updateDashboard = function(){
             title: {
                 text: ''
             },
+            exporting:false,
             plotOptions: {
                 pie: {
                     allowPointSelect: true,
@@ -1778,6 +1822,8 @@ $rootScope.updateDashboard = function(){
         }]
     });
     //top 5 removed
+    
+
     
     //colored line chart
     $('#best_safety').highcharts({

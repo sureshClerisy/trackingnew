@@ -2,14 +2,14 @@
 .tb-my .table-res-1{display:block;float:left;width:100%}
 .tb-my .table-row-main1{width:100%;display:block;border-bottom:1px solid rgba(230, 230, 230, 0.7);float:left;}
 .tb-my .table-row-main1:nth-child(2n+1){background:#fff;}
-.tb-my .tb-cell{word-wrap: break-word;word-break: break-all;display:inline-block;padding:10px 10px;vertical-align: middle;}
+.tb-my .tb-cell{position: relative;word-wrap: break-word;word-break: break-all;display:inline-block;padding:10px 10px;vertical-align: middle;}
 .tb-my .tb-head {background:#FAFAFA;}
 .tb-my .tb-head .tb-cell {font-size: 15px ; white-space: nowrap;font-family: 'Montserrat';color:#000;text-transform: uppercase;vertical-align: top;}
 .tb-my .lode-arrow, .tb-head .tb-cell {
   display: inline-block;
   float: none;
   font-family: "Montserrat";
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 600;
   padding-right: 0;
   position: relative;
@@ -22,8 +22,19 @@
   padding-bottom: 6px;
   padding-top: 6px;
 }
-.tb-my .lode-arrow:after{background: url(../img/arr-short.png)no-repeat left top;position: absolute;right: -21px;top: 0;bottom: 0;width: 20px;height: 16px;content: "";margin: auto;}
-.tb-my .tb-body{font-size: 15px;}
+.tb-my .lode-arrow:after {
+    background: url(../img/arr-short.png)no-repeat left top;
+    position: absolute;
+    right: -21px;
+    top: 1px;
+    bottom: 0;
+    width: 20px;
+    height: 16px;
+    content: "";
+    margin: auto;
+    background-size: 17px;
+}
+.tb-my .tb-body{font-size: 13px;    color: #000000;}
 .tb-my .tb-cell.action span.wid{ min-width: 91px;display: inline-block;}
 .tb-my .tb-cell.action a {float: left;width: 30px;height: 30px;    text-align: center;padding: 5px 7px;}
 .tb-my .tb-cell .text-comp-name {display: inline-block;    overflow: hidden;text-overflow: ellipsis;white-space: nowrap;width:125px;}
@@ -338,7 +349,7 @@
 .table-structure-main-block.tb-my .table-row-main1.tb-head .tb-cell{
     font-family: "Montserrat";
     color: #000;
-    font-weight: 600;
+    font-weight: 600;    font-size: 13px;
 }
 .table-row-main1.tb-body.visited .tb-cell span {
   color: red;
@@ -453,7 +464,16 @@ body .dataTables_paginate ul {
 .open-block .tb-cell.del-report,
 .open-block .tb-cell.delivery-report,
 .open-block .tb-cell.destst-report  
-{display:none;}
+.tb-cell.shipper-state{display:none;}
+.tb-cell.shipper-state{    width:115px;}
+.tb-cell.shipper-new-col {
+    width: 155px;padding-left: 25px!important;}
+.tb-cell.shipper-name-street {    width: 200px;}
+.tb-cell.shipper-zipcode {    width: 135px;}
+.tb-cell.shipper-status {    width: 94px;}
+.tb-cell.shipper-dead-miles {    width: 119px;}
+.tb-head {    border-bottom: 3px solid #0784DC!important;    padding: 3px 0;}
+.shipper-control-table .tb-cell.action {    width: 148px;}
 @media (min-width:2500px){
 .tb-my .tb-cell {
   display: table-cell;
@@ -469,6 +489,36 @@ body .dataTables_paginate ul {
   width: 100%;
 }
 .add-new-data{width:100%;max-width:100%;}
+}
+@media (max-width:1400px){
+.shipper-control-table .tb-my .table-row-main1 {
+  float: none;background:#fff;
+}.shipper-control-table .tb-my .table-row-main1:nth-child(even) {
+  float: none;background:#f4f4f4;
+}
+}
+@media (min-width:1400px){
+.shipper-control-table .tb-my .tb-cell {
+  display: table-cell;
+    float: none !important;
+    width: auto !important;border-bottom: 1px solid rgba(230, 230, 230, 0.7);
+}
+.shipper-control-table  .table-structure-main-block.tb-my .table-row-main1.tb-head .tb-cell {
+    border-bottom: 3px solid #0784DC;
+}
+.shipper-control-table .tb-my .table-row-main1 {
+  display: table-row;
+  float: none;background:#fff;
+}.shipper-control-table .tb-my .table-row-main1:nth-child(even) {
+  display: table-row;
+  float: none;background:#f4f4f4;
+}
+.shipper-control-table .tb-my .table-res-1 {
+  display: table;
+  width: 100%;
+}
+.shipper-control-table .tb-my .tb-cell.action {width:150px!important;text-align:right;}
+.shipper-control-table .tb-my .tb-head .tb-cell.action {text-align:center;}
 }
 @media (min-width:2200px){
 .report-section.tb-my .tb-cell {
@@ -501,6 +551,8 @@ body .dataTables_paginate ul {
 }
 .report-section.tb-my{width:100%;overflow:auto;}
 .report-section.tb-my .ld-id span{padding-left:0px;}
+.shipper-control-table .open-block .tb-cell{display:none;}
+
 }
 /*
 @media (min-width:2530px){
@@ -574,6 +626,7 @@ body .dataTables_paginate ul {
 }
 .tb-cell.delivery { width: 105px;}
 }
+
 @media (max-width:2460px){
 .tb-cell.source-bill{display:none;}
 .open-block .tb-cell.source-bill{display:block;}
@@ -626,7 +679,7 @@ body .dataTables_paginate ul {
 @media (max-width:2200px){
 .tb-cell.company-bill{display:none;}
 .open-block .tb-cell.company-bill{display:block;}
-
+.shipper-control-table .plus-1 {    display: none;}
 }
 
 @media (max-width:2170px){
@@ -751,16 +804,18 @@ body .dataTables_paginate ul {
 
 .tb-cell.miles-plan    {display:none;}
 .open-block .tb-cell.miles-plan    {display:block;}
+
 }
 @media (max-width:1286px){
 
 .tb-cell.Driver,.tb-cell.st-bill,.tb-cell.st1-plan    {display:none;}
 .open-block .tb-cell.Driver    ,.open-block .tb-cell.st-bill,.open-block .tb-cell.st1-plan    {display:block;}
-
+.tb-cell.Invoice-No-bill {    width: 90px;}
 }
 @media (max-width:1225px){
-.tb-cell.st1    {display:none;}
-.open-block .tb-cell.st1    {display:block;}
+.tb-my .tb-cell.shipper-status ,.tb-cell.st1    {display:none;}
+.open-block .tb-cell.st1   ,.tb-my .open-block .tb-cell.shipper-status     {display:block;}
+.shipper-control-table .plus-1 {    display: block;}
 }
 
 @media (max-width:1200px){
@@ -778,8 +833,9 @@ body .dataTables_paginate ul {
 }
 @media (max-width:1170px){
 
-.tb-cell.Destination    {display:none;}
-.open-block .tb-cell.Destination    {display:block;}
+.tb-cell.Destination ,.tb-cell.shipper-zipcode    {display:none;}
+.open-block .tb-cell.Destination , .open-block .tb-cell.shipper-zipcode{display:block;}
+
 
 }
 @media (max-width:1090px){
@@ -804,19 +860,20 @@ body .dataTables_paginate ul {
 
 .tb-cell.Origin-plan    {display:none;}
 .open-block .tb-cell.Origin-plan    {display:block;}
-
+.tb-cell.shipper-name-street {    width: 180px;}
+.shipper-control-table .tb-cell.action {    width: 140px;}
 }
 
 @media (max-width:900px){
 
-.tb-cell.Origin   {display:none;}
-.open-block .tb-cell.Origin   {display:block;}
+.tb-cell.Origin,.tb-cell.shipper-state    {display:none;}
+.open-block .tb-cell.Origin,.open-block .tb-cell.shipper-state    {display:block;}
 
 }
 @media (max-width:880px){
 
 .tb-cell.Origin,.tb-cell.pickup-plan    {display:none;}
-.open-block .tb-cell.Origin,.open-block .tb-cell.pickup-plan    {display:block;}
+.open-block .tb-cell.Origin,.open-block .tb-cell.pickup-plan,  -block .tb.tb-cell.shipper-state   {display:block;}
 
 }
 @media (max-width:835px){
@@ -828,11 +885,12 @@ body .dataTables_paginate ul {
 @media (max-width:800px){
 .tb-cell.delivery  {display:none;}
 .open-block .tb-cell.delivery {display:block;}
+.tb-cell.shipper-new-col {    width: 118px;}
 }
 @media (max-width:770px){
 
-.tb-cell.delivery-bill,.tb-cell.fl-plan    {display:none;}
-.open-block .tb-cell.delivery-bill,.open-block .tb-cell.fl-plan    {display:block;}
+.tb-cell.delivery-bill,.tb-cell.fl-plan ,.tb-cell.city-shipper   {display:none;}
+.open-block .tb-cell.delivery-bill,.open-block .tb-cell.fl-plan ,.open-block  .tb-cell.city-shipper   {display:block;}
 
 .tb-my .open-block .tb-cell span .heading { width: 50%;}
 .tb-my .open-block .tb-cell span .value { width: 50%;}
@@ -840,8 +898,8 @@ body .dataTables_paginate ul {
 }
 @media (max-width:660px){
 
-.tb-cell.pickup,.tb-cell.pickup-bill,.tb-cell.p-age-plan    {display:none;}
-.open-block .tb-cell.pickup,.open-block .tb-cell.pickup-bill,.open-block .tb-cell.p-age-plan    {display:block;}
+.tb-cell.pickup,.tb-cell.pickup-bill,.tb-cell.p-age-plan ,.tb-cell.shipper-name-street    {display:none;}
+.open-block .tb-cell.pickup,.open-block .tb-cell.pickup-bill,.open-block .tb-cell.p-age-plan,.open-block  .tb-cell.shipper-name-street     {display:block;}
 
 }
 @media (max-width:574px){
@@ -872,8 +930,8 @@ body .dataTables_paginate ul {
 }
 @media (max-width:440px){
 
-.tb-cell.ph {display:none;}
-.open-block .tb-cell.ph {display:block;}
+.tb-cell.ph,.tb-cell.shipper-rating {display:none;}
+.open-block .tb-cell.ph,.open-block .tb-cell.shipper-rating  {display:block;}
 
 }
 @media (max-width:420px){

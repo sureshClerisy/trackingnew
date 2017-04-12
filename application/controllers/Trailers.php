@@ -289,6 +289,17 @@ class Trailers extends Admin_Controller {
 			echo json_encode(array("success" => false));
 		}
 	}
-	
-	
+
+	public function fetchDataForCsv() {
+
+		$data 		= array();
+		$content 	= '';
+        $searchText = json_decode(file_get_contents('php://input'), true);
+		$keys 	 	= [['Truck ID','Unit ID','VIN','Owner','Type','Description','Monthly payment','Due date','Purchase price','Interest rate','Notes','Status','Created']];
+
+		$dataRow = $this->Trailer->fetchDriversForCSV($searchText);
+		
+		$data 	 = array_merge($keys,$dataRow);
+		echo json_encode(array('fileName'=>$this->createExcell('trailers',$data)));
+	}
 }

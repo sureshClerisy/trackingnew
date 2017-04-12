@@ -298,14 +298,14 @@ class BrokersModel extends Parent_Model
 	* Fetch loads of particular broker
 	*/
 	 
-	public function getBrokerRelatedLoads( $brokerId, $startDate = '', $endDate = '', $filters = array(), $total = false ) {
+	public function getBrokerRelatedLoads( $brokerId, $startDate = '', $endDate = '', $filters = array(), $total = false ,$export=NULL) {
 		if(count($filters) <= 0){
 			$filters = array("itemsPerPage"=>20, "limitStart"=>1, "sortColumn"=>"DeliveryDate", "sortType"=>"DESC","status"=>"");
 		}
 
 		$data =  $condition = array();
 		if(!$total) {
-        $this->db->select('CONCAT( d.first_name ," + " ,team.first_name) AS teamdriverName, 
+        $this->db->select('loads.created,loads.overallTotalProfit,loads.overallTotalProfitPercent,CONCAT( d.first_name ," + " ,team.first_name) AS teamdriverName, 
         					CASE loads.driver_type 
         						WHEN "team" THEN CONCAT(d.first_name," + ",team.first_name) 
         									ELSE concat(d.first_name," ",d.last_name) 
@@ -383,9 +383,11 @@ class BrokersModel extends Parent_Model
 			$this->db->order_by("loads.".$filters["sortColumn"],$filters["sortType"]);	
 		}
 
-		if(!$total){
+		if(!$total ){
 			$filters["limitStart"] = $filters["limitStart"] == 1 ? 0 : $filters["limitStart"];
-			$this->db->limit($filters["itemsPerPage"],$filters["limitStart"]);
+			if(!empty($filters['export'])){//bypass while export data
+				$this->db->limit($filters["itemsPerPage"],$filters["limitStart"]);
+			}
 		}
 		
 		$query = $this->db->get('loads');
@@ -396,5 +398,31 @@ class BrokersModel extends Parent_Model
 		}
 
 	}
+
+	public function fetchDriversForCSV($search = null) {
+
+        $this->db->select('*')->from('broker_info');
+
+        $this->db->where("delete_broker",0);
+        if(!empty($search['searchText'])){
+        	$this->db->like('broker_info.TruckCompanyName',$search['searchText']); 
+			$this->db->or_like('broker_info.postingAddress',$search['searchText']);
+			$this->db->or_like('broker_info.city',$search['searchText']);
+			$this->db->or_like('broker_info.state',$search['searchText']);
+			$this->db->or_like('broker_info.zipcode',$search['searchText']);
+			$this->db->or_like('broker_info.MCNumber',$search['searchText']);
+			$this->db->or_like('broker_info.MCNumber',$search['searchText']);
+			$this->db->or_like('broker_info.CarrierMC',$search['searchText']);
+			$this->db->or_like('broker_info.DOTNumber',$search['searchText']);
+			$this->db->or_like('broker_info.brokerStatus',$search['searchText']);
+        }
+
+        $result = $this->db->get(); 
+        if($result->num_rows()>0){
+			return $result->result_array();
+        } else {
+			return false;
+		}
+    } 
 }
 

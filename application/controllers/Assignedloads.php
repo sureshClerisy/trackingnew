@@ -97,7 +97,7 @@ class Assignedloads extends Admin_Controller{
 		}
 
 		if(isset($_COOKIE["_globalDropdown"]) && !empty($_COOKIE["_globalDropdown"])){
-		
+
 			$gDropdown = json_decode($_COOKIE["_globalDropdown"],true);
 			// pr($gDropdown); die;
 			if (isset($gDropdown["label"]) && $gDropdown["label"] == "_idispatcher") {  //A Dispatcher's All drivers
@@ -150,10 +150,10 @@ class Assignedloads extends Admin_Controller{
 				$this->data['vehicleIdRepeat'] = '';
 			}
 		}
-			
-			$this->data['labelArray'] = $vDriversList;		
-			$this->data['loadSource'] = 'truckstop.com';
-			$this->data["selectedDriver"] = isset($gDropdown) ? $gDropdown : "";
+
+		$this->data['labelArray'] = $vDriversList;		
+		$this->data['loadSource'] = 'truckstop.com';
+		$this->data["selectedDriver"] = isset($gDropdown) ? $gDropdown : "";
 		if ( $jobs ) {
 			$this->data['assigned_loads'] = $jobs;
 		} else {
@@ -167,7 +167,7 @@ class Assignedloads extends Admin_Controller{
 		$objPost = json_decode(file_get_contents('php://input'),true);
 
 		$loadSource = '';
-	
+
 		$startDate = (isset($objPost['startingDate']) && $objPost['startingDate'] != 'undefined' ) ? $objPost['startingDate'] : '';
 		$endDate = (isset($objPost['endingDate']) && $objPost['endingDate'] != 'undefined' ) ? $objPost['endingDate'] : '';
 		
@@ -224,7 +224,7 @@ class Assignedloads extends Admin_Controller{
 	/**
 	 *  Deleting the assigned load
 	 */ 
-	 
+
 	public function deleteAssignedLoad( $loadId = null, $srcPage = '' ) {
 		try{
 			$result = $this->Job->deleteAssignedLoad( $loadId );
@@ -243,7 +243,7 @@ class Assignedloads extends Admin_Controller{
 	/**
 	 * Generating the invoice 
 	 */ 
-	 
+
 	public function generateInvoice( $loadId = null , $parameter = '' ,$srcPage = "") {
 		$pathGen = str_replace('application/', '', APPPATH);
 		$data = array();
@@ -276,23 +276,23 @@ class Assignedloads extends Admin_Controller{
 			$errMsg = array();
 			if ( !isset($data['jobRecord']['shipper_name']) || $data['jobRecord']['shipper_name'] == '') 
 				$errMsg[] = 'shipper name';
-		
+
 			if ( !isset($data['jobRecord']['consignee_name']) || $data['jobRecord']['consignee_name'] == '' )
 				$errMsg[] = 'consignee name';
-					
+
 			if ( !isset($data['jobRecord']['PickupAddress']) || $data['jobRecord']['PickupAddress'] == '' || !isset($data['jobRecord']['OriginCity']) || $data['jobRecord']['OriginCity'] == '' || !isset($data['jobRecord']['OriginState']) || $data['jobRecord']['OriginState'] == '' || !isset($data['jobRecord']['OriginZip']) || $data['jobRecord']['OriginZip'] == '' || !isset($data['jobRecord']['OriginCountry']) || $data['jobRecord']['OriginCountry'] == '' )
 				$errMsg[] = 'full origin address';
-				
+
 			if ( !isset($data['jobRecord']['DestinationAddress']) || $data['jobRecord']['DestinationAddress'] == '' || !isset($data['jobRecord']['DestinationCity']) || $data['jobRecord']['DestinationCity'] == '' || !isset($data['jobRecord']['DestinationState']) || $data['jobRecord']['DestinationState'] == '' || !isset($data['jobRecord']['DestinationZip']) || $data['jobRecord']['DestinationZip'] == '' || !isset($data['jobRecord']['DestinationCountry']) || $data['jobRecord']['DestinationCountry'] == ''  )
 				$errMsg[] = 'full delivery address';
-				
+
 			if ( !empty($errMsg)) {
 				$newMsg = implode(', ',$errMsg);
 				$billingErr = 1;	
 				$errorMessage .= 'enter '.$newMsg.'.';
 				$showError = 1;
 			}
-				
+
 			if ( $data['jobRecord']['woRefno'] == '' ) {
 				if ( $billingErr == 1 ) {
 					$errorMessage = str_replace('.','',$errorMessage);
@@ -311,7 +311,7 @@ class Assignedloads extends Admin_Controller{
 					$errorMessage = str_replace('.','',$errorMessage);
 					$errorMessage .= ' '.$this->lang->line('errAnd').' ';
 				}
-								
+
 				if ( $data['jobRecord']['TruckCompanyName'] == '' ) {
 					$errorMessage .= ' '.$this->lang->line('errEnter').' ';
 					$errorMessage .= $this->lang->line('errGenerateBroker');
@@ -322,13 +322,13 @@ class Assignedloads extends Admin_Controller{
 					
 					if ( $data['jobRecord']['city'] == '' )
 						$errMsg[] = 'city';
-						
+
 					if ( $data['jobRecord']['state'] == '' )
 						$errMsg[] = 'state';
 					
 					if ( $data['jobRecord']['zipcode'] == '' )
 						$errMsg[] = 'zip code';
-						
+
 					if ( !empty($errMsg)) {
 						$newMsg = implode(', ',$errMsg);	
 						$errorMessage .= 'enter broker '.$newMsg;
@@ -360,10 +360,10 @@ class Assignedloads extends Admin_Controller{
 				
 				if ( $extEntity == 1 )
 					$errMsg[] = 'extra stop entity';
-					
+
 				if ( $extname == 1 )
 					$errMsg[] = 'extra stop name';
-					
+
 				if ( $extaddress == 1 )
 					$errMsg[] = 'extra stop address';
 				
@@ -378,22 +378,22 @@ class Assignedloads extends Admin_Controller{
 					$showError = 1;
 				}
 			}
-						
+
 			if ( $showError == 0 ) {
 				if ( $data['jobRecord']['invoiceNo'] == '' || $data['jobRecord']['invoiceNo'] == null  || $data['jobRecord']['invoiceNo'] == 'undefined' || $data['jobRecord']['invoiceNo'] == 0 ) {
 					$invoicedNo = $this->Billing->generateInvoiceNumber($data['jobRecord']['id']);
 					$data['jobRecord']['invoiceNo'] = $invoicedNo;
 				}
-			
+
 				$invoicedDate = $this->Billing->addGenerateInvoiceDate($data['jobRecord']['id']);
 				
 				$data['jobRecord']['invoicedDate'] = $invoicedDate;
-					
+
 				$html = $this->load->view('invoice', $data, true); 
 				$invoiceResult = $this->Billing->fetchUploadedDocs( $loadId, 'invoice');
 				$fileName = "invoice_".time().".pdf";
 				$pdfFilePath = $pathGen."assets/uploads/documents/invoice/".$fileName;
-		 
+
 				$this->load->library('m_pdf');
 				$this->m_pdf->pdf->WriteHTML($html);
 				//~ $this->m_pdf->pdf->Output($pdfFilePath, "D");    
@@ -414,7 +414,7 @@ class Assignedloads extends Admin_Controller{
 					$response['data']['cmd'] = $cmd;
 					exec($cmd . " > /dev/null &");   
 				}
-				 
+
 				if ( !empty($invoiceResult) && $invoiceResult['doc_name'] != '' ) {
 					if(file_exists($pathGen."assets/uploads/documents/invoice/".$invoiceResult['doc_name'])){
 						unlink($pathGen."assets/uploads/documents/invoice/".$invoiceResult['doc_name']);
@@ -439,7 +439,7 @@ class Assignedloads extends Admin_Controller{
 					$billingLoads = $this->Billing->getInProgressLoads('invoice');
 				else
 					$billingLoads = $this->Billing->getInProgressLoads();
-					
+
 				echo json_encode(array('results' => $data, 'showError' => $showError, 'errorMessage' => $errorMessage, 'billingLoads' => $billingLoads));  
 			} else {
 				echo json_encode(array('showError' => $showError, 'errorMessage' => $errorMessage));  
@@ -450,7 +450,7 @@ class Assignedloads extends Admin_Controller{
 	/**
 	 * Merging PDF files
 	 */
-	 
+
 	public function mergingPdf( $loadId = null, $srcPage = "" ) {
 		$pdf = $this->load->library('m_pdf');
 		$pdf = new mPDF();
@@ -494,18 +494,18 @@ class Assignedloads extends Admin_Controller{
 
 			$pdf->Output($pdfFilePath, "F");
 			
-				if (substr(php_uname(), 0, 7) == "Windows"){ 
+			if (substr(php_uname(), 0, 7) == "Windows"){ 
 					//pclose(popen("start /B ". $cmd, "r"));  
-					$response['data']['cmd'] = 'Windows';
-				} 
-				else { 					
-					$thumbFolder = 'thumb_bundle';
-					$raw_name = explode('.',$fileName);
-					$cmd = 'cd '.$pathGen."assets/uploads/documents/bundle/";
-					$cmd .= '; convert -thumbnail x600 '.$fileName.'[0] -flatten ../'.$thumbFolder.'/thumb_'.$raw_name[0].'.jpg';
-					$response['data']['cmd'] = $cmd;
-					exec($cmd . " > /dev/null &");   
-				}
+				$response['data']['cmd'] = 'Windows';
+			} 
+			else { 					
+				$thumbFolder = 'thumb_bundle';
+				$raw_name = explode('.',$fileName);
+				$cmd = 'cd '.$pathGen."assets/uploads/documents/bundle/";
+				$cmd .= '; convert -thumbnail x600 '.$fileName.'[0] -flatten ../'.$thumbFolder.'/thumb_'.$raw_name[0].'.jpg';
+				$response['data']['cmd'] = $cmd;
+				exec($cmd . " > /dev/null &");   
+			}
 			
 			$docPrimaryId = '';
 			if ( !empty($invoiceResult) && $invoiceResult['doc_name'] != '' ) {
@@ -544,20 +544,20 @@ class Assignedloads extends Admin_Controller{
 		}
 		
 		for ($i = 0; $i < count($files); $i++ ) {
-				$ext = explode('.',$files[$i]);
-				if ( strtolower($ext[1]) == 'png' || strtolower($ext[1]) == 'jpg' || strtolower($ext[1]) == 'jpeg' ) {
-					$pdf->AddPage('L','A4');
-					$pdf->WriteHTML('<img src="'.$files[$i].'" />');
-				} else if ( strtolower($ext[1]) == 'xlsx' ) {
-					
-				} else if ( $ext[1] == 'txt' ) {
-					$result = file_get_contents($files[$i]);
-					$pdf->AddPage('L','A4');
-					$pdf->WriteHTML($result);
-				} else {
-					$pagecount = $pdf->setSourceFile($pathGen.$files[$i]);	
-					for($j = 1; $j <= $pagecount ; $j++)
-					{
+			$ext = explode('.',$files[$i]);
+			if ( strtolower($ext[1]) == 'png' || strtolower($ext[1]) == 'jpg' || strtolower($ext[1]) == 'jpeg' ) {
+				$pdf->AddPage('L','A4');
+				$pdf->WriteHTML('<img src="'.$files[$i].'" />');
+			} else if ( strtolower($ext[1]) == 'xlsx' ) {
+
+			} else if ( $ext[1] == 'txt' ) {
+				$result = file_get_contents($files[$i]);
+				$pdf->AddPage('L','A4');
+				$pdf->WriteHTML($result);
+			} else {
+				$pagecount = $pdf->setSourceFile($pathGen.$files[$i]);	
+				for($j = 1; $j <= $pagecount ; $j++)
+				{
 						$tplidx = $pdf->importPage(($j), '/MediaBox'); // template index.
 						$pdf->addPage('L','A4');// orientation can be P|L
 						$pdf->useTemplate($tplidx, 0, 0, 0, 0, TRUE);                   
@@ -569,19 +569,27 @@ class Assignedloads extends Admin_Controller{
 			$pdfFilePath = $pathGen."assets/uploads/documents/bundle/".$fileName;
 
 			$pdf->Output('tes.pdf', "D"); 
-		
-		
-	} 
-	
+
+
+		} 
+
 	/**
 	 * Fetching Broker list on add load
 	 */
-	 
+
 	public function getBrokersList( $loadId = null ) {
+		$this->load->model('Shipper');
+
 		$brokersData = $this->BrokersModel->getBrokersList();
+		$new = array("id" => "", "TruckCompanyName" => "Select Broker");
+		array_unshift($brokersData, $new);
+
+		$this->data['shippersList'] = $this->Shipper->fetchShipperList();
+		$new = array("id" => "", "shipperCompanyName" => "Select Shipper");
+		array_unshift($this->data['shippersList'], $new);
 		if ( !empty($brokersData) ) 
 			$this->data['brokersList'] = $brokersData;
-			
+
 		$getBrokerLoad = $this->BrokersModel->getBrokerDetail( $loadId );
 		$this->data['brokerLoadDetail'] = $getBrokerLoad;
 		echo json_encode($this->data);
@@ -600,7 +608,7 @@ class Assignedloads extends Admin_Controller{
 		$files2 = $pathGen.'/compresspdf_demo/PDFReference15_v5.pdf';
 		$files 	= array($files1,$files2);
 		$pdf 	= new FPDI();
-	
+
 		for ($i = 0; $i < count($files); $i++ ) {
 			$pagecount = $pdf->setSourceFile($files[$i]);
 			
@@ -646,13 +654,13 @@ class Assignedloads extends Admin_Controller{
 		$files = array('/home/csolution/Downloads/semail_(2) (1).pdf','/home/csolution/Downloads/podNew(1).pdf');
 		// include('class.pdf2text.php');
 		$this->load->library('PDF2text.php');
-$a = new PDF2Text();
+		$a = new PDF2Text();
 $a->setFilename('/home/csolution/Downloads/semail_(2) (1).pdf'); //grab the test file at http://www.newyorklivearts.org/Videographer_RFP.pdf
 $out = $a->decodePDF();
 pr($out);
 echo $a->output();
 
- die;
+die;
 		/*$resu = $this->pdf2string($files[0]);
 		$pdf->SetProtection($resu);
 
@@ -669,127 +677,131 @@ echo $a->output();
 				$pdf->useTemplate($tplidx, 0, 0, 0, 0, TRUE);                   
 			}
 		}		
-			
+
 		
 		$pdf->Output(); 
 	} 
 
 	function pdf2string($sourcefile) { 
 
-    $fp = fopen($sourcefile, 'rb'); 
-    $content = fread($fp, filesize($sourcefile)); 
-    fclose($fp); 
+		$fp = fopen($sourcefile, 'rb'); 
+		$content = fread($fp, filesize($sourcefile)); 
+		fclose($fp); 
 
-    $searchstart = 'stream'; 
-    $searchend = 'endstream'; 
-    $pdfText = ''; 
-    $pos = 0; 
-    $pos2 = 0; 
-    $startpos = 0; 
+		$searchstart = 'stream'; 
+		$searchend = 'endstream'; 
+		$pdfText = ''; 
+		$pos = 0; 
+		$pos2 = 0; 
+		$startpos = 0; 
 
-    while ($pos !== false && $pos2 !== false) { 
+		while ($pos !== false && $pos2 !== false) { 
 
-        $pos = strpos($content, $searchstart, $startpos); 
-        $pos2 = strpos($content, $searchend, $startpos + 1); 
+			$pos = strpos($content, $searchstart, $startpos); 
+			$pos2 = strpos($content, $searchend, $startpos + 1); 
 
-        if ($pos !== false && $pos2 !== false){ 
+			if ($pos !== false && $pos2 !== false){ 
 
-            if ($content[$pos] == 0x0d && $content[$pos + 1] == 0x0a) { 
-                $pos += 2; 
-            } else if ($content[$pos] == 0x0a) { 
-                $pos++; 
-            } 
+				if ($content[$pos] == 0x0d && $content[$pos + 1] == 0x0a) { 
+					$pos += 2; 
+				} else if ($content[$pos] == 0x0a) { 
+					$pos++; 
+				} 
 
-            if ($content[$pos2 - 2] == 0x0d && $content[$pos2 - 1] == 0x0a) { 
-                $pos2 -= 2; 
-            } else if ($content[$pos2 - 1] == 0x0a) { 
-                $pos2--; 
-            } 
+				if ($content[$pos2 - 2] == 0x0d && $content[$pos2 - 1] == 0x0a) { 
+					$pos2 -= 2; 
+				} else if ($content[$pos2 - 1] == 0x0a) { 
+					$pos2--; 
+				} 
 
-            $textsection = substr( 
-                $content, 
-                $pos + strlen($searchstart) + 2, 
-                $pos2 - $pos - strlen($searchstart) - 1 
-            ); 
-            $data = @gzuncompress($textsection); 
-            $pdfText .= $this->pdfExtractText($data); 
-            $startpos = $pos2 + strlen($searchend) - 1; 
+				$textsection = substr( 
+					$content, 
+					$pos + strlen($searchstart) + 2, 
+					$pos2 - $pos - strlen($searchstart) - 1 
+					); 
+				$data = @gzuncompress($textsection); 
+				$pdfText .= $this->pdfExtractText($data); 
+				$startpos = $pos2 + strlen($searchend) - 1; 
 
-        } 
-    } 
+			} 
+		} 
 
-    return preg_replace('/(\s)+/', ' ', $pdfText); 
+		return preg_replace('/(\s)+/', ' ', $pdfText); 
 
-} 
+	} 
 
-function pdfExtractText($psData){ 
+	function pdfExtractText($psData){ 
 
-    if (!is_string($psData)) { 
-        return ''; 
-    } 
+		if (!is_string($psData)) { 
+			return ''; 
+		} 
 
-    $text = ''; 
+		$text = ''; 
 
     // Handle brackets in the text stream that could be mistaken for 
     // the end of a text field. I'm sure you can do this as part of the 
     // regular expression, but my skills aren't good enough yet. 
-    $psData = str_replace('\)', '##ENDBRACKET##', $psData); 
-    $psData = str_replace('\]', '##ENDSBRACKET##', $psData); 
+		$psData = str_replace('\)', '##ENDBRACKET##', $psData); 
+		$psData = str_replace('\]', '##ENDSBRACKET##', $psData); 
 
-    preg_match_all( 
-        '/(T[wdcm*])[\s]*(\[([^\]]*)\]|\(([^\)]*)\))[\s]*Tj/si', 
-        $psData, 
-        $matches 
-    ); 
+		preg_match_all( 
+			'/(T[wdcm*])[\s]*(\[([^\]]*)\]|\(([^\)]*)\))[\s]*Tj/si', 
+			$psData, 
+			$matches 
+			); 
 
-    for ($i = 0; $i < sizeof($matches[0]); $i++) { 
-        if ($matches[3][$i] != '') { 
+		for ($i = 0; $i < sizeof($matches[0]); $i++) { 
+			if ($matches[3][$i] != '') { 
             // Run another match over the contents. 
-            preg_match_all('/\(([^)]*)\)/si', $matches[3][$i], $subMatches); 
-            foreach ($subMatches[1] as $subMatch) { 
-                $text .= $subMatch; 
-            } 
-        } else if ($matches[4][$i] != '') { 
-            $text .= ($matches[1][$i] == 'Tc' ? ' ' : '') . $matches[4][$i]; 
-        } 
-    } 
+				preg_match_all('/\(([^)]*)\)/si', $matches[3][$i], $subMatches); 
+				foreach ($subMatches[1] as $subMatch) { 
+					$text .= $subMatch; 
+				} 
+			} else if ($matches[4][$i] != '') { 
+				$text .= ($matches[1][$i] == 'Tc' ? ' ' : '') . $matches[4][$i]; 
+			} 
+		} 
 
-    // Translate special characters and put back brackets. 
-    $trans = array( 
-        '...'                => '…', 
-        '\205'                => '…', 
-        '\221'                => chr(145), 
-        '\222'                => chr(146), 
-        '\223'                => chr(147), 
-        '\224'                => chr(148), 
-        '\226'                => '-', 
-        '\267'                => '•', 
-        '\('                => '(', 
-        '\['                => '[', 
-        '##ENDBRACKET##'    => ')', 
-        '##ENDSBRACKET##'    => ']', 
-        chr(133)            => '-', 
-        chr(141)            => chr(147), 
-        chr(142)            => chr(148), 
-        chr(143)            => chr(145), 
-        chr(144)            => chr(146), 
-    ); 
+    	// Translate special characters and put back brackets. 
+		$trans = array( 
+			'...'                => '…', 
+			'\205'                => '…', 
+			'\221'                => chr(145), 
+			'\222'                => chr(146), 
+			'\223'                => chr(147), 
+			'\224'                => chr(148), 
+			'\226'                => '-', 
+			'\267'                => '•', 
+			'\('                => '(', 
+			'\['                => '[', 
+			'##ENDBRACKET##'    => ')', 
+			'##ENDSBRACKET##'    => ']', 
+			chr(133)            => '-', 
+			chr(141)            => chr(147), 
+			chr(142)            => chr(148), 
+			chr(143)            => chr(145), 
+			chr(144)            => chr(146), 
+			); 
 
-    $text = strtr($psData, $trans); 
+		$text = strtr($psData, $trans);
+		return $text;
+	}
 
-    return $text; 
-
-} 
 	public function getRecords(){
-		$params = json_decode(file_get_contents('php://input'),true);
 
-		$total = 0;
-		$jobs = array();
-		if($params["pageNo"] < 1){
-			$params["limitStart"] = ($params["pageNo"] * $params["itemsPerPage"] + 1);	
-		}else{
-			$params["limitStart"] = ($params["pageNo"] * $params["itemsPerPage"] );	
+		$params = json_decode(file_get_contents('php://input'),true);
+		$total 	= 0;
+		$jobs 	= array();
+
+		if(empty($params["export"])){
+			if($params["pageNo"] < 1){
+				$params["limitStart"] = ($params["pageNo"] * $params["itemsPerPage"] + 1);	
+			}else{
+				$params["limitStart"] = ($params["pageNo"] * $params["itemsPerPage"] );	
+			}
 		}
+
+		$params["export"] = (!empty($params["export"]))?$params["export"]:0;//For export request
 
 		if((isset($params["sortColumn"]) && empty($params["sortColumn"])) || !isset($params["sortColumn"])){ $params["sortColumn"] = "DeliveryDate"; }
 		if((isset($params["sortType"]) && empty($params["sortType"])) || !isset($params["sortType"])){ $params["sortType"] = "DESC"; }
@@ -828,9 +840,19 @@ function pdfExtractText($psData){
 			}
 		}
 
+		if(!empty($params["export"])){
+			
+			$content = '';
+			$keys 	= [['DATE','CUSTOMER NAME','DRIVERS','INVOICE','CHARGES','PROFIT','%PROFIT','MILES','DEAD MILES','RATE/MILE','DATE P/U','PICK UP','DATE DE','DELIVERY','LOLAD ID','STATUS']];
+			
+			//Created a common function in my_controller for all load data for excell file
+			$data = $this->buildExportLoadData($jobs);
+			
+			$data = array_merge($keys,$newArray);
+			echo json_encode(array('fileName'=>$this->createExcell('myloads',$data)));
+			die();
+		}
+
 		echo json_encode(array("data"=>$jobs,"total"=>$total));
 	}
 }
-
-
-

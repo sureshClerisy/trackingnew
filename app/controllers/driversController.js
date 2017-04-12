@@ -129,6 +129,8 @@ app.controller('editDriversController', function(dataFactory,getDriversData, $sc
 		$scope.driverDocs = [];
 	}
 	
+	var editDriv = this;
+	editDriv.showNotification = false;
 	$scope.title = $rootScope.languageArray.editDriver ;
 	$rootScope.uniqueFieldsValue = true;
 	$scope.dropzoneConfigDriverEdit = {
@@ -199,14 +201,26 @@ app.controller('editDriversController', function(dataFactory,getDriversData, $sc
 		var file = $scope.myFile;
 			var fd = new FormData();
             var data = JSON.stringify($scope.driversData);
+            console.log(data);
             fd.append('profile_image', file);
 			fd.append('posted_data',data);
 			fd.append('id',$scope.driversData.id);
 			$http.post(URL+'/drivers/update/',fd,{
 			transformRequest: angular.identity,
-			headers: {'Content-Type': undefined}
+			headers: {'Content-Type': undefined },
+			headers: {'typeCheck': 'type' }
             }).then(function successCallback(response){
-			if ( response.data.success == true ) {
+            	console.log(response);
+            if ( response.data.notification != undefined && response.data.notification == 'yes' ) {
+            	editDriv.showNotification = true;
+            	editDriv.showNotificationMessage = response.data.message;
+            	// console.log(response.data.notify);
+            	// editDriv.NotifyData = response.data.notify;
+            	// editDriv.driverOne = editDriv.NotifyData.driverName;
+            	// editDriv.driverTwo = editDriv.NotifyData.teamName;
+            	//angular.element("#changeBothDrivers").modal('show');
+            	
+            } else if ( response.data.success == true ) {
 				$rootScope.driverEditMessage = $rootScope.languageArray.driverUpdatedSuccMsg;
 				//$scope.dropzone.processQueue();
 				$location.path('drivers');
@@ -215,7 +229,35 @@ app.controller('editDriversController', function(dataFactory,getDriversData, $sc
 				$location.path('drivers');
 			}
 		});
+	};
+
+	editDriv.changeBothDrivers = function(driverId, userId, previousUser, secondDriverId) {
+		editDriv.changeAssignedDriverLoads('team',driverId, userId, previousUser, secondDriverId);
 	}
+
+	editDriv.changeSingleDriver = function(driverId, userId, previousUser) {
+		editDriv.changeAssignedDriverLoads('single',driverId, userId, previousUser);
+	}
+
+	editDriv.hidNotifyMessage = function() {
+		editDriv.showNotification = false;
+	}
+
+	editDriv.changeAssignedDriverLoads = function(type,driverId, userId, previousUser, secondDriverId) {
+	// editDriv.changeAssignedDriverLoads = function(type ) {}
+	// var driverId = editDriv.NotifyData.driver_id;
+	// var userId = editDriv.NotifyData.user_id;
+	// var previousUser = editDriv.NotifyData.previous_userId; 
+	// var secondDriverId = editDriv.NotifyData.second_driver_id;
+
+		dataFactory.httpRequest(URL + '/drivers/changeDriverAssignment/'+type+"/"+driverId+"/"+userId+"/"+previousUser+"/"+secondDriverId).then(function(data) {
+			if(data.success == true) {
+				$rootScope.driverEditMessage = $rootScope.languageArray.driverUpdatedSuccMsg;
+				$location.path('drivers');
+			}
+	    });
+	}
+	
 });
 
 
@@ -285,7 +327,8 @@ app.controller('addDriversController', function(dataFactory,$scope, PubNub, $htt
 			fd.append('posted_data',data);
 			$http.post(URL+'/drivers/add/',fd,{
 			transformRequest: angular.identity,
-			headers: {'Content-Type': undefined}
+			headers: {'Content-Type': undefined},
+			headers: {'typeCheck': 'type' }
             }).then(function successCallback(response){
 				if ( response.data.success == true ) {
 					$rootScope.driverEditMessage = $rootScope.languageArray.driverSavedSuccMsg;

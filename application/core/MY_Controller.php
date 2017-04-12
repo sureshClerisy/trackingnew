@@ -1,61 +1,63 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-	class MY_Controller extends CI_Controller {
-		function __construct()
-		{
-			parent::__construct();
-		}
-	}
-	   
-    class Admin_Controller extends MY_Controller
+class MY_Controller extends CI_Controller {
+	function __construct()
 	{
-		public $finalArray;
-		public $username;
-		public $password;
-		public $id;
-		public $accountID;
-		public $wsdl_url;
-		public $entity;
-		public $event;
-		public $serverAddr;
-		public $protocol;
+		parent::__construct();
+	}
+}
 
-		function __construct() {
+class Admin_Controller extends MY_Controller
+{
+	public $finalArray;
+	public $username;
+	public $password;
+	public $id;
+	public $accountID;
+	public $wsdl_url;
+	public $entity;
+	public $event;
+	public $serverAddr;
+	public $protocol;
 
-		  	parent::__construct();
-			$this->load->library(array('session'));
-			$loggedUser_username 	= $this->session->userdata('loggedUser_username');
-			$loggedUser_id 			= $this->session->userdata('loggedUser_id');
-			$user_logged_in 		= $this->session->userdata('loggedUser_loggedin');
+	function __construct() {
 
-			$this->entity     = $this->config->item('entity');
-			$this->event      = $this->config->item('event');
-			$this->protocol   = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
-			$this->serverAddr = base_url();
+		parent::__construct();
+		$this->load->library(array('session'));
+		$loggedUser_username 	= $this->session->userdata('loggedUser_username');
+		$loggedUser_id 			= $this->session->userdata('loggedUser_id');
+		$user_logged_in 		= $this->session->userdata('loggedUser_loggedin');
 
-			if( (isset($loggedUser_username) && $loggedUser_username != '') && (isset($loggedUser_id) && $loggedUser_id != '') && (isset($user_logged_in) && $user_logged_in == true) ) {
-			
-			} else {
-				die();	
-			}
-			
-			$this->id 			= $this->config->item('truck_id');	
-			$this->username 	= $this->config->item('truck_username');
-			$this->password 	= $this->config->item('truck_password');
-			$this->url 			= $this->config->item('truck_url');
+		$this->entity     = $this->config->item('entity');
+		$this->event      = $this->config->item('event');
+		
+		$this->load->library('excel');
+
+		$this->protocol   = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+		$this->serverAddr = base_url();
+
+		if( (isset($loggedUser_username) && $loggedUser_username != '') && (isset($loggedUser_id) && $loggedUser_id != '') && (isset($user_logged_in) && $user_logged_in == true) ) {
+		} else {
+			die();	
+		}
+
+		$this->id 			= $this->config->item('truck_id');	
+		$this->username 	= $this->config->item('truck_username');
+		$this->password 	= $this->config->item('truck_password');
+		$this->url 			= $this->config->item('truck_url');
 			$this->wsdl_url		= 'http://webservices.truckstop.com/V13/Searching/LoadSearch.svc?wsdl'; //Live Mode Api 
 			$this->finalArray	= array();
 		}
 		
 		public function commonApiHits($abbreviation = 'F', $dateTime = array() , $hoursOld = '', $origin_country = 'USA', $origin_range = 300 ,$destination_city = '', $destination_states = '', $destination_range = 300, $dest_country = 'USA', $load_type = 'Full') {
-		if ( strpos($this->origin_state,',') !== false ) {
-			$states = explode(',',$this->origin_state);
-			$statesCount = count($states);
-		} else {
-			$statesCount = 1;
-		} 
-		
+			if ( strpos($this->origin_state,',') !== false ) {
+				$states = explode(',',$this->origin_state);
+				$statesCount = count($states);
+			} else {
+				$statesCount = 1;
+			} 
+
 			$pageNo = 1;
 			$dat 	= array();
 
@@ -116,7 +118,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 						//~ break;
 					//~ }
 				//~ }
-					
+
 				if( count($data['rows']) < 200 || count($dat) >= 2000)  {
 					break;
 				}
@@ -140,9 +142,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 			$jobs = $this->Job->fetchSavedJobsNew($userId, $vehicleId, $scopeType, $dispatcherId, $driverId, $secondDriverId, $startDate, $endDate,$filters);
 			if( !empty($jobs) && count($jobs) > 0){
 				foreach ($jobs as $key => $value) {
-						if($jobs[$key]['invoiceNo']==0){
-							$jobs[$key]['invoiceNo'] = '';
-						}
+					if($jobs[$key]['invoiceNo']==0){
+						$jobs[$key]['invoiceNo'] = '';
+					}
 					$_COOKIE_NAME = 'VISIT_'.$value['truckstopID'].'_'.str_replace("/", "_", $value['pickDate']);
 					if(isset($_COOKIE[$_COOKIE_NAME])) {
 						$jobs[$key]['visited']	= true;
@@ -202,7 +204,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 			if ( isset($response_a['rows'][0]['elements'][0]['distance']['text']) && $response_a['status'] == 'OK' && !isset($response_a['error_message']) ) {
 				$distance = explode('mi',$response_a['rows'][0]['elements'][0]['distance']['text']);
 				$estimatedTime = $response_a['rows'][0]['elements'][0]['duration']['text'];
-			
+
 				$distanceMile = trim(str_replace(',','',$distance[0]));
 				$dataArray = array('origin'=>str_replace(' ','~',$location_ori),'destination'=>str_replace(' ','~',$location_dest),	'miles'=>ceil($distanceMile), 'estimated_time' => $estimatedTime);
 
@@ -218,7 +220,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 		/**
 		 * Change phone number format
 		 */
-		  
+
 		function sanitize_phone( $phone ) {
 			$format = "/(?:(?:\+?1\s*(?:[.-]\s*)?)?(?:\(\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9])\s*\)|([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\s*(?:[.-]\s*)?)?([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]{4})(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+))?$/";
 			$phone = preg_replace( '/\s+(#|x|ext(ension)?)\.?:?\s*(\d+)/', ' ext \3', $phone );
@@ -280,6 +282,56 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 			}
 			return $response;
 		}
+		
+		/**
+		* Meytod createExcell
+		* @param $DataArray
+		* @return File Name
+		*
+		*/
+		
+		public function createExcell($moduleName = null,$dataArray = null){
 
+			$fileName = time().'_'.$moduleName.'.xlsx';
+			$this->excel->setActiveSheetIndex(0);
+			$this->excel->getActiveSheet()->setTitle($moduleName);
+			$this->excel->getActiveSheet()->getDefaultColumnDimension()->setWidth(16);
 
-	}
+			$this->excel->getActiveSheet()->fromArray($dataArray,NULL,'A1');
+			$objWriter = PHPExcel_IOFactory::createWriter($this->excel, 'Excel2007');
+			$objWriter->save('assets/ExportExcel/'.$fileName);
+			return $fileName;
+		}
+
+		/**
+		* Meytod createExcell
+		* @param $DataArray
+		* @return File Name
+		*
+		*/
+		
+		public function buildExportLoadData($loads = NULL){
+
+			$newArray = [];
+			foreach ($loads as $key => $load) {
+				
+				$newArray[$key]['DATE'] 		= date('m/d',strtotime($load['created']));
+				$newArray[$key]['CUSTOMER NAME']= $load['companyName'];
+				$newArray[$key]['DRIVERS'] 		= $load['driverName'];
+				$newArray[$key]['INVOICE'] 		= $load['invoiceNo'];
+				$newArray[$key]['CHARGES'] 		= $load['totalCost'];
+				$newArray[$key]['PROFIT'] 		= $load['overallTotalProfit'];
+				$newArray[$key]['%PROFIT'] 		= $load['overallTotalProfitPercent'];
+				$newArray[$key]['MILES'] 		= $load['Mileage'];
+				$newArray[$key]['DEAD MILES'] 	= $load['deadmiles'];
+				$newArray[$key]['RATE/MILE'] 	= (!empty($load['rpm']))?$load['rpm']:$load['RPM'];
+				$newArray[$key]['DATE P/U'] 	= date('m/d',strtotime($load['pickDate']));
+				$newArray[$key]['PICK UP'] 		= $load['OriginCity'].', '.$load['OriginState'];
+				$newArray[$key]['DATE DE'] 		= date('m/d',strtotime($load['DeliveryDate']));
+				$newArray[$key]['DELIVERY'] 	= $load['DestinationCity'].', '.$load['DestinationState'];
+				$newArray[$key]['LOLAD ID'] 	= $load['id'];
+				$newArray[$key]['STATUS'] 		= $load['JobStatus'];
+			}
+			return $newArray;
+		}
+}

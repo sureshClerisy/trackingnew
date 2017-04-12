@@ -2732,6 +2732,10 @@ table.dataTable thead .sorting_desc:after{
 }
 /**@media****/
 /**6 march****/
+.alert.alert-success.alert-success-yellow {
+    background-color: #ffdf00 ;
+    color: #4b4a4a;
+}
 .list-view .list-view-group-container {
     padding: 0 0;
     margin-top: 0px;
@@ -6381,7 +6385,7 @@ table.driver-insights thead tr {
     z-index: 22;}
 
 .ginsight-panel .widget-2::after {
-    background-image: url("../img/stats1.png");
+    background-image: url("../img/stats1.jpg");
 }
 .ginsight-panel .stats-2 .widget-2::after {
     background-image: url("../img/stats2.jpg");
@@ -6414,6 +6418,80 @@ table.driver-insights thead tr {
 
 .second-body-panel .number{float:right;color:#48B0F7;}
 .second-body-panel .ltext{float:right;text-align:right;}
+/******************box-dashboard*************/
+.box-move-able {
+    height: 410px;
+    box-shadow: 0px 1px 1px rgba(0,0,0,0.3);
+}
+.block-dash-content1 {
+    width: 100%;
+    float: left;
+}
+.block-dash-content1 h3 {
+        font-family: 'Montserrat'!important;
+    font-weight: 700;font-size:40px;
+}
+h3.today-block  {
+        font-family: 'Montserrat'!important;
+    font-weight: 700;
+}
+.block-dash-content1 h1 {line-height: 16px;
+}
+.half-height-block{height:49% !important;}
+.block-dash-content1 span {width:100%;float:left;}
+.panel-heading.heading-tb-moveable {
+    border-bottom: 1px solid #dedede !important;
+    color: #067ed1;
+}
+.panel-heading.heading-tb-moveablepl {
+    border-bottom: 1px solid #dedede !important;
+    color: #705eaf;
+}
+.table-striped.my-table-move th {
+    border-color: #067ed1;border-width:2;
+}
+.table-striped.my-table-move.my-table-pl th {
+    border-color: #705eaf;border-width:2;
+}
+.table-striped.my-table-move td{background: none !important;}
+.heighchar-block-css ,.heighchar-block-css .highcharts-container {width:100%;height:auto!important;max-width:300px;height:360px!important;}
+.text-center-block-move{text-align:center;}
+.text-center-block-move .heighchar-block-css{float:none;display: inline-block;}
+.box-move-able .ar-1-1{
+    height: 410px;
+}
+.panel .panel-heading.main-control-move{    position: absolute;
+    top: 15px;
+    width: 100%;
+    text-align: right;}
+.box-move-able .widget-6 {
+    background:url('../img/grey.jpg')no-repeat left center; background-position:0px 0px;background-size: cover;
+}
+.box-move-able .widget-8 {
+    background:url('../img/purple.jpg')no-repeat left center; background-position:0px 0px;background-size: cover;
+}
+.box-move-able .widget-9 {
+    background:url('../img/blue.jpg')no-repeat left center; background-position:0px 0px;background-size: cover;
+}
+h3.today-block {
+    font-family: 'Montserrat'!important;
+    font-size: 16px;font-weight: 200;
+    text-transform: uppercase;
+}
+.panel-heading.main-control-move1.heading-tb-moveable {
+    color:#34d6c7;
+}
+.cgreen.btn{background:#34d6c7;border-color:#34d6c7;}
+.red.btn{background:#f55853;border-color:#f55853;}
+.red.btn:hover {
+    background: #fb3731;
+    border-color: #f55853;
+}
+.cgreen.btn:hover {
+    background: #11d0be;
+    border-color: #34d6c7;
+}
+/******************box-dashboard*************/
 @media (min-width:2000px){
     .map-load-section .dataTables_wrapper.no-footer table thead tr th.billing-origin{
        width:200px;

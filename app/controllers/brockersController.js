@@ -328,4 +328,3 @@ app.directive('starRating',
 		};
 	}
 );
-

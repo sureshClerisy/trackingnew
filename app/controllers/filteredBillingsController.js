@@ -24,16 +24,16 @@ app.controller('filteredBillingsController', ["dataFactory","$scope","$http","$r
 	
 	//----------drop-down ---------------------------	
 
-	$rootScope.editLoads = true;
+	$rootScope.editLoads 	= true;
 	$rootScope.matchingTrucks = false;
-	$rootScope.showMaps = false;
+	$rootScope.showMaps 	= false;
 	$rootScope.showhighlighted = 'loadDetail';
 
-	$scope.showPlusMinus = true;
-	$scope.canDocsShow = true;
+	$scope.showPlusMinus 	= true;
+	$scope.canDocsShow 		= true;
 	
 
-	
+	$scope.showCalendar = true;
 	$rootScope.filteredBillingLoads = [];
 	$rootScope.Docs = [];
 	$scope.dateRangeSelector = {};
@@ -51,12 +51,19 @@ app.controller('filteredBillingsController', ["dataFactory","$scope","$http","$r
 		$scope.haveRecords = false;
 	}
 
+	if($scope.filterArgs.requestFrom != undefined && $scope.filterArgs.requestFrom == "billings"){
+		$scope.showCalendar = false;
+	}else{
+		$scope.showCalendar = true;
+	}
 
 	if(getBillingData.filterArgs.startDate != undefined){
 		$scope.dateRangeSelector.startDate = getBillingData.filterArgs.startDate; 	
 		$scope.dateRangeSelector.endDate = getBillingData.filterArgs.endDate; 	
 	}else{
-		$scope.dateRangeSelector = {startDate: moment().startOf('month').format('YYYY-MM-DD'), endDate: moment().format('YYYY-MM-DD')};    
+		if(getBillingData.filterArgs.requestFrom != undefined && getBillingData.filterArgs.requestFrom != "billings"){
+			$scope.dateRangeSelector = {startDate: moment().startOf('month').format('YYYY-MM-DD'), endDate: moment().format('YYYY-MM-DD')};    
+		}
 	}
 
 	/*if( $cookies.getObject('_gDateRange') ){

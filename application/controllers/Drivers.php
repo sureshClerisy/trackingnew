@@ -1,14 +1,12 @@
 <?php
-class Drivers extends Admin_Controller
-{
+class Drivers extends Admin_Controller {
 	public $userId;
 	public $roleId;
 	public $pathGen;
 	public $userName;
 	// private $entity;
 	// private $event;
-	function __construct()
-	{ 
+	function __construct() { 
 		parent::__construct();	
 		$this->userName = $this->session->loggedUser_username;
 		$this->pathGen = str_replace('application/', '', APPPATH);
@@ -18,13 +16,12 @@ class Drivers extends Admin_Controller
 		if($this->roleId != 1){
 			$this->userId = $this->session->loggedUser_id;
 		}
-		
 	}
 
-	public function index()
-	{
-		$data = array();
-		$parent_id = null;
+	public function index() {
+
+		$data 		= array();
+		$parent_id 	= null;
 		$parentIdCheck = $this->session->userdata('loggedUser_parentId');
 		if( isset($parentIdCheck) && $parentIdCheck != 0 ) {
 			$parent_id = $this->session->userdata('loggedUser_parentId');
@@ -41,8 +38,8 @@ class Drivers extends Admin_Controller
 			}
 			$parent_id = array_merge($parentId,array($this->userId));
 		}
-		
-		$data['rows'] = $this->Driver->fetchAllRecords($parent_id);		
+
+		$data['rows'] = $this->Driver->fetchAllRecords($parent_id);
 		$data['total_records'] = count($data['rows']);
 	
 		echo json_encode($data);
@@ -55,8 +52,7 @@ class Drivers extends Admin_Controller
 	* Return: success or error
 	* Comment: Used for deleting drivers documents
 	*/
-	public function deleteContractDocs($docId = null, $docName = '')
-	{
+	public function deleteContractDocs($docId = null, $docName = '') {
 		try{
 			$fileNameArray = explode('.',$docName);
 			$ext = end($fileNameArray);
@@ -97,8 +93,7 @@ class Drivers extends Admin_Controller
 	* Return: success or error
 	* Comment: Used for uploading drivers documents
 	*/
-	public function uploadDocs()
-	{
+	public function uploadDocs() {
 		$prefix = "driver"; 
 	    $response  = array();
 	    if(isset($_POST["driverId"]) && $_POST["driverId"] != ""){
@@ -137,8 +132,7 @@ class Drivers extends Admin_Controller
 	* Comment: Used for add new driver
 	*/
 	
-	public function add()
-	{	
+	public function add() {	
 		try{
 			$file_name = '';		
 			if(!empty($_FILES) && $_FILES['profile_image']['name'] != ''){
@@ -248,7 +242,7 @@ class Drivers extends Admin_Controller
 			if(!empty($file_name)){
 				$data['profile_image'] = $file_name;
 			}
-			$id = $_POST['id'];
+			$id = @$_POST['id'];
 			$previous = array();
 			$previous = $this->Driver->get_driver_data($id);
 
@@ -260,6 +254,25 @@ class Drivers extends Admin_Controller
 
 			$data["first_name"] = trim($data["first_name"]);
 			$data["last_name"] = trim($data["last_name"]);
+			
+			$messageValue = 0;
+			$messageNot = '';
+		
+			if ( !empty($editedFields) && isset($editedFields['user_id']) ) {
+				$notif = $this->changeAssignedLoads($data['id'],$editedFields['user_id']);
+				if ( is_array($notif) && !empty($notif)) {
+					$yes = 'yes';
+					$no = 'no';
+					$messageNot = "Success : Data saved successfully. ".$notif['driverName']." is in team with ".$notif['teamName'].". <span style='color:red;'>Please change </span> the assignment of <a href='#/editDrivers/'".$notif['second_driver_id']." target = '_blank' class='notify-link'>{$notif['teamName']}</a>";
+					// $message = "Success : Data saved successfully." $notif['driverName']." is in team with ".$notif['teamName'].". Do you want to change the team member also <a href='javascript:void(0);' class='notify-link' ng-click='editDriver.changeBothDrivers({$notif['driver_id']},{$editedFields['user_id']},{$previous['user_id']},{$notif['second_driver_id']})'>Yes</a>  or <a href='javascript:void(0);' class='notify-link' ng-click='editDriver.changeSingleDriver({$notif['driver_id']},{$editedFields['user_id']},{$previous['user_id']})'>No</a>";
+					// $notif['user_id'] = $editedFields['user_id'];
+					// $notif['previous_userId'] = $previous['user_id'];
+
+					$messageValue = 1;
+				}
+				
+			}
+			
 			$result = $this->Driver->update($data, $id);
 
 			if(count($editedFields) > 0){
@@ -274,8 +287,8 @@ class Drivers extends Admin_Controller
 						$value = $dispatcherInfo["first_name"]." ".$dispatcherInfo["last_name"];
 	
 						$this->Driver->addDispatcherDriverLog($editedFields['user_id'], $previous['user_id']);
-					} 
 
+					} 
 					if(!empty($prevField)){
 						$message.= "<br/> - Changed ".ucwords(str_replace("_"," ",$key))." from <i>".$prevField."</i> to <i>".$value."</i>";
 					}else{
@@ -287,7 +300,13 @@ class Drivers extends Admin_Controller
 			}
 			
 			logActivityEvent($previous["id"], $this->entity["driver"], $this->event["edit"], $message, $this->Job);	
-			echo json_encode(array('success' => true));
+
+			if( $messageValue == 1 ) {
+				echo json_encode(array('notification' => 'yes', 'message' => $messageNot));
+			} else {
+				echo json_encode(array('success' => true));
+			}
+		
 		}catch(Exception $e){
 			log_message('error','EDIT_DRIVER'.$e->getMessage());
 			echo json_encode(array('success' => false));
@@ -429,7 +448,108 @@ class Drivers extends Admin_Controller
 
 		echo json_encode(array('response' => $response));
 	}
-	
+
+	public function fetchDataForCsv() {
+
+		$data 		= array();
+		$parent_id 	= null;
+		$content 	= '';
+		$parentIdCheck = $this->session->userdata('loggedUser_parentId');
+		if( isset($parentIdCheck) && $parentIdCheck != 0 ) {
+			$parent_id = $this->session->userdata('loggedUser_parentId');
+		}
+		if ( $this->roleId == 2 ) {
+			$parent_id = $this->userId;
+		}
+
+		$childIds = $this->User->fetchDispatchersChilds($this->userId);
+		if ( !empty($childIds) ) {
+			$parentId = array();
+			foreach($childIds as $child ) {
+				array_push($parentId,$child['id']);
+			}
+			$parent_id = array_merge($parentId,array($this->userId));
+		}
+
+        $searchText 	= json_decode(file_get_contents('php://input'), true);
+		$keys 			= [['First Name','Last Name','Email','Label','License Number','Dispatcher','Phone','Status','DOB','City','Vehicle ID']];
+		$dataRow 		= $this->Driver->fetchDriversForCSV($parent_id,$searchText);
+		$data = array_merge($keys,$dataRow);
+		echo json_encode(array('fileName'=>$this->createExcell('drivers',$data)));
+		die();
+		// echo json_encode($data);
+	}
+
+	/**
+	* change future assignedloads under new dispatcher
+	*/
+
+	private function changeAssignedLoads( $driverId = null, $userId = null ) {
+		$jobsList = $this->Driver->fetchDriversLoad($driverId);
+		if ( !empty($jobsList) ) {
+			$notification = 0;
+			$notifyArray = array();
+			foreach($jobsList as $jobs ) {
+
+				if ( $jobs['driver_type'] == 'team ') {
+					$notification = 1;
+					$notifyArray['driver_id'] = $jobs['driver_id'];
+					$notifyArray['second_driver_id'] = $jobs['second_driver_id'];
+					$notifyArray['id'] = $jobs['id'];
+					$notifyArray['driverName'] = $jobs['driverName'];
+					$notifyArray['teamName'] = $jobs['teamName'];
+				} 
+
+				$data[] = array(
+					'id' => $jobs['id'],
+					'driver_id' => $jobs['driver_id'],
+					'dispatcher_id' => $userId,
+				);
+			}
+
+			$this->Driver->updateLoadsAssignments($data);
+
+			if ( $notification == 1 )
+				return $notifyArray;
+
+		}
+		return true;
+	}
+
+	/**
+	* Changing driver assignment after selecting yes or no 
+	*/
+
+	public function changeDriverAssignment( $type = '', $driverId = null , $userId = null , $previousUser = null, $secondDriverId = null) {
+
+		$type  = ( $type == 'team') ? $type : '';
+		$jobsList = $this->Driver->fetchDriversLoad($driverId,$type);
+		if ( !empty($jobsList) ) {
+			foreach($jobsList as $jobs ) {
+				$data[] = array(
+					'id' => $jobs['id'],
+					'dispatcher_id' => $userId,
+				);
+			}
+			$this->Driver->updateLoadsAssignments($data);
+		}
+
+		$data = array(
+			'id' => $driverId,
+			'user_id' => $userId
+		);
+
+		$this->Driver->updateDriver($data);
+
+		if ( $secondDriverId != '' && $secondDriverId != 0 ) {
+			$data = array(
+				'id' => $secondDriverId,
+				'user_id' => $userId
+			);
+			$this->Driver->updateDriver($data);
+		}
+		$previousUser = (isset($previousUser) && $previousUser != '' ) ? $previousUser : false;
+		$this->Driver->addDispatcherDriverLog($userId, $previousUser);
+		echo json_encode(array('success' => true));
+	}
 }
-
-

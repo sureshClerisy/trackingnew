@@ -4,6 +4,16 @@
         <div class="content sm-gutter">
           <!-- START CONTAINER FLUID -->
           <div class="container-fluid padding-25 sm-padding-10 bg-color">
+
+          <div class="row">
+                <div class="col-md-12 col-xlg-12">
+                    <div ng-show="editDriver.showNotification == true" class="alert alert-success" role="alert">
+                        <button ng-click = "editDriver.hidNotifyMessage()" class="close"></button>
+                        <p dynamic="editDriver.showNotificationMessage"></p>
+                    </div>
+                 </div>
+            </div>
+
             <div class="row">
                 <div class="col-md-12 col-xlg-12">
                     

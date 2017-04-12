@@ -1,68 +1,77 @@
       <!-- START PAGE CONTENT WRAPPER -->
       <div class="page-content-wrapper ">
-        <!-- START PAGE CONTENT -->
-        <div class="content sm-gutter">
-          <!-- START CONTAINER FLUID -->
-          <div class="container-fluid padding-25 sm-padding-10">
-			<div class="row">
-				<div class="col-md-12 col-xlg-12">
-					<div ng-show="alertmsg == true&&alertdeletemsg !=true" class="alert alert-success" role="alert">
-						<button class="close" data-dismiss="alert"></button>						
-						{{Message}}
-						</div>
-						<div ng-show="alertdeletemsg == true" class="alert alert-success" role="alert">
-						<button ng-click = "hidedeletemessage()" class="close"></button>
-						{{driverdeleteMessage}}
-						</div>
-					<div class="commen-heading driver-page">
-						<h2 class="oprate-dashbord">{{ languageArray.driversHeading }}</h2>
-					</div>
-					
-					</div>
-			</div>
-			
-			<div class="row invocie-block-row">
-				<div class="col-md-12 col-xlg-12">
-					<div class="load-new-block-table">
-						<div class="panel-body add-new-data">
-							<div class="load-tabe-auto map-load-section">
-								<a href="#/addDriver" class="add-new-data-button">
-									<button title="Add Driver" class="btn btn-primary btn-cons m-b-10" type="button"><i class="fa fa-plus"></i> <span class="bold">{{ languageArray.addDriverButton }}</span></button></a>
-								
-								<table datatable="ng" dt-options="dtOptions" class="table tr-hover table-hover table-striped driver-table" id="tableWithExportOptions">
-									<thead>
-										<tr>
-											<!-- <th>S.No</th> -->
-											<th>{{ languageArray.driverName }}</th>
-											<th>{{ languageArray.drivertrucknum }}</th>
-											<th>{{ languageArray.dispatcher }}</th>
-											<th class="phn-number-th">{{ languageCommonVariables.commonTableThPhone }}</th>
-											<th>{{ languageCommonVariables.commonTableThEmail }}</th>
-											<th>{{ languageArray.driveroperatorlic }}</th>
-											<th class="text-center">{{ languageCommonVariables.commonTableThAction }}</th>
-										</tr>
-									</thead>
-									<tbody>
-										<tr ng-repeat="value in data">
-										
-											<!-- <td class="">{{ ((pageNumber- 1) * 10) + ($index + 1) }}</td> -->
+      	<!-- START PAGE CONTENT -->
+      	<div class="content sm-gutter">
+      		<!-- START CONTAINER FLUID -->
+      		<div class="container-fluid padding-25 sm-padding-10">
+      			<div class="row">
+      				<div class="col-md-12 col-xlg-12">
+      					<div ng-show="alertmsg == true&&alertdeletemsg !=true" class="alert alert-success" role="alert">
+      						<button class="close" data-dismiss="alert"></button>						
+      						{{Message}}
+      					</div>
+      					<div ng-show="alertdeletemsg == true" class="alert alert-success" role="alert">
+      						<button ng-click = "hidedeletemessage()" class="close"></button>
+      						{{driverdeleteMessage}}
+      					</div>
+      					<div class="commen-heading driver-page">
+      						<h2 class="oprate-dashbord">{{ languageArray.driversHeading }}</h2>
+      					</div>
+      				</div>
+      			</div>
 
-											<td>{{ value.first_name }} {{ value.last_name }}</td>
-											<td> {{ value.label }}</td>
-											<td> {{ value.dispatcher }}</td>
-											<td> {{ value.phone }}</td>
-											<td>{{ value.email }} </td>
-											<td>{{ value.driver_license_number }}</td>
-																			
-										 
-											<td class="text-center action-btn-ryt action-extra"> 
-												
-                                                <div class="export-options-container">
-													<div class="exportOptions">
-														<div class="DTTT btn-group">
-															<a href="#/editDrivers/{{value.id}}" class="btn btn-default DTTT_button_pdf" title="{{languageCommonVariables.editDriver}}" ui-jq="tooltip" >
-																<span><i class="fa fa-edit" aria-hidden="true"></i></span>
-															</a>
+      			<div class="row invocie-block-row">
+      				<div class="col-md-12 col-xlg-12">
+      					<div class="load-new-block-table">
+      						<div class="panel-body add-new-data">
+      							<div class="load-tabe-auto map-load-section">
+      								<a href="#/addDriver" class="add-new-data-button">
+      									<button title="Add Driver" class="btn btn-primary btn-cons m-b-10" type="button">
+      										<i class="fa fa-plus"></i> 
+      										<span class="bold">{{ languageArray.addDriverButton }}</span>
+      									</button>
+      								</a>
+      								<a href="" class="add-new-data-button" style="right: 150px;" ng-click="exportCsvData('drivers')">
+      									<button title="Export Drivers" class="btn btn-primary btn-cons m-b-10" type="button">
+      										<i class="fa fa-file-excel-o"></i> 
+      										<span class="bold">Export</span>
+      									</button>
+      								</a>
+
+      								<table datatable="ng" dt-options="dtOptions" class="table tr-hover table-hover table-striped driver-table" id="tableWithExportOptions">
+      									<thead>
+      										<tr>
+      											<!-- <th>S.No</th> -->
+      											<th>{{ languageArray.driverName }}</th>
+      											<th>{{ languageArray.drivertrucknum }}</th>
+      											<th>{{ languageArray.dispatcher }}</th>
+      											<th class="phn-number-th">{{ languageCommonVariables.commonTableThPhone }}</th>
+      											<th>{{ languageCommonVariables.commonTableThEmail }}</th>
+      											<th>{{ languageArray.driveroperatorlic }}</th>
+      											<th class="text-center">{{ languageCommonVariables.commonTableThAction }}</th>
+      										</tr>
+      									</thead>
+      									<tbody>
+      										<tr ng-repeat="value in data">
+
+      											<!-- <td class="">{{ ((pageNumber- 1) * 10) + ($index + 1) }}</td> -->
+
+      											<td>{{ value.first_name }} {{ value.last_name }}</td>
+      											<td> {{ value.label }}</td>
+      											<td> {{ value.dispatcher }}</td>
+      											<td> {{ value.phone }}</td>
+      											<td>{{ value.email }} </td>
+      											<td>{{ value.driver_license_number }}</td>
+
+
+      											<td class="text-center action-btn-ryt action-extra"> 
+
+      												<div class="export-options-container">
+      													<div class="exportOptions">
+      														<div class="DTTT btn-group">
+      															<a href="#/editDrivers/{{value.id}}" class="btn btn-default DTTT_button_pdf" title="{{languageCommonVariables.editDriver}}" ui-jq="tooltip" >
+      																<span><i class="fa fa-edit" aria-hidden="true"></i></span>
+      															</a>
 															<!--a class="btn btn-default DTTT_button_copy" title="{{languageCommonVariables.deleteDriver}}" ui-jq="tooltip" ng-click='removeDriver(value.id,$index)' >
 																<span><i class="fa fa-trash" aria-hidden="true"></i></span>
 															</a-->
@@ -95,5 +104,5 @@
 		</div>
 	</div>
 </div>
- 
+
 <ng-include src="'./assets/templates/common_modals.html'"></ng-include>

@@ -32,13 +32,13 @@
 				<div class="col-lg-12 col-md-12">
 					<div class="panel panel-transparent">
 						<div class="panel-body">
-							<form id="form-project" name="newbroker" role="form" autocomplete="off" ng-submit="newbroker.$valid && addshipper()" enctype="multipart/formdata" novalidate>
+							<form id="form-project" name="newbroker" role="form" autocomplete="off" ng-submit="newbroker.$valid && shipper.addshipper()" enctype="multipart/formdata" novalidate>
 								<!--row-->
 								<div class="row clearfix">
 									<div class="col-sm-6">
 										<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':newbroker.companyname.$invalid && !newbroker.companyname.$pristine || newbroker.$submitted && newbroker.companyname.$invalid}">
 											<label>{{ languageArray.brokerListingTableThName }}</label>
-											<input type="text" class="form-control" name="companyname" ng-model="addBrokersData.TruckCompanyName" required />
+											<input type="text" class="form-control" name="companyname" ng-model="addBrokersData.shipperCompanyName" required />
 										</div>
 										<label class="error" for="companyname" ng-show="newbroker.companyname.$invalid && !newbroker.companyname.$pristine || newbroker.$submitted && newbroker.companyname.$invalid">Please enter shipper name.</label>
 									</div>
@@ -62,10 +62,16 @@
 										</div>
 										<label class="error" for="city" ng-show="newbroker.city.$invalid && !newbroker.city.$pristine || newbroker.$submitted && newbroker.city.$invalid">Please enter city.</label>
 									</div>
+
 									<div class="col-sm-6">
-										<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':newbroker.state.$invalid && !newbroker.state.$pristine || newbroker.$submitted && newbroker.state.$invalid}">
+										<div pg-form-group class="form-group form-group-default required th-select" ng-class="{'has-error':newbroker.state.$invalid && !newbroker.state.$pristine || newbroker.$submitted && newbroker.state.$invalid}">
 											<label>{{languageArray.brokerListingTableThState}}</label>
-											<input type="text" class="form-control" name="state" ng-model="addBrokersData.state" required />
+											<ui-select name="state" ng-model="addBrokersData.state" theme="bootstrap" on-select="shipper.onSelectStateCallback($item, $model)" required >
+												<ui-select-match class="ui-select-match" placeholder="select state">{{shipper.stateSelected}}</ui-select-match>
+												<ui-select-choices class="ui-select-choices" repeat="item in shipper.states_data | filter: $select.search">
+													<div ng-bind-html="trustAsHtml((item.label | highlight: $select.search))"></div>
+												</ui-select-choices>
+											</ui-select>
 										</div>
 										<label class="error" for="state" ng-show="newbroker.state.$invalid && !newbroker.state.$pristine || newbroker.$submitted && newbroker.state.$invalid">Please enter state.</label>
 									</div>
@@ -82,16 +88,6 @@
 									</div>
 									<div class="col-sm-6">
 										<div pg-form-group class="form-group form-group-default">
-											<label>{{ languageArray.brokerListingTableThstatus }}</label>
-											<input type="text" class="form-control" name="status" ng-model="addBrokersData.brokerStatus">
-										</div>
-									</div>
-								</div>
-								<!--row-end-->
-								<!--row-->
-								<div class="row clearfix">
-									<div class="col-sm-6">
-										<div pg-form-group class="form-group form-group-default">
 											<label>{{ languageArray.brokerListingTableThrating }}</label>
 											<div ng-init="rating = changedRating "></div>
 											<div class="star-rating"  star-rating rating-value="rating" data-max="5" on-rating-selected="rateFunction(rating)"></div>
@@ -99,10 +95,10 @@
 									</div>
 								</div>
 								<!--row-end-->
-								
+																
 								<div class="row clearfix">
 									<div class="col-sm-12">
-										<div class="dropzone" ng-dropzone dropzone="dropzone" dropzone-config="dropzoneConfigBrokerAdd" ></div>
+										<div class="dropzone" ng-dropzone dropzone="dropzone" dropzone-config="dropzoneConfigShipperAdd" ></div>
 									</div>
 								</div>
 								

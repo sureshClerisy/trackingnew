@@ -15,8 +15,28 @@ var app = angular.module('app',['gantt','gantt.table','gantt.tooltips','signatur
 	'angularUtils.directives.dirPagination','ngCookies','ui.router','ngStorage','jQueryScrollbar','ui.utils',
     'oc.lazyLoad','datatables','ngSanitize','ui.select','angular-sortable-view','dcbImgFallback']);
     
-app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$ocLazyLoadProvider','$provide',
-    function($stateProvider, $urlRouterProvider, $localStorageProvider,$ocLazyLoadProvider,$provide) {
+app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$ocLazyLoadProvider','$provide','$httpProvider',
+    function($stateProvider, $urlRouterProvider, $localStorageProvider,$ocLazyLoadProvider,$provide,$httpProvider) {
+        $httpProvider.interceptors.push(['$cookies', function ($cookies) {
+            return {
+                'request': function (config) {
+                    if ( config.headers.typeCheck != undefined && config.headers.typeCheck == 'type') {
+                       config.headers = {};
+                    } else {
+                        config.headers = config.headers || {};
+                        config.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+                        config.headers.Accept = 'application/json;odata=verbose';
+                    }
+                    var token = $cookies.get('authToken');
+                    if (token) {
+                        config.headers.Authorization = 'Bearer ' + token;
+                    }
+                    return config;
+                    
+                }
+            };
+       }]);
+
 		$urlRouterProvider.otherwise('/login');
 		$provide.decorator('$document',function($delegate){
             $delegate.referrer = null;
@@ -142,6 +162,7 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
 				title: 'Edit Driver',
 				templateUrl: 'assets/templates/drivers/editDrivers.html',
                 controller: 'editDriversController',
+                controllerAs: 'editDriver',
                 moduleName: 'drivers',
 				resolve:{            
 					getDriversData: function(dataFactory, $stateParams) {
@@ -314,11 +335,50 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
 					},
 				},
 			}).state('driversInsights', {
-				url: '/driversInsights/:key/?:q',
-				title: "Drivers Insights",
-				templateUrl: 'assets/templates/loads/driversInsights.html',
+                url: '/driversInsights/:key/?:q',
+                title: "Drivers Insights",
+                templateUrl: 'assets/templates/loads/driversInsights.html',
                 controller: 'driversInsightsController',
                 controllerAs: 'dInsights',
+                moduleName: 'loads',
+                params: {
+                    type: true,
+                },
+                resolve:{
+                     deps: ['$ocLazyLoad', function($ocLazyLoad) {
+                            return $ocLazyLoad.load([
+                                    'datepicker',
+                                    'daterangepicker',
+                                    'timepicker',
+                                    'autonumeric',
+                                    'wysihtml5',
+                                    'signature',
+                                    'inputMask',
+                                    'telephonefilter',
+                                ], {
+                                    insertBefore: '#lazyload_placeholder'
+                                });
+                        }],
+                    driverListing: function(dataFactory, $stateParams) {
+                        var qstr = "";
+                        if($stateParams.q != undefined){
+                             qstr = "/?"+$stateParams.q;
+                        }
+                        if ( $stateParams.type == true){
+                            return dataFactory.httpRequest(URL+'/Loads/driversInsights/'+$stateParams.key+qstr);
+                        }
+                        else{
+                            var response = {total: 0,drivers: [], filterArgs:[]};
+                            return response;
+                        }
+                    },
+                },
+            }).state('truckInsights', {
+				url: '/truckInsights/:key/?:q',
+				title: "Truck Insights",
+				templateUrl: 'assets/templates/vehicles/truckInsights.html',
+                controller: 'truckInsightsController',
+                controllerAs: 'tInsights',
                 moduleName: 'loads',
                 params: {
                 	type: true,
@@ -338,13 +398,13 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
                                     insertBefore: '#lazyload_placeholder'
                                 });
                         }],
-					driverListing: function(dataFactory, $stateParams) {
+					trucksListing: function(dataFactory, $stateParams) {
 						var qstr = "";
 						if($stateParams.q != undefined){
 							 qstr = "/?"+$stateParams.q;
 						}
 						if ( $stateParams.type == true){
-							return dataFactory.httpRequest(URL+'/Loads/driversInsights/'+$stateParams.key+qstr);
+							return dataFactory.httpRequest(URL+'/Loads/truckInsights/'+$stateParams.key+qstr);
 						}
 						else{
 							var response = {total: 0,drivers: [], filterArgs:[]};
@@ -681,24 +741,36 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
             })
             .state('shipper', {
                 url: '/shipper',
-                title: 'Add Shipper',
+                title: 'Shipper Listing',
                 templateUrl: 'assets/templates/shipper/shipperListing.html',
                 controller: 'shipperController',
+                controllerAs: 'shipper',
                 moduleName: 'brokers',
+                params: {
+                    type : '',
+                    message: ''
+                },
                 resolve:{
                     getShipperListing: function(dataFactory, $stateParams) {
                         return dataFactory.httpRequest(URL+'/shippers');
-                    }
+                    },
+                    fetchStatesList : function() {
+                        return [];
+                    },
                 }
             }).state('editshipper', {
                 url: '/editshipper/:id',
                 title: 'Edit Shipper',
                 templateUrl: 'assets/templates/shipper/editShipper.html',
                 controller: 'editShipperController',
+                controllerAs: 'shipper',
                 moduleName: 'brokers',
                 resolve:{            
                     getShipperData: function(dataFactory, $stateParams) {
                         return dataFactory.httpRequest(URL+'/shippers/update/' + $stateParams.id);
+                    },
+                    fetchStatesList : function(dataFactory) {
+                        return dataFactory.httpRequest(URL+'/shippers/fetchUsStates');
                     },
                     deps: ['$ocLazyLoad', function($ocLazyLoad) {
                         return $ocLazyLoad.load([
@@ -713,8 +785,25 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
                 url: '/addshipper',
                 title: 'Add Shipper',
                 templateUrl: 'assets/templates/shipper/addShipper.html',
-                controller: 'addShipperController',
+                controller: 'shipperController',
+                controllerAs: 'shipper',
                 moduleName: 'brokers',
+                resolve:{ 
+                    getShipperListing: function() {
+                        return [];
+                    },
+                    fetchStatesList : function(shipperService) {
+                        return shipperService.fetchStatesList();
+                    },
+
+                    deps: ['$ocLazyLoad', function($ocLazyLoad) {
+                        return $ocLazyLoad.load([
+                            'select',
+                            ], {
+                            insertBefore: '#lazyload_placeholder'
+                        })
+                    }]
+                }
             })
 }]);
 

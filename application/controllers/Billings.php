@@ -8,9 +8,9 @@
 class Billings extends Admin_Controller{
 	
 	public $triuser;
-    public $password;
-    public $apikey;
-    public $token;
+	public $password;
+	public $apikey;
+	public $token;
 	public $userId;
 	public $finalArray;
 	public $triumphToken;
@@ -23,12 +23,14 @@ class Billings extends Admin_Controller{
 		$this->userRoleId  = $this->session->role;
 		$this->userId 		= $this->session->loggedUser_id;
 		$this->userName   	= $this->session->loggedUser_username;
-		$this->load->model(array('Vehicle','Job','Billing'));
+
+		$this->load->model(array('Vehicle','Job','Billing',"Report"));
 		$this->load->helper('truckstop');
 		$this->load->helper('download');
+
 		
 		$this->data = array();
-        if ( $this->config->item('triumph_environment') == 'production' ) {
+		if ( $this->config->item('triumph_environment') == 'production' ) {
 			$this->triuser  			= $this->config->item('triumph_user');
 			$this->password				= $this->config->item('triumph_pass');
 			$this->apikey   			= $this->config->item('triumph_apik');
@@ -65,7 +67,7 @@ class Billings extends Admin_Controller{
 		
 		echo json_encode($this->data);
 	}
-		
+	
 	public function fetchVehicleAddress( $vehicleId = null ) {
 		
 		$result = $this->Job->fetchVehicleAddress( $vehicleId);
@@ -93,7 +95,7 @@ class Billings extends Admin_Controller{
 	/**
 	 * Fetching load info common function
 	 */
-	  
+	
 	public function fetchingSentPaymentsInfo() {
 		$this->data['loads'] = $this->Billing->fetchLoadsForPayment();
 		$this->data['sentPaymentCount'] = $this->Billing->sentPaymentCount();
@@ -126,7 +128,7 @@ class Billings extends Admin_Controller{
 	/**
 	 * creating schedule and send for payment
 	 */ 
-	 
+	
 	public function creatingSchedule() 
 	{
 		try{	
@@ -161,7 +163,7 @@ class Billings extends Admin_Controller{
 			} else {
 				$documentType = 'docType[0]=1&docType[1]=2&docType[2]=3';
 			}		
-						
+			
 			for ( $i = 0; $i < count($resultReturnedIds); $i++ ) {
 				$genDocs[$i]['inputId'] = urlencode($resultReturnedIds[$i]);
 				$genDocs[$i]['filename'] = urlencode($this->Billing->getBundleFileName( $objPost['selectedIds'][$i] ));
@@ -183,7 +185,7 @@ class Billings extends Admin_Controller{
 
 				$this->Billing->updatePaymentSent( $objPost['selectedIds'][$i] );
 			}
-		
+			
 			$idsVar = '';
 			foreach ( $saveIds as $saveId ) {
 				$newIds = explode('+',$saveId);
@@ -195,14 +197,14 @@ class Billings extends Admin_Controller{
 			$fundingOptions = $fundingOptionsArray[0];
 			$this->triumphToken = $fundingOptionsArray[1];
 			$funding = 'Fund using WIRE *9995';
-				
+			
 			if (!empty( $fundingOptions) ) {
 				foreach( $fundingOptions as $funds ) {
 					if ( $funds['isDefault'] == 1 ) 
 						$funding = $funds['name'];
 				}
 			} 
-		
+			
 			$errorMessage = '';
 			if ( !empty($inputIdsForFinal) ) {
 				$finalizeInputArray = $this->createFinalizeInputArray($inputIdsForFinal, $funding,$this->triumphToken);
@@ -234,7 +236,7 @@ class Billings extends Admin_Controller{
 					$errorMessage = 'Error !: Some error occured while submiting documents to triumph';
 				}
 			}
-		
+			
 			$data = $this->fetchingSentPaymentsInfo();
 			echo json_encode(array('success' => true,'loadsInfo' => $data, 'errorMessage' => $errorMessage));
 		}catch(Exception $e){
@@ -274,7 +276,7 @@ class Billings extends Admin_Controller{
 	/**
 	 * Converting file to byte array
 	 */
-	  
+	
 	public function convertByte( $fileName = '') {
 		ini_set('max_execution_time', -1);
 		$pathGen = str_replace('application/', '', APPPATH);
@@ -286,11 +288,11 @@ class Billings extends Admin_Controller{
 	/**
 	 * Creating Document Triumph Api method 
 	 */
-	 
+	
 	public function createDocument( $loadDetail = array(), $token = '' ) {
 		$url = 'v1Submit/CreateDocument';
 		$postData = "inputId={$loadDetail['inputId']}&filename={$loadDetail['filename']}&fileData={$loadDetail['fileData']}&{$loadDetail['docType']}"; 
-			
+		
 		$result = $this->commonTriumphCurlRequest( $url, $postData, $token);
 		if ( $result['Error'] == 1 && ( strpos($result['ErrorMessage'], 'No cookie named SessionToken was passed with the request or it was not in a valid format.') !== false) ) {
 			$token = $this->get_sessionToken();
@@ -303,7 +305,7 @@ class Billings extends Admin_Controller{
 			return array($result['documentId'], $token);
 		}
 	}
-	 
+	
 	/**
 	 * finalize input array
 	 */
@@ -333,7 +335,7 @@ class Billings extends Admin_Controller{
 	/**
 	 * Create  Multiple Inputs method
 	 */
-	 
+	
 	public function createMultipleInputs( $loadIds = array() ) {
 		$i = 0;
 		$postData = '';
@@ -370,11 +372,11 @@ class Billings extends Admin_Controller{
 			return array($result['InputId'], $this->triumphToken);
 		}
 	} 
-	 
+	
 	/**
 	 * Creating common triumph curl method
 	 */
-	 
+	
 	public function commonTriumphCurlRequest( $url = '', $post = '', $triumphToken = '') {
 		
 		$c = curl_init($this->triumphUrlRequest.$url);
@@ -388,11 +390,11 @@ class Billings extends Admin_Controller{
 		$response = json_decode($page,TRUE);
 		return $response;
 	}
-	 	
+	
 	/**
 	 * Getting load detail for single record on send for payment
 	 */
-	 
+	
 	public function getLoadDetail( $loadId = null ) {
 		$result = $this->Billing->getSingleLoadDetail( $loadId );
 		if ( $result['doc_name'] != '' && $result['doc_type'] == 'bundle' ) {
@@ -436,21 +438,21 @@ class Billings extends Admin_Controller{
 	/**
 	 * Generating session token for triumph
 	 */
-	 
+	
 	public function get_sessionToken(){
-       $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL,$this->triumphUrl);
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS,
-            "username={$this->triuser}&password={$this->password}&apiKey={$this->apikey}");
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $server_output = curl_exec ($ch);
-        $data = (json_decode($server_output));
-        curl_close ($ch);
-        return $data;
-    }
-    
-   	public function updateReadyForInvoice() {
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL,$this->triumphUrl);
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_POSTFIELDS,
+			"username={$this->triuser}&password={$this->password}&apiKey={$this->apikey}");
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		$server_output = curl_exec ($ch);
+		$data = (json_decode($server_output));
+		curl_close ($ch);
+		return $data;
+	}
+	
+	public function updateReadyForInvoice() {
 		$this->Job->readyInvoice();
 	}
 
@@ -485,10 +487,60 @@ class Billings extends Admin_Controller{
 	*/
 
 	public function billingStats(){
-		$date= date("Y-m-d");
-		$sentToTriumphToday = $this->Billing->sentForPaymentToday($date);
-		$expectedBilling 	= $this->Billing->expectedBilling($date);
-		echo json_encode(array("sentToTriumphToday"=>$sentToTriumphToday,"expectedBilling"=>$expectedBilling));
+		$lastWeekStartDay   = date("Y-m-d", strtotime('monday last week'));
+		$lastWeekEndDay     = date("Y-m-d", strtotime('sunday last week'));
+		$thisWeekStartDay   = date("Y-m-d", strtotime('monday this week'));
+		$thisWeekLastDay    = date("Y-m-d", strtotime('sunday this week'));
+		$thisWeekToday      = date("Y-m-d");
+		$yesterday          = date("Y-m-d", strtotime("yesterday"));
+		$pieChart = $lastWeek = $thisWeek = array();
+		$goalFilterThisWeek = array("startDate"=>$thisWeekStartDay, "endDate"=> $thisWeekLastDay);
+		$goalFilterLastWeek = array("startDate"=>$lastWeekStartDay, "endDate"=> $lastWeekEndDay);
+		$goalValuesThisWeek = $this->getMonthDays($thisWeekStartDay ,$thisWeekLastDay);
+		$goalValuesLastWeek = $this->getMonthDays($lastWeekStartDay ,$lastWeekEndDay);
+
+		$dispatchersList    = $this->Report->getDispatchersListForGoals();
+		$thisWeek["goal"]    = $this->getPerformanceLoadsForAllDispatchers($dispatchersList, $goalFilterThisWeek, $goalValuesThisWeek);
+		$lastWeek["goal"]    = $this->getPerformanceLoadsForAllDispatchers($dispatchersList, $goalFilterLastWeek, $goalValuesLastWeek);
+
+		$recentTransactions     = $this->Billing->getRecentTransactions();
+		if(isset($recentTransactions[0]["date"])){
+			$expectedBillingToday   = $this->Billing->expectedBillingOnDate($recentTransactions[0]["date"],$yesterday);	
+		}else{
+			$expectedBillingToday   = $this->Billing->expectedBillingOnDate($yesterday,$yesterday);	
+		}
+		
+		$expectedBillingToday   = is_null($expectedBillingToday) ? 0 : $expectedBillingToday;
+
+		$lastWeek["sentToTriumph"]  = $this->Billing->sentForPaymentWithFilter( $lastWeekStartDay, $lastWeekEndDay );
+		$lastWeek["sentToTriumph"]  = is_null($lastWeek["sentToTriumph"]) ? 0 : $lastWeek["sentToTriumph"];
+		$lastWeek["goalCompleted"]  = ( $lastWeek["sentToTriumph"] / $lastWeek["goal"] ) * 100;
+
+
+		$thisWeek["sentToTriumph"]  = $this->Billing->sentForPaymentWithFilter( $thisWeekStartDay, $thisWeekToday  );
+		$thisWeek["sentToTriumph"]  = is_null($thisWeek["sentToTriumph"]) ? 0 : $thisWeek["sentToTriumph"];
+		$thisWeek["goalCompleted"]  = ( $thisWeek["sentToTriumph"] / $thisWeek["goal"] ) * 100;
+		$thisWeek["targetType"]     = $thisWeek["goalCompleted"] > 100 ? "ahead" : "behind";
+		$thisWeek["target"]         = abs($thisWeek["goalCompleted"] - 100) ;
+
+
+		$sentToTriumphToday     = $this->Billing->sentForPaymentWithFilter( $thisWeekToday,    $thisWeekToday  );
+		$sentToTriumphToday     = is_null($sentToTriumphToday) ? 0 : $sentToTriumphToday;
+		
+		$expectedBilling 	    = $this->Billing->expectedBilling($thisWeekToday);
+
+		$jobStatusStats         = $this->Job->fetchLoadsSummary(null, null,"all");
+		$pieChart["waitingPaperwork"] = (int)$this->Job->getWaitingPaperworkCount(null,"all");
+
+		if(isset($jobStatusStats[0])){
+			foreach ($jobStatusStats as $key => $value) {
+				if(empty(trim($value['JobStatus'])) )
+					continue;
+				$pieChart[$value['JobStatus']] = (int)$value['tnum'];
+			}
+		}
+		//pr($pieChart);die;
+		echo json_encode(array("sentToTriumphToday"=>$sentToTriumphToday,"expectedBilling"=>$expectedBilling, "lastWeek"=> $lastWeek, "thisWeek" => $thisWeek, "recentTransactions" => $recentTransactions, "expectedBillingToday"=>$expectedBillingToday,"pieChart" => $pieChart ));
 	}	
 
 
@@ -500,20 +552,267 @@ class Billings extends Admin_Controller{
 	* Comment: get specific stats for billing dashboard on refresh.
 	*/
 	public function getSpecificStat(){
+		$lastWeekStartDay = date("Y-m-d", strtotime('monday last week'));
+		$lastWeekEndDay   = date("Y-m-d", strtotime('sunday last week'));
+		$thisWeekStartDay = date("Y-m-d", strtotime('monday this week'));
+		$thisWeekLastDay    = date("Y-m-d", strtotime('sunday this week'));
+		$thisWeekToday    = date("Y-m-d");
+		$yesterday        = date("Y-m-d", strtotime("yesterday"));
+		$pieChart = $lastWeek = $thisWeek = array();
+
+		$goalFilterThisWeek = array("startDate"=>$thisWeekStartDay, "endDate"=> $thisWeekLastDay);
+		$goalFilterLastWeek = array("startDate"=>$lastWeekStartDay, "endDate"=> $lastWeekEndDay);
+		$goalValuesThisWeek = $this->getMonthDays($thisWeekStartDay ,$thisWeekLastDay);
+		$goalValuesLastWeek = $this->getMonthDays($lastWeekStartDay ,$lastWeekEndDay);
+
 		$postObj = json_decode(file_get_contents("php://input"),true);
-		//$date= date("Y-m-d");
+		$date= date("Y-m-d");
 		$date="2017-02-09";
 		$response= array();
 		if(isset($postObj["type"])){
 			switch ($postObj["type"]) {
-				case 'expected_billing': $response["expectedBilling"]    = $this->Billing->expectedBilling($date);	   break;
-				case 'sent_today'      : $response["sentToTriumphToday"] = $this->Billing->sentForPaymentToday($date); break;
+				
+				case 'expected_billing'      : $response["expectedBilling"]       = $this->Billing->expectedBilling($thisWeekToday, $thisWeekToday);  
+				
+				
+				case 'sent_today'            : $response["sentToTriumphToday"]    = $this->Billing->sentForPaymentWithFilter($thisWeekToday, $thisWeekToday); 
+				$response["sentToTriumphToday"]     = is_null($response["sentToTriumphToday"]) ? 0 : $response["sentToTriumphToday"];
+				$lastTransaction = $this->Billing->getRecentTransactions(1);
+				if(isset($lastTransaction[0]["date"])){
+					$response["expectedBillingToday"]   = $this->Billing->expectedBillingOnDate($lastTransaction[0]["date"],$yesterday);	
+				}else{
+					$response["expectedBillingToday"]  = $this->Billing->expectedBillingOnDate($yesterday,$yesterday);
+				}
+				break;
+				
+				case 'last_week_sale'        : $dispatchersList    = $this->Report->getDispatchersListForGoals();
+				$response["goal"]    = $this->getPerformanceLoadsForAllDispatchers($dispatchersList, $goalFilterLastWeek, $goalValuesLastWeek);
+				$response["sentToTriumph"] = $this->Billing->sentForPaymentWithFilter($lastWeekStartDay, $lastWeekEndDay); 
+				$response["sentToTriumph"] = is_null($response["sentToTriumph"]) ? 0 : $response["sentToTriumph"];
+				$response["goalCompleted"]  = ( $response["sentToTriumph"] / $response["goal"] ) * 100;
+				break;
+				
+				case 'week_till_today_sale'  : $dispatchersList    = $this->Report->getDispatchersListForGoals();
+				$response["goal"]    = $this->getPerformanceLoadsForAllDispatchers($dispatchersList, $goalFilterThisWeek, $goalValuesThisWeek);
+				$response["sentToTriumph"] = $this->Billing->sentForPaymentWithFilter($thisWeekStartDay, $thisWeekToday); 
+				$response["sentToTriumph"] = is_null($response["sentToTriumph"]) ? 0 : $response["sentToTriumph"];
+				$response["goalCompleted"]  = ( $response["sentToTriumph"] / $response["goal"] ) * 100;
+				$response["targetType"]     = $response["goalCompleted"] > 100 ? "ahead" : "behind";
+				$response["target"]         = abs($response["goalCompleted"] - 100) ;
+				break;
+
+				case 'recent_transactions'   : $response["recentTransactions"]    = $this->Billing->getRecentTransactions(); break;
+				case 'job_status'            : $jobStatusStats         = $this->Job->fetchLoadsSummary(null, null,"all");
+				$response["waitingPaperwork"] = (int)$this->Job->getWaitingPaperworkCount(null,"all");
+				if(isset($jobStatusStats[0])){
+					foreach ($jobStatusStats as $key => $value) {
+						if(empty(trim($value['JobStatus'])) )
+							continue;
+						$response[$value['JobStatus']] = (int)$value['tnum'];
+					}
+				}
 			}
 		}
 		echo json_encode($response);
 	}
-	
+
+	/**
+	* get number of days in month
+	*/
+
+	public function getMonthDays($startDate = '', $endDate = '' ) {
+		$data 	= array();
+		$time  	  = strtotime($startDate);
+		$endTime  = strtotime($endDate);
+		$month    = date("m",$time);
+		$year     = date("Y",$time);
+		$endMonth = date("m",$endTime);
+		$endYear  = date("Y",$endTime);
+
+		$monthsRange = range($month,$endMonth);
+		$days = 0;
+		for($i = 0; $i < count($monthsRange); $i++) {
+			$days += cal_days_in_month(CAL_GREGORIAN, $monthsRange[$i], $endYear);
+		}
+
+		$data['singleFinancial'] 	= round( $this->config->item('singleFinancialGoal') / $days ) * count($monthsRange);
+		$data['teamFinancial']  	= round( $this->config->item('teamFinancialGoal') / $days ) * count($monthsRange);					
+		$data['singleMiles'] 		= round( $this->config->item('singleMilesGoal') / $days ) * count($monthsRange);
+		$data['teamMiles']          = round( $this->config->item('teamMilesGoal') / $days ) * count($monthsRange);
+		
+		return $data;
+	}
+
+	public function getPerformanceLoadsForAllDispatchers($dispatchersList = array(),$rparam, $goalValues) {
+		$mainArray = array();
+		$lPResult = array();
+
+		$overallTotalFinancialGoal = $overallTotalMilesGoal = $overallPlusMinusFinancialGoal = $overallPlusMinusMilesGoal = $totalInvoices	= $totalMiles = $totalDeadMiles	= $totalCharges	= $totalProfit = 0;	
+		$goalLogStartDate = '2017-03-29';			// static date to consider the logs which are started from 29th march
+		
+		foreach( $dispatchersList as $key => $dispatcher ) {
+			$teamFinancialGoal 	 = 0;
+			$teamMilesGoal 		 = 0;
+			$singleFinancialGoal = 0;
+			$singleMilesGoal	 = 0;
+			$showDispatcher		 = 1;
+			$value 			= $this->Report->getLoadsTrackingAggregateDashboard($rparam,"dispatchers","dashboard", $dispatcher['dispId']);
+			$driversList    = $this->Report->getTotalTeamDrivers($dispatcher['dispId'], $rparam['startDate'], $rparam['endDate'] );
+			$driverLastLog  = $this->Report->getDispatcherLastLog($dispatcher['dispId'], $rparam['startDate']);
+			
+			if( !empty($driversList)) {
+				$driversList = $this->getUniqueDriverDate($driversList);
+				$driversList = array_values($driversList);
+				for( $i = 0; $i < count($driversList); $i++ ) {
+					if ( $i == 0 ) {
+						$daysdiff = 1;
+						if ( $driversList[$i]['createdDate'] <= $goalLogStartDate ) {				// check if log is before 29 march
+							$sDate 	 = new DateTime($rparam["startDate"]);
+							$singleDrivers = $driversList[$i]['single'];
+							$teamDrivers   = $driversList[$i]['team'];
+
+							$eDate   		= new DateTime($driversList[$i]['createdDate']);
+							$newEndDate 	= $driversList[$i]['createdDate'];
+							$daysdiff 	    += $eDate->diff($sDate)->format("%a");
+							$singleFinancialGoal 	+= $driversList[$i]['single'] * $goalValues['singleFinancial'] * $daysdiff;
+							$teamFinancialGoal	+= $driversList[$i]['team'] * $goalValues['teamFinancial'] * $daysdiff;
+						} else {
+							if ( !empty($driverLastLog) && count($driverLastLog) > 0 ) {// check if previous log exist for dispatcher then calc from startdate
+								$sDate 		= new DateTime($rparam['startDate']);
+								$eDate   	= new DateTime($driversList[$i]['createdDate']);
+								$newEndDate = $driversList[$i]['createdDate'];
+								$daysdiff  += $eDate->diff($sDate)->format("%a");
+								$daysdiff = $daysdiff - 1;
+								
+								$singleFinancialGoal 	+= $driverLastLog['single'] * $goalValues['singleFinancial'] * $daysdiff;
+								$teamFinancialGoal	+= $driverLastLog['team'] * $goalValues['teamFinancial'] * $daysdiff;
+								
+								$singleFinancialGoal 	+= $driversList[$i]['single'] * $goalValues['singleFinancial'];
+								$teamFinancialGoal	+= $driversList[$i]['team'] * $goalValues['teamFinancial'];
+							}
+							else {				// check if previous log does not exist for dispatcher then calc from logged start date
+								
+								$sDate 			= new DateTime($driversList[$i]['createdDate']);
+								$eDate   		= new DateTime($driversList[$i]['createdDate']);
+								$newEndDate 	= $driversList[$i]['createdDate'];
+								$daysdiff 	   += $eDate->diff($sDate)->format("%a");
+
+								$singleFinancialGoal 	+= $driversList[$i]['single'] * $goalValues['singleFinancial'] * $daysdiff;
+								$teamFinancialGoal	+= $driversList[$i]['team'] * $goalValues['teamFinancial'] * $daysdiff;
+							}
+						}
+					} else {
+						$endCreated = date('Y-m-d',(strtotime ( '-1 day' , strtotime ( $driversList[$i]['createdDate']) ) ));
+						$sDate 			= new DateTime($driversList[$i -1 ]['createdDate']);
+						$eDate   		= new DateTime($endCreated);
+						$newEndDate 	= $driversList[$i]['createdDate'];
+
+						$daysdiff 			= $eDate->diff($sDate)->format("%a");
+						$singleFinancialGoal += $driversList[$i-1]['single'] * $goalValues['singleFinancial'] * $daysdiff;
+						$teamFinancialGoal   += $driversList[$i-1]['team'] * $goalValues['teamFinancial'] * $daysdiff;
+						
+						$singleFinancialGoal += $driversList[$i]['single'] * $goalValues['singleFinancial'];
+						$teamFinancialGoal   += $driversList[$i]['team'] * $goalValues['teamFinancial'];
+						
+					}
+
+					if ( $driversList[$i]['single'] <= 0 && $driversList[$i]['team'] <= 0 )
+						$showDispatcher = 0;		
+				}
+				
+				if( $newEndDate < $rparam['endDate'] ) {	
+					$sDate 					= new DateTime($newEndDate);
+					$eDate   				= new DateTime($rparam['endDate']);
+					$daysdiff 				= $eDate->diff($sDate)->format("%a");
+
+					$driverList = end($driversList);
+
+					$singleFinancialGoal 	+= $driverList['single'] * $goalValues['singleFinancial'] * $daysdiff;
+					$teamFinancialGoal 	+= $driverList['team'] * $goalValues['teamFinancial'] * $daysdiff;
+					
+				}
+			} else {	
+				$driversList = $this->Report->getTotalDriversList($dispatcher['dispId'], $rparam['startDate'], $rparam['endDate'] );
+				$daysdiff = 0;
+				if ( !empty($driversList)) {
+					if ( !empty($driverLastLog) && count($driverLastLog) > 0 )
+						$sDate 		= new DateTime($rparam["startDate"]);
+					else 
+						$sDate 		= new DateTime($driversList["createdDate"]);
+
+					$eDate   	= new DateTime($rparam['endDate']);
+					$daysdiff 	= $eDate->diff($sDate)->format("%a");
+					$daysdiff 	= $daysdiff + 1;
+				}
+
+				$single = isset($driversList['single']) ? $driversList['single'] : 0;
+				$team   = isset($driversList['team']) ? $driversList['team'] : 0;
+				$singleFinancialGoal  += $single * $goalValues['singleFinancial'] * $daysdiff;
+				$teamFinancialGoal	+= $team * $goalValues['teamFinancial'] * $daysdiff;
+				
+				if ( $driversList['createdDate'] > $rparam['endDate'] && empty($driverLastLog)) {
+					$showDispatcher = 0;
+				} else if( $driversList['single'] <= 0 && $driversList['team'] <= 0 ) {
+					$showDispatcher = 0;
+				}
+			}									
+			
+			if ( empty($value) && $showDispatcher == 0)
+				continue;
+
+			$totalFinancialGoal 		= $singleFinancialGoal + $teamFinancialGoal; 		
+			$overallTotalFinancialGoal += $totalFinancialGoal;
+			
+		}
+
+		return $overallTotalFinancialGoal;
+	}
+
+	/**
+	* get latest date from many date time of same day
+	*/
+
+	public function getUniqueDriverDate($driversList = array()) {
+		$driverListlength  = count($driversList);
+		for( $j = 0; $j < $driverListlength; $j++ ) {
+			if ( isset($driversList[$j]['createdDate']) && isset($driversList[$j+1]['createdDate'])  && ($driversList[$j]['createdDate'] == $driversList[$j+1]['createdDate']) ) {
+
+				if ( $driversList[$j]['createdTime'] > $driversList[$j+1]['createdTime']) {
+					unset($driversList[$j+1]);
+				}
+				else {
+					unset($driversList[$j]);
+				}
+			}
+		}
+		$driversList = array_values($driversList);
+		return $driversList;
+	}
+
+	public function fetchDataForCsv(){
+
+		if ( !in_array($this->userRoleId, $this->config->item('with_admin_role')) ) {
+			echo json_encode($this->data);
+			exit();
+		}
+		
+		$postObj 	= json_decode(file_get_contents("php://input"),true);
+		$parameter 	= ($postObj['InvoiceLoads'])?'':'invoice';
+
+		$filters 	= ['searchQuery'=>$postObj['searchText'],"itemsPerPage"=>20, "limitStart"=>1, "sortColumn"=>"DeliveryDate", "sortType"=>"DESC"];
+
+		$filters["startDate"] = $filters["endDate"] = '';
+		
+		if(isset($_COOKIE["_gDateRangeBilling"]) && !empty($_COOKIE["_gDateRangeBilling"])){
+			$gDateRange = json_decode($_COOKIE["_gDateRangeBilling"],true);
+			$filters["startDate"] = $gDateRange["startDate"]; $filters["endDate"] = $gDateRange["endDate"];
+		}
+
+		$jobs = $this->Billing->getInProgressLoads( $parameter, false, $filters ,true);
+
+		$keys = [['DATE','CUSTOMER NAME','DRIVERS','INVOICE','CHARGES','PROFIT','%PROFIT','MILES','DEAD MILES','RATE/MILE','DATE P/U','PICK UP','DATE DE','DELIVERY','LOLAD ID','STATUS']];
+
+		$data = array_merge($keys,$jobs);
+		echo json_encode(array('fileName'=>$this->createExcell('billing',$data)));
+	}
 }
-
-
-

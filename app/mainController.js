@@ -1,7 +1,10 @@
 app.controller('mainController', function (dataFactory,  PubNub, $scope, $sce,$rootScope, $location, $http , $cookies, $state, $localStorage, $q, $timeout,$window, $compile) {
 $rootScope.logoutmessage=false;
     $scope.login = {};
-	
+
+    var main = this;
+    main.itemsPerPage = 10;
+    
 	$scope.trustAsHtml = function(value) {
         return $sce.trustAsHtml(value);
     };
@@ -81,6 +84,8 @@ $rootScope.logoutmessage=false;
 	    //}
     };
 
+
+
      $scope.selectPortlet = function($event,widgetID) {
     	
     	visibility = 1;
@@ -100,6 +105,10 @@ $rootScope.logoutmessage=false;
 		}
 		$scope.autoFetchLoads = false;
     }
+
+     // $scope.toggleAll = function() {
+     // 	angular.element('.page-sidebar').removeAttr('style');
+     // }
 
     $scope.showHidePortlet = function() {
     	if(!angular.element('#appMenu').hasClass('show')){
@@ -297,11 +306,31 @@ $rootScope.logoutmessage=false;
 			$scope.csvContent += "\n" + csvString;
 			var timestamp = Math.floor(Date.now() / 1000);
 
-			var downloadContainer = angular.element('<div data-tap-disabled="true"><a></a></div>');
-			var downloadLink = angular.element(downloadContainer.children()[0]);
+			var downloadContainer 	= angular.element('<div data-tap-disabled="true"><a></a></div>');
+			var downloadLink 		= angular.element(downloadContainer.children()[0]);
 			downloadLink.attr('href', 'data:application/octet-stream;base64,'+btoa($scope.csvContent));
 			downloadLink.attr('download', "detailInfo_"+timestamp+".csv");
 			downloadLink.attr('target', '_blank');
+			angular.element('body').append(downloadContainer);
+			$timeout(function () {
+			  downloadLink[0].click();
+			  downloadLink.remove();
+			}, null);
+        });
+    }
+
+    $rootScope.exportCsvData = function(moduleName){
+    	
+    	var searchText = angular.element('input[type="search"]').val();
+    	
+    	dataFactory.httpRequest(URL+'/'+moduleName+'/fetchDataForCsv','POST',{},{searchText: searchText }).then(function(data){
+
+			var url = URL+'/assets/ExportExcel/'+data.fileName;
+			var downloadContainer 	= angular.element('<div data-tap-disabled="true"><a></a></div>');
+			var downloadLink 		= angular.element(downloadContainer.children()[0]);
+			downloadLink.attr('href', url);
+			downloadLink.attr('download', data.filename);
+			// downloadLink.attr('target', '_blank');
 			angular.element('body').append(downloadContainer);
 			$timeout(function () {
 			  downloadLink[0].click();
@@ -2674,15 +2703,19 @@ $rootScope.logoutmessage=false;
 				}
 			});
 		}
-		
+				
 		$scope.selectedBrokerName = 'Select Broker';		
+		main.selectedShipperName = 'Select Shipper';		
 		dataFactory.httpRequest(URL+'/assignedloads/getBrokersList/'+primaryAddId).then(function(data) {					// Fetching brokers info to show in dropdown
 			$scope.brokersList = data.brokersList;
+			main.shippersList = data.shippersList;
 			if ( data.brokerLoadDetail.length != 0 ) {
 				$rootScope.editBrokerLoadInfo = data.brokerLoadDetail;
 				$scope.selectedBrokerName = data.brokerLoadDetail.TruckCompanyName;
 				$scope.brokerSelectedId = data.brokerLoadDetail.id;
 			}
+
+
 		});
 	}
 	
@@ -2782,6 +2815,38 @@ $rootScope.logoutmessage=false;
 				}
 				$scope.autoFetchLoads = false;
 			});
+		}
+	} 
+
+	/**
+	 * Fetching broker info on change of selectbox
+	 */
+	 
+	main.onSelectChangeShipperCallback = function( value, key , parameter) {
+		main.selectedShipperName = value.shipperCompanyName;
+		if ( value.id != '' && value.id != undefined ) {
+			$scope.autoFetchLoads = true;
+			dataFactory.httpRequest(URL+'/shippers/fetchShipperRecord/'+value.id).then(function(data) {					// Fetching broker info to show fields selected
+				if ( parameter == 'addRequest' ) {
+					
+				} else {
+					$rootScope.editSavedLoad.TruckCompanyName = data.brokerDetail.TruckCompanyName;
+					$rootScope.editSavedLoad.PointOfContact = data.brokerDetail.PointOfContact;
+					$rootScope.editSavedLoad.PointOfContactPhone = data.brokerDetail.PointOfContactPhone;
+					$rootScope.editSavedLoad.TruckCompanyEmail = data.brokerDetail.TruckCompanyEmail;
+					
+				}
+				$rootScope.editSavedLoad.broker_id = data.brokerDetail.id; 					// SHOWING UPLOAD BUTTON ON JOB TICKET	
+			
+				if ( data.brokerDocuments != undefined ) {
+					$scope.brokerDocuments = data.brokerDocuments;
+				} else {
+					$scope.brokerDocuments = [];
+				}
+				$scope.autoFetchLoads = false;
+			});
+		} else {
+
 		}
 	} 
 		

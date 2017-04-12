@@ -23,6 +23,13 @@ class Filteredbillings extends Admin_Controller{
 		$filters["filterType"] = isset($_REQUEST["filterType"]) ? $_REQUEST["filterType"] : 'all';
 		$filters["userType"] = isset($_REQUEST["userType"]) ? $_REQUEST["userType"] : 'all';
 		$filters["userId"] = isset($_REQUEST["userToken"]) ? $_REQUEST["userToken"] : false;
+		$filters["deliveryDate"] = isset($_REQUEST["deliveryDate"]) ? $_REQUEST["deliveryDate"] : "";
+		if ( isset($filters["filterType"]) && $filters["filterType"] == 'sent_today_expected' ) {	
+			$recentTransactions = $this->Billing->getRecentTransactions(1);
+			if(isset($recentTransactions[0]["date"])){ 
+				$filters["dateFrom"] =  $recentTransactions[0]["date"]; 
+			}
+		}
 
 
 		if( isset( $_REQUEST["startDate"]) && $_REQUEST["startDate"] != ""){ $filters["startDate"] = date("Y-m-d", strtotime($_REQUEST["startDate"])); }
@@ -40,6 +47,7 @@ class Filteredbillings extends Admin_Controller{
 
 		$jobs = $this->Billing->getFilteredLoads( $filters);
 		$data['total'] = $this->Billing->getFilteredLoads( $filters,true);
+
 		
 		$data['loads'] = $jobs;
 		$data['billType'] = 'billing';
@@ -62,7 +70,7 @@ class Filteredbillings extends Admin_Controller{
 		}
 		
 
-		if((isset($params["sortColumn"]) && empty($params["sortColumn"])) || !isset($params["sortColumn"])){ $params["sortColumn"] = "PickupDate"; }
+		if((isset($params["sortColumn"]) && empty($params["sortColumn"])) || !isset($params["sortColumn"])){ $params["sortColumn"] = "DeliveryDate"; }
 		if((isset($params["sortType"]) && empty($params["sortType"])) || !isset($params["sortType"])){ $params["sortType"] = "DESC"; }
 		if(!isset($params["startDate"])){ $params["startDate"] = ''; }
 		if(!isset($params["endDate"])){ $params["endDate"] = ''; }
@@ -74,7 +82,16 @@ class Filteredbillings extends Admin_Controller{
 		$params["userType"] = isset($params["filterArgs"]["userType"]) ? $params["filterArgs"]["userType"] : 'all';
 		$params["userId"] = isset($params["filterArgs"]["userToken"]) ? $params["filterArgs"]["userToken"] : false;
 
-		
+		if(isset($params["filterType"]["requestFrom"]) && $params["filterType"]["requestFrom"] == "billings"){
+			$params["startDate"] = $params["endDate"] = "";
+		}
+
+		if ( isset($params["filterType"]) && $params["filterType"] == 'sent_today_expected' ) {	
+			$recentTransactions = $this->Billing->getRecentTransactions(1);
+			if(isset($recentTransactions[0]["date"])){ 
+				$params["dateFrom"] =  $recentTransactions[0]["date"]; 
+			}
+		}
 
 		if($params["userType"] == "team" || $params["userType"] == "driver"){
 

@@ -25,7 +25,7 @@ app.controller('driversInsightsController', ["dataFactory","$scope","$rootScope"
     vmInsights.goToDriverLoads = function(type,page, extra){
     	var args ="";
         if(extra.recordType != undefined && extra.recordType == "withoutTruck"){
-            $state.go("editDrivers", { 'id': extra.driver_id, type:true }, { reload: true } );
+            $state.go("trucks", {type:true }, { reload: true } );
         }else if(extra.recordType != undefined && extra.recordType == "trucksReporting"){
             $state.go("editTruck", { 'id': extra.vehicleId, type:true }, { reload: true } );
         }else{
@@ -54,6 +54,23 @@ app.controller('driversInsightsController', ["dataFactory","$scope","$rootScope"
         vmInsights.loadItems();
     };
 
+    vmInsights.exportInsights = function(search){
+        dataFactory.httpRequest(URL+'/Loads/getDriversInsightsRecords/','Post',{} ,{ pageNo:'', itemsPerPage:vmInsights.itemsPerPage,searchQuery: search, sortColumn:'', sortType:'',filterArgs:vmInsights.filterArgs,'export':1}).then(function(data){
+            
+            var url = URL+'/assets/ExportExcel/'+data.fileName;
+            var timestamp = Math.floor(Date.now() / 1000);
+            var downloadContainer   = angular.element('<div data-tap-disabled="true"><a></a></div>');
+            var downloadLink        = angular.element(downloadContainer.children()[0]);
+            downloadLink.attr('href',url);
+            downloadLink.attr('download', data.fileName);
+            angular.element('body').append(downloadContainer);
+            setTimeout(function(){
+              downloadLink[0].click();
+              downloadLink.remove();
+            },100);
+        });
+    }
+
     vmInsights.loadNextPage = function(pageNumber,search,sortColumn,sortType){
     	vmInsights.autoFetchLoads = true;
         dataFactory.httpRequest(URL+'/Loads/getDriversInsightsRecords/','Post',{} ,{ pageNo:pageNumber, itemsPerPage:vmInsights.itemsPerPage,searchQuery: search, sortColumn:sortColumn, sortType:sortType,filterArgs:vmInsights.filterArgs }).then(function(data){
@@ -73,6 +90,7 @@ app.controller('driversInsightsController', ["dataFactory","$scope","$rootScope"
     vmInsights.callSearchFilter = function(query){
     	vmInsights.loadNextPage((vmInsights.currentPage - 1), query, vmInsights.lastSortedColumn,vmInsights.lastSortType);
     };
+
 
     vmInsights.sortCustom = function(sortColumn,type) {
 		type = type == "ASC" ? "DESC" : "ASC";

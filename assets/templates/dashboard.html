@@ -312,9 +312,26 @@
 				                            </div>
 				                            <div class="panel-controls ">
 				                                <ul>
-				                                    <li ng-show="otherIcon"><a class="portlet-collapse" href="" data-toggle="collapse"><i class="portlet-icon portlet-icon-collapse"></i></a></li>
-				                                    <li ng-show="otherIcon"><a href=""><i class="fa fa-print" ng-click="print_xl()"></i></a></li>
-				                                    <li><a href="" class="portlet-maximize" data-toggle="maximize" ng-click = "toggleIcon($event,'leaderboard')"><i class="portlet-icon portlet-icon-maximize portlet-increase-size" ></i></a></li>
+				                                    <li ng-show="otherIcon">
+				                                    	<a class="portlet-collapse" href="" data-toggle="collapse">
+				                                    		<i class="portlet-icon portlet-icon-collapse"></i>
+				                                    	</a>
+				                                    </li>
+				                                    <li ng-show="otherIcon">
+				                                    	<a href="">
+				                                    		<i class="fa fa-print" ng-click="print_xl()"></i>
+				                                    	</a>
+				                                    </li>
+				                                    <li ng-show="otherIcon" >
+				                                    	<a href = "">
+				                                    		<i class="fa fa-file-excel-o" ng-click ="exportLeaderBoard(typeOfData)"></i>
+				                                    	</a>
+				                                    </li>
+				                                    <li>
+				                                    	<a href="" class="portlet-maximize" data-toggle="maximize" ng-click = "toggleIcon($event,'leaderboard')">
+				                                    		<i class="portlet-icon portlet-icon-maximize portlet-increase-size" ></i>
+				                                    	</a>
+				                                    </li>
 				                                </ul>
 				                            </div>
 				                        </div>
@@ -347,7 +364,7 @@
 															  </tr>
 															</thead>
 															<tbody>
-															  	<tr ng-repeat="loads in loadPerformance"  ng-click="skipClick ? showRecordsWithFilter('reports', 'loads', loads.urlColumn, loads.username,loads.dispatcherId, loads.second_driver_id) : clickMatchLoadDetail(loads.truckstopID, loads.loadid, loads.deadmiles, loads.invoice, loads.totalCost, loads.pickDate, loads.vehicle_id , $index)">
+															  	<tr ng-repeat="loads in loadPerformance	"  ng-click="skipClick ? showRecordsWithFilter('reports', 'loads', loads.urlColumn, loads.username,loads.dispatcherId, loads.second_driver_id) : clickMatchLoadDetail(loads.truckstopID, loads.loadid, loads.deadmiles, loads.invoice, loads.totalCost, loads.pickDate, loads.vehicle_id , $index)">
 																	<td class="v-align-middle semi-bold">{{loads.fcolumn}}</td>
 																	
 																	<td ng-show="typeOfData == '_idriver'" class="text-center v-align-middle semi-bold">{{loads.PickupDate}}</td>
@@ -604,20 +621,43 @@
 				                            <div class="panel-title">Today Insights </div>
 				                            <div class="panel-controls">
 				                                <ul>
-				                                    <li ng-show="otherIcon" ><a class="portlet-collapse" href="" data-toggle="collapse"><i class="portlet-icon portlet-icon-collapse"></i></a>
+				                                    <li ng-show="otherIcon" >
+				                                    	<a class="portlet-collapse" href="" data-toggle="collapse">
+				                                    		<i class="portlet-icon portlet-icon-collapse"></i>
+				                                    	</a>
 				                                    </li>
-				                                    <li ng-show="otherIcon" ><a href = ""><i class="fa fa-print" ng-click ="print_todayInsights()"></i></a></li>
-				                                    <li><a class="portlet-maximize" href="" data-toggle="maximize" ng-click="toggleIcon($event,'today-insights')"><i class="portlet-icon portlet-icon-maximize portlet-increase-size"></i></a>
+				                                    <li ng-show="otherIcon" >
+				                                    	<a href = "">
+				                                    		<i class="fa fa-print" ng-click ="print_todayInsights()"></i>
+				                                    	</a>
+				                                    </li>
+
+				                                    <li ng-show="otherIcon" >
+				                                    	<a href = "">
+				                                    		<i class="fa fa-file-excel-o" ng-click ="exportTodayReport()"></i>
+				                                    	</a>
+				                                    </li>
+				                                    <li>
+				                                    	<a class="portlet-maximize" href="" data-toggle="maximize" ng-click="toggleIcon($event,'today-insights')"><i class="portlet-icon portlet-icon-maximize portlet-increase-size"></i>
+				                                    	</a>
 				                                    </li>
 				                                </ul>
 				                            </div>
 				                        </div>
 				                        <div class="panel-body">
 							                <ul class="nav nav-tabs nav-tabs-simple" id="tinsights" role="tablist" ui-jq="tabCollapse">
-							                    <li class="active tpickup" ng-click="getTodayReport('booked')"  ><a href="#todayPickup"  data-toggle="tab" pg-tab role="tab">Pickup</a> </li>
-							                    <li class="tinprogress"> <a href="#todayInprogress" ng-click="getTodayReport('inprogress')" data-toggle="tab" pg-tab role="tab">Inprogress</a> </li>
-							                    <li class="tdelivery"> <a href="#todayDelivery"  ng-click="getTodayReport('delivery')" data-toggle="tab" pg-tab role="tab">Delivery</a> </li>
-							                    <li class="tidle"> <a href="#todayIdle" ng-click="getTodayReport('idle')" data-toggle="tab" pg-tab role="tab">Idle</a> </li>
+							                    <li class="active tpickup" ng-click="getTodayReport('booked')"  >
+							                    	<a href="#todayPickup"  data-toggle="tab" pg-tab role="tab">Pickup</a> 
+							                    </li>
+							                    <li class="tinprogress"> 
+							                    	<a href="#todayInprogress" ng-click="getTodayReport('inprogress')" data-toggle="tab" pg-tab role="tab">Inprogress</a> 
+							                    </li>
+							                    <li class="tdelivery"> 
+							                    	<a href="#todayDelivery"  ng-click="getTodayReport('delivery')" data-toggle="tab" pg-tab role="tab">Delivery</a> 
+							                    </li>
+							                    <li class="tidle"> 
+							                    	<a href="#todayIdle" ng-click="getTodayReport('idle')" data-toggle="tab" pg-tab role="tab">Idle</a> 
+							                    </li>
 							                </ul>
 							                <div class="tab-content no-padding">
 							                    <div class="tab-pane active" id="todayPickup">
@@ -824,11 +864,11 @@
 							                <div class="col-sm-6 p-l-0">
 							                    <div class="ar-1-1">
 							                        <!-- START WIDGET -->
-							                        <div class="widget-2 panel no-border bg-primary widget widget-loader-circle-lg no-margin" pg-portlet progress="circle-lg" overlay-color='0,0,0' overlay-opacity="0.6" on-refresh="refreshTest('.widget-2')">
+							                        <div class="widget-2 dawt panel no-border bg-primary widget widget-loader-circle-lg no-margin" pg-portlet progress="circle-lg" overlay-color='0,0,0' overlay-opacity="0.6" on-refresh="refreshTest('.dawt','active_drivers_without_truck')">
 							                            <div class="panel-heading dwithout-t">
 							                                <div class="panel-controls">
 							                                    <ul>
-							                                        <li><a ng-click="refresh('.widget-2','active_drivers_without_truck')" class="portlet-refresh" data-toggle="refresh"><i class="portlet-icon portlet-icon-refresh text-white"></i></a>
+							                                        <li><a class="portlet-refresh" data-toggle="refresh"><i class="portlet-icon portlet-icon-refresh text-white"></i></a>
 							                                        </li>
 							                                    </ul>
 							                                </div>
@@ -849,11 +889,11 @@
 							               	<div class="col-sm-6 p-l-0 stats-2">
 							                    <div class="ar-1-1">
 							                        <!-- START WIDGET -->
-							                        <div class="widget-2 panel no-border bg-primary widget widget-loader-circle-lg no-margin" pg-portlet progress="circle-lg" overlay-color='0,0,0' overlay-opacity="0.6" on-refresh="refreshTest('.widget-2')">
+							                        <div class="widget-2 twd panel no-border bg-primary widget widget-loader-circle-lg no-margin" pg-portlet progress="circle-lg" overlay-color='0,0,0' overlay-opacity="0.6" on-refresh="refreshTest('.twd','trucks_reporting')">
 							                            <div class="panel-heading dwithout-t">
 							                                <div class="panel-controls">
 							                                    <ul>
-							                                        <li><a ng-click="refresh('.widget-2','trucks_reporting')" class="portlet-refresh" data-toggle="refresh"><i class="portlet-icon portlet-icon-refresh text-white"></i></a>
+							                                        <li><a class="portlet-refresh" data-toggle="refresh"><i class="portlet-icon portlet-icon-refresh text-white"></i></a>
 							                                        </li>
 							                                    </ul>
 							                                </div>
@@ -862,14 +902,14 @@
 							                            	 <div class="metro live-tile" data-mode="carousel" data-start-now="true" data-delay="3000" ui-jq="liveTile">
 							                                    <div class="slide-front tiles slide active">
 							                                       <div class="  top-right bottom-right  p-t-50">
-									                                    <span class="number " ng-click="showRecordsWithFilter('trucksReporting','driversInsights', 'driver', '', '', '',dashboard.activeDriversDate)">{{ dashboard.trucksNotReporting }}</span>
+									                                    <span class="number " ng-click="showRecordsWithFilter('trucksReporting','truckInsights', 'trucksReporting', '', '', '',dashboard.activeDriversDate)">{{ dashboard.trucksNotReporting }}</span>
 									                                    <br>
 									                                    <h3 class="text-white ltext">Trucks are not reporting current location</h3>
 									                                </div>
 							                                    </div>
 							                                    <div class="slide-back tiles">
 							                                        <div class="  top-right bottom-right  p-t-50">
-									                                    <span class="number ">{{ dashboard.vehiclesWithoutDriver }}</span>
+									                                    <span class="number " ng-click="showRecordsWithFilter('trucksWithoutDriver','truckInsights', 'trucksWithoutDriver', '', '', '',dashboard.activeDriversDate)">{{ dashboard.vehiclesWithoutDriver }}</span>
 									                                    <br>
 									                                    <h3 class="text-white ltext">Trucks without driver</h3>
 									                                </div>

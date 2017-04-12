@@ -880,17 +880,34 @@
 					
 					
 					<div class="popup-inner-content-main" ng-show="showAddhighlighted == 'brokerDetails'">
-						
-						<div class="form-group form-group-default th-select broker-detail-dropdown">
-							<label>Select Broker</label>
-							
-							<ui-select ng-model="brokerSelectedId" theme="bootstrap" on-select="onSelectChangeBrokerCallback($item, $model, 'addRequest')">
-								<ui-select-match class="ui-select-match" placeholder="Select Broker">{{selectedBrokerName}}</ui-select-match>
-								<ui-select-choices class="ui-select-choices" repeat="item in brokersList | filter: $select.search">
-									<span ng-bind-html="trustAsHtml((item.TruckCompanyName | highlight: $select.search))"></span>
-								</ui-select-choices>
-							</ui-select>
+				
+					<div class="row">
+						<div class="col-sm-5 col-md-5">
+							<div class="form-group form-group-default th-select broker-detail-dropdown">
+								<label>Select Broker</label>								
+								<ui-select ng-model="brokerSelectedId" theme="bootstrap" on-select="onSelectChangeBrokerCallback($item, $model, 'addRequest')" ng-disabled="mctrl.disabledBrokerDropDown == true">
+									<ui-select-match class="ui-select-match" placeholder="Select Broker">{{selectedBrokerName}}</ui-select-match>
+									<ui-select-choices class="ui-select-choices" repeat="item in brokersList | filter: $select.search">
+										<span ng-bind-html="trustAsHtml((item.TruckCompanyName | highlight: $select.search))"></span>
+									</ui-select-choices>
+								</ui-select>
+							</div>
 						</div>
+						<div class="col-sm-2 col md-2">
+
+						</div>
+						<div class="col-sm-5 col-md-5">
+							<div class="form-group form-group-default th-select broker-detail-dropdown">
+								<label>Select Shipper</label>								
+								<ui-select ng-model="shipperSelectedId" theme="bootstrap" on-select="mctrl.onSelectChangeShipperCallback($item, $model, 'addRequest')" ng-disabled="mctrl.disabledShipperDropDown == true">
+									<ui-select-match class="ui-select-match" placeholder="Select Shipper">{{mctrl.selectedShipperName}}</ui-select-match>
+									<ui-select-choices class="ui-select-choices" repeat="item in mctrl.shippersList | filter: $select.search">
+										<span ng-bind-html="trustAsHtml((item.shipperCompanyName | highlight: $select.search))"></span>
+									</ui-select-choices>
+								</ui-select>
+							</div>
+						</div>
+					</div>
 								
 						
 							

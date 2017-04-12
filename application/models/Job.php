@@ -20,19 +20,16 @@ class Job extends Parent_Model {
 		return $num_rows;
 	}
 
-
-
 	public function getTodayReport($args = null, $type, $reportType = "pickup",$date = ''){
 		if(empty($date)){ $date = date('Y-m-d'); }
 		
 		if($reportType == "exceptIdle"){
 			$this->db->select("count(DISTINCT d.id) as total");
 		}else{
-			$this->db->select("CASE loads.driver_type 
+			$this->db->select("loads.created,b.TruckCompanyName as companyName,CASE loads.driver_type 
     						WHEN 'team' THEN CONCAT(d.first_name,' + ',team.first_name) 
     									ELSE concat(d.first_name,' ',d.last_name) 
-    									END AS driverName, loads.id,  CONCAT('Truck - ',v.label) as truckName, CONCAT(u.first_name, ' ', u.last_name) as dispatcher, loads.PickupDate, loads.DeliveryDate, loads.OriginCity, loads.OriginState,   loads.DestinationCity,loads.DestinationState, loads.PaymentAmount, loads.Mileage, (loads.PaymentAmount/loads.Mileage) as RPM, loads.deadmiles, b.TruckCompanyName as companyName
-     									");
+    									END AS driverName,loads.invoiceNo,loads.totalCost,loads.overallTotalProfit,loads.overallTotalProfitPercent,loads.Mileage,CONCAT('Truck - ',v.label) as truckName, CONCAT(u.first_name, ' ', u.last_name) as dispatcher, loads.PickupDate, loads.DeliveryDate, loads.OriginCity, loads.OriginState, loads.DestinationCity,loads.DestinationState, loads.PaymentAmount, (loads.PaymentAmount/loads.Mileage) as RPM, loads.deadmiles,loads.id,loads.JobStatus,loads.pickDate");
 		}
 
 		$this->db->join("vehicles as v", "loads.vehicle_id = v.id","Left");
@@ -158,7 +155,7 @@ class Job extends Parent_Model {
 
 
 	public function getDriversWithFilter($filters = array(), $type ='', $rtype = '', $date = '', $total = false){
-
+		
 		if(empty($date)){ $date = date("Y-m-d"); }
 		if($rtype == "getIdleIds" ){
 			$this->db->select("group_concat(d.id) as total");
@@ -304,7 +301,7 @@ class Job extends Parent_Model {
 	    					CASE loads.driver_type 
 	    						WHEN "team" THEN CONCAT(d.first_name," + ",team.first_name) 
 									ELSE concat(d.first_name," ",d.last_name) 
-									END AS driverName, loads.driver_type, loads.id, loads.invoiceNo, loads.vehicle_id, loads.truckstopID,loads.Bond,loads.PointOfContactPhone,loads.equipment_options,loads.LoadType,loads.PickupDate,loads.DeliveryDate,loads.OriginCity,loads.OriginState,loads.DestinationCity,loads.DestinationState,loads.PickupAddress,loads.DestinationAddress,loads.PaymentAmount,loads.Mileage, (loads.PaymentAmount/loads.Mileage) as rpm, loads.deadmiles,loads.Weight,loads.Length,loads.JobStatus,loads.totalCost,loads.pickDate,loads.load_source,b.TruckCompanyName as companyName
+									END AS driverName, loads.driver_type, loads.id, loads.invoiceNo, loads.vehicle_id, loads.truckstopID,loads.Bond,loads.PointOfContactPhone,loads.equipment_options,loads.LoadType,loads.PickupDate,loads.DeliveryDate,loads.OriginCity,loads.OriginState,loads.DestinationCity,loads.DestinationState,loads.PickupAddress,loads.DestinationAddress,loads.PaymentAmount,loads.Mileage, (loads.PaymentAmount/loads.Mileage) as rpm, loads.deadmiles,loads.Weight,loads.created,loads.overallTotalProfitPercent,loads.overallTotalProfit,loads.Length,loads.JobStatus,loads.totalCost,loads.pickDate,loads.load_source,b.TruckCompanyName as companyName
 								');	
 		}
 		$this->db->join("vehicles as v", "loads.vehicle_id = v.id","Left");
@@ -499,7 +496,9 @@ class Job extends Parent_Model {
 
 
 
-	public function fetchSavedJobsNew( $loggedUserId = null, $vehicleId = null, $scopeType = '', $dispatcherId = null, $driverId = null, $secondDriverId = null, $startDate = '', $endDate = '',$filters = array() ) {
+	public function fetchSavedJobsNew( $loggedUserId = null, $vehicleId = null, $scopeType = '', $dispatcherId = null, $driverId = null, $secondDriverId = null, $startDate = '', $endDate = '',$filters = array()) {
+
+		// ex($filters);
 		
 		if(count($filters) <= 0){
 			$filters = array("itemsPerPage"=>20, "limitStart"=>1, "sortColumn"=>"DeliveryDate", "sortType"=>"DESC","status"=>"");
@@ -507,11 +506,11 @@ class Job extends Parent_Model {
 
 
 		$data =  $condition = array();
-        $this->db->select('CONCAT( d.first_name ," + " ,team.first_name) AS teamdriverName, 
+        $this->db->select('loads.id,CONCAT( d.first_name ," + " ,team.first_name) AS teamdriverName, 
         					CASE loads.driver_type 
         						WHEN "team" THEN CONCAT(d.first_name," + ",team.first_name) 
         									ELSE concat(d.first_name," ",d.last_name) 
-        									END AS driverName, loads.driver_type, loads.id, loads.invoiceNo, loads.vehicle_id, loads.truckstopID,loads.Bond,loads.PointOfContactPhone,loads.equipment_options,loads.LoadType,loads.PickupDate,loads.DeliveryDate,loads.OriginCity,loads.OriginState,loads.DestinationCity,loads.DestinationState,loads.PickupAddress,loads.DestinationAddress,loads.PaymentAmount,loads.Mileage, (loads.PaymentAmount/loads.Mileage) as rpm, loads.deadmiles,loads.Weight,loads.Length,loads.JobStatus,loads.totalCost,loads.pickDate,loads.load_source,broker_info.TruckCompanyName as companyName');
+        									END AS driverName, loads.driver_type,loads.invoiceNo, loads.vehicle_id, loads.truckstopID,loads.Bond,loads.PointOfContactPhone,loads.equipment_options,loads.LoadType,loads.PickupDate,loads.DeliveryDate,loads.OriginCity,loads.OriginState,loads.DestinationCity,loads.DestinationState,loads.PickupAddress,loads.DestinationAddress,loads.PaymentAmount,loads.Mileage, (loads.PaymentAmount/loads.Mileage) as rpm, loads.deadmiles,loads.Weight,loads.Length,loads.JobStatus,loads.totalCost,loads.pickDate,loads.load_source,broker_info.TruckCompanyName as companyName,loads.created,loads.overallTotalProfit,loads.overallTotalProfitPercent,loads.DeliveryDate,loads.totalCost');
 		
 		$this->db->join("vehicles as v", "loads.vehicle_id = v.id","Left");
 		$this->db->join("drivers as d", "loads.driver_id = d.id","Left");
@@ -568,7 +567,7 @@ class Job extends Parent_Model {
             //$this->db->or_like('LOWER(CONCAT( d.first_name ," + " ,team.first_name))', strtolower($filters['searchQuery']));
             $this->db->group_end();
 		}
-		$filters["limitStart"] = $filters["limitStart"] == 1 ? 0 : $filters["limitStart"];
+		
 	
 		if(isset($filters["sortColumn"]) && $filters["sortColumn"] == "driverName"){
 			$this->db->order_by('CASE 
@@ -585,8 +584,14 @@ class Job extends Parent_Model {
 			$this->db->order_by("loads.".$filters["sortColumn"],$filters["sortType"]);	
 		}
 
-		$this->db->limit($filters["itemsPerPage"],$filters["limitStart"]);
+		//Bypass limit when you want to export saved load as csv
+		if(empty($filters["export"])){
+			$filters["limitStart"] = $filters["limitStart"] == 1 ? 0 : $filters["limitStart"];
+			$this->db->limit($filters["itemsPerPage"],$filters["limitStart"]);
+		}
+
 		$query = $this->db->get('loads');
+
 		if ($query->num_rows() > 0) {
 			return $query->result_array();
 		} else {
@@ -803,6 +808,7 @@ class Job extends Parent_Model {
 		$this->db->where(array('loads.sent_for_payment' => 0, 'loads.delete_status' => 0,'loads.ready_for_invoice' => 0));
 		$this->db->where("(SELECT  count(documents.load_id) as c FROM  documents WHERE  documents.load_id  =  loads.id and documents.doc_type in ('pod','rateSheet') )< 2  ");
 		$query = $this->db->get('loads');
+		//echo $this->db->last_query();die;
 		if ($query->num_rows() > 0) {
 			return $query->row_array()["waitingPaperwork"];
 		} else {

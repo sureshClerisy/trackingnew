@@ -46,9 +46,13 @@ class Loads extends Admin_Controller{
 			}
 		}
 		$newDestlabel = array();
-
-		$startDate = date('Y-m-01');
-		$endDate = date("Y-m-d"); 
+		if(isset($_REQUEST["requestFrom"]) && $_REQUEST["requestFrom"] == "billings"){
+			$startDate = $endDate = "";
+		}else{
+			$startDate = date('Y-m-01');
+			$endDate   = date("Y-m-d"); 	
+		}
+		
 		
 		if(isset($_REQUEST["startDate"]) && $_REQUEST["startDate"] != ""){ $startDate = date("Y-m-d", strtotime($_REQUEST["startDate"])); }
 		if(isset($_REQUEST["endDate"]) && $_REQUEST["endDate"] != ""){ $endDate = date("Y-m-d", strtotime($_REQUEST["endDate"])); }
@@ -154,13 +158,20 @@ class Loads extends Admin_Controller{
 	
 	
 	public function getRecords(){
+		
 		$params = json_decode(file_get_contents('php://input'),true);
-		$total = 0;
-		$jobs = array();
+		$total 	= 0;
+		$jobs 	= array();
+		
+
 		if($params["pageNo"] < 1){
 			$params["limitStart"] = ($params["pageNo"] * $params["itemsPerPage"] + 1);	
 		}else{
 			$params["limitStart"] = ($params["pageNo"] * $params["itemsPerPage"] );	
+		}
+
+		if(isset($params["filterArgs"]["requestFrom"]) && $params["filterArgs"]["requestFrom"] == "billings"){
+			$params["startDate"] = $params["endDate"] = "";
 		}
 
 		if((isset($params["sortColumn"]) && empty($params["sortColumn"])) || !isset($params["sortColumn"])){ $params["sortColumn"] = "DeliveryDate"; }
@@ -175,6 +186,7 @@ class Loads extends Admin_Controller{
 		}
 
 		if(isset($params["filterArgs"]["requestFrom"]) && $params["filterArgs"]["requestFrom"] == "capacity_analysis"){
+
 			if($params["filterArgs"]["filterType"] == "idle"){
 				$params["driverId"] = $params["filterArgs"]["driverId"];
 				$params["secondDriverId"] = $params["filterArgs"]["secondDriverId"];
@@ -193,17 +205,18 @@ class Loads extends Admin_Controller{
 			$jobs = $this->getSingleVehicleLoads($this->userId,array(),"all",false,false,false,$params["startDate"],$params["endDate"],$params); 
 			$total = $this->Job->fetchSavedJobsTotal($this->userId,array(),"all",false,false,false,$params["startDate"],$params["endDate"],$params); 
 		} else if (isset($params["filterArgs"]["userType"]) && ($params["filterArgs"]["userType"] == "driver" || $params["filterArgs"]["userType"] == "team" )){ 
+			
 			$driverInfo = $this->Driver->getInfoByDriverId($params["filterArgs"]["userToken"]);
 			if(isset($driverInfo[0])){
 				$driverInfo = $driverInfo[0];
 			}
-			$gVehicleId = isset($driverInfo["vehicleId"])  ? $driverInfo["vehicleId"] : '';
-			$dispatcherId = isset($driverInfo["dispatcherId"])  ? $driverInfo["dispatcherId"] : '';
-			$secondDriverId = isset($driverInfo["team_driver_id"])  ? $driverInfo["team_driver_id"] : '';
-			$statesAddress = $this->Vehicle->get_vehicles_address($this->userId,$gVehicleId);
-			$driverId = isset($params["filterArgs"]["userToken"]) ? $params["filterArgs"]["userToken"] : false ;
-			$vehicleIdRepeat = $statesAddress[0]['id'];	
-			$results = $this->Vehicle->getLastLoadRecord($statesAddress[0]['id'], $statesAddress[0]['driver_id']);
+			$gVehicleId 		= isset($driverInfo["vehicleId"])  ? $driverInfo["vehicleId"] : '';
+			$dispatcherId 		= isset($driverInfo["dispatcherId"])  ? $driverInfo["dispatcherId"] : '';
+			$secondDriverId 	= isset($driverInfo["team_driver_id"])  ? $driverInfo["team_driver_id"] : '';
+			$statesAddress 		= $this->Vehicle->get_vehicles_address($this->userId,$gVehicleId);
+			$driverId 			= isset($params["filterArgs"]["userToken"]) ? $params["filterArgs"]["userToken"] : false ;
+			$vehicleIdRepeat 	= $statesAddress[0]['id'];	
+			$results 			= $this->Vehicle->getLastLoadRecord($statesAddress[0]['id'], $statesAddress[0]['driver_id']);
 
 			if($params["filterArgs"]["userType"] == "team") {
 				$jobs = $this->getSingleVehicleLoads($this->userId, $vehicleIdRepeat,"team", $dispatcherId, $driverId, $secondDriverId, $params["startDate"],$params["endDate"],$params);	
@@ -212,7 +225,7 @@ class Loads extends Admin_Controller{
 				$jobs = $this->getSingleVehicleLoads($this->userId, $vehicleIdRepeat, "driver", $dispatcherId, $driverId, $secondDriverId, $params["startDate"],$params["endDate"],$params);	
 				$total = $this->Job->fetchSavedJobsTotal($this->userId, $vehicleIdRepeat,"driver", $dispatcherId, $driverId, $secondDriverId, $params["startDate"],$params["endDate"],$params);	
 			}
-		} else if (isset($params["filterArgs"]["userType"]) && $params["filterArgs"]["userType"] == "broker") { 
+		} else if (isset($params["filterArgs"]["userType"]) && $params["filterArgs"]["userType"] == "broker") {
 			$params['dispatcherId']   = $params['filterArgs']['dispatcherId'];
 			$params['driverId']       = $params['filterArgs']['driverId'];
 			$params['secondDriverId'] = $params['filterArgs']['secondDriverId'];
@@ -224,11 +237,21 @@ class Loads extends Admin_Controller{
 			$this->data["total"] = $this->BrokersModel->getBrokerRelatedLoads($params["filterArgs"]["userToken"], $params['startDate'], $params['endDate'], $params, true); 
 			$total = $this->data["total"][0]['count'];
 		} else{
+
 			$jobs = $this->getSingleVehicleLoads($this->userId,array(),"all",false,false,false,$params["startDate"],$params["endDate"],$params); 
 			$total = $this->Job->fetchSavedJobsTotal($this->userId,array(),"all",false,false,false,$params["startDate"],$params["endDate"],$params); 
 		}
-		
+
 		if(!$jobs){$jobs = array();}
+
+		//Export loads to excell file Start
+		if(!empty($params['export'])){
+			$keys 	= [['DATE','CUSTOMER NAME','DRIVERS','INVOICE','CHARGES','PROFIT','%PROFIT','MILES','DEAD MILES','RATE/MILE','DATE P/U','PICK UP','DATE DE','DELIVERY','LOLAD ID','STATUS']];
+			$todayReport = $this->buildExportLoadData($jobs);
+			$data = array_merge($keys,$todayReport);
+			echo json_encode(array('fileName'=>$this->createExcell('loads',$data)));die();
+		}
+		//Export loads to excell file End
 
 		echo json_encode(array("data"=>$jobs,"total"=>$total));
 	}
@@ -248,7 +271,11 @@ class Loads extends Admin_Controller{
 		$filters["sortType"] ="DESC"; 
 		$filters["status"] =""; 
 		$filters["requestFrom"] = 'capacity_analysis';
-		if(isset($filters["filterType"]) && $filters["filterType"] == "withoutTruck"){
+
+		if(isset($filters["filterType"]) && $filters["filterType"] == "trucksWithoutDriver"){
+			$response["driversList"] = $this->Driver->fetchTrucksWithoutDriver($filters);
+			$response["total"] = $this->Driver->fetchTrucksWithoutDriver($filters,true);
+		}else if(isset($filters["filterType"]) && $filters["filterType"] == "withoutTruck"){
 			$response["driversList"] = $this->Driver->fetchDriversWithoutTruck($filters);
 			$response["total"] = $this->Driver->fetchDriversWithoutTruck($filters,true);
 
@@ -265,6 +292,7 @@ class Loads extends Admin_Controller{
 	}
 	public function getDriversInsightsRecords(){
 		$params = json_decode(file_get_contents('php://input'),true);
+
 		$total = 0;
 		$jobs = array();
 		if($params["pageNo"] < 1){
@@ -299,6 +327,118 @@ class Loads extends Admin_Controller{
 			}
 		} 
 		
+		//Export data to excell file START
+		if(!empty($params["export"])){
+			$this->exportData($jobs);//Exporting Data here. Terminate script also
+		}
+		//Export data to excell file END
+
+		if(!$jobs){$jobs = array();}
+
+		echo json_encode(array("data"=>$jobs,"total"=>$total));
+	}
+
+	/**
+	* Method exportData
+	* @param GET Request
+	* @return NULL
+	*/
+	public function exportData($dataArray,$keys=NULL){
+		
+		$defaultKeys=[['DRIVER NAME','TRUCK','DISPATCHER']];
+
+		$exportData =[];
+		if(!$keys){
+			foreach ($dataArray as $key => $value) {
+				$exportData[$key]['driverName'] = $value['driverName'];
+				$exportData[$key]['truckName']  = $value['truckName'];
+				$exportData[$key]['dispatcher'] = $value['dispatcher'];
+			}
+		}else{
+			$defaultKeys = $keys;
+			foreach ($dataArray as $key => $value) {
+				$exportData[$key]['vehicleId'] 	= $value['vehicleId']	;
+				$exportData[$key]['vin']  		= $value['vin'];		
+				$exportData[$key]['model'] 		= $value['model'];
+			}
+		}
+
+		$data 	= array_merge($defaultKeys,$exportData);
+		echo json_encode(array('fileName'=>$this->createExcell('insights',$data)));die();
+	}
+
+	/**
+	* Method truckInsights
+	* @param GET Request
+	* @return JSON
+	* Getting list of trucks with requested params
+	*/
+	public function truckInsights($urlArgs = '') 
+	{
+		$filters = $_REQUEST;
+		$filters["itemsPerPage"] =20; 
+		$filters["limitStart"] =1; 
+		$filters["sortColumn"] ="DeliveryDate"; 
+		$filters["sortType"] ="ASC"; 
+		$filters["status"] =""; 
+		$filters["requestFrom"] = 'capacity_analysis';
+
+		if(isset($filters["filterType"]) && $filters["filterType"] == "trucksWithoutDriver"){
+			$response["trucksList"] = $this->Driver->fetchTrucksWithoutDriver($filters);
+			$response["total"] = $this->Driver->fetchTrucksWithoutDriver($filters,true);
+		}else if(isset($filters["filterType"]) && $filters["filterType"] == "trucksReporting"){
+			$response["trucksList"] = $this->Driver->trucksReporting($filters);
+			$response["total"] = $this->Driver->trucksReporting($filters,true);
+		}
+		
+		$response['filterArgs'] = $filters;
+		$response['filterArgs']["firstParam"] = $urlArgs;
+		echo json_encode($response);
+	}
+
+
+	/**
+	* Method getTruckInsightsRecords
+	* @param POST Request
+	* @return JSON
+	* Getting list of trucks with requested params
+	*/
+	public function getTruckInsightsRecords()
+	{
+		$params = json_decode(file_get_contents('php://input'),true);
+		
+		$total = 0;
+		$jobs = array();
+
+		if($params["pageNo"] < 1){
+			$params["limitStart"] = ($params["pageNo"] * $params["itemsPerPage"] + 1);	
+		}else{
+			$params["limitStart"] = ($params["pageNo"] * $params["itemsPerPage"] );	
+		}
+
+		if((isset($params["sortColumn"]) && empty($params["sortColumn"])) || !isset($params["sortColumn"])){ 
+			$params["sortColumn"] = "DeliveryDate"; 
+		}
+
+		if((isset($params["sortType"]) && empty($params["sortType"])) || !isset($params["sortType"])){ 
+			$params["sortType"] = "ASC"; 
+		}
+
+		if(isset($params["filterArgs"]["filterType"]) && $params["filterArgs"]["filterType"] == "trucksWithoutDriver"){
+			$jobs  	= $this->Driver->fetchTrucksWithoutDriver($params);
+			$total 	= $this->Driver->fetchTrucksWithoutDriver($params,true);
+			$keys 	= [['TRUCK NUMBER','VIN','MODEL']];
+			if(!empty($params["export"])){$this->exportData($jobs,$keys);}
+		}
+
+		if(isset($params["filterArgs"]["filterType"]) && $params["filterArgs"]["filterType"] == "trucksReporting"){
+			$jobs  = $this->Driver->trucksReporting($params);
+			$total = $this->Driver->trucksReporting($params,true);
+
+			if(!empty($params["export"])){$this->exportData($jobs);}
+		}
+		
+
 		if(!$jobs){$jobs = array();}
 
 		echo json_encode(array("data"=>$jobs,"total"=>$total));

@@ -7,9 +7,16 @@ $lang['brokerListingTableRatings'] = 'Ratings';
 $lang['brokerBlackListUpdate'] 	= 'The broker black list status has been updated.';
 $lang['brokerBlackListErrorMsg'] = 'Error! : The broker could not be marked as black list.';
 $lang['brokerUpdatedSuccMsg'] 	= 'Success: The broker details has been updated successfully.';
+$lang['shipperUpdatedSuccMsg'] 	= 'Success: The shipper details has been updated successfully.';
+
 $lang['brokerUpdatedErrMsg'] 	= 'Error: The broker details could not be updated.';
+$lang['shipperUpdatedErrMsg'] 	= 'Error: The shipper details could not be updated.';
+
 $lang['brokerSavedSuccMsg'] 	= 'Success: The broker details has been added successfully.';
+$lang['shipperSavedSuccMsg'] 	= 'Success: The shipper details has been added successfully.';
+
 $lang['brokerSavedErrMsg'] 		= 'Error: The broker details could not be added.';
+$lang['shipperSavedErrMsg'] 	= 'Error: The shipper details could not be added.';
 
 $lang['brokerDeleteSuccMsg'] 	= 'Success: The broker details has been deleted successfully.';
 $lang['shipperDeleteSuccMsg'] 	= 'Success: The shipper details has been deleted successfully.';
@@ -17,6 +24,7 @@ $lang['shipperDeleteSuccMsg'] 	= 'Success: The shipper details has been deleted 
 $lang['brokerDeleteErrMsg'] 	= 'Error! : The broker details could not be deleted.';
 $lang['shipperDeleteErrMsg'] 	= 'Error! : The shipper details could not be deleted.';
 $lang['brokerExistingSuccMsg'] 	= 'Success : The broker details already exist and hence updated.';
+$lang['shipperExistingSuccMsg'] 	= 'Success : The shipper details already exist and hence updated.';
 /** Message for broker Pages Start*/
 
 /** Message for broker Add Start*/

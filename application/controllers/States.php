@@ -64,9 +64,10 @@ class States extends Admin_Controller{
 	public function fetchDataForCsv() {
 		$search = json_decode(file_get_contents('php://input'),true);
 		$result = $this->User->getTableRecord( $search['tableName'],$search['primaryId'] );
-		//~ pr($result);
+		
 		$keys = '';
 		$values = '';
+		
 		foreach( $result as $key => $value ) {
 			$keyvalue = $this->replaceUnderScore( $key );
 			$keys .= $keyvalue.",";

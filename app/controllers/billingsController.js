@@ -279,5 +279,27 @@ app.controller('billingsController', ["dataFactory","$scope","$http","$rootScope
 			
 			$scope.autoFetchLoads = false;
 		});
-	}	 
+	}
+
+	$scope.exportBillingData = function(){
+    	
+    	var searchText = angular.element('input[type="search"]').val();
+
+    	dataFactory.httpRequest(URL+'/billings/fetchDataForCsv','POST',{},{searchText: searchText,InvoiceLoads:$scope.showReadyForInvoiceLoads }).then(function(data){
+			
+			
+			var url = URL+'/assets/ExportExcel/'+data.fileName;
+			var timestamp = Math.floor(Date.now() / 1000);
+			var downloadContainer 	= angular.element('<div data-tap-disabled="true"><a></a></div>');
+			var downloadLink 		= angular.element(downloadContainer.children()[0]);
+			downloadLink.attr('href',url);
+			downloadLink.attr('download', data.fileName);
+			downloadLink.attr('target', '_blank');
+			angular.element('body').append(downloadContainer);
+			$timeout(function () {
+			  downloadLink[0].click();
+			  downloadLink.remove();
+			}, null);
+        });
+    }	 
 }]);
