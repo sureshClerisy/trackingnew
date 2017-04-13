@@ -1,4 +1,4 @@
-app.controller('sendPaymentController', ["dataFactory","$scope","$http","$rootScope", "$state","$location","$cookies","$stateParams", "getSendBillingData","$compile","$filter","$log",'Sample', 'ganttMouseOffset', 'ganttDebounce', 'moment','$q','$window','$sce','$timeout',function(dataFactory,$scope,$http ,$rootScope ,$state, $location ,  $cookies, $stateParams, getSendBillingData , $compile,$filter,$log,utils, Sample, mouseOffset, debounce, moment,$q,$window,$sce,$timeout){
+app.controller('sendDirectPaymentController', ["dataFactory","$scope","$http","$rootScope", "$state","$location","$cookies","$stateParams", "getDirectBillingData","$compile","$filter","$log",'Sample', 'ganttMouseOffset', 'ganttDebounce', 'moment','$q','$window','$sce','$timeout',function(dataFactory,$scope,$http ,$rootScope ,$state, $location ,  $cookies, $stateParams, getDirectBillingData , $compile,$filter,$log,utils, Sample, mouseOffset, debounce, moment,$q,$window,$sce,$timeout){
 	if($rootScope.loggedInUser == false)
 		$location.path('login');
 	
@@ -43,27 +43,21 @@ app.controller('sendPaymentController', ["dataFactory","$scope","$http","$rootSc
 	$scope.deletedRowIndex = '';
 	$scope.idSelection = [];
 	$scope.noRecordFoundMessage = $rootScope.languageArray.noRecordFound;
-	if ( getSendBillingData.billType == 'sendForPayment' ) {
-		$scope.sentPaymentCount = getSendBillingData.sentPaymentCount;
-		$scope.flaggedPaymentCount = getSendBillingData.flaggedPaymentCount;
-		$rootScope.SendLoads = getSendBillingData.loads;
-		var targetVariable = 16;
-		var disableAnotherSorting = 0;
-		angular.forEach($rootScope.SendLoads,function(value,key) {
-			if ( value.flag == 1 ) {
-				$scope.idSelection.push(value.id);
-			}
-		});
-	} else {
-		$rootScope.SendLoads = [];
-		var targetVariable = 8;
-		var disableAnotherSorting = '';
-	}
 
-	$scope.billPaymentMode = getSendBillingData.billPaymentType;
+	$scope.sentPaymentCount = getDirectBillingData.sentPaymentCount;
+	$scope.flaggedPaymentCount = getDirectBillingData.flaggedPaymentCount;
+	$rootScope.SendLoads = getDirectBillingData.loads;
+	var targetVariable = 16;
+	var disableAnotherSorting = 0;
+	angular.forEach($rootScope.SendLoads,function(value,key) {
+		if ( value.flag == 1 ) {
+			$scope.idSelection.push(value.id);
+		}
+	});
+
+	$scope.billPaymentMode = getDirectBillingData.billPaymentType;
+
 	$rootScope.readyToSendPaymentCount = $rootScope.SendLoads.length;	
-	
-	$rootScope.dataTableOpts(20,targetVariable,disableAnotherSorting);	
 	
 	$rootScope.saveTypeLoad = 'sendForPayment';    			// setting the save type for dynamic changing the listing on routes
 	

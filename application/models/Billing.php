@@ -29,7 +29,8 @@ class Billing extends CI_Model {
 		case loads.driver_type
 			when "team" then concat(drivers.first_name," + ",team.first_name,"-",vehicles.label)
 			ELSE concat(drivers.first_name," ",drivers.last_name,"-",vehicles.label)
-		end as driverName,loads.LoadType, loads.PickupDate, loads.PickupAddress, loads.OriginCity, loads.OriginState, loads.DestinationCity, loads.DestinationState, loads.DestinationAddress, loads.PaymentAmount, loads.Mileage, loads.deadmiles, loads.DeliveryDate, loads.JobStatus, loads.truckstopID, loads.id, loads.deadmiles, loads.totalCost, loads.pickDate, loads.invoiceNo, loads.load_source,loads.ready_for_invoice,broker_info.TruckCompanyName,vehicles.id as vehicleID');
+		end as driverName,loads.LoadType, loads.PickupDate, loads.PickupAddress, loads.OriginCity, loads.OriginState, loads.DestinationCity, loads.DestinationState, loads.DestinationAddress, loads.PaymentAmount, loads.Mileage, loads.deadmiles, loads.DeliveryDate, loads.JobStatus, loads.truckstopID, loads.id, loads.deadmiles, loads.totalCost, loads.pickDate, loads.invoiceNo, loads.load_source,loads.ready_for_invoice,broker_info.TruckCompanyName,vehicles.id as vehicleID,loads.created,loads.totalCost,loads.overallTotalProfit,loads.overallTotalProfitPercent,(loads.PaymentAmount/loads.Mileage) as rpm');
+		
 		$this->db->join('broker_info','broker_info.id = loads.broker_id','LEFT');
 		$this->db->join('drivers','drivers.id = loads.driver_id','LEFT');
 		$this->db->join('drivers as team','team.id = loads.second_driver_id','LEFT');
@@ -183,9 +184,8 @@ class Billing extends CI_Model {
 		case loads.driver_type
 			when "team" then concat(drivers.first_name," + ",team.first_name,"-",vehicles.label)
 			ELSE concat(drivers.first_name," ",drivers.last_name,"-",vehicles.label)
-		end as driverName,loads.invoiceNo,loads.totalCost,loads.overallTotalProfit,loads.overallTotalProfitPercent,loads.Mileage,loads.deadmiles, (loads.PaymentAmount/loads.Mileage) as rpm,DATE_FORMAT(loads.pickDate,"%m/%d") as lp,concat(loads.OriginCity," ,",loads.OriginState) as pickup,DATE_FORMAT(loads.DeliveryDate,"%m/%d") as ld,concat(loads.DestinationCity," ,",loads.DestinationState) as delivery,loads.id,loads.JobStatus'.$ohterColumns);
-
-	
+		end as driverName,
+		loads.invoiceNo,loads.totalCost,loads.overallTotalProfit,loads.overallTotalProfitPercent,loads.Mileage,loads.deadmiles, (loads.PaymentAmount/loads.Mileage) as rpm,DATE_FORMAT(loads.pickDate,"%m/%d") as lp,concat(loads.OriginCity," ,",loads.OriginState) as pickup,DATE_FORMAT(loads.DeliveryDate,"%m/%d") as ld,concat(loads.DestinationCity," ,",loads.DestinationState) as delivery,loads.id,loads.JobStatus'.$ohterColumns);
 
 		$this->db->join('broker_info','broker_info.id = loads.broker_id','LEFT');
 		$this->db->join('drivers','drivers.id = loads.driver_id','LEFT');
@@ -346,7 +346,7 @@ class Billing extends CI_Model {
 	 * Fetching loads having invoice generated
 	 */
 	
-	public function fetchLoadsForPayment() {
+	public function fetchLoadsForPayment($type = '') {
 		$inarray = $this->db->distinct()->select('documents.load_id')->where('doc_type','invoice')->get('documents')->result_array();
 		$in_aray = array('');
 		if ( !empty($inarray) ) {
@@ -359,10 +359,17 @@ class Billing extends CI_Model {
 		$this->db->select('loads.PickupDate,loads.PickupAddress,loads.OriginCity,loads.OriginState,loads.OriginCountry,loads.DestinationAddress,loads.DestinationCity,loads.DestinationState,loads.DestinationCountry,loads.PaymentAmount,loads.truckstopID,loads.id,loads.flag,concat(drivers.first_name," ",drivers.last_name,"-",vehicles.label) as driverName,drivers.profile_image,vehicles.id as vehicleID,drivers.first_name,drivers.last_name,drivers.color');
 		$this->db->join('drivers','drivers.id = loads.driver_id','LEFT');
 		$this->db->join('vehicles','vehicles.id = loads.vehicle_id','LEFT');
+
+		if ( $type == 'shipper' )
+			$this->db->where('loads.billType', $type);
+		else
+			$this->db->where('loads.billType !=', 'shipper');
+
 		$this->db->where_in('loads.id', $in_aray);
 		$this->db->where(array('loads.sent_for_payment' => 0, 'loads.delete_status' => 0));
 		$this->db->order_by('loads.invoicedDate','DESC');
 		$result = $this->db->get('loads');
+
 		if ( $result->num_rows() > 0 ) {
 			return $result->result_array();
 		} else {
@@ -374,8 +381,12 @@ class Billing extends CI_Model {
 	 * Fetching loads already sent count
 	 */
 	
-	public function sentPaymentCount() {
+	public function sentPaymentCount($type = '') {
 		$this->db->where(array('loads.sent_for_payment' => 1, 'loads.delete_status' => 0));
+		if ( $type == 'shipper' )
+			$this->db->where('loads.billType', $type);
+		else
+			$this->db->where('loads.billType !=', 'shipper');
 		$num_rows = $this->db->count_all_results('loads');
 		return $num_rows;
 	}
@@ -384,8 +395,13 @@ class Billing extends CI_Model {
 	 * Fetching flagged loads count
 	 */
 	 
-	public function flaggedPaymentCount() {
+	public function flaggedPaymentCount($type = '') {
 		$where = array('loads.flag' => 1, 'loads.sent_for_payment' => 0, 'loads.delete_status' => 0 );
+		if ( $type == 'shipper' )
+			$this->db->where('loads.billType', $type);
+		else
+			$this->db->where('loads.billType !=', 'shipper');
+
 		$this->db->where($where);
 		$num_rows = $this->db->count_all_results('loads');
 		return $num_rows;
@@ -395,10 +411,15 @@ class Billing extends CI_Model {
 	 * Fetching loads already sent for payment
 	 */
 	 
-	public function fetchSentPaymentLoads() {
+	public function fetchSentPaymentLoads($type = '') {
 		$this->db->select('loads.PickupDate,loads.PickupAddress,loads.OriginCity,loads.OriginState,loads.OriginCountry,loads.DestinationAddress,loads.DestinationCity,loads.DestinationState,loads.DestinationCountry,loads.PaymentAmount,loads.truckstopID,loads.id,loads.flag,loads.sent_for_payment,concat(drivers.first_name," ",drivers.last_name,"-",vehicles.label) as driverName,drivers.profile_image,vehicles.id as vehicleID,drivers.first_name,drivers.last_name,drivers.color');
 		$this->db->join('drivers','drivers.id = loads.driver_id','LEFT');
 		$this->db->join('vehicles','vehicles.id = loads.vehicle_id','LEFT');
+		if ( $type == 'shipper' )
+			$this->db->where('loads.billType', $type);
+		else
+			$this->db->where('loads.billType !=', 'shipper');
+		
 		$this->db->where(array('loads.sent_for_payment' => 1, 'loads.delete_status' => 0 ));
 		$this->db->order_by('loads.invoicedDate','DESC');
 		$result = $this->db->get('loads');
@@ -413,10 +434,15 @@ class Billing extends CI_Model {
 	 * Fetching loads whose flagged is set for payment
 	 */
 	 
-	public function fetchFlaggedPaymentLoads() {
+	public function fetchFlaggedPaymentLoads($type = '') {
 		$this->db->select('loads.PickupDate,loads.PickupAddress,loads.OriginCity,loads.OriginState,loads.OriginCountry,loads.DestinationAddress,loads.DestinationCity,loads.DestinationState,loads.DestinationCountry,loads.PaymentAmount,loads.truckstopID,loads.id,loads.flag,concat(drivers.first_name," ",drivers.last_name,"-",vehicles.label) as driverName,drivers.profile_image,vehicles.id as vehicleID,drivers.first_name,drivers.last_name,drivers.color');
 		$this->db->join('drivers','drivers.id = loads.driver_id','LEFT');
 		$this->db->join('vehicles','vehicles.id = loads.vehicle_id','LEFT');
+		if ( $type == 'shipper' )
+			$this->db->where('loads.billType', $type);
+		else
+			$this->db->where('loads.billType !=', 'shipper');
+		
 		$where = array('loads.flag' => 1, 'loads.sent_for_payment' => 0, 'loads.delete_status' => 0 );
 		$this->db->where($where);
 		$this->db->order_by('loads.invoicedDate','DESC');

@@ -253,6 +253,23 @@ class Shippers extends Admin_Controller {
 
 	public function getshipperListById($shipperId = null ) {
 		$result['shipperData'] = $this->Shipper->getshippersById($shipperId);
+		$resultNew = $this->Shipper->fetchContractDocuments($shipperId, 'shipper');
+		if ( !empty($resultNew) ) {
+			for( $i = 0; $i < count($resultNew); $i++ ) {
+				$fileNameArray = explode('.',$resultNew[$i]['document_name']);
+				$fileName = '';
+				for ( $j = 0; $j < count($fileNameArray) - 1; $j++ ) {
+					$fileName .= $fileNameArray[$j];
+				}
+				$fileName = 'thumb_'.$fileName.'.jpg';
+				
+				$result['brokerDocuments'][$i]['doc_name'] = $resultNew[$i]['document_name'];
+				$result['brokerDocuments'][$i]['thumb_doc_name'] = $fileName;
+				$result['brokerDocuments'][$i]['id'] = $resultNew[$i]['id'];
+				$result['brokerDocuments'][$i]['BrokerId'] = $shipperId;
+				$result['brokerDocuments'][$i]['billType'] = 'shipper';
+			}
+		}
 		echo json_encode($result);
 	}
 }

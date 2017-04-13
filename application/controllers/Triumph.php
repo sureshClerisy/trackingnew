@@ -193,6 +193,7 @@ class Triumph extends Admin_Controller {
 					$this->data['brokerDocuments'][$i]['thumb_doc_name'] = $fileName;
 					$this->data['brokerDocuments'][$i]['id'] = $result[$i]['id'];
 					$this->data['brokerDocuments'][$i]['BrokerId'] = $brokerDetail['id'];
+					$this->data['brokerDocuments'][$i]['billType'] = 'broker';
 				}
 			}
 		}

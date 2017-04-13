@@ -249,7 +249,9 @@ class Assignedloads extends Admin_Controller{
 		$data = array();
 		$extraStopsArray = array();
 		$docPrimaryId = '';
-		$data['jobRecord'] = $this->Job->FetchSingleJobForInvoice($loadId);
+		$checkBillType = $this->Job->fetchLoadBillType($loadId);
+		$checkBillType = (isset($checkBillType) && $checkBillType != '' ) ? $checkBillType : 'broker';
+		$data['jobRecord'] = $this->Job->FetchSingleJobForInvoice($loadId, $checkBillType);
 		$documents = $this->Billing->fetchDocToBundle($loadId);
 		
 		if ( isset($data['jobRecord']['Stops']) && $data['jobRecord']['Stops'] > 0 ) 
@@ -258,7 +260,6 @@ class Assignedloads extends Admin_Controller{
 		$data['extraStops'] = $extraStopsArray;
 		$cookieVariable = get_cookie('setLanguageGlobalVariable');
 		$this->lang->load('loads',$cookieVariable);
-		
 		
 		if ( empty($documents) || count($documents) < 2 ) {
 			$errorMessage = $this->lang->line('errRateOrPod');
@@ -577,7 +578,7 @@ class Assignedloads extends Admin_Controller{
 	 * Fetching Broker list on add load
 	 */
 
-	public function getBrokersList( $loadId = null ) {
+	public function getBrokersList( $loadId = null, $type = '' ) {
 		$this->load->model('Shipper');
 
 		$brokersData = $this->BrokersModel->getBrokersList();
@@ -590,7 +591,7 @@ class Assignedloads extends Admin_Controller{
 		if ( !empty($brokersData) ) 
 			$this->data['brokersList'] = $brokersData;
 
-		$getBrokerLoad = $this->BrokersModel->getBrokerDetail( $loadId );
+		$getBrokerLoad = $this->BrokersModel->getBrokerDetail( $loadId, $type );
 		$this->data['brokerLoadDetail'] = $getBrokerLoad;
 		echo json_encode($this->data);
 	} 

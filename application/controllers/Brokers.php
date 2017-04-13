@@ -226,8 +226,8 @@ class Brokers extends Admin_Controller {
 	 * Fetching broker uploaded document on job ticket
 	 */ 
 	
-	public function getBrokerDocumentUploaded( $brokerId = null ) {
-		$result = $this->BrokersModel->fetchContractDocuments($brokerId, 'broker');
+	public function getBrokerShipperDocumentUploaded( $brokerId = null, $type = '' ) {
+		$result = $this->BrokersModel->fetchContractDocuments($brokerId, $type);
 		if ( !empty($result) ) {
 			for( $i = 0; $i < count($result); $i++ ) {
 				$fileNameArray = explode('.',$result[$i]['document_name']);
@@ -241,6 +241,7 @@ class Brokers extends Admin_Controller {
 				$this->data['brokerDocuments'][$i]['thumb_doc_name'] = $fileName;
 				$this->data['brokerDocuments'][$i]['id'] = $result[$i]['id'];
 				$this->data['brokerDocuments'][$i]['BrokerId'] = $brokerId;
+				$this->data['brokerDocuments'][$i]['billType'] = $type;
 			}
 		}
 		echo json_encode($this->data);

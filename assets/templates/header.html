@@ -174,14 +174,17 @@
 							<div ng-class="{'lang-prb-solv':setClassInModel == true}" class="load-popup-tab">
 								
 								<ul class="load-popup-tab-list">
+
 									<li ng-class="showAddhighlighted == 'loadDetail' ? 'active' : ''" >
 										<a href="javascript:void(0)" ng-click="showAddLoadDetails(saveAddPrimaryId)" >{{ languageCommonVariables.popuploaddetails }}</a>
 									</li>
+
 									<li ng-class="showAddhighlighted == 'brokerDetails' ? 'active' : ''" >
 										<a href="javascript:void(0)" ng-click="showAddBrokerInfo(saveAddPrimaryId)" >
-										<i class="fa fa-thumbs-up broker-status"  style="color: #6ba900;" ng-if="editBrokerLoadInfo.brokerStatus == 'Approved'"></i>
-										<i class="fa fa-thumbs-down broker-status" style="color: #ff0000;" ng-if="editBrokerLoadInfo.brokerStatus == 'Not Approved' || editBrokerLoadInfo.brokerStatus == 'Not Available' || editBrokerLoadInfo.brokerStatus == 'Declined Credit'"></i>
-										{{ languageCommonVariables.popupbroker }}</a>
+										<i class="fa fa-thumbs-up broker-status"  style="color: #6ba900;" ng-if="editBrokerLoadInfo.brokerStatus == 'Approved' && mctrl.showSelectedShipOrBrok == 'broker'"></i>
+										<i class="fa fa-thumbs-down broker-status" style="color: #ff0000;" ng-if="(editBrokerLoadInfo.brokerStatus == 'Not Approved' || editBrokerLoadInfo.brokerStatus == 'Not Available' || editBrokerLoadInfo.brokerStatus == 'Declined Credit') && mctrl.showSelectedShipOrBrok == 'broker'"></i>
+										{{ (mctrl.showSelectedShipOrBrok == 'broker' || mctrl.showSelectedShipOrBrok == '' || mctrl.showSelectedShipOrBrok == 'undefined') ? languageCommonVariables.popupbroker : 'Shipper'}}
+										</a>
 									</li>
 									<li ng-class="showAddhighlighted == 'matchTruck' ? 'active' : ''">
 										<a href="javascript:void(0)" ng-click="fetchMatchingTruck( '',saveAddPrimaryId,editSavedLoad.vehicle_id,'addRequest' )">
@@ -456,7 +459,7 @@
 
 					<!-- end of load detail -->
 		
-							<div class="col-xs-12 popup-input-edit-fields">
+						<div class="col-xs-12 popup-input-edit-fields">
 									<div class="row row-float shipper-start bg-blue"> 
 										<div class="table-input-head">
 											<h1>Origin Detail</h1>
@@ -555,7 +558,7 @@
 																																	
 										</div>										
 									</div>
-								<div class="row bg-orange shipper-start-new" ng-show="extraStopTotLength == true">
+							<div class="row bg-orange shipper-start-new" ng-show="extraStopTotLength == true">
 
 									
 
@@ -656,102 +659,102 @@
 									
 
 									
+							</div>
+								
+							<div class="row consignee-start"> 
+
+								<div class="table-input-head">
+									<h1>DESTINATION</h1>										
+								</div>
+
+								<div class="col-sm-4 col-md-4 popup-input-edit-grid pad-remove-left">
+									<div class="form-group form-group-default th-select new-select-th">
+										<label>Entity</label>
+										<ui-select ng-disabled="disableTemp" name="consignee_entity" ng-model="editSavedLoad.consignee_entity" theme="bootstrap" on-select="onSelectChangeEntityCallback($item, $model,'consignee')">
+											<ui-select-match class="ui-select-match" placeholder="Select Entity">{{consigneeentity | capitalize}}</ui-select-match>
+											<ui-select-choices class="ui-select-choices" repeat="item in entityType | filter: $select.search">
+												<span ng-bind-html="trustAsHtml((item.val | highlight: $select.search))"></span>
+											</ui-select-choices>
+										</ui-select>
+									</div>
+								</div>									
+								<div class="col-sm-4 col-md-4 popup-input-edit-grid">
+									<div class=" dat-sec-1 form-group form-group-default">
+										<label>{{ languageCommonVariables.name }}</label>
+										<input type="text" name="consignee_names" ng-model="editSavedLoad.consignee_name" class="form-control"  />
+									</div>
+								</div>	
+								<div class="col-sm-4 col-md-4 popup-input-edit-grid pad-remove-right">
+									<div class=" dat-sec-1 form-group form-group-default">
+										<label>{{ languageCommonVariables.telephone }}</label>
+										<input type="text" ng-disabled="disableTemp" name="consignee_phone" ui-jq="mask" ui-options="'(999) 999-9999'" ng-model="editSavedLoad.consignee_phone"  class="form-control" />
+									</div>
+								</div>	
+																	
+								<div class="col-md-6 popup-input-edit-grid pickup-time-date pad-remove-left" >
+									<div class="half-width-input weight-input weight-a weight-add-on">
+										<div class="dat-sec-1 form-group form-group-default">
+											<label>{{ languageCommonVariables.popupdelivery}} {{ languageCommonVariables.date }}</label>
+											<div class="input-group date" ui-jq="datepicker" ui-options='{format: "yyyy-mm-dd",autoclose: true}'>
+												<input ng-click="refreshDatepicker($event)"  ng-disabled="disableTemp" class="form-control" type="text" name="delivery_date" value="{{editSavedLoad.DeliveryDate}}" ng-model="editSavedLoad.DeliveryDate" ng-change="onPickupDateChange(editSavedLoad.DeliveryDate,'delivery')" /><span class="input-group-addon align-icon"><i class="fa fa-calendar"></i></span>
+											</div>
+										</div>
+										<div class=" dat-sec-2 form-group form-group-default date ">
+											<div class="time-range">
+												<label>{{ languageCommonVariables.popupdelivery }} {{ languageCommonVariables.time }}</label>
+												<input ng-click="refreshTimepicker($event)" ng-disabled="disableTemp"  autocomplete = "off" type="text" id="timepickerDestin" name="pickup_time" class="form-control " ng-model="tempstorage.deliveryTT"  timepicker/>
+											</div>
+											<div class="time-range">
+												<label>&nbsp;</label>
+												<input ng-click="refreshTimepicker($event)" ng-disabled="disableTemp" autocomplete = "off" type="text" id="timepickerDestin_range_end" name="pickup_date_range_end" class="form-control " ng-model="tempstorage.deliveryTT_range_end"  timepicker/>
+											</div>
+										</div>
+									</div>
 								</div>
 								
-								<div class="row consignee-start"> 
-
-									<div class="table-input-head">
-										<h1>DESTINATION</h1>										
+								<div class="col-md-6 popup-input-edit-grid bg-red-last pad-remove-right">
+									<div class="col-md-12">
+										<div class="half-width-input weight-input input-address">									
+											<div class="form-group form-group-default noBackground destination_add">
+												<label>{{ languageCommonVariables.destination }} {{ languageCommonVariables.address }}</label>
+												<input type="text" ng-disabled="disablePerm" id="autoCompleteDestAddress" class="form-control" ng-model="editSavedLoad.DestinationAddress" name="destination_address" />
+											</div>
+										</div>											
 									</div>
-
-									<div class="col-sm-4 col-md-4 popup-input-edit-grid pad-remove-left">
-										<div class="form-group form-group-default th-select new-select-th">
-											<label>Entity</label>
-											<ui-select ng-disabled="disableTemp" name="consignee_entity" ng-model="editSavedLoad.consignee_entity" theme="bootstrap" on-select="onSelectChangeEntityCallback($item, $model,'consignee')">
-												<ui-select-match class="ui-select-match" placeholder="Select Entity">{{consigneeentity | capitalize}}</ui-select-match>
-												<ui-select-choices class="ui-select-choices" repeat="item in entityType | filter: $select.search">
-													<span ng-bind-html="trustAsHtml((item.val | highlight: $select.search))"></span>
-												</ui-select-choices>
-											</ui-select>
+								</div>
+								<div class="col-xs-12 no-padding">
+									<div class="col-md-3 popup-input-edit-grid pad-remove-left">
+										<div class="form-group form-group-default noBackground">
+											<label>City</label>
+											<input type="text" class="form-control" ng-disabled="disablePerm" id="DestinationCity" ng-blur="changeAddMilesDistance('origin')" ng-model="editSavedLoad.DestinationCity" name="destinationCity" />
 										</div>
-									</div>									
-									<div class="col-sm-4 col-md-4 popup-input-edit-grid">
-										<div class=" dat-sec-1 form-group form-group-default">
-											<label>{{ languageCommonVariables.name }}</label>
-											<input type="text" name="consignee_names" ng-model="editSavedLoad.consignee_name" class="form-control"  />
+									</div>
+									<div class="col-md-3 popup-input-edit-grid">
+										<div class="form-group form-group-default noBackground">
+											<label>State</label>
+											<input type="text" class="form-control" ng-disabled="disablePerm" id="DestinationState" ng-blur="changeAddMilesDistance('origin')" ng-model="editSavedLoad.DestinationState" name="DestinationState" />
 										</div>
-									</div>	
-									<div class="col-sm-4 col-md-4 popup-input-edit-grid pad-remove-right">
-										<div class=" dat-sec-1 form-group form-group-default">
-											<label>{{ languageCommonVariables.telephone }}</label>
-											<input type="text" ng-disabled="disableTemp" name="consignee_phone" ui-jq="mask" ui-options="'(999) 999-9999'" ng-model="editSavedLoad.consignee_phone"  class="form-control" />
+									</div>
+									<div class="col-md-3 popup-input-edit-grid">
+										<div class="form-group form-group-default">
+											<label>Zip Code</label>
+											<input type="text" name="destinationZip" ng-disabled="disablePerm" class="form-control" ng-model="editSavedLoad.DestinationZip" />
 										</div>
-									</div>	
-																		
-									<div class="col-md-6 popup-input-edit-grid pickup-time-date pad-remove-left" >
-										<div class="half-width-input weight-input weight-a weight-add-on">
-											<div class="dat-sec-1 form-group form-group-default">
-												<label>{{ languageCommonVariables.popupdelivery}} {{ languageCommonVariables.date }}</label>
-												<div class="input-group date" ui-jq="datepicker" ui-options='{format: "yyyy-mm-dd",autoclose: true}'>
-													<input ng-click="refreshDatepicker($event)"  ng-disabled="disableTemp" class="form-control" type="text" name="delivery_date" value="{{editSavedLoad.DeliveryDate}}" ng-model="editSavedLoad.DeliveryDate" ng-change="onPickupDateChange(editSavedLoad.DeliveryDate,'delivery')" /><span class="input-group-addon align-icon"><i class="fa fa-calendar"></i></span>
-												</div>
-											</div>
-											<div class=" dat-sec-2 form-group form-group-default date ">
-												<div class="time-range">
-													<label>{{ languageCommonVariables.popupdelivery }} {{ languageCommonVariables.time }}</label>
-													<input ng-click="refreshTimepicker($event)" ng-disabled="disableTemp"  autocomplete = "off" type="text" id="timepickerDestin" name="pickup_time" class="form-control " ng-model="tempstorage.deliveryTT"  timepicker/>
-												</div>
-												<div class="time-range">
-													<label>&nbsp;</label>
-													<input ng-click="refreshTimepicker($event)" ng-disabled="disableTemp" autocomplete = "off" type="text" id="timepickerDestin_range_end" name="pickup_date_range_end" class="form-control " ng-model="tempstorage.deliveryTT_range_end"  timepicker/>
-												</div>
-											</div>
+									</div>
+									<div class="col-md-3 popup-input-edit-grid pad-remove-right">
+										<div class="form-group form-group-default noBackground">
+											<label>Country</label>
+											<input type="text" class="form-control" ng-disabled="disablePerm" id="DestinationCountry" ng-blur="changeAddMilesDistance('origin')" ng-model="editSavedLoad.DestinationCountry" name="DestinationCountry" />
 										</div>
 									</div>
 									
-									<div class="col-md-6 popup-input-edit-grid bg-red-last pad-remove-right">
-										<div class="col-md-12">
-											<div class="half-width-input weight-input input-address">									
-												<div class="form-group form-group-default noBackground destination_add">
-													<label>{{ languageCommonVariables.destination }} {{ languageCommonVariables.address }}</label>
-													<input type="text" ng-disabled="disablePerm" id="autoCompleteDestAddress" class="form-control" ng-model="editSavedLoad.DestinationAddress" name="destination_address" />
-												</div>
-											</div>											
-										</div>
-									</div>
-									<div class="col-xs-12 no-padding">
-										<div class="col-md-3 popup-input-edit-grid pad-remove-left">
-											<div class="form-group form-group-default noBackground">
-												<label>City</label>
-												<input type="text" class="form-control" ng-disabled="disablePerm" id="DestinationCity" ng-blur="changeAddMilesDistance('origin')" ng-model="editSavedLoad.DestinationCity" name="destinationCity" />
-											</div>
-										</div>
-										<div class="col-md-3 popup-input-edit-grid">
-											<div class="form-group form-group-default noBackground">
-												<label>State</label>
-												<input type="text" class="form-control" ng-disabled="disablePerm" id="DestinationState" ng-blur="changeAddMilesDistance('origin')" ng-model="editSavedLoad.DestinationState" name="DestinationState" />
-											</div>
-										</div>
-										<div class="col-md-3 popup-input-edit-grid">
-											<div class="form-group form-group-default">
-												<label>Zip Code</label>
-												<input type="text" name="destinationZip" ng-disabled="disablePerm" class="form-control" ng-model="editSavedLoad.DestinationZip" />
-											</div>
-										</div>
-										<div class="col-md-3 popup-input-edit-grid pad-remove-right">
-											<div class="form-group form-group-default noBackground">
-												<label>Country</label>
-												<input type="text" class="form-control" ng-disabled="disablePerm" id="DestinationCountry" ng-blur="changeAddMilesDistance('origin')" ng-model="editSavedLoad.DestinationCountry" name="DestinationCountry" />
-											</div>
-										</div>
-										
-									</div>
 								</div>
+							</div>
 								
 								<input ng-model="primaryLoadId" type="hidden" name="id" class="form-control" />
 								<input type ="hidden" name = "bond" ng-model="editSavedLoad.Bond" />
 									
-								<div class="load-det-main">	
+							<div class="load-det-main">	
 								<div class="table-input-head">
 									<h1 class="ng-binding">lOAD DETAILS</h1>
 								</div>
@@ -860,7 +863,7 @@
 										</div>
 									</div>
 								</div>
-						</div>
+							</div>
 						</div>
 
 					<!-- end of input fields -->
@@ -881,33 +884,30 @@
 					
 					<div class="popup-inner-content-main" ng-show="showAddhighlighted == 'brokerDetails'">
 				
-					<div class="row">
-						<div class="col-sm-5 col-md-5">
-							<div class="form-group form-group-default th-select broker-detail-dropdown">
-								<label>Select Broker</label>								
-								<ui-select ng-model="brokerSelectedId" theme="bootstrap" on-select="onSelectChangeBrokerCallback($item, $model, 'addRequest')" ng-disabled="mctrl.disabledBrokerDropDown == true">
-									<ui-select-match class="ui-select-match" placeholder="Select Broker">{{selectedBrokerName}}</ui-select-match>
-									<ui-select-choices class="ui-select-choices" repeat="item in brokersList | filter: $select.search">
-										<span ng-bind-html="trustAsHtml((item.TruckCompanyName | highlight: $select.search))"></span>
-									</ui-select-choices>
-								</ui-select>
+						<div class="row-fmain-1">
+							<div class="half-block-main">
+								<div class="form-group form-group-default th-select broker-detail-dropdown">
+									<label>Select Broker</label>								
+									<ui-select ng-model="brokerSelectedId" theme="bootstrap" on-select="onSelectChangeBrokerCallback($item, $model, 'addRequest')" >
+										<ui-select-match class="ui-select-match" placeholder="Select Broker">{{selectedBrokerName}}</ui-select-match>
+										<ui-select-choices class="ui-select-choices" repeat="item in brokersList | filter: $select.search">
+											<span ng-bind-html="trustAsHtml((item.TruckCompanyName | highlight: $select.search))"></span>
+										</ui-select-choices>
+									</ui-select>
+								</div>
+							</div>
+							<div class="half-block-main">
+								<div class="form-group form-group-default th-select broker-detail-dropdown">
+									<label>Select Shipper</label>								
+									<ui-select ng-model="shipperSelectedId" theme="bootstrap" on-select="mctrl.onSelectChangeShipperCallback($item, $model, 'addRequest')" >
+										<ui-select-match class="ui-select-match" placeholder="Select Shipper">{{mctrl.selectedShipperName}}</ui-select-match>
+										<ui-select-choices class="ui-select-choices" repeat="item in mctrl.shippersList | filter: $select.search">
+											<span ng-bind-html="trustAsHtml((item.shipperCompanyName | highlight: $select.search))"></span>
+										</ui-select-choices>
+									</ui-select>
+								</div>
 							</div>
 						</div>
-						<div class="col-sm-2 col md-2">
-
-						</div>
-						<div class="col-sm-5 col-md-5">
-							<div class="form-group form-group-default th-select broker-detail-dropdown">
-								<label>Select Shipper</label>								
-								<ui-select ng-model="shipperSelectedId" theme="bootstrap" on-select="mctrl.onSelectChangeShipperCallback($item, $model, 'addRequest')" ng-disabled="mctrl.disabledShipperDropDown == true">
-									<ui-select-match class="ui-select-match" placeholder="Select Shipper">{{mctrl.selectedShipperName}}</ui-select-match>
-									<ui-select-choices class="ui-select-choices" repeat="item in mctrl.shippersList | filter: $select.search">
-										<span ng-bind-html="trustAsHtml((item.shipperCompanyName | highlight: $select.search))"></span>
-									</ui-select-choices>
-								</ui-select>
-							</div>
-						</div>
-					</div>
 								
 						
 							
@@ -916,11 +916,11 @@
 								<div class="">
 									<div class="company-detail-popup-heading">
 										<h4>{{ editBrokerLoadInfo.TruckCompanyName }}
-											<span ng-if="showBrokerStatus != 'undefined' && showBrokerStatus != ''" ng-class="editBrokerLoadInfo.brokerStatus == 'Approved' ? 'green-color' : 'red-color'">({{ showBrokerStatus }})</span>
+											<span ng-if="showBrokerStatus != 'undefined' && showBrokerStatus != '' && editBrokerLoadInfo.billType != 'shipper'" ng-class="editBrokerLoadInfo.brokerStatus == 'Approved' ? 'green-color' : 'red-color'">({{ showBrokerStatus }})</span>
 										</h4>
 										<div class="save-cancel" ng-show="add_broker_div == true">
 										
-											<button style="float: right" ng-click="uploadBrokerDocument(saveAddPrimaryId,editSavedLoad.broker_id)" ng-if="showUploadBrokerButton == true" class="ratesheet-tripDetail btn btn-success btn-cons m-b-10" type="button"><i class="fa fa-cloud-upload"></i> <span class="bold">Upload Document</span>
+											<button style="float: right" ng-click="mctrl.uploadBrokerDocument(saveAddPrimaryId,editSavedLoad.broker_id)" ng-if="mctrl.showUploadBrokerButton == true" class="ratesheet-tripDetail btn btn-success btn-cons m-b-10" type="button"><i class="fa fa-cloud-upload"></i> <span class="bold">Upload Document</span>
 											</button>
 										
 											<button ng-click="saveBrokerShipper(saveAddPrimaryId,'broker')" ng-disabled="addBrokerLoad.$invalid" class="btn btn-primary btn-cons m-b-10" type="button"><i class="pg-form"></i> <span class="bold">Save</span>
@@ -953,7 +953,6 @@
 												</figure>
 												<div class="amount-section-text">
 													<p>{{ languageCommonVariables.handle }}</p>
-													<!-- <a> {{editBrokerLoadInfo.PointOfContact}}</a>  -->
 													<div class="form-group form-group-default">
 														<input class="form-control" type="text" ng-model="editBrokerLoadInfo.PointOfContact">
 													</div>
@@ -1019,17 +1018,6 @@
 												</div>
 											</div>
 										</div>
-										<!--div class="col-sm-4 col-md-4">
-											<div class="amount-section-grid amount-section-grid3">
-												<figure>
-													<img src="./pages/img/adrdress-icon-company.png">
-												</figure>
-												<div class="amount-section-text">
-													<p>{{ languageCommonVariables.address }}</p>
-													<a> {{ editBrokerLoadInfo.postingAddress }} </a>
-												</div>
-											</div>
-										</div-->
 									</div>
 								</div>
 
@@ -1070,7 +1058,7 @@
 							</div>
 					
 					
-					<div class="col-xs-12 company-autority-section comp-authority-new">
+					<div class="col-xs-12 company-autority-section comp-authority-new" ng-if="editBrokerLoadInfo.billType != 'shipper'">
 								<div class="table-input-head black-bg">
 									<h1>{{ languageCommonVariables.authority }}</h1>
 								</div>
@@ -1103,7 +1091,7 @@
 					</form>
 					
 					<!-- START PANEL -->
-						<div class="drop-panel dropzone-padding" ng-show="uploadBrokerDoc == true" >
+						<div class="drop-panel dropzone-padding" ng-show="mctrl.uploadBrokerDoc == true" >
 							<div class="panel-body no-scroll no-padding">
 								<form class="dropzone" id="docsDropzoneBroker" method="post" enctype="multipart/form-data" ng-dropzone dropzone="dropzone" dropzone-config="dropzoneConfigBrokerDoc">
 									<input name="file" type="file" multiple />
@@ -1115,15 +1103,15 @@
 					   <section class="truck-load-pdf-adjust-width" ng-repeat="brokerDoc in brokerDocuments">
 							<div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 truck-load-pdf-left">
 								<div class="row">
-									<div class="pdf-cover" data-id="{{brokerDoc.id}}" data-loadid="{{brokerDoc.load_id}}" data-url="assets/uploads/documents/broker/{{brokerDoc.doc_name}}" ng-click="perviewDoc($event)">
-										<img ng-class="{'text-success': docs.thumb.includes('.doc') > -1}" ng-src="assets/uploads/documents/thumb_broker/{{brokerDoc.thumb_doc_name}}" fallback-src="pages/img/pdf.png" />
+									<div class="pdf-cover" data-id="{{brokerDoc.id}}" data-loadid="{{brokerDoc.load_id}}" data-url="assets/uploads/documents/{{brokerDoc.billType}}/{{brokerDoc.doc_name}}" ng-click="perviewDoc($event)">
+										<img ng-class="{'text-success': docs.thumb.includes('.doc') > -1}" ng-src="assets/uploads/documents/thumb_{{brokerDoc.billType}}/{{brokerDoc.thumb_doc_name}}" fallback-src="pages/img/pdf.png" />
 									</div>
 								</div>
 							</div>
 							<div class="col-xs-12 col-sm-9 col-md-9 col-lg-9 truck-load-pdf-right">
 								<p>{{brokerDoc.doc_name}}</p>
-								<a target="_blank" href="assets/uploads/documents/broker/{{brokerDoc.doc_name}}" class="gray"><img src="./pages/img/image-aroow-down.png">{{ languageCommonVariables.downloadbutton }}</a>
-								<a href="" class="dark-gray" ng-click="deleteDoc(brokerDoc.id, brokerDoc.doc_name,'0','broker',brokerDoc.BrokerId)"><img src="./pages/img/upload-cross.png">{{ languageCommonVariables.deletebutton }}</a>
+								<a target="_blank" href="assets/uploads/documents/{{brokerDoc.billType}}/{{brokerDoc.doc_name}}" class="gray"><img src="./pages/img/image-aroow-down.png">{{ languageCommonVariables.downloadbutton }}</a>
+								<a href="" class="dark-gray" ng-click="deleteDoc(brokerDoc.id, brokerDoc.doc_name,'0',brokerDoc.billType,brokerDoc.BrokerId)"><img src="./pages/img/upload-cross.png">{{ languageCommonVariables.deletebutton }}</a>
 							</div>
 						</section>
 				</div> <!--popup-inner-content-main -->
@@ -1578,6 +1566,42 @@
     <!-- /.modal-dialog -->
 </div>
 <!-- END MODAL STICK UP SMALL ALERT -->
+
+
+<!-- Confirm Delete Modal -->
+<div class="modal fade slide-up confirm-delete " id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="popup-overlay">
+		<div class="popup-main">
+			<div class="popup-main-table">
+				<div class="popup-table-cell">
+						<div class="confirm-main-content-">
+							<div class="popconfirm-img">
+								<img src="pages/img/confirm-icon.png">
+							</div>
+							<h2 class="confirm-heading">{{ languageCommonVariables.confirmdelete }}</h2>
+							<div class="line-image">
+								<img src="pages/img/confirm-line.png">
+							</div>
+							<div class="confirm-btn-section">
+								<a href="" class="common-item confirm-yes yes-btn" ng-click="confirmDelete('yes')"><button class="btn btn-primary btn-cons m-b-10" type="button"><i class="fa fa-check"></i> <span class="bold"> {{ languageCommonVariables.confirmdeleteyes|capitalize }} </span>
+								</button></a>
+								<a href="" class="chain-item yes-btn" style="display: none" ng-click="confirmDeleteChainItem('yes')" ><button class="btn btn-primary btn-cons m-b-10" type="button"><i class="fa fa-check"></i> <span class="bold"> {{ languageCommonVariables.confirmdeleteyes|capitalize }} </span>
+								</button></a>
+								<a href="" class="doc-item yes-btn" style="display: none" ng-click="confirmDocDelete('yes')" ><button class="btn btn-primary btn-cons m-b-10" type="button"><i class="fa fa-check"></i> <span class="bold"> {{ languageCommonVariables.confirmdeleteyes|capitalize }} </span>
+								</button></a>
+								<a href="" class="common-item no-btn" ng-click="confirmDelete('no')"><button class="btn btn-danger btn-cons m-b-10" type="button"><i class="fa fa-close"></i><span class="bold"> {{ languageCommonVariables.confirmdeleteno|capitalize }} </span></button></a>
+								<a href="" class="chain-item no-btn" style="display: none;" ng-click="confirmDeleteChainItem('no')" ><button class="btn btn-danger btn-cons m-b-10" type="button"><i class="fa fa-close"></i><span class="bold"> {{ languageCommonVariables.confirmdeleteno|capitalize }} </span></button></a>
+								<a href="" class="doc-item no-btn" style="display: none;" ng-click="confirmDocDelete('no')" ><button class="btn btn-danger btn-cons m-b-10" type="button"><i class="fa fa-close"></i><span class="bold"> {{ languageCommonVariables.confirmdeleteno|capitalize }} </span></button></a>
+							</div>
+							<!--a href="" data-dismiss="modal" class="confirm-cancle-btn" ><img src="pages/img/confirm-cancle.png"></a-->
+						</div>
+				</div>
+			</div>
+		</div>
+	</div>
+<!-- 	table-full-width  -->
+</div>
+<!-- Confirm Delete Modal -->
 
 <style>
 #show-image { z-index: 9999999; }

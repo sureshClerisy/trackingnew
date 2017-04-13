@@ -149,16 +149,16 @@
 
         <li ng-if="loggedUserRoleId == 3 || loggedUserRoleId == 1 || loggedUserRoleId == 5 " ng-class="{'open active':(state=='billing' || state=='sendForPayment') }"> 
           
-          <a class="test" href="#/billingDashboard"><span class="title">Billing</span>
+          <!--a class="test" href="#/billingDashboard"><span class="title">Billing</span>
                 <span class="icon-thumbnail"><i class="icon-pg fa fa-usd" aria-hidden="true"></i></span>
-            </a>
+            </a-->
 
-           <!-- <a class="test" href="javascript:void(0);"><span class="title">{{ languageCommonVariables.billing }}</span>
+           <a class="test" href="javascript:void(0);"><span class="title">{{ languageCommonVariables.billing }}</span>
             <span class=" arrow" ng-class="{'open active':(state=='billing' || state=='sendForPayment') }"></span>
-            <span class="icon-thumbnail"><i class="icon-pg fa fa-usd"></i></span> -->
+            <span class="icon-thumbnail"><i class="icon-pg fa fa-usd"></i></span> 
         </a>
 
-        <!-- <ul class="sub-menu">
+        <ul class="sub-menu">
             <li class="">
               <a href="#/billingDashboard">Billing Dashboard
                   <span class="icon-thumbnail">bd</span></a>
@@ -171,7 +171,12 @@
                   <a href="#/sendForPayment">{{ languageCommonVariables.sendForPayment}}
                       <span class="icon-thumbnail">sp</span></a>
             </li>
-        </ul> -->
+            <li class="">
+                  <a href="#/sendDirectPayment">Send Direct Payment
+                      <span class="icon-thumbnail">dp</span></a>
+            </li>
+        </ul>
+
       </li>
 
           <li ng-if="loggedUserRoleId != 6 && loggedUserRoleId != 4">

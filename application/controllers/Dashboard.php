@@ -1558,6 +1558,7 @@ class Dashboard extends Admin_Controller {
 		$data = array();
 		$this->load->model('BrokersModel');
 		$args = json_decode(file_get_contents('php://input'),true);
+
 		$cmpName = $this->BrokersModel->getTopFiveCustomer($args);
 		$data["paymentAmount"] = array();
 		$data["cName"]['cmpName'] = array();
@@ -1598,6 +1599,10 @@ class Dashboard extends Admin_Controller {
 		$data['trucksNotReporting'] = $trucksNotReporting;
 		$data['vehiclesWithoutDriver'] = $vehiclesWithoutDriver;
 		$data['todayDate'] 	  = date('Y-m-d');
+		
+		// if()
+
+		// ex($data);
 
 		echo json_encode($data); 				
 	}

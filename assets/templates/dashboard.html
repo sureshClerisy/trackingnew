@@ -269,9 +269,22 @@
 				                            <div class="panel-title">{{ languageArray.topcustomer }}</div>
 				                            <div class="panel-controls">
 				                                <ul>
-				                                    <li ng-show="otherIcon"><a class="portlet-collapse text-white" href="" data-toggle="collapse"><i class="portlet-icon portlet-icon-collapse"></i></a>
+				                                    <li ng-show="otherIcon" >
+				                                    	<a href = "">
+				                                    		<i class="fa fa-file-excel-o" ng-click ="exportTop5()"></i>
+				                                    	</a>
 				                                    </li>
-				                                    <li><a href="" class="portlet-maximize" data-toggle="maximize" ng-click="toggleIcon($event,'top_brokers')"><i class="portlet-icon portlet-icon-maximize portlet-increase-size" ></i> </a></li>
+				                                    <li ng-show="otherIcon">
+					                                    <a class="portlet-collapse text-white" href="" data-toggle="collapse">
+					                                    	<i class="portlet-icon portlet-icon-collapse"></i>
+					                                    </a>
+				                                    </li>
+				                                    <li>
+					                                    <a href="" class="portlet-maximize" data-toggle="maximize" ng-click="toggleIcon($event,'top_brokers')">
+					                                    	<i class="portlet-icon portlet-icon-maximize portlet-increase-size" ></i> 
+					                                    </a>
+				                                    </li>
+				                                    
 				                                </ul>
 				                            </div>
 				                        </div>
@@ -289,7 +302,10 @@
 														<div class="col-sm-12 col-md-12 col-xlg-12  cart-color-size">
 															<div class="cart-color">
 																<ul class="print-listing chart-color"> 
-																	<li ng-repeat="(key,value) in comp_name.cmpName" ><span style="background:{{barColors[$index]}}"></span><p class="cursor-class" ng-click="showRecordsWithFilter('broker',comp_name.brokerIds[$index],'',valueIds.driverId, valueIds.dispatcherId, valueIds.secondDriverId)">{{ value }}</p></li>
+																	<li ng-repeat="(key,value) in comp_name.cmpName" >
+																	<span style="background:{{barColors[$index]}}"></span>
+																	<p class="cursor-class" ng-click="showRecordsWithFilter('broker',comp_name.brokerIds[$index],'',valueIds.driverId, valueIds.dispatcherId, valueIds.secondDriverId)">{{ value }}</p>
+																	</li>
 																</ul>
 															</div>
 														</div>

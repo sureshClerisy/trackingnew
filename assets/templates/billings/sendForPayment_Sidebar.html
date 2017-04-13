@@ -5,19 +5,19 @@
         <p class="menu-title">{{ languageCommonVariables.browse }}</p>
         <ul class="main-menu">
             <li ng-class="showPaymentSidebarLiSelected == 'inbox' ? 'active' : ''">
-                <a ng-click="showSendPaymentsLoads()">
+                <a ng-click="showSendPaymentsLoads(billPaymentMode)">
                     <span class="title"><i class="pg-inbox"></i> {{ languageCommonVariables.inbox }}</span>
                     <span class="badge pull-right">{{ readyToSendPaymentCount }}</span>
                 </a>
             </li>
             <li ng-class="showPaymentSidebarLiSelected == 'sent' ? 'active' : ''">
-                <a href="javascript:void(0)" ng-click="showAlreadySentPaymentRecords()">
+                <a href="javascript:void(0)" ng-click="showAlreadySentPaymentRecords(billPaymentMode)">
                     <span class="title"><i class="pg-sent"></i>{{ languageCommonVariables.sent }}</span>
                     <span class="badge pull-right">{{ sentPaymentCount }}</span>
                 </a>
             </li>
             <li ng-class="showPaymentSidebarLiSelected == 'flagged' ? 'active' : ''">
-                <a href="javascript:void(0)" ng-click="showFlaggedPaymentRecords()">
+                <a href="javascript:void(0)" ng-click="showFlaggedPaymentRecords(billPaymentMode)">
                     <span class="title"><i class="fa fa-flag"></i>{{ languageCommonVariables.flagged }}</span>
                     <span class="badge pull-right">{{ flaggedPaymentCount }}</span>
                 </a>

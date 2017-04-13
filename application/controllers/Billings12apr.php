@@ -82,12 +82,12 @@ class Billings extends Admin_Controller{
 	 * Fetching loads with generated invoice only for send payment page
 	*/ 
 	
-	public function sendForPayment($paymentType = '') {
+	public function sendForPayment() {
 		if ( !in_array($this->userRoleId, $this->config->item('with_admin_role')) ) {
 			echo json_encode($this->data);
 			exit();
 		}
-		$this->data = $this->fetchingSentPaymentsInfo( $paymentType);
+		$this->data = $this->fetchingSentPaymentsInfo();
 		$this->data['billType'] = 'sendForPayment';
 		echo json_encode($this->data);
 	}
@@ -96,11 +96,10 @@ class Billings extends Admin_Controller{
 	 * Fetching load info common function
 	 */
 	
-	public function fetchingSentPaymentsInfo($paymentType = '') {
-		$this->data['loads'] = $this->Billing->fetchLoadsForPayment($paymentType);
-		$this->data['sentPaymentCount'] = $this->Billing->sentPaymentCount($paymentType);
-		$this->data['flaggedPaymentCount'] = $this->Billing->flaggedPaymentCount($paymentType);
-		$this->data['billPaymentType'] = $paymentType;
+	public function fetchingSentPaymentsInfo() {
+		$this->data['loads'] = $this->Billing->fetchLoadsForPayment();
+		$this->data['sentPaymentCount'] = $this->Billing->sentPaymentCount();
+		$this->data['flaggedPaymentCount'] = $this->Billing->flaggedPaymentCount();
 		return $this->data;
 	}
 	
@@ -108,12 +107,12 @@ class Billings extends Admin_Controller{
 	 * Fetching loads which are sent for payment
 	 */
 	
-	public function fetchSentPaymentRecords($paymentType = '') {
+	public function fetchSentPaymentRecords() {
 		if ( !in_array($this->userRoleId, $this->config->item('with_admin_role')) ) {
 			echo json_encode($this->data);
 			exit();
 		}
-		$this->data['loads'] = $this->Billing->fetchSentPaymentLoads($paymentType);
+		$this->data['loads'] = $this->Billing->fetchSentPaymentLoads();
 		echo json_encode($this->data);
 	} 	
 	
@@ -121,8 +120,8 @@ class Billings extends Admin_Controller{
 	 * Fetching loads whose flag is set for payment
 	 */
 	
-	public function fetchFlaggedPaymentRecords($paymentType = '') {
-		$data['loads'] = $this->Billing->fetchFlaggedPaymentLoads($paymentType);
+	public function fetchFlaggedPaymentRecords() {
+		$data['loads'] = $this->Billing->fetchFlaggedPaymentLoads();
 		echo json_encode($data);
 	} 	
 	
@@ -238,7 +237,7 @@ class Billings extends Admin_Controller{
 				}
 			}
 			
-			$data = $this->fetchingSentPaymentsInfo('broker');
+			$data = $this->fetchingSentPaymentsInfo();
 			echo json_encode(array('success' => true,'loadsInfo' => $data, 'errorMessage' => $errorMessage));
 		}catch(Exception $e){
 			log_message("error","SENT_FOR_PAYMENT".$e->getMessage());
@@ -426,7 +425,7 @@ class Billings extends Admin_Controller{
 				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> removed the job ticket <a 	href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$loadId.',\'\',\'\',\'\',\'\',0,\'\')">#'.$loadId.'</a> from queue.';	
 				logActivityEvent($loadId, $this->entity["ticket"], $this->event["remove_from_queue"], $message, $this->Job,$srcPage);
 			}
-			$data = $this->fetchingSentPaymentsInfo('broker');
+			$data = $this->fetchingSentPaymentsInfo();
 			$data['flaggedLoads'] = $this->Billing->fetchFlaggedPaymentLoads();
 			echo json_encode(array('success' => true,'loadsInfo' => $data));	
 		}catch(Exception $e){
@@ -789,22 +788,6 @@ class Billings extends Admin_Controller{
 		$driversList = array_values($driversList);
 		return $driversList;
 	}
-
-	/**
-	* fetch loads which are to be send directly without triumph
-	*/
-
-	public function fetchDirectPaymentLoads() {
-		if ( !in_array($this->userRoleId, $this->config->item('with_admin_role')) ) {
-			echo json_encode($this->data);
-			exit();
-		}
-		$this->data = $this->fetchingSentPaymentsInfo('shipper');
-		echo json_encode($this->data);
-	}
-
-
-
 
 	public function fetchDataForCsv(){
 

@@ -80,7 +80,7 @@ app.controller('brokersController', function(dataFactory,$scope, PubNub ,$http ,
 	}
 });
 
-app.controller('editBrokersController', function(dataFactory,getBrokersData, $scope, PubNub, $http ,$rootScope , $location , $cookies, $stateParams){
+app.controller('editBrokersController', function(dataFactory,getBrokersData, $scope, PubNub, $http ,$rootScope , $location , $cookies, $stateParams, $timeout){
 	
 	if($rootScope.loggedInUser == false)
 		$location.path('login');
@@ -126,7 +126,9 @@ app.controller('editBrokersController', function(dataFactory,getBrokersData, $sc
 					/*$rootScope.ExceedMessage = 'Error! : The uploaded document exceeds the maximum allowed limit of 128MB.';*/
 				}
 				else if(response.docList != undefined && response.docList.length > 0){
-					$scope.brokerDocs = response.docList;
+					$timeout(function() {
+						$scope.brokerDocs = response.docList;
+					}, 400);					
 				}else{
 					$scope.brokerDocs = [];
 				}

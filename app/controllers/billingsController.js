@@ -294,12 +294,11 @@ app.controller('billingsController', ["dataFactory","$scope","$http","$rootScope
 			var downloadLink 		= angular.element(downloadContainer.children()[0]);
 			downloadLink.attr('href',url);
 			downloadLink.attr('download', data.fileName);
-			downloadLink.attr('target', '_blank');
 			angular.element('body').append(downloadContainer);
-			$timeout(function () {
-			  downloadLink[0].click();
+			setTimeout(function(){
+				downloadLink[0].click();
 			  downloadLink.remove();
-			}, null);
+			});
         });
     }	 
 }]);

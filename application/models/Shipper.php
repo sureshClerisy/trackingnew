@@ -23,12 +23,11 @@ class Shipper extends Parent_Model {
         
         if(isset($args["searchQuery"]) && !empty($args["searchQuery"])){
             $this->db->group_start();
-            $this->db->or_like('shipperCompanyName', strtolower($args['searchQuery']));
+            $this->db->like('LOWER(shipperCompanyName)', strtolower($args['searchQuery']));
             $this->db->or_like('LOWER(postingAddress)', strtolower($args['searchQuery']) );
             $this->db->or_like('LOWER(city)', strtolower($args['searchQuery']) );
             $this->db->or_like('LOWER(state)', strtolower($args['searchQuery']) );
             $this->db->or_like('zipcode', strtolower($args['searchQuery']) );
-            $this->db->or_like('status', strtolower($args['searchQuery']) );
             $this->db->group_end();
         }
 
@@ -152,6 +151,7 @@ class Shipper extends Parent_Model {
     public function fetchShipperList() {
         $this->db->select('id,shipperCompanyName');
         $this->db->where('status',1);
+        $this->db->where('deleted',0);
         $result = $this->db->get('shippers');
         if( $result->num_rows() > 0 ) {
             return $result->result_array();

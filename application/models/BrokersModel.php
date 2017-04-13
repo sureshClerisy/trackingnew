@@ -124,7 +124,7 @@ class BrokersModel extends Parent_Model
 	 * Fetching broker information after checking loadId
 	 */
 	 
-	public function getBrokerDetail( $loadId = null ) {
+	public function getBrokerDetail( $loadId = null, $type = '' ) {
 		$brokerId = '';
 		$brokerDetail = array();
 		$loadInfo = array();
@@ -134,8 +134,10 @@ class BrokersModel extends Parent_Model
 			$brokerId = $loadInfo['broker_id'];
 		}
 			
-		if ( $brokerId != '' && $brokerId != null ) {
+		if ( $brokerId != '' && $brokerId != null && $type == 'broker' ) {
 			$brokerDetail = $this->getBrokerInfo( $brokerId );
+		} else if ( $brokerId != '' && $brokerId != null && $type == 'shipper' ) {
+			$brokerDetail = $this->db->select('id,shipperCompanyName,postingAddress,city,state,zipcode,rating')->where('shippers.id',$brokerId)->get('shippers')->row_array();
 		}
 		
 		if ( !empty($loadInfo) ) {
@@ -165,11 +167,11 @@ class BrokersModel extends Parent_Model
 	 * Update broker documents_list in broker_info table
 	 */
 	 
-	public function uploadBrokerDocument( $fileName = '', $brokerId = null ) {
+	public function uploadBrokerDocument( $fileName = '', $entityId = null, $parameter = '' ) {
 		$docs = array(
 			'document_name' => $fileName,
-			'entity_type' => 'broker',
-			'entity_id' => $brokerId
+			'entity_type' => $parameter,
+			'entity_id' => $entityId
 		);
 		$this->insertContractDocument($docs);
 		return true;

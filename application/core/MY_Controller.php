@@ -316,7 +316,7 @@ class Admin_Controller extends MY_Controller
 			foreach ($loads as $key => $load) {
 				
 				$newArray[$key]['DATE'] 		= date('m/d',strtotime($load['created']));
-				$newArray[$key]['CUSTOMER NAME']= $load['companyName'];
+				$newArray[$key]['CUSTOMER NAME']= (!empty($load['companyName']))?$load['companyName']:$load['TruckCompanyName'];
 				$newArray[$key]['DRIVERS'] 		= $load['driverName'];
 				$newArray[$key]['INVOICE'] 		= $load['invoiceNo'];
 				$newArray[$key]['CHARGES'] 		= $load['totalCost'];

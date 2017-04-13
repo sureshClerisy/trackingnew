@@ -425,21 +425,24 @@ class Truckstop extends Admin_Controller{
 		$truckAverage 		= $this->defaultTruckAvg;
 	
 		if ( $loadId != '' && is_numeric($loadId) ) {
+			$checkBillType = $this->Job->fetchLoadBillType($loadId);
+			$checkBillType = (isset($checkBillType) && $checkBillType != '' ) ? $checkBillType : 'broker';
+			$jobRecord = $this->Job->FetchSingleJob($loadId, $checkBillType);
 
-			$jobRecord = $this->Job->FetchSingleJob($loadId);
+			// if ( isset($_POST['loadRequest']) && ($_POST['loadRequest'] == 'addRequest') ){
+			// 	$data['brokerData'] = $this->Job->getBrokerForLoadDetail($loadId);
+			// } else {
+			// 	$data['brokerData'] = $this->Job->getBrokerForLoadDetail($loadId, $jobRecord['billType']);
 			
-			if ( isset($_POST['loadRequest']) && ($_POST['loadRequest'] == 'addRequest') ){
-				$data['brokerData'] = $this->Job->getBrokerForLoadDetail($loadId);
-			} else {
-				$data['brokerData'] = $this->Job->getBrokerForLoadDetail($loadId);
-				
-				if ( !empty($data['brokerData']) ) {
-					$jobRecord['MCNumber'] = ($jobRecord['MCNumber'] != '' && $jobRecord['MCNumber'] != 0) ? $jobRecord['MCNumber'] : $data['brokerData']['mc_number'];
-					$jobRecord['CarrierMC'] = ($jobRecord['CarrierMC'] != '' && $jobRecord['CarrierMC'] != 0) ? $jobRecord['CarrierMC'] : $data['brokerData']['CarrierMC'];
-					$jobRecord['DOTNumber'] = ($jobRecord['DOTNumber'] != '' && $jobRecord['DOTNumber'] != 0) ? $jobRecord['DOTNumber'] : $data['brokerData']['dot_number'];
-					$jobRecord['TruckCompanyName'] = ($jobRecord['TruckCompanyName'] != '') ? $jobRecord['TruckCompanyName'] : $data['brokerData']['TruckCompanyName'];
-				}
-			}
+			// 	if ( !empty($data['brokerData'])  ) {
+			// 		$jobRecord['MCNumber'] = (isset($data['brokerData']['mc_number']) && $data['brokerData']['mc_number'] != '' ) ? $data['brokerData']['mc_number'] : $jobRecord['MCNumber'];
+			// 		$jobRecord['CarrierMC'] = (isset($data['brokerData']['CarrierMC']) && $data['brokerData']['CarrierMC'] != '' ) ? $data['brokerData']['CarrierMC'] : $jobRecord['CarrierMC'];
+			// 		$jobRecord['DOTNumber'] = (isset($data['brokerData']['dot_number']) && $data['brokerData']['dot_number'] != '') ? $data['brokerData']['dot_number'] : $jobRecord['DOTNumber'];
+
+			// 		$jobRecord['TruckCompanyName'] = (isset($data['brokerData']['TruckCompanyName']) && $data['brokerData']['TruckCompanyName'] != '' ) ? $data['brokerData']['TruckCompanyName'] :  $jobRecord['TruckCompanyName'];
+			// 	}
+			// }
+
 			$origin = $jobRecord['OriginCity'].' '.$jobRecord['OriginState'].' '.$jobRecord['OriginCountry'];
 			$destination = $jobRecord['DestinationCity'].' '.$jobRecord['DestinationState'].' '.$jobRecord['DestinationCountry'];
 			
@@ -1991,8 +1994,12 @@ class Truckstop extends Admin_Controller{
 	//------------------ Upload Docs Functions --------------------------
 
 	public function uploadDocs( $parameter = '' ){
+
 		if ( $parameter != '' ) {
 			$doc = $parameter;
+		} else if (isset($_REQUEST['docType']) && $_REQUEST['docType'] != '' ) {
+			$doc 	= $_REQUEST['docType'];
+			$parameter = $_REQUEST['docType'];
 		} else {
 			$doc = 'DOC';
 			$parameter = 'docs';
@@ -2002,7 +2009,7 @@ class Truckstop extends Admin_Controller{
 			echo json_encode(array('loadIdNotExist' => 1));
 			exit();
 		}
-		
+	
 		$response = $this->uploadFileToServer($_FILES, $doc, $parameter,$_REQUEST['loadId']);
 		
 		if(!$response['error']){
@@ -2017,14 +2024,22 @@ class Truckstop extends Admin_Controller{
 			} else {
 				$docPrimaryId = '';
 			}
-			
-			if ( $parameter == 'broker' ) {			// saving data to broker table
+		
+			if ( $parameter == 'broker' || $parameter == 'shipper') {			// saving data to broker table
 				try{
-					$brokerInfo = $this->BrokersModel->getBrokerInfo($_REQUEST['brokerId']);
-					$this->BrokersModel->uploadBrokerDocument($response['data']['file_name'], $_REQUEST['brokerId']);
-					$this->fetchBrokerDocuments($_REQUEST['brokerId']);
-					$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> uploaded a new document ('.$response['data']['file_name'].') for broker <a class="notify-link" href="'.$this->serverAddr.'#/editbroker/'.$brokerInfo["id"].'">'.ucfirst($brokerInfo["TruckCompanyName"]).'</a> from ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$_REQUEST['loadId'].',\'\',\'\',\'\',\'\',0,\'\')">#'.$_REQUEST['loadId'].'</a>';
-					logActivityEvent($brokerInfo['id'], $this->entity["broker"], $this->event["upload_doc"], $message, $this->Job, $_REQUEST['srcPage']);
+					if ($parameter == 'broker' )
+						$brokerInfo = $this->BrokersModel->getBrokerInfo($_REQUEST['brokerId']);
+					else {
+						$this->load->model('Shipper');
+						$brokerInfo = $this->Shipper->getShipperInfo($_REQUEST['brokerId']);
+					}
+
+					$this->BrokersModel->uploadBrokerDocument($response['data']['file_name'], $_REQUEST['brokerId'], $parameter);
+					$this->fetchBrokerShipperDocuments($_REQUEST['brokerId'],$parameter);
+
+					$companyName = ( $parameter == 'broker') ? $brokerInfo['TruckCompanyName'] : $brokerInfo['shipperCompanyName'];
+					$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> uploaded a new document ('.$response['data']['file_name'].') for '.$parameter.' <a class="notify-link" href="'.$this->serverAddr.'#/edit'.$parameter.'/'.$brokerInfo["id"].'">'.ucfirst($companyName).'</a> from ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$_REQUEST['loadId'].',\'\',\'\',\'\',\'\',0,\'\')">#'.$_REQUEST['loadId'].'</a>';
+					logActivityEvent($brokerInfo['id'], $this->entity[$parameter], $this->event["upload_doc"], $message, $this->Job, $_REQUEST['srcPage']);
 				}catch(Exception $e){
 					log_message('error','UPLOAD_BROKER_DOC_FROM_TICKET'.$e->getMessage());
 				}
@@ -2032,8 +2047,8 @@ class Truckstop extends Admin_Controller{
 				$this->updateDocumentTable($response['data']['file_name'],$_REQUEST['loadId'],$parameter, $docPrimaryId,$_REQUEST['srcPage']);
 			}
 		} else {
-			if ( $parameter == 'broker' ) {
-				$this->fetchBrokerDocuments($_REQUEST['brokerId'], $response );
+			if ( $parameter == 'broker' || $parameter == 'shipper' ) {
+				$this->fetchBrokerShipperDocuments($_REQUEST['brokerId'], $parameter, $response );
 			} else {
 				$this->fetchDocuments($_REQUEST['loadId'],$response );
 			}
@@ -2070,8 +2085,8 @@ class Truckstop extends Admin_Controller{
 	 * Fetching Broker Documents for job ticket
 	 */
 	 
-	public function fetchBrokerDocuments( $brokerId = null, $errorResponse = array() ){
-		$result = $this->BrokersModel->fetchContractDocuments($brokerId, 'broker');
+	public function fetchBrokerShipperDocuments( $brokerId = null, $type = '', $errorResponse = array() ){
+		$result = $this->BrokersModel->fetchContractDocuments($brokerId, $type);
 		$docs_list = array();
 		if ( !empty($result) ) {
 			for( $i = 0; $i < count($result); $i++ ) {
@@ -2086,9 +2101,10 @@ class Truckstop extends Admin_Controller{
 				$docs_list['brokerDocuments'][$i]['thumb_doc_name'] = $fileName;
 				$docs_list['brokerDocuments'][$i]['id'] = $result[$i]['id'];
 				$docs_list['brokerDocuments'][$i]['BrokerId'] = $brokerId;
+				$docs_list['brokerDocuments'][$i]['billType'] = $type;
 			}
 		}
-		
+
 		if ( !empty($errorResponse) && isset($errorResponse['error_exceed']) ){
 			$exceedMsg = $errorResponse['error_exceed'];
 		} else {
@@ -2134,27 +2150,28 @@ class Truckstop extends Admin_Controller{
 			}
 			
 			if ( $parameter == '' ) 
-				$parameter = 'docs';
-			
+				$parameter = 'docs';			
 			
 			if($_FILES['file']['error'] == 0 ){
 
 				$extArr 						= explode('.',$_FILES['file']['name']);
-				$extension 						= strtolower(end($extArr));
-				
+				$extension 						= strtolower(end($extArr));				
 			   	$config['file_name']   			= $config['_prefix'].time().'.'.$extension;
 				$config['upload_path']          = 'assets/uploads/documents/'.$parameter.'/';
 				$config['allowed_types']        = 'pdf|gif|jpg|png|docx|doc|xls|xlsx|txt|ico|bmp|svg';
 				
 				$this->load->library('upload', $config);
-				
+			
+
+				// $this->degradePdfVersion($_FILES,$config,$parameter);
+			
 				if ( !$this->upload->do_upload('file'))	{
 					$response['error'] 		= true;
 					$response['error_desc'] = $this->upload->display_errors();
 				} else {
 					$response['error'] 		= false;
 					$response['data'] 		= $this->upload->data();
-					
+			
 					if ( ($parameter == 'rateSheet' || $parameter == 'pod') &&  strtolower($extension) == 'pdf' ) {
 						 // $fileCheck = $this->CheckPdfNotCompressed($response['data']['file_name'], $parameter);		// code to check uploaded pdf file is compressed or not
 												
@@ -2213,8 +2230,36 @@ class Truckstop extends Admin_Controller{
 	* Degrading PDF(1.5+) to 1.4 version
 	*/
 
-	public function degradePdfVersion( $data = NULL ){
+	// public function degradePdfVersion( $data = NULL , $config = array(), $parameter = ''){
+	public function degradePdfVersion( $data = NULL ){		
+
+		// $fileName = $data['file']['name'];
+		// $outputfile = $config['upload_path'].'/'.$fileName;
+		// $sourcefile = $data['file']['tmp_name'];
+
+		// $pathGen 	= str_replace('application/', '', APPPATH.'assets/'); 
+		// $gostscript = $pathGen.'ghostscript/gs-920-linux_x86_64';
 		
+		// try{
+		// 	shell_exec("{$gostscript} -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dNOPAUSE -dQUIET -dBATCH -dAutoRotatePages=/None -sOutputFile={$outputfile} {$sourcefile}"); 
+			
+		// 	$fileNameArray = explode('.',$fileName);
+		// 	$newfileName = '';
+		// 	for ( $i = 0; $i < count($fileNameArray) - 1; $i++ ) {
+		// 		$newfileName .= $fileNameArray[$i];
+		// 	}
+		// 	$newfileName = $newfileName.'.jpg';
+
+		// 	$fileName = '/var/www/html/trackingnew/assets/uploads/documents/rateSheet/rateSheet_1491972107_1.pdf';
+		// 	$thumbFolder = 'thumb_'.$parameter;
+		// 	$cmd = 'cd '.$pathGen.'uploads/documents/rateSheet/'.$fileName;
+	 //    	$cmd .= '; convert -thumbnail x600 '.$fileName.'[0] -flatten ../'.$thumbFolder.'/thumb_'.$newfileName;
+	 //    	$response['data']['cmd'] = $cmd;
+	 //        exec($cmd . " > /dev/null &");
+		// 	echo $fileName;
+		// }catch(Exception $e){
+		// 	$e->getMessage();
+		// }
 		$fileName = $data['raw_name'].'_1.pdf';
 		$outputfile = $data['file_path'].'/'.$fileName;
 		$sourcefile = $data['full_path'];
@@ -2223,7 +2268,7 @@ class Truckstop extends Admin_Controller{
 		$gostscript = $pathGen.'ghostscript/gs-920-linux_x86_64';
 		
 		try{
-			shell_exec("{$gostscript} -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dNOPAUSE -dQUIET -dBATCH -sOutputFile={$outputfile} {$sourcefile}"); 
+			shell_exec("{$gostscript} -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dNOPAUSE -dQUIET -dBATCH -dAutoRotatePages=/None -sOutputFile={$outputfile} {$sourcefile}"); 
 			return $fileName;
 		}catch(Exception $e){
 			$e->getMessage();
@@ -2281,7 +2326,7 @@ class Truckstop extends Admin_Controller{
 		}
 		$fileName = $fileName.'.jpg';
 		$thumbFile =  $thumb_PATH.'thumb_'.$fileName;
-		
+	
 		if (file_exists($file)) {
 			unlink($file);
 		}
@@ -2316,16 +2361,17 @@ class Truckstop extends Admin_Controller{
 			}
 		}
 		
-		if ( $_POST['doc_type'] == 'broker' ) {
+		if ( $_POST['doc_type'] == 'broker' || $_POST['doc_type'] == 'shipper' ) {
 			try{
 				$brokerId =  isset($_POST['assignedBrokeId']) ? $_POST['assignedBrokeId'] : 0;
-				$brokerInfo = $this->BrokersModel->getEntityInfoByDocId($_POST['docId'], $this->entity["broker"]);
+				$brokerInfo = $this->BrokersModel->getEntityInfoByDocId($_POST['docId'], $this->entity[$_POST['doc_type']]);
 
 				$this->BrokersModel->removeContractDocs($_POST['docId']);
-				$this->fetchBrokerDocuments($brokerId);
+				$this->fetchBrokerShipperDocuments($brokerId, $_POST['doc_type']);
 
-				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> deleted a document ('.$brokerInfo["document_name"].') of broker <a class="notify-link" href="'.$this->serverAddr.'#/editbroker/'.$brokerInfo["id"].'"> '.$brokerInfo["TruckCompanyName"].'</a>  from ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$_POST['bloadId'].',\'\',\'\',\'\',\'\',0,\'\')">#'.$_POST['bloadId'].'</a>';
-				logActivityEvent($brokerInfo['id'], $this->entity["broker"], $this->event["remove_doc"], $message, $this->Job);	
+				$companyName = ( $_POST['doc_type'] == 'broker') ? $brokerInfo['TruckCompanyName'] : $brokerInfo['shipperCompanyName'];
+				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> deleted a document ('.$brokerInfo["document_name"].') of '.$_POST['doc_type'].' <a class="notify-link" href="'.$this->serverAddr.'#/edit'.$_POST['doc_type'].'/'.$brokerInfo["id"].'"> '.$companyName.'</a>  from ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$_POST['loadId'].',\'\',\'\',\'\',\'\',0,\'\')">#'.$_POST['loadId'].'</a>';
+				logActivityEvent($brokerInfo['id'], $this->entity[$_POST['doc_type']], $this->event["remove_doc"], $message, $this->Job);	
 			}catch(Exception $e){
 				log_message('error','DELETE_BROKER_DOCS_TICKET'.$e->getMessage());
 			}

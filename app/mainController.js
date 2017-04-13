@@ -1042,6 +1042,11 @@ $rootScope.logoutmessage=false;
 						$rootScope.vehicleInfo = {};
 						$rootScope.editSavedLoad = data.encodedJobRecord;
 						
+						if ( $rootScope.editSavedLoad.billType != undefined && $rootScope.editSavedLoad.billType != '' ) 
+							main.showSelectedShipOrBrok = $rootScope.editSavedLoad.billType;
+						else
+							main.showSelectedShipOrBrok = 'broker';
+
 						$scope.showEditButton = true;
 						if ( $rootScope.editSavedLoad.flag != undefined && $rootScope.editSavedLoad.flag == '1' && data.userRoleId != '1' && data.userRoleId != '3' && data.userRoleId != '5' ) {
 							$scope.showEditButton = false;
@@ -1610,8 +1615,8 @@ $rootScope.logoutmessage=false;
 		$rootScope.brokerDetailInfo  = true;		
 		$rootScope.showhighlighted = 'brokerDetails';
 		
-		$rootScope.uploadBrokerDoc = false;
-		$rootScope.showUploadBrokerButton = true;
+		main.uploadBrokerDoc = false;
+		main.showUploadBrokerButton = true;
 		
 		$rootScope.save_cancel_div = false;
 		$rootScope.save_edit_div = true;
@@ -1619,25 +1624,34 @@ $rootScope.logoutmessage=false;
 		if ( loadId == "" || loadId == undefined || loadId == null ) {
 			$rootScope.showBrokerDropdown = false;
 		}
+
+		$scope.brokerDocuments = [];
+		$scope.selectedBrokerName = 'Select Broker';		
+		main.selectedShipperName = 'Select Shipper';
 		if ( $rootScope.editSavedLoad.broker_id != '' && $rootScope.editSavedLoad.broker_id != undefined && $rootScope.editSavedLoad.broker_id != null ) {
-			dataFactory.httpRequest(URL+'/brokers/getBrokerDocumentUploaded/'+$rootScope.editSavedLoad.broker_id).then(function(data) {					// Fetching broker document uploaded information
+			dataFactory.httpRequest(URL+'/brokers/getBrokerShipperDocumentUploaded/'+$rootScope.editSavedLoad.broker_id+'/'+$rootScope.editSavedLoad.billType).then(function(data) {			// Fetching broker document uploaded information
 				//~ $rootScope.BrokerDocUploaded = data.BrokerDocUploaded;
 				if ( data.brokerDocuments != undefined && data.brokerDocuments.length > 0 ) {
 					$scope.brokerDocuments = data.brokerDocuments;
-				} else {
-					$scope.brokerDocuments = [];
-				}
+				} 
 			});
 		}
-		
-		
+				
 		if ( loadId != "" && loadId != undefined && loadId != null ) {
-			dataFactory.httpRequest(URL+'/assignedloads/getBrokersList/'+loadId).then(function(data) {					// Fetching brokers info to show in dropdown
+			dataFactory.httpRequest(URL+'/assignedloads/getBrokersList/'+loadId+'/'+$rootScope.editSavedLoad.billType).then(function(data) {		// Fetching brokers info to show in dropdown
 				$scope.brokersList = data.brokersList;
-				if ( data.brokerLoadDetail.length != 0 ) {
+				main.shippersList = data.shippersList;
+				
+				if ( Object.keys(data.brokerLoadDetail).length > 0 && data.brokerLoadDetail.id != undefined && data.brokerLoadDetail.id != '' ) {
 					$rootScope.editBrokerLoadInfo = data.brokerLoadDetail;
-					$scope.selectedBrokerName = data.brokerLoadDetail.TruckCompanyName;
-					$scope.brokerSelectedId = data.brokerLoadDetail.id;
+
+					if ( $rootScope.editSavedLoad.billType != undefined && $rootScope.editSavedLoad.billType === 'shipper' ) {
+						main.selectedShipperName = data.brokerLoadDetail.shipperCompanyName;
+						main.shipperSelectedId	= data.brokerLoadDetail.id;
+					} else {
+						$scope.selectedBrokerName = data.brokerLoadDetail.TruckCompanyName;
+						$scope.brokerSelectedId = data.brokerLoadDetail.id;
+					}	
 				}
 			});
 		}
@@ -2289,6 +2303,7 @@ $rootScope.logoutmessage=false;
 			$rootScope.disablePerm = false;
 			$rootScope.disableTemp = false;
 			
+			main.showSelectedShipOrBrok = 'broker';
 			$rootScope.editSavedLoad.PickupAddress = '';
 			$rootScope.editSavedLoad.DestinationAddress = '';
 			$rootScope.vehicleDriverFound = false;
@@ -2350,7 +2365,7 @@ $rootScope.logoutmessage=false;
 		$scope.add_load_div = true;			// for add load
 		$rootScope.disablePerm = false;
 		$rootScope.disableTemp = false;
-		console.log(loadId);
+	
 		if ( loadId != '' && loadId != undefined ) {
 			$scope.add_load_div = false;			// for add load
 			$rootScope.save_edit_div = true;			// for add load
@@ -2693,20 +2708,22 @@ $rootScope.logoutmessage=false;
 		$rootScope.showBrokerStatus = '';
 		$rootScope.showAddhighlighted = 'brokerDetails';
 		
-		$rootScope.uploadBrokerDoc = false;
-		$rootScope.showUploadBrokerButton = true;
-			
-		if ( $rootScope.editSavedLoad.broker_id != '' && $rootScope.editSavedLoad.broker_id != undefined && $rootScope.editSavedLoad.broker_id != null ) {	
-			dataFactory.httpRequest(URL+'/brokers/getBrokerDocumentUploaded/'+$rootScope.editSavedLoad.broker_id).then(function(data) {					// Fetching broker document uploaded information
-				if ( data.brokerDocuments != undefined && data.brokerDocuments.length != 0 ) {
-					$scope.brokerDocuments = data.brokerDocuments;
-				}
-			});
-		}
+		main.uploadBrokerDoc = false;
+		main.showUploadBrokerButton = true;
+		
+		$scope.brokerDocuments = [];	
+		// if ( $rootScope.editSavedLoad.broker_id != '' && $rootScope.editSavedLoad.broker_id != undefined && $rootScope.editSavedLoad.broker_id != null ) {	
+		// 	dataFactory.httpRequest(URL+'/brokers/getBrokerDocumentUploaded/'+$rootScope.editSavedLoad.broker_id).then(function(data) {					// Fetching broker document uploaded information
+		// 		if ( data.brokerDocuments != undefined && data.brokerDocuments.length != 0 ) {
+		// 			$scope.brokerDocuments = data.brokerDocuments;
+		// 		}
+		// 	});
+		// }
 				
 		$scope.selectedBrokerName = 'Select Broker';		
-		main.selectedShipperName = 'Select Shipper';		
-		dataFactory.httpRequest(URL+'/assignedloads/getBrokersList/'+primaryAddId).then(function(data) {					// Fetching brokers info to show in dropdown
+		main.selectedShipperName = 'Select Shipper';	
+		main.showSelectedShipOrBrok = 'broker';	
+		dataFactory.httpRequest(URL+'/assignedloads/getBrokersList/'+primaryAddId).then(function(data) {			// Fetching brokers info to show in dropdown
 			$scope.brokersList = data.brokersList;
 			main.shippersList = data.shippersList;
 			if ( data.brokerLoadDetail.length != 0 ) {
@@ -2771,16 +2788,14 @@ $rootScope.logoutmessage=false;
 	 
 	$scope.onSelectChangeBrokerCallback = function( value, key , parameter) {
 		$scope.selectedBrokerName = value.TruckCompanyName;
+		main.showSelectedShipOrBrok = 'broker';
 		if ( value.id != '' && value.id != undefined ) {
+
+			main.selectedShipperName = 'Select Shipper';
 			$scope.autoFetchLoads = true;
 			dataFactory.httpRequest(URL+'/triumph/getBrokerFullDetails/'+value.id+'/'+value.MCNumber).then(function(data) {					// Fetching broker info to show fields selected
 				if ( parameter == 'addRequest' ) {
 					$rootScope.editBrokerLoadInfo.TruckCompanyName = data.brokerDetail.TruckCompanyName;
-					$rootScope.editBrokerLoadInfo.PointOfContact = data.brokerDetail.PointOfContact;
-					$rootScope.editBrokerLoadInfo.PointOfContactPhone = data.brokerDetail.PointOfContactPhone;
-					$rootScope.editBrokerLoadInfo.TruckCompanyEmail = data.brokerDetail.TruckCompanyEmail;
-					$rootScope.editBrokerLoadInfo.TruckCompanyPhone = data.brokerDetail.TruckCompanyPhone;
-					$rootScope.editBrokerLoadInfo.TruckCompanyFax = data.brokerDetail.TruckCompanyFax;
 					$rootScope.editBrokerLoadInfo.postingAddress = data.brokerDetail.postingAddress;
 					$rootScope.editBrokerLoadInfo.city = data.brokerDetail.city;
 					$rootScope.editBrokerLoadInfo.state = data.brokerDetail.state;
@@ -2790,13 +2805,9 @@ $rootScope.logoutmessage=false;
 					$rootScope.editBrokerLoadInfo.DOTNumber = data.brokerDetail.DOTNumber;
 					$rootScope.editBrokerLoadInfo.brokerStatus = data.brokerDetail.brokerStatus;
 					$rootScope.editBrokerLoadInfo.id = data.brokerDetail.id;
+					$rootScope.editBrokerLoadInfo.billType = 'broker';
 				} else {
 					$rootScope.editSavedLoad.TruckCompanyName = data.brokerDetail.TruckCompanyName;
-					$rootScope.editSavedLoad.PointOfContact = data.brokerDetail.PointOfContact;
-					$rootScope.editSavedLoad.PointOfContactPhone = data.brokerDetail.PointOfContactPhone;
-					$rootScope.editSavedLoad.TruckCompanyEmail = data.brokerDetail.TruckCompanyEmail;
-					$rootScope.editSavedLoad.TruckCompanyPhone = data.brokerDetail.TruckCompanyPhone;
-					$rootScope.editSavedLoad.TruckCompanyFax = data.brokerDetail.TruckCompanyFax;
 					$rootScope.editSavedLoad.postingAddress = data.brokerDetail.postingAddress;
 					$rootScope.editSavedLoad.city = data.brokerDetail.city;
 					$rootScope.editSavedLoad.state = data.brokerDetail.state;
@@ -2804,7 +2815,10 @@ $rootScope.logoutmessage=false;
 					$rootScope.editSavedLoad.MCNumber = data.brokerDetail.MCNumber;
 					$rootScope.editSavedLoad.DOTNumber = data.brokerDetail.DOTNumber;
 					$rootScope.editSavedLoad.brokerStatus = data.brokerDetail.brokerStatus;
+					$rootScope.editSavedLoad.billType = 'broker';
 				}
+
+
 				$rootScope.editSavedLoad.broker_id = data.brokerDetail.id; 					// SHOWING UPLOAD BUTTON ON JOB TICKET	
 				$rootScope.showBrokerStatus = (data.brokerDetail.brokerStatus == "Approved") ? $rootScope.languageCommonVariables.statusApproved : $rootScope.languageCommonVariables.statusDeclined;
 				
@@ -2815,6 +2829,25 @@ $rootScope.logoutmessage=false;
 				}
 				$scope.autoFetchLoads = false;
 			});
+		} else {
+			$scope.selectedBrokerName = 'Select Broker';
+			if ( parameter == 'addRequest') {
+				$rootScope.editBrokerLoadInfo = {};
+			} else {
+				$rootScope.editSavedLoad.TruckCompanyName = '';
+				$rootScope.editSavedLoad.postingAddress = '';
+				$rootScope.editSavedLoad.city = '';
+				$rootScope.editSavedLoad.state = '';
+				$rootScope.editSavedLoad.zipcode = '';
+				$rootScope.editSavedLoad.MCNumber = '';
+				$rootScope.editSavedLoad.DOTNumber = '';
+				$rootScope.editSavedLoad.CarrierMC = '';
+			}
+			$rootScope.showBrokerStatus = '';
+			$rootScope.editBrokerLoadInfo.billType 		   = '';
+			$rootScope.editSavedLoad.billType			   = '';
+			$rootScope.editSavedLoad.broker_id  = '';
+			$scope.brokerDocuments = [];
 		}
 	} 
 
@@ -2824,29 +2857,59 @@ $rootScope.logoutmessage=false;
 	 
 	main.onSelectChangeShipperCallback = function( value, key , parameter) {
 		main.selectedShipperName = value.shipperCompanyName;
+		main.showSelectedShipOrBrok = 'shipper';
 		if ( value.id != '' && value.id != undefined ) {
+			$scope.selectedBrokerName = 'Select Broker';
 			$scope.autoFetchLoads = true;
-			dataFactory.httpRequest(URL+'/shippers/fetchShipperRecord/'+value.id).then(function(data) {					// Fetching broker info to show fields selected
+			dataFactory.httpRequest(URL+'/shippers/getshipperListById/'+value.id).then(function(data) {	
+				$scope.autoFetchLoads = false;
 				if ( parameter == 'addRequest' ) {
-					
+					$rootScope.editBrokerLoadInfo.TruckCompanyName = data.shipperData.shipperCompanyName;
+					$rootScope.editBrokerLoadInfo.postingAddress   = data.shipperData.postingAddress;
+					$rootScope.editBrokerLoadInfo.city 			   = data.shipperData.city;
+					$rootScope.editBrokerLoadInfo.state			   = data.shipperData.state;
+					$rootScope.editBrokerLoadInfo.zipcode          = data.shipperData.zipcode;
+					$rootScope.editBrokerLoadInfo.billType 		   = 'shipper';
 				} else {
-					$rootScope.editSavedLoad.TruckCompanyName = data.brokerDetail.TruckCompanyName;
-					$rootScope.editSavedLoad.PointOfContact = data.brokerDetail.PointOfContact;
-					$rootScope.editSavedLoad.PointOfContactPhone = data.brokerDetail.PointOfContactPhone;
-					$rootScope.editSavedLoad.TruckCompanyEmail = data.brokerDetail.TruckCompanyEmail;
-					
+					$rootScope.editSavedLoad.TruckCompanyName    = data.shipperData.shipperCompanyName;
+					$rootScope.editSavedLoad.postingAddress      = data.shipperData.postingAddress;
+					$rootScope.editSavedLoad.city 				 = data.shipperData.city;
+					$rootScope.editSavedLoad.state   			 = data.shipperData.state;
+					$rootScope.editSavedLoad.zipcode   			 = data.shipperData.zipcode;
+					$rootScope.editSavedLoad.billType			 = 'shipper';
 				}
-				$rootScope.editSavedLoad.broker_id = data.brokerDetail.id; 					// SHOWING UPLOAD BUTTON ON JOB TICKET	
+
+				$rootScope.editBrokerLoadInfo.MCNumber = '';
+				$rootScope.editSavedLoad.MCNumber = '';
+
+				$rootScope.editSavedLoad.broker_id = data.shipperData.id; 					// SHOWING UPLOAD BUTTON ON JOB TICKET	
 			
 				if ( data.brokerDocuments != undefined ) {
 					$scope.brokerDocuments = data.brokerDocuments;
 				} else {
 					$scope.brokerDocuments = [];
 				}
-				$scope.autoFetchLoads = false;
+				
 			});
 		} else {
-
+			main.selectedShipperName = 'Select Shipper';
+			if ( parameter == 'addRequest') {
+				$rootScope.editBrokerLoadInfo = {};
+			} else {
+				$rootScope.editSavedLoad.TruckCompanyName = '';
+				$rootScope.editSavedLoad.postingAddress = '';
+				$rootScope.editSavedLoad.city = '';
+				$rootScope.editSavedLoad.state = '';
+				$rootScope.editSavedLoad.zipcode = '';
+				$rootScope.editSavedLoad.MCNumber = '';
+				$rootScope.editSavedLoad.CarrierMC = '';
+				$rootScope.editSavedLoad.DOTNumber = '';
+			}
+			$rootScope.showBrokerStatus = '';
+			$rootScope.editBrokerLoadInfo.billType 		   = '';
+			$rootScope.editSavedLoad.billType			   = '';
+			$rootScope.editSavedLoad.broker_id  = '';
+			$scope.brokerDocuments = [];
 		}
 	} 
 		
@@ -2884,7 +2947,7 @@ $rootScope.logoutmessage=false;
 		$scope.resetTheForm = function(resetType) {			
 			if( resetType == 'broker' ) {
 				$rootScope.editBrokerLoadInfo = {};
-				$scope.selectedBrokerName = '';
+				$scope.selectedBrokerName = 'Select Broker';
 				$rootScope.showBrokerStatus = '';
 			} else {
 				$rootScope.editShippingLoadInfo = {};
@@ -3880,7 +3943,7 @@ $rootScope.logoutmessage=false;
 	}
     
     $scope.deleteDoc = function(id,filename,loadId,doc_type, brokerId){
-		angular.element("#confirm-delete").modal('show');
+    	angular.element("#confirm-delete").modal('show');
 		angular.element("#confirm-delete").data("loadId",loadId);
 		angular.element("#confirm-delete").data("id",id);
 		angular.element("#confirm-delete").data("filename",filename);
@@ -3902,10 +3965,10 @@ $rootScope.logoutmessage=false;
 				dataFactory.httpRequest(URL+'/truckstop/deleteDocument','POST',{},{loadId:loadId,docId:id,filename:filename,doc_type:doc_type,assignedBrokeId : assignedBrokerId,srcPage:$rootScope.srcPage,bloadId:$rootScope.primaryLoadId}).then(function(data){
 					PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
 					$rootScope.alertExceedMsg = false;
-					if ( doc_type == 'broker' ) {
+					if ( doc_type == 'broker' || doc_type == 'shipper') {
 						$scope.brokerDocuments = data.result.brokerDocuments;
 						$rootScope.alertloadmsg = true;
-						$rootScope.Message = 'Success: The broker document has been deleted successfully.';
+						$rootScope.Message = 'Success: The '+doc_type+' document has been deleted successfully.';
 					} else {
 						$rootScope.Docs = data.result.dlist;
 						$rootScope.alertloadmsg = true;
@@ -3913,10 +3976,10 @@ $rootScope.logoutmessage=false;
 							$rootScope.Message = 'Success: The document has been deleted successfully and load has been moved to billable section.';
 							$rootScope.showSendPaymentsLoads();				// fetching sent for payment loads if invoice for that load is deleted.
 							$rootScope.noLoadSelected = true;
-							$rootScope.selectedIndex = '';			// setting selected index to empty for send for payment page
+							$rootScope.selectedIndex = '';					// setting selected index to empty for send for payment page
 							$rootScope.notHitPaymentLoadRequest = 0;		// not hitting request on send for payment page if invoice is deleted
 							$rootScope.saveTypeLoad == 'sendForPayment'
-							$rootScope.readyToSendPaymentCount = parseInt($rootScope.readyToSendPaymentCount) - 1;		// changing the inbox send for payment count on deleting invoice
+							$rootScope.readyToSendPaymentCount = parseInt($rootScope.readyToSendPaymentCount) - 1;	// changing the inbox send for payment count on deleting invoice
 						} else {
 							$rootScope.Message = 'Success: The document has been deleted successfully.';
 							if($rootScope.saveTypeLoad == 'filteredBillingLoads'){
@@ -3958,8 +4021,8 @@ $rootScope.logoutmessage=false;
 		}
 		
 		angular.element(".progress-div").show();
-		if ( docType == 'broker' ) {
-			dataFactory.httpRequest(URL+'/truckstop/fetchBrokerDocuments/'+loadId).then(function(data){
+		if ( docType == 'broker' || docType == 'shipper' ) {
+			dataFactory.httpRequest(URL+'/truckstop/fetchBrokerShipperDocuments/'+loadId+'/'+docType).then(function(data){
 				data = angular.fromJson(data);
 				$scope.brokerDocuments = data.result.brokerDocuments;
 				angular.element(".progress-div").hide();
@@ -4039,10 +4102,10 @@ $rootScope.logoutmessage=false;
 	/**
 	 * confirm for broker Upload
 	 */ 
-	$scope.uploadBrokerDocument = function( loadId, brokerId ) {
+	main.uploadBrokerDocument = function( loadId, brokerId ) {
 		if ( loadId != undefined && loadId != '' && brokerId != undefined && brokerId != '' ) {
-			$rootScope.uploadBrokerDoc = true;
-			$rootScope.showUploadBrokerButton = false;
+			main.uploadBrokerDoc = true;
+			main.showUploadBrokerButton = false;
 		} else {
 			$rootScope.alertloadmsg = false;
 			$rootScope.alertExceedMsg = true;
@@ -4188,7 +4251,7 @@ $rootScope.logoutmessage=false;
 	$scope.dropzoneConfigBrokerDoc = {
 		parallelUploads: 3,
 		maxFileSize: 10,
-		url: URL+ '/truckstop/uploadDocs/broker',
+		url: URL+ '/truckstop/uploadDocs/',
 		addRemoveLinks: true, 
 		acceptedFiles: 'image/*, application/pdf, .xls, .xlsx, .doc, .docx, .txt, .svg, .bmp',
 		init:function(){
@@ -4197,6 +4260,7 @@ $rootScope.logoutmessage=false;
 		sending:function(file, xhr, formData){
 			formData.append("loadId", $rootScope.primaryLoadId);
 			formData.append("brokerId", $rootScope.editSavedLoad.broker_id);
+			formData.append("docType", $rootScope.editSavedLoad.billType);
 			formData.append("srcPage", $rootScope.srcPage);
 		},
 		success:function(file,response){
@@ -4218,7 +4282,7 @@ $rootScope.logoutmessage=false;
 				
 				$scope.brokerDocuments = response.result.brokerDocuments;
 				$scope.$apply();
-				$timeout(function() {$scope.fetchJobDocs('0',$rootScope.editSavedLoad.broker_id,'broker');},800);
+				$timeout(function() {$scope.fetchJobDocs('0',$rootScope.editSavedLoad.broker_id, $rootScope.editSavedLoad.billType);},800);
 			}
 		},
 	};

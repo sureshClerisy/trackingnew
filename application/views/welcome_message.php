@@ -135,6 +135,7 @@
     createScriptOrLinkTag('app/controllers/shipperController.js','script');
     createScriptOrLinkTag('app/services/shipperService.js','script');
     createScriptOrLinkTag('app/services/environmentconfig.js','script');
+    createScriptOrLinkTag('app/controllers/sendDirectPaymentController.js','script');
     ?>
     <script src="login/loadLanguages"></script>
     <!--for footable-->

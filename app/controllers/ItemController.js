@@ -399,8 +399,6 @@ app.controller('AdminController', function($scope,$interval, $document,$timeout,
     $scope.onSelectVehicleCallback = function (item, model){
         $scope.search_vehicle = item.vid;
         
-        alert($scope.search_vehicle);
-
         $cookies.remove("_globalDropdown");
         $cookies.putObject('_globalDropdown', item);    
         if(item.vid == "" ) {
@@ -1281,6 +1279,24 @@ $rootScope.exportTodayReport = function(){
               downloadLink.remove();
             }, null);
 
+    });
+}
+
+$rootScope.exportTop5 = function(){
+    var tempBuffer = $cookies.getObject('_globalDropdown');
+    if ( tempBuffer != undefined ) {
+        if ( tempBuffer.label == '' || tempBuffer.label == 'all' || tempBuffer.label == '_iall' )  
+            data = {'startDate':$scope.dateRangeSelector.startDate, 'endDate':$scope.dateRangeSelector.endDate,'export':1};
+        else if ( tempBuffer.label == "_idispatcher" )
+            data = {'startDate':$scope.dateRangeSelector.startDate, 'endDate':$scope.dateRangeSelector.endDate, "dispatcherId" : tempBuffer.dispId,'export':1};
+        else
+           data = {'startDate':$scope.dateRangeSelector.startDate, 'endDate':$scope.dateRangeSelector.endDate,"driverId":tempBuffer.id, "dispatcherId" : tempBuffer.dispId, 'secondDriverId' : tempBuffer.team_driver_id,'export':1};  
+    } else {
+        data = {'startDate':$scope.dateRangeSelector.startDate, 'endDate':$scope.dateRangeSelector.endDate,'export':1};
+    }
+
+    dataFactory.httpRequest(URL+'/dashboard/topFiveCustomer','POST',{},data).then(function(data){
+       alert(data.fileName);
     });
 }
 

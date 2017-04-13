@@ -60,6 +60,7 @@ class Filteredbillings extends Admin_Controller{
 	
 
 	public function getRecords($parameter = ''){
+
 		$params = json_decode(file_get_contents('php://input'),true);
 		$total = 0;
 		$jobs = array();
@@ -104,6 +105,14 @@ class Filteredbillings extends Admin_Controller{
 
 		$jobs = $this->Billing->getFilteredLoads( $params);
 		$total = $this->Billing->getFilteredLoads( $params,true);
+		
+		if(!empty($params['export'])){
+			$keys = [['DATE','CUSTOMER NAME','DRIVERS','INVOICE','CHARGES','PROFIT','%PROFIT','MILES','DEAD MILES','RATE/MILE','DATE P/U','PICK UP','DATE DE','DELIVERY','LOLAD ID','STATUS']];
+			$exportData = $this->buildExportLoadData($jobs);
+			$data = array_merge($keys,$exportData);
+			echo json_encode(array('fileName'=>$this->createExcell('billing',$data)));die();
+		}
+
 		if(!$jobs){$jobs = array();}
 		echo json_encode(array("data"=>$jobs,"total"=>$total));
 	}	

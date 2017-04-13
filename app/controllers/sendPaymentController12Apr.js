@@ -59,8 +59,6 @@ app.controller('sendPaymentController', ["dataFactory","$scope","$http","$rootSc
 		var targetVariable = 8;
 		var disableAnotherSorting = '';
 	}
-
-	$scope.billPaymentMode = getSendBillingData.billPaymentType;
 	$rootScope.readyToSendPaymentCount = $rootScope.SendLoads.length;	
 	
 	$rootScope.dataTableOpts(20,targetVariable,disableAnotherSorting);	
@@ -248,11 +246,11 @@ app.controller('sendPaymentController', ["dataFactory","$scope","$http","$rootSc
 		 * Fetching loads already sent for payment
 		 */
 		 
-		$scope.showAlreadySentPaymentRecords = function(paymentType) {
+		$scope.showAlreadySentPaymentRecords = function() {
 			$scope.showPaymentSidebarLiSelected = 'sent';
 			$rootScope.noLoadSelected = true;
 			$scope.autoFetchLoads = true;
-			dataFactory.httpRequest(URL+'/billings/fetchSentPaymentRecords/'+paymentType).then(function(data){
+			dataFactory.httpRequest(URL+'/billings/fetchSentPaymentRecords').then(function(data){
 				$rootScope.SendLoads = data.loads;
 				$scope.autoFetchLoads = false;
 			});
@@ -262,11 +260,11 @@ app.controller('sendPaymentController', ["dataFactory","$scope","$http","$rootSc
 		 * Fetching loads whose flag is set
 		 */
 		
-		$scope.showFlaggedPaymentRecords = function(paymentType) {
+		$scope.showFlaggedPaymentRecords = function() {
 			$scope.showPaymentSidebarLiSelected = 'flagged';
 			$rootScope.noLoadSelected = true;
 			$scope.autoFetchLoads = true;
-			dataFactory.httpRequest(URL+'/billings/fetchFlaggedPaymentRecords/'+paymentType).then(function(data){
+			dataFactory.httpRequest(URL+'/billings/fetchFlaggedPaymentRecords').then(function(data){
 				$rootScope.SendLoads = data.loads;
 				$scope.autoFetchLoads = false;
 			});
@@ -276,11 +274,11 @@ app.controller('sendPaymentController', ["dataFactory","$scope","$http","$rootSc
 		 * Fetching loads sending for payment
 		 */
 		 
-		$rootScope.showSendPaymentsLoads = function(paymentType) {
+		$rootScope.showSendPaymentsLoads = function() {
 			$scope.showPaymentSidebarLiSelected = 'inbox';
 			$rootScope.noLoadSelected = true;
 			$scope.autoFetchLoads = true;
-			dataFactory.httpRequest(URL+'/billings/sendForPayment/'+paymentType).then(function(data){
+			dataFactory.httpRequest(URL+'/billings/sendForPayment').then(function(data){
 				$rootScope.SendLoads = data.loads;
 				$scope.autoFetchLoads = false;
 			});

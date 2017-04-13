@@ -209,9 +209,11 @@
 									</li>
 									<li ng-class="showhighlighted == 'brokerDetails' ? 'active' : ''" >
 										<a href="javascript:void(0)" ng-click="showBrokerInfo(editSavedLoad.ID,primaryLoadId)" >
-										<i class="fa fa-thumbs-up broker-status"  style="color: #6ba900;" ng-if="editSavedLoad.brokerStatus == 'Approved'"></i>
-										<i class="fa fa-thumbs-down broker-status" style="color: #ff0000;" ng-if="editSavedLoad.brokerStatus == 'Not Approved' || editSavedLoad.brokerStatus == 'Not Available' || editSavedLoad.brokerStatus == 'Declined Credit'"></i>
-										{{ languageCommonVariables.popupbroker }}</a>
+										<i class="fa fa-thumbs-up broker-status"  style="color: #6ba900;" ng-if="editSavedLoad.brokerStatus == 'Approved' && mctrl.showSelectedShipOrBrok == 'broker'"></i>
+										<i class="fa fa-thumbs-down broker-status" style="color: #ff0000;" ng-if="(editSavedLoad.brokerStatus == 'Not Approved' || editSavedLoad.brokerStatus == 'Not Available' || editSavedLoad.brokerStatus == 'Declined Credit') && (mctrl.showSelectedShipOrBrok == 'broker')"></i>
+										{{ (mctrl.showSelectedShipOrBrok == 'broker' || mctrl.showSelectedShipOrBrok == '' || mctrl.showSelectedShipOrBrok == 'undefined') ? languageCommonVariables.popupbroker : 'Shipper'}}
+
+										</a>
 									</li>
 															
 									<li ng-class="showhighlighted == 'matchTruck' ? 'active' : ''">
@@ -947,40 +949,51 @@
 				
 					
 					<div class="popup-inner-content-main"  ng-show="brokerDetailInfo == true">
-						<div class="col-xs-12">
-							<div class="form-group form-group-default th-select broker-detail-dropdown" ng-show="showBrokerDropdown == true">
-								<label>Select Broker</label>
-								<ui-select ng-disabled="disabledUISelect" ng-model="brokerSelectedId" theme="bootstrap" on-select="onSelectChangeBrokerCallback($item, $model)" >
-									<ui-select-match class="ui-select-match" placeholder="Select Broker">{{selectedBrokerName}}</ui-select-match>
-									<ui-select-choices class="ui-select-choices" repeat="item in brokersList | filter: $select.search">
-										<span ng-bind-html="trustAsHtml((item.TruckCompanyName | highlight: $select.search))"></span>
-									</ui-select-choices>
-								</ui-select>
+						<div class="row-fmain-1">
+							<div class="half-block-main">
+								<div class="form-group form-group-default th-select broker-detail-dropdown" ng-show="showBrokerDropdown == true">
+									<label>Select Broker</label>								
+									<ui-select ng-disabled="disableTemp" ng-model="brokerSelectedId" theme="bootstrap" on-select="onSelectChangeBrokerCallback($item, $model)">
+										<ui-select-match class="ui-select-match" placeholder="Select Broker">{{selectedBrokerName}}</ui-select-match>
+										<ui-select-choices class="ui-select-choices" repeat="item in brokersList | filter: $select.search">
+											<span ng-bind-html="trustAsHtml((item.TruckCompanyName | highlight: $select.search))"></span>
+										</ui-select-choices>
+									</ui-select>
+								</div>
+							</div>
+							<div class="half-block-main">
+								<div class="form-group form-group-default th-select broker-detail-dropdown" ng-show="showBrokerDropdown == true">
+									<label>Select Shipper</label>								
+									<ui-select ng-disabled="disableTemp" ng-model="mctrl.shipperSelectedId" theme="bootstrap" on-select="mctrl.onSelectChangeShipperCallback($item, $model)">
+										<ui-select-match class="ui-select-match" placeholder="Select Shipper">{{mctrl.selectedShipperName}}</ui-select-match>
+										<ui-select-choices class="ui-select-choices" repeat="item in mctrl.shippersList | filter: $select.search">
+											<span ng-bind-html="trustAsHtml((item.shipperCompanyName | highlight: $select.search))"></span>
+										</ui-select-choices>
+									</ui-select>
+								</div>
 							</div>
 						</div>
 						
 						
 						
-						<form method="POST" name="editLoad2" role="form" ng-submit="saveddEditLoad(editSavedLoad)" ng-class="showFormClass == true ? 'saveform' : ''">
-							
-								<div class="col-xs-12">
-									<div class="company-detail-popup-heading">
-										<h4>{{ editSavedLoad.TruckCompanyName }}
-											<span ng-if="showBrokerStatus != 'undefined' && showBrokerStatus != ''" ng-class="editSavedLoad.brokerStatus == 'Approved' ? 'green-color' : 'red-color'">({{ showBrokerStatus }})</span>
-										</h4>
-										<button  style="float: right" ng-click="uploadBrokerDocument(primaryLoadId,editSavedLoad.broker_id)" ng-if="showUploadBrokerButton == true" class="ratesheet-tripDetail btn btn-success btn-cons m-b-10" type="button"><i class="fa fa-cloud-upload"></i> <span class="bold">Upload Document</span>
+						<form method="POST" name="editLoad2" role="form" ng-submit="saveddEditLoad(editSavedLoad)" ng-class="showFormClass == true ? 'saveform' : ''">	
+							<div class="col-xs-12">
+								<div class="company-detail-popup-heading">
+									<h4>{{ editSavedLoad.TruckCompanyName }}
+										<span ng-if="showBrokerStatus != 'undefined' && showBrokerStatus != '' && editSavedLoad.billType != 'shipper'" ng-class="editSavedLoad.brokerStatus == 'Approved' ? 'green-color' : 'red-color'">({{ showBrokerStatus }})</span>
+									</h4>
+									<button  style="float: right" ng-click="mctrl.uploadBrokerDocument(primaryLoadId,editSavedLoad.broker_id)" ng-if="mctrl.showUploadBrokerButton == true" class="ratesheet-tripDetail btn btn-success btn-cons m-b-10" type="button"><i class="fa fa-cloud-upload"></i> <span class="bold">Upload Document</span>
+									</button>
+										<div class="save-cancel" ng-show="save_cancel_div == true">
+											<button ng-click ="saveEditLoad(editSavedLoad)" ng-disabled="editLoad.$invalid" class="save btn btn-primary btn-cons m-b-10" type="button"><i class="pg-form"></i> <span class="bold">Save</span>
+											</button>
+											<button href="javascript:void(0)" ng-click="changeSaveStatus()" class="cancelTheLoad btn btn-danger btn-cons m-b-10" type="button"><i class="fa fa-close"></i><span class="bold"> Close </span></button>
+										</div>
+										<button href="javascript:void(0);" ng-click="changeEditStatus()" ng-if = "save_edit_div == true && showEditButton == true" class="edit-loadDetail edit1Load btn btn-info btn-cons m-b-10" type="button"><i class="fa fa-paste"></i> <span class="bold">Edit</span>
 										</button>
 
-											<div class="save-cancel" ng-show="save_cancel_div == true">
-												<button ng-click ="saveEditLoad(editSavedLoad)" ng-disabled="editLoad.$invalid" class="save btn btn-primary btn-cons m-b-10" type="button"><i class="pg-form"></i> <span class="bold">Save</span>
-												</button>
-												<button href="javascript:void(0)" ng-click="changeSaveStatus()" class="cancelTheLoad btn btn-danger btn-cons m-b-10" type="button"><i class="fa fa-close"></i><span class="bold"> Close </span></button>
-											</div>
-											<button href="javascript:void(0);" ng-click="changeEditStatus()" ng-if = "save_edit_div == true && showEditButton == true" class="edit-loadDetail edit1Load btn btn-info btn-cons m-b-10" type="button"><i class="fa fa-paste"></i> <span class="bold">Edit</span>
-											</button>
-
-										</div>
-								</div>
+									</div>
+							</div>
 
 
 
@@ -1100,8 +1113,8 @@
 									</div>
 								</div>
 							</div>
-								
-							<div class="col-xs-12 company-autority-section comp-authority-new">
+													
+							<div class="col-xs-12 company-autority-section comp-authority-new" ng-if="editSavedLoad.billType != 'shipper'">
 									<div class="table-input-head black-bg">
 										<h1>{{ languageCommonVariables.authority }}</h1>
 									</div>
@@ -1133,12 +1146,11 @@
 						
 						<!-- START PANEL -->
 						
-						<div class="drop-panel dropzone-padding" ng-show="uploadBrokerDoc == true" >
+						<div class="drop-panel dropzone-padding" ng-show="mctrl.uploadBrokerDoc == true" >
 							<div class="panel-body no-scroll no-padding">
 								
 								<form class="dropzone" id="docsDropzoneBroker" method="post" enctype="multipart/form-data" ng-dropzone dropzone="dropzone" dropzone-config="dropzoneConfigBrokerDoc">
-									<input name="file" type="file" multiple />
-								
+									<input name="file" type="file" multiple />								
 								</form>
 							</div>
 						</div>
@@ -1147,27 +1159,23 @@
 					   <section class="truck-load-pdf-adjust-width" ng-repeat="brokerDoc in brokerDocuments">
 							<div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 truck-load-pdf-left">
 								<div class="row">
-									<div class="pdf-cover" data-id="{{brokerDoc.id}}" data-loadid="{{brokerDoc.load_id}}" data-url="assets/uploads/documents/broker/{{brokerDoc.doc_name}}" ng-click="perviewDoc($event)">
-										<img ng-class="{'text-success': docs.thumb.includes('.doc') > -1}" ng-src="assets/uploads/documents/thumb_broker/{{brokerDoc.thumb_doc_name}}" fallback-src="pages/img/pdf.png" />
+									<div class="pdf-cover" data-id="{{brokerDoc.id}}" data-loadid="{{brokerDoc.load_id}}" data-url="assets/uploads/documents/{{brokerDoc.billType}}/{{brokerDoc.doc_name}}" ng-click="perviewDoc($event)">
+										<img ng-class="{'text-success': docs.thumb.includes('.doc') > -1}" ng-src="assets/uploads/documents/thumb_{{brokerDoc.billType}}/{{brokerDoc.thumb_doc_name}}" fallback-src="pages/img/pdf.png" />
 									</div>
 								</div>
 							</div>
 							<div class="col-xs-12 col-sm-9 col-md-9 col-lg-9 truck-load-pdf-right">
 								<p>{{brokerDoc.doc_name}}</p>
-								<a target="_blank" href="assets/uploads/documents/broker/{{brokerDoc.doc_name}}" class="no-padding">
-									<button class="btn btn-success btn-cons m-b-10" type="button"><i class="fa fa-cloud-download"></i> <span class="bold"> {{ languageCommonVariables.downloadbutton }}</span>
-											</button>
-									
-
-									</a>
-
-								<a href="" class="no-padding" ng-click="deleteDoc(brokerDoc.id,brokerDoc.doc_name,'0','broker',brokerDoc.BrokerId)">
-									<button class="btn btn-danger btn-cons m-b-10" type="button"><i class="fa fa-trash"></i><span class="bold"> {{ languageCommonVariables.deletebutton }}</span>
-											</button>
-
-									</a>
-								
-																
+								<a target="_blank" href="assets/uploads/documents/{{brokerDoc.billType}}/{{brokerDoc.doc_name}}" class="no-padding">
+									<button class="btn btn-success btn-cons m-b-10" type="button">
+										<i class="fa fa-cloud-download"></i> <span class="bold"> {{ languageCommonVariables.downloadbutton }}</span>
+									</button>
+								</a>
+								<a href="javascript:void(0);" class="no-padding" ng-click="deleteDoc(brokerDoc.id,brokerDoc.doc_name,'0',brokerDoc.billType,brokerDoc.BrokerId)">
+									<button class="btn btn-danger btn-cons m-b-10" type="button">
+										<i class="fa fa-trash"></i><span class="bold"> {{ languageCommonVariables.deletebutton }}</span>
+									</button>
+								</a>							
 							</div>
 						</section>
 						</div>
@@ -1653,40 +1661,7 @@
 <!-- 	table-full-width  -->
 </div>
 <!-- Add Signature Modal -->
-<!-- Confirm Delete Modal -->
-<div class="modal fade slide-up confirm-delete " id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-	<div class="popup-overlay">
-		<div class="popup-main">
-			<div class="popup-main-table">
-				<div class="popup-table-cell">
-						<div class="confirm-main-content-">
-							<div class="popconfirm-img">
-								<img src="pages/img/confirm-icon.png">
-							</div>
-							<h2 class="confirm-heading">{{ languageCommonVariables.confirmdelete }}</h2>
-							<div class="line-image">
-								<img src="pages/img/confirm-line.png">
-							</div>
-							<div class="confirm-btn-section">
-								<a href="" class="common-item confirm-yes yes-btn" ng-click="confirmDelete('yes')"><button class="btn btn-primary btn-cons m-b-10" type="button"><i class="fa fa-check"></i> <span class="bold"> {{ languageCommonVariables.confirmdeleteyes|capitalize }} </span>
-								</button></a>
-								<a href="" class="chain-item yes-btn" style="display: none" ng-click="confirmDeleteChainItem('yes')" ><button class="btn btn-primary btn-cons m-b-10" type="button"><i class="fa fa-check"></i> <span class="bold"> {{ languageCommonVariables.confirmdeleteyes|capitalize }} </span>
-								</button></a>
-								<a href="" class="doc-item yes-btn" style="display: none" ng-click="confirmDocDelete('yes')" ><button class="btn btn-primary btn-cons m-b-10" type="button"><i class="fa fa-check"></i> <span class="bold"> {{ languageCommonVariables.confirmdeleteyes|capitalize }} </span>
-								</button></a>
-								<a href="" class="common-item no-btn" ng-click="confirmDelete('no')"><button class="btn btn-danger btn-cons m-b-10" type="button"><i class="fa fa-close"></i><span class="bold"> {{ languageCommonVariables.confirmdeleteno|capitalize }} </span></button></a>
-								<a href="" class="chain-item no-btn" style="display: none;" ng-click="confirmDeleteChainItem('no')" ><button class="btn btn-danger btn-cons m-b-10" type="button"><i class="fa fa-close"></i><span class="bold"> {{ languageCommonVariables.confirmdeleteno|capitalize }} </span></button></a>
-								<a href="" class="doc-item no-btn" style="display: none;" ng-click="confirmDocDelete('no')" ><button class="btn btn-danger btn-cons m-b-10" type="button"><i class="fa fa-close"></i><span class="bold"> {{ languageCommonVariables.confirmdeleteno|capitalize }} </span></button></a>
-							</div>
-							<!--a href="" data-dismiss="modal" class="confirm-cancle-btn" ><img src="pages/img/confirm-cancle.png"></a-->
-						</div>
-				</div>
-			</div>
-		</div>
-	</div>
-<!-- 	table-full-width  -->
-</div>
-<!-- Confirm Delete Modal -->
+
 
 
 <script>

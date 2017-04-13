@@ -663,10 +663,34 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
                                 });
                         }],
             		getSendBillingData: function(dataFactory, $stateParams) {
-						 return dataFactory.httpRequest(URL+'/billings/sendForPayment');
+						 return dataFactory.httpRequest(URL+'/billings/sendForPayment/broker');
 					}
 				}
 			})
+            .state('sendDirectPayment',{
+                url: '/sendDirectPayment',
+                title: 'Send Direct Payment',
+                templateUrl: 'assets/templates/billings/sendDirectPayment.html',
+                controller: 'sendDirectPaymentController',
+                moduleName: 'loads',
+                resolve: {
+                    deps: ['$ocLazyLoad', function($ocLazyLoad) {
+                            return $ocLazyLoad.load([
+                                    'datepicker',
+                                    'timepicker',
+                                    'autonumeric',
+                                    'wysihtml5',
+                                    'inputMask',
+                                    'menuclipper'
+                                ], {
+                                    insertBefore: '#lazyload_placeholder'
+                                });
+                        }],
+                    getDirectBillingData: function(dataFactory, $stateParams) {
+                         return dataFactory.httpRequest(URL+'/billings/sendForPayment/shipper');
+                    }
+                }
+            })
 			.state('trailers', {
 				url: '/trailers',
 				title: 'Trailers',

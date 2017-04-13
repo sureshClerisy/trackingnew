@@ -876,24 +876,42 @@ class Job extends Parent_Model {
 		return true;
 	}
 
-	public function FetchSingleJob( $jobId ) {
-		$this->db->select('loads.*,concat(drivers.first_name," ",drivers.last_name,"-",vehicles.label) as assignedDriverName, users.username, concat("Truck - ",vehicles.label) as assignedTruckLabel,concat(drivers.first_name," ",drivers.last_name) as assigedDriverFullName, broker_info.MCNumber,broker_info.DOTNumber,broker_info.TruckCompanyName,broker_info.postingAddress,broker_info.CarrierMC,broker_info.city,broker_info.state,broker_info.zipcode,drivers.color');
+	public function FetchSingleJob( $jobId, $type = '' ) {
+		if ( $type == 'shipper') {
+			$this->db->select('loads.*,concat(drivers.first_name," ",drivers.last_name,"-",vehicles.label) as assignedDriverName, users.username, concat("Truck - ",vehicles.label) as assignedTruckLabel,concat(drivers.first_name," ",drivers.last_name) as assigedDriverFullName, shippers.shipperCompanyName as TruckCompanyName, shippers.postingAddress,shippers.city,shippers.state,shippers.zipcode,drivers.color');
+			$this->db->join('shippers', 'shippers.id = loads.broker_id','Left');
+		} else {
+			$this->db->select('loads.*,concat(drivers.first_name," ",drivers.last_name,"-",vehicles.label) as assignedDriverName, users.username, concat("Truck - ",vehicles.label) as assignedTruckLabel,concat(drivers.first_name," ",drivers.last_name) as assigedDriverFullName, broker_info.MCNumber,broker_info.DOTNumber,broker_info.TruckCompanyName,broker_info.postingAddress,broker_info.CarrierMC,broker_info.city,broker_info.state,broker_info.zipcode,drivers.color');
+			$this->db->join('broker_info', 'broker_info.id = loads.broker_id','Left');
+		}		
 		$this->db->join('drivers', 'drivers.id = loads.driver_id','Left');
 		$this->db->join('vehicles', 'vehicles.id = loads.vehicle_id','Left');
-		$this->db->join('broker_info', 'broker_info.id = loads.broker_id','Left');
 		$this->db->join('users', 'users.id = loads.dispatcher_id','Left');
 		$this->db->where('loads.id', $jobId);
 		return $this->db->get('loads')->row_array();
 		
+	}
+
+	/**
+	* Fetching the billType of load
+	*/
+
+	public function fetchLoadBillType($jobId = null ) {
+		return $this->db->where('loads.id',$jobId)->get('loads')->row()->billType;
 	}
 	
 	/**
 	 * Fetching single load details for generating invoice
 	 */
 	  
-	public function FetchSingleJobForInvoice( $jobId ) {
-		$this->db->select('loads.invoiceNo,loads.invoicedDate,loads.id,loads.PickupDate,loads.DeliveryDate,loads.woRefno,loads.shipper_name,loads.LoadType,loads.PickupAddress, loads.OriginStreet,loads.OriginCity,loads.OriginState,loads.OriginCountry,loads.OriginZip,loads.shipper_phone,loads.Quantity,loads.PickupDate,loads.Weight,loads.consignee_name, loads.DestinationAddress,loads.DestinationStreet, loads.DestinationCity, loads.DestinationState, loads.DestinationCountry, loads.DestinationZip, loads.consignee_phone, loads.DeliveryDate,loads.PaymentAmount,loads.Stops,broker_info.TruckCompanyName,broker_info.postingAddress,broker_info.city,broker_info.state,broker_info.zipcode');
-		$this->db->join('broker_info', 'broker_info.id = loads.broker_id','Left');
+	public function FetchSingleJobForInvoice( $jobId = null, $type = '' ) {
+		if ( $type == 'shipper') {
+			$this->db->select('loads.invoiceNo, loads.invoicedDate,loads.id, loads.PickupDate,loads.DeliveryDate,loads.woRefno, loads.shipper_name, loads.LoadType, loads.PickupAddress, loads.OriginStreet, loads.OriginCity,loads.OriginState, loads.OriginCountry,loads.OriginZip,loads.shipper_phone, loads.Quantity,loads.PickupDate, loads.Weight,loads.consignee_name, loads.DestinationAddress,loads.DestinationStreet, loads.DestinationCity, loads.DestinationState, loads.DestinationCountry, loads.DestinationZip, loads.consignee_phone, loads.DeliveryDate, loads.PaymentAmount, loads.Stops, shippers.shipperCompanyName as TruckCompanyName, shippers.postingAddress,shippers.city,shippers.state,shippers.zipcode');
+			$this->db->join('shippers', 'shippers.id = loads.broker_id','Left');
+		} else {
+			$this->db->select('loads.invoiceNo,loads.invoicedDate,loads.id,loads.PickupDate,loads.DeliveryDate,loads.woRefno,loads.shipper_name,loads.LoadType,loads.PickupAddress, loads.OriginStreet,loads.OriginCity,loads.OriginState,loads.OriginCountry,loads.OriginZip,loads.shipper_phone,loads.Quantity,loads.PickupDate,loads.Weight,loads.consignee_name, loads.DestinationAddress,loads.DestinationStreet, loads.DestinationCity, loads.DestinationState, loads.DestinationCountry, loads.DestinationZip, loads.consignee_phone, loads.DeliveryDate,loads.PaymentAmount,loads.Stops,broker_info.TruckCompanyName,broker_info.postingAddress,broker_info.city,broker_info.state,broker_info.zipcode');
+			$this->db->join('broker_info', 'broker_info.id = loads.broker_id','Left');
+		}
 		$this->db->where('loads.id', $jobId);
 		
 		return $this->db->get('loads')->row_array();
@@ -903,9 +921,15 @@ class Job extends Parent_Model {
 	 * Getting broker table mc number for add request show
 	 */
 	
-	public function getBrokerForLoadDetail( $loadId ) {
-		$this->db->select('broker_info.MCNumber as mc_number,broker_info.DOTNumber as dot_number,broker_info.TruckCompanyName,broker_info.postingAddress,broker_info.CarrierMC');
-		$this->db->join('broker_info', 'broker_info.id = loads.broker_id','LEFT');
+	public function getBrokerForLoadDetail( $loadId = null, $type = '') {
+		if ( $type == 'shipper') {
+			$this->db->select('shippers.shipperCompanyName as TruckCompanyName');
+			$this->db->join('shippers', 'shippers.id = loads.broker_id','INNER');
+		} else {
+			$this->db->select('broker_info.MCNumber as mc_number,broker_info.DOTNumber as dot_number, broker_info.TruckCompanyName, broker_info.postingAddress, broker_info.CarrierMC');
+			$this->db->join('broker_info', 'broker_info.id = loads.broker_id','LEFT');
+		}
+		
 		$this->db->where('loads.id', $loadId);		
 		$result = $this->db->get('loads');
 		if( $result->num_rows() > 0 ) 
@@ -1085,22 +1109,22 @@ class Job extends Parent_Model {
 	
 		$saveData['truckstopID'] = $saveData['ID'];
 		$saveData['vehicle_id'] = $vehicle_id;
-		
+	
 		/** saving broker info to broker table */
-		if ( $saveData['MCNumber'] != '' && $saveData['MCNumber'] != null ) {
-			$brokerData = array(
-				'TruckCompanyName' => $saveData['TruckCompanyName'],
-				'postingAddress' => $saveData['postingAddress'],
-				'city' => isset($saveData['city']) ? $saveData['city'] : '',
-				'state' => isset($saveData['state']) ? $saveData['state'] : '',
-				'zipcode' => isset($saveData['zipcode']) ? $saveData['zipcode'] : '',
-				'MCNumber' => $saveData['MCNumber'],
-				'CarrierMC' => isset($saveData['CarrierMC']) ? $saveData['CarrierMC'] : '',
-				'DOTNumber' => $saveData['DOTNumber'],
-				'brokerStatus' => @$saveData['brokerStatus'],
-				'DebtorKey' => isset($saveData['DebtorKey']) ? $saveData['DebtorKey'] : '',
-			);
-			
+		$brokerData = array(
+			'postingAddress' => $saveData['postingAddress'],
+			'city' => isset($saveData['city']) ? $saveData['city'] : '',
+			'state' => isset($saveData['state']) ? $saveData['state'] : '',
+			'zipcode' => isset($saveData['zipcode']) ? $saveData['zipcode'] : '',
+		);
+		if ( isset($saveData['MCNumber']) && $saveData['MCNumber'] != '' && $saveData['MCNumber'] != null ) {
+			$brokerData['TruckCompanyName'] = $saveData['TruckCompanyName'];
+			$brokerData['MCNumber'] 		= $saveData['MCNumber'];
+			$brokerData['CarrierMC'] 		= isset($saveData['CarrierMC']) ? $saveData['CarrierMC'] : '';
+			$brokerData['DOTNumber'] 		= $saveData['DOTNumber'];
+			$brokerData['brokerStatus']		= isset($saveData['brokerStatus']) ? $saveData['brokerStatus'] : '';
+			$brokerData['DebtorKey'] 		= isset($saveData['DebtorKey']) ? $saveData['DebtorKey'] : '';
+						
 			$this->db->select('id');
 			$this->db->where('MCNumber',$saveData['MCNumber']);
 			$brokerRes = $this->db->get('broker_info');
@@ -1114,6 +1138,14 @@ class Job extends Parent_Model {
 				$this->db->insert('broker_info',$brokerData);
 				$brokerLastId = $this->db->insert_id();
 			}
+
+			$saveData['billType'] = 'broker';
+		} else if ( isset($saveData['billType']) && $saveData['billType'] == 'shipper' && !empty($saveData['broker_id']) ) {
+			// $brokerData['shipperCompanyName'] = $saveData['shipperCompanyName'];
+			$this->db->where('shippers.id',$saveData['broker_id']);
+			$this->db->update('shippers',$brokerData);
+			$brokerLastId = $saveData['broker_id'];
+			$saveData['billType'] = 'shipper';
 		} else {
 			$brokerLastId = null;
 		}
@@ -1139,6 +1171,8 @@ class Job extends Parent_Model {
 		unset($saveData['assignedDriverName']);	
 		
 		unset($saveData['TruckCompanyName']);
+		unset($saveData['shipperCompanyName']);
+		unset($saveData['companyName']);
 		unset($saveData['TruckCompanyCity']);
 		unset($saveData['TruckCompanyState']);
 		unset($saveData['MCNumber']);
@@ -1300,6 +1334,8 @@ class Job extends Parent_Model {
 		unset($saveData['ID']);
 		
 		unset($saveData['TruckCompanyName']);
+		unset($saveData['shipperCompanyName']);
+		unset($saveData['companyName']);
 		unset($saveData['MCNumber']);
 		unset($saveData['CarrierMC']);
 		unset($saveData['DOTNumber']);	
@@ -1319,7 +1355,7 @@ class Job extends Parent_Model {
 		if ( isset($saveData['driver_id']) && $saveData['driver_id'] != '' && $saveData['driver_id'] != 0 && $saveData['vehicle_id'] != '' && $saveData['vehicle_id'] != 0 ) {
 			$saveData['dispatcher_id'] = $this->getAssignedDispatcherId($saveData['driver_id']);
 		}
-					
+
 		if ( $loadId != '' && $loadId != null ) {
 			$this->db->select('id,driver_id,dispatcher_id');
 			$where = array('loads.driver_id' => $saveData['driver_id'], 'loads.id' => $loadId);

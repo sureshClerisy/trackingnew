@@ -2732,10 +2732,8 @@ table.dataTable thead .sorting_desc:after{
 }
 /**@media****/
 /**6 march****/
-.alert.alert-success.alert-success-yellow {
-    background-color: #ffdf00 ;
-    color: #4b4a4a;
-}
+
+
 .list-view .list-view-group-container {
     padding: 0 0;
     margin-top: 0px;
@@ -6492,6 +6490,43 @@ h3.today-block {
     border-color: #34d6c7;
 }
 /******************box-dashboard*************/
+
+#confirm-delete {
+    z-index: 9999;
+}
+
+.row-fmain-1 {
+    width: 100%;
+    float: left;
+    position: relative;
+}
+.row-fmain-1 .half-block-main {
+    width: 50%;
+    float: left;
+    padding-right: 31px;
+}
+.row-fmain-1 .half-block-main:nth-child(2n) {
+    float: right;
+    padding-right: 0px;
+    padding-left: 30px;
+}
+.row-fmain-1:before {
+    content: "OR";
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin: auto;
+    top: 11px;
+    width: 30px;
+    height: 30px;
+    background: #2099ec;
+    border-radius: 30px;
+    color: #fff;
+    font-weight: 700;
+    text-align: center;
+    padding: 6px 0px;
+    font-size: 13px;
+}
 @media (min-width:2000px){
     .map-load-section .dataTables_wrapper.no-footer table thead tr th.billing-origin{
        width:200px;
