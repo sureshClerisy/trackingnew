@@ -779,7 +779,7 @@ class Vehicle extends Parent_Model
 
     public function fetchVehiclesForCSV( $userId = false ,$search = null) {   
         $this->db->DISTINCT();
-        $this->db->select('vehicles.label,vehicles.model,vehicles.vehicle_type,vehicles.tracker_id,CONCAT(drivers.first_name, " ", `drivers`.`last_name` ),CONCAT(users.first_name, " ", `users`.`last_name` ),vehicles.registration_plate,vehicles.vin,vehicles.permitted_speed,vehicles.cargo_capacity,vehicles.cargo_bay_l,vehicles.cargo_bay_w,vehicles.fuel_type,vehicles.fuel_consumption,vehicles.tank_capactiy,vehicles.tyres_size,vehicles.tyres_number,vehicles.state,vehicles.city,vehicles.vehicle_address,vehicles.unit')
+        $this->db->select('vehicles.label,vehicles.model,vehicles.vehicle_type,vehicles.tracker_id,CONCAT(drivers.first_name, " ", `drivers`.`last_name` ),CONCAT(users.first_name, " ", `users`.`last_name` ),vehicles.registration_plate,vehicles.vin,vehicles.permitted_speed,CONCAT(vehicles.cargo_capacity," ","lbs"),vehicles.cargo_bay_l,vehicles.cargo_bay_w,vehicles.fuel_type,vehicles.fuel_consumption,vehicles.tank_capactiy,vehicles.tyres_size,vehicles.tyres_number,vehicles.state,vehicles.city,vehicles.vehicle_address,vehicles.unit')
         ->from('vehicles');
         $this->db->join('drivers','drivers.id=vehicles.driver_id','LEFT');
         $this->db->join('equipment_types',("FIND_IN_SET(equipment_types.abbrevation , vehicles.vehicle_type) > 0"), 'LEFT');

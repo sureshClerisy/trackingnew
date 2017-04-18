@@ -338,11 +338,11 @@
 				                                    		<i class="fa fa-print" ng-click="print_xl()"></i>
 				                                    	</a>
 				                                    </li>
-				                                    <li ng-show="otherIcon" >
+				                                    <!-- <li ng-show="otherIcon" >
 				                                    	<a href = "">
 				                                    		<i class="fa fa-file-excel-o" ng-click ="exportLeaderBoard(typeOfData)"></i>
 				                                    	</a>
-				                                    </li>
+				                                    </li> -->
 				                                    <li>
 				                                    	<a href="" class="portlet-maximize" data-toggle="maximize" ng-click = "toggleIcon($event,'leaderboard')">
 				                                    		<i class="portlet-icon portlet-icon-maximize portlet-increase-size" ></i>
@@ -405,9 +405,16 @@
 																	<td ng-show="typeOfData == '_idriver'" class="text-center v-align-middle semi-bold"></td>
 																	<td ng-show="typeOfData == '_idriver'" class="text-center v-align-middle semi-bold"></td>
 
-																	<td ng-if="typeOfData != '_idriver' && typeOfData != '_iteam'" class="text-center v-align-middle semi-bold">	{{totalAllArray.overallTotalFinancialGoal | currency:"$":2}} <span class="goals-font" ng-class="totalAllArray.overallPlusMinusFinancialGoal >= 0 ? 'positiveGoal' : 'negativeGoal'" > 	{{totalAllArray.overallPlusMinusFinancialGoal | currency:"$":2}}</span>
+																	<td ng-if="typeOfData != '_idriver' && typeOfData != '_iteam'" class="text-center v-align-middle semi-bold">	
+																		{{totalAllArray.overallTotalFinancialGoal | currency:"$":2}} 
+																		<span class="goals-font" ng-class="totalAllArray.overallPlusMinusFinancialGoal >= 0 ? 'positiveGoal' : 'negativeGoal'" > 	
+																			{{totalAllArray.overallPlusMinusFinancialGoal | currency:"$":2}}
+																		</span>
 																	</td>
-																	<td ng-if="typeOfData != '_idriver' && typeOfData != '_iteam'" class="text-center v-align-middle semi-bold">{{totalAllArray.overallTotalMilesGoal | number:0}} <span class="goals-font" ng-class="totalAllArray.overallPlusMinusMilesGoal >= 0 ? 'positiveGoal' : 'negativeGoal'"> {{totalAllArray.overallPlusMinusMilesGoal | number:0}} </span>
+																	<td ng-if="typeOfData != '_idriver' && typeOfData != '_iteam'" class="text-center v-align-middle semi-bold">{{totalAllArray.overallTotalMilesGoal | number:0}} 
+																		<span class="goals-font" ng-class="totalAllArray.overallPlusMinusMilesGoal >= 0 ? 'positiveGoal' : 'negativeGoal'"> 
+																			{{totalAllArray.overallPlusMinusMilesGoal | number:0}} 
+																		</span>
 																	 </td>
 																	<td  class="text-center v-align-middle semi-bold">{{totalAllArray.totMiles | number:0}}</td>
 																	<td  class="text-center v-align-middle">{{totalAllArray.totDeadMiles | number:0}}</td>
@@ -444,12 +451,31 @@
 				                            </div>
 				                            <div class="panel-controls">
 				                                <ul>
-				                                    <li ng-show="otherIcon"><a class="portlet-collapse text-white" href="" data-toggle="collapse"><i class="portlet-icon portlet-icon-collapse"></i></a>
+				                                    <li ng-show="otherIcon">
+				                                    	<a class="portlet-collapse text-white" href="" data-toggle="collapse">
+				                                    		<i class="portlet-icon portlet-icon-collapse"></i>
+				                                    	</a>
 				                                    </li>
-				                                    <li ng-show="otherIcon"><a href="" class="portlet-refresh" data-toggle="refresh"><i class="portlet-icon portlet-icon-refresh" ng-click = "update_weather(latitude, longitude , curAdd )"></i></a></li>
+				                                    <li ng-show="otherIcon">
+				                                    	<a href="" class="portlet-refresh" data-toggle="refresh">
+				                                    		<i class="portlet-icon portlet-icon-refresh" ng-click = "update_weather(latitude, longitude , curAdd )"></i>
+				                                    	</a>
+				                                    </li>
 			                                        <li ng-show="otherIcon">
-			                                        	<a href="" ><i class="fa fa-print" ng-click = "print_weather()"></i></a></li>
-		                           					<li><a href="" class="portlet-maximize" data-toggle="maximize" ng-click="toggleIcon($event, 'weather')"><i class="portlet-icon portlet-icon-maximize portlet-increase-size" ></i></a></li>
+			                                        	<a href="" >
+			                                        		<i class="fa fa-print" ng-click = "print_weather()"></i>
+			                                        	</a>
+			                                        </li>
+			                                        <li ng-show="otherIcon">
+			                                        	<a href="" >
+			                                        		<i class="fa fa-file-excel-o" ng-click = "exportWeather()"></i>
+			                                        	</a>
+			                                        </li>
+		                           					<li>
+		                           						<a href="" class="portlet-maximize" data-toggle="maximize" ng-click="toggleIcon($event, 'weather')">
+		                           							<i class="portlet-icon portlet-icon-maximize portlet-increase-size" ></i>
+		                           						</a>
+		                           					</li>
 
 				                                </ul>
 				                            </div>
@@ -584,11 +610,30 @@
 				                            <div class="panel-title">{{ languageArray.loadstatus }}</div>
 				                            <div class="panel-controls">
 				                                <ul>
-				                                    <li ng-show="otherIcon"><a class="portlet-collapse" href="" data-toggle="collapse"><i class="portlet-icon portlet-icon-collapse"></i></a>
+				                                    <li ng-show="otherIcon">
+					                                    <a class="portlet-collapse" href="" data-toggle="collapse">
+					                                    	<i class="portlet-icon portlet-icon-collapse"></i>
+					                                    </a>
 				                                    </li>
-				                                     <li ng-show="otherIcon"><a href="" class="portlet-refresh" data-toggle="refresh"><i class="portlet-icon portlet-icon-refresh" ng-click = "refresh_loadStatus()"></i></a></li>
-				                                     <li ng-show="otherIcon"><a href=""><i class="fa fa-print" ng-click = "load_status()"></i></a></li>
-				                                     <li><a href="" class="portlet-maximize" data-toggle="maximize" ng-click="toggleIcon($event,'load_status')" ><i class="portlet-icon portlet-icon-maximize portlet-increase-size" ></i></a></li>
+				                                    <li ng-show="otherIcon">
+				                                     	<a href="" class="portlet-refresh" data-toggle="refresh">
+				                                     		<i class="portlet-icon portlet-icon-refresh" ng-click = "refresh_loadStatus()"></i>
+				                                     	</a>
+				                                    </li>
+				                                    <li ng-show="otherIcon">
+				                                     	<a href="">
+				                                     		<i class="fa fa-print" ng-click = "load_status()"></i>
+				                                     	</a>
+				                                    </li><li ng-show="otherIcon">
+				                                     	<a href="">
+				                                     		<i class="fa fa-file-excel-o" ng-click = "exportLoadStatus()"></i>
+				                                     	</a>
+				                                    </li>
+				                                    <li>
+				                                     	<a href="" class="portlet-maximize" data-toggle="maximize" ng-click="toggleIcon($event,'load_status')" >
+				                                     		<i class="portlet-icon portlet-icon-maximize portlet-increase-size" ></i>
+				                                     	</a>
+				                                    </li>
 
 				                                </ul>
 				                            </div>
@@ -622,7 +667,7 @@
 																<li class="view-lcount" ng-click="showRecordsWithFilter('invoices','billings')"> <p >{{ languageArray.loadstatusinvoice }} </p><h6>{{summary.invoiceCount}}</h6><span> : </span></li>
 																<li class="view-lcount" ng-click="showRecordsWithFilter('waiting-paperwork','billings')"> <p >{{ languageArray.loadstatusinvoicwaitppr }}</p><h6>{{summary.waitingPaperworkCount}}</h6><span> : </span></li>
 																<li > <p>{{ languageArray.loadstatusinvoicpaynoreciv }}</p><h6>{{summary.paymentNotRecievedCount}}</h6><span> : </span></li>
-																<li class="view-lcount" ng-click="showRecordsWithFilter('sentForPayment','billings')"> <p >{{ languageArray.loadstatusinvoicpayoncoll }}  </p><h6>{{summary.sentForPaymentCount}}</h6><span> : </span></li>
+																<li class="view-lcount" ng-click="showRecordsWithFilter('payment-on-collection','billings')"> <p >{{ languageArray.loadstatusinvoicpayoncoll }}  </p><h6>{{summary.sentForPaymentCount}}</h6><span> : </span></li>
 															</ul>
 														</div>
 													</div>

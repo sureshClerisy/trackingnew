@@ -222,7 +222,7 @@ app.controller('assignedLoadsController', ["dataFactory","$scope", "PubNub", "$h
     		case 'Length'			 	: $scope.LengthSortType = type; break;
     		case 'Weight'			 	: $scope.WeightSortType = type; break;
     		case 'TruckCompanyName'		: $scope.TruckCompanyNameSortType = type; break;
-    		case 'load_source'			: $scope.load_sourceSortType = type; break;
+    		case 'billType'				: $scope.load_sourceSortType = type; break;
     		case 'JobStatus'			: $scope.JobStatusSortType = type; break;
     	}
 

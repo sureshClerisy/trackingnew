@@ -1,0 +1,41 @@
+<div class="page-content-wrapper ">
+	<div class="content sm-gutter">
+		<div class="container-fluid padding-25 sm-padding-10 sm-gutter bill-dash">
+			<div class="row">
+				<div class="col-md-12 col-xlg-12">
+					<div class="commen-heading dashboard-page">
+						<h2 class="oprate-dashbord">Investor Dashboard</h2>
+						<div class="label_select_box"> 
+							<div class="dashbord-select-dropdown th-select">
+								<ui-select class="mdrivers" ng-model="investor.vehicle.selected" theme="bootstrap" on-select="investor.vehicleChangeCallBack($item, $model);" required>
+									<ui-select-match class="ui-select-match" placeholder="Select Vehcile">{{ $select.selected.vehicleName}}    </ui-select-match>
+									<ui-select-choices class="ui-select-choices" repeat="item in investor.vehicleList">
+										<span ng-bind-html="trustAsHtml((item.vehicleName | highlight: $select.search))"></span>
+									</ui-select-choices>
+								</ui-select>
+							</div>
+						</div>
+		            </div>
+		        </div>
+		    </div>
+		    <div class="row">
+		    	<div class="panel panel-default green-border wpanel" pg-portlet>
+                    <div class="panel-heading">
+                        <div class="panel-title">{{ languageArray.trucklocation }}
+                        </div>
+                    </div>
+                    <div class="panel-body no-padding">
+                        <div class="row  no-margin">
+							<div class="col-xlg-12 col-md-12 no-padding">
+								<div class=" text-center">
+									<div style="height: 400px" id="live-trucks-map"></div>
+								</div>
+							</div>     	
+						</div>
+                    </div><!-- panel-body -->
+                </div>
+		    	
+		    </div>
+		</div>
+	</div>
+</div>

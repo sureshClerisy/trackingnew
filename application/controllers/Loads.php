@@ -48,6 +48,12 @@ class Loads extends Admin_Controller{
 		$newDestlabel = array();
 		if(isset($_REQUEST["requestFrom"]) && $_REQUEST["requestFrom"] == "billings"){
 			$startDate = $endDate = "";
+			if(isset($_REQUEST["dateFrom"]) && $_REQUEST["dateFrom"] != "null"){ 
+				$startDate = date("Y-m-d", strtotime($_REQUEST["dateFrom"])); 
+			}
+			if(isset($_REQUEST["dateTo"]) && $_REQUEST["dateTo"] != "null"){ 
+				$endDate = date("Y-m-d", strtotime($_REQUEST["dateTo"])); 
+			}
 		}else{
 			$startDate = date('Y-m-01');
 			$endDate   = date("Y-m-d"); 	
@@ -140,6 +146,13 @@ class Loads extends Admin_Controller{
 				
 		}
 
+
+
+		switch ( strtolower( $filterArgs["status"] ) ) {
+			case "inprogress": 	
+			case "delivered" :	
+			case "booked"    :	$this->data['table_title'] = $filterArgs["status"]; break;
+		}
 
 		$this->data['loadSource'] = 'truckstop.com';
 
@@ -249,7 +262,7 @@ class Loads extends Admin_Controller{
 			$keys 	= [['DATE','CUSTOMER NAME','DRIVERS','INVOICE','CHARGES','PROFIT','%PROFIT','MILES','DEAD MILES','RATE/MILE','DATE P/U','PICK UP','DATE DE','DELIVERY','LOLAD ID','STATUS']];
 			$todayReport = $this->buildExportLoadData($jobs);
 			$data = array_merge($keys,$todayReport);
-			echo json_encode(array('fileName'=>$this->createExcell('loads',$data)));die();
+			echo json_encode(array('fileName'=>$this->createExcell('loads',$data,TRUE)));die();
 		}
 		//Export loads to excell file End
 
@@ -357,7 +370,7 @@ class Loads extends Admin_Controller{
 		}else{
 			$defaultKeys = $keys;
 			foreach ($dataArray as $key => $value) {
-				$exportData[$key]['vehicleId'] 	= $value['vehicleId']	;
+				$exportData[$key]['label'] 		= $value['label'];
 				$exportData[$key]['vin']  		= $value['vin'];		
 				$exportData[$key]['model'] 		= $value['model'];
 			}
@@ -419,28 +432,24 @@ class Loads extends Admin_Controller{
 		if((isset($params["sortColumn"]) && empty($params["sortColumn"])) || !isset($params["sortColumn"])){ 
 			$params["sortColumn"] = "DeliveryDate"; 
 		}
-
 		if((isset($params["sortType"]) && empty($params["sortType"])) || !isset($params["sortType"])){ 
 			$params["sortType"] = "ASC"; 
 		}
-
 		if(isset($params["filterArgs"]["filterType"]) && $params["filterArgs"]["filterType"] == "trucksWithoutDriver"){
+
 			$jobs  	= $this->Driver->fetchTrucksWithoutDriver($params);
 			$total 	= $this->Driver->fetchTrucksWithoutDriver($params,true);
 			$keys 	= [['TRUCK NUMBER','VIN','MODEL']];
 			if(!empty($params["export"])){$this->exportData($jobs,$keys);}
 		}
-
 		if(isset($params["filterArgs"]["filterType"]) && $params["filterArgs"]["filterType"] == "trucksReporting"){
 			$jobs  = $this->Driver->trucksReporting($params);
 			$total = $this->Driver->trucksReporting($params,true);
 
 			if(!empty($params["export"])){$this->exportData($jobs);}
 		}
-		
 
 		if(!$jobs){$jobs = array();}
-
 		echo json_encode(array("data"=>$jobs,"total"=>$total));
 	}
 }

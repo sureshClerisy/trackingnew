@@ -1,4 +1,4 @@
-app.controller('sendPaymentController', ["dataFactory","$scope","$http","$rootScope", "$state","$location","$cookies","$stateParams", "getSendBillingData","$compile","$filter","$log",'Sample', 'ganttMouseOffset', 'ganttDebounce', 'moment','$q','$window','$sce','$timeout',function(dataFactory,$scope,$http ,$rootScope ,$state, $location ,  $cookies, $stateParams, getSendBillingData , $compile,$filter,$log,utils, Sample, mouseOffset, debounce, moment,$q,$window,$sce,$timeout){
+app.controller('sendPaymentController', ["dataFactory","$scope","$http","$rootScope", "$state","$location","$cookies","$stateParams", "getSendBillingData","$compile","$filter","$log",'Sample', 'ganttMouseOffset', 'ganttDebounce', 'moment','$q','$window','$sce','$timeout', function(dataFactory,$scope,$http ,$rootScope ,$state, $location ,  $cookies, $stateParams, getSendBillingData , $compile,$filter,$log,utils, Sample, mouseOffset, debounce, moment,$q,$window,$sce,$timeout){
 	if($rootScope.loggedInUser == false)
 		$location.path('login');
 	
@@ -7,9 +7,6 @@ app.controller('sendPaymentController', ["dataFactory","$scope","$http","$rootSc
     $scope.duplicatejobstatus='';
     window.scrollTo(0,0);
 	
-	//~ $scope.trustAsHtml = function(value) {
-        //~ return $sce.trustAsHtml(value);
-    //~ };
     $scope.onSelectStateCallback = function (item, model){
 		$rootScope.editSavedLoad.OriginState = item.code;
 		$rootScope.originPlaceholderValue = item.label;
@@ -25,69 +22,42 @@ app.controller('sendPaymentController', ["dataFactory","$scope","$http","$rootSc
 	
 	//----------drop-down ---------------------------	
 
+	var sendPym = this;
 	
 	$scope.callDynamicFn = false;
 	$rootScope.Message = '';
-	$scope.siteURL = URL;
-	$scope.mindate = new Date();
-	
+		
 	$rootScope.showHeader = true;
 	$rootScope.SendLoads = [];
-	$scope.saveLoadsData = [];
 	$rootScope.Docs = [];
 	
-	$scope.sentPaymentCount = '';
-	$scope.flaggedPaymentCount = '';
-	$scope.showPaymentSidebarLiSelected = 'inbox';
-
+	$rootScope.sentPaymentCount 		= 0;
+	$rootScope.factoredPaymentCount 	= 0;
+	$rootScope.readyToSendPaymentCount  = 0;
+	
 	$scope.deletedRowIndex = '';
 	$scope.idSelection = [];
 	$scope.noRecordFoundMessage = $rootScope.languageArray.noRecordFound;
-	if ( getSendBillingData.billType == 'sendForPayment' ) {
-		$scope.sentPaymentCount = getSendBillingData.sentPaymentCount;
-		$scope.flaggedPaymentCount = getSendBillingData.flaggedPaymentCount;
-		$rootScope.SendLoads = getSendBillingData.loads;
-		var targetVariable = 16;
-		var disableAnotherSorting = 0;
-		angular.forEach($rootScope.SendLoads,function(value,key) {
-			if ( value.flag == 1 ) {
-				$scope.idSelection.push(value.id);
-			}
-		});
-	} else {
-		$rootScope.SendLoads = [];
-		var targetVariable = 8;
-		var disableAnotherSorting = '';
-	}
+	
+	$rootScope.sentPaymentCount 	   = getSendBillingData.sentPaymentCount;
+	$rootScope.factoredPaymentCount    = getSendBillingData.factoredPaymentCount;
+	$rootScope.readyToSendPaymentCount = getSendBillingData.loadsForPaymentCount;
+	
+	if ( getSendBillingData.sendPaymentContType == 'sendForPayment') {
+		$rootScope.SendLoads = getSendBillingData.loads;		
+		$scope.showPaymentSidebarLiSelected = 'inbox';
 
-	$scope.billPaymentMode = getSendBillingData.billPaymentType;
-	$rootScope.readyToSendPaymentCount = $rootScope.SendLoads.length;	
-	
-	$rootScope.dataTableOpts(20,targetVariable,disableAnotherSorting);	
-	
+	} else if ( getSendBillingData.sendPaymentContType == 'factoredLoads') {
+		$scope.showPaymentSidebarLiSelected = 'factoring';
+		$rootScope.SendLoads 	= getSendBillingData.factoredLoads;
+		$scope.idSelection = [];
+		if ( getSendBillingData.triumphIdsArray.length > 0 ) {
+		 	$scope.idSelection = getSendBillingData.triumphIdsArray;
+		}
+	} 
+
 	$rootScope.saveTypeLoad = 'sendForPayment';    			// setting the save type for dynamic changing the listing on routes
 	
-	$scope.newRowsArray = [];
-	$scope.newDriversArray = [];
-	$scope.iterationLeftBar = [];
-	$scope.iterationDelete = [];
-	$scope.firstStartOrigin = '';
-	$scope.firstStartPickup = '';
-	$scope.showFirstLi = false;
-	$scope.previousDate = $filter('date')(new Date(), 'yyyy-MM-dd');
-	$scope.multiData = false;
-	$scope.base_image = new Image();
-	$scope.base_image2 = new Image();
-	$scope.base_image.src = 'pages/img/green-point.png';
-	$scope.base_image2.src = 'pages/img/red-point.png';
-	
-    $scope.totalMiles = 0;
-	var totalMilesSum = 0;
-	var totalDeadMilesSum = 0;
-	var totalWorkingHours = 0;
-	var totalProfitPercent = 0;
-	var totalCost = 0;
-	var totalPayment = 0;
 	
 	$scope.getNextDateForIt = 1;
 	$scope.getProfitPercent = function(profitAmount1, totalPayment1){
@@ -168,39 +138,33 @@ app.controller('sendPaymentController', ["dataFactory","$scope","$http","$rootSc
 
 	/***********Load Details ends******************/
 	
-	$scope.changeClass = function(){
-		if($scope.iClass === false){
-			$scope.iClass = true;
-		}
-		else{
-			$scope.iClass = false;
-		}
-	}
 	
 	/**Send for payment page start*/
 			    		
 		/**
 		 * Sending bundle document to triumph request 
 		 **/
-		$scope.sendDocsForPayment = function() {
+		sendPym.sendDocsForPayment = function() {
 			if ( $scope.idSelection.length > 0 ) {
 				$rootScope.showErrorMessage = false;
 				$scope.autoFetchLoads = true;
 				dataFactory.httpRequest(URL+'/billings/creatingSchedule','POST',{},{selectedIds : $scope.idSelection }).then(function(data){
+					$scope.autoFetchLoads = false;
 					if ( data.success == true ) {
-						$rootScope.SendLoads = data.loadsInfo.loads;
-						$scope.sentPaymentCount = data.loadsInfo.sentPaymentCount;
-						$scope.flaggedPaymentCount = data.loadsInfo.flaggedPaymentCount;
-						$rootScope.readyToSendPaymentCount = data.loadsInfo.loads.length;
+						$rootScope.SendLoads 				 = data.loadsInfo.factoredLoads;
+						$rootScope.sentPaymentCount			 =  data.loadsInfo.sentPaymentCount;
+						$rootScope.factoredPaymentCount 	 =  data.loadsInfo.factoredPaymentCount;
+						$rootScope.readyToSendPaymentCount   =  data.loadsInfo.loadsForPaymentCount;
 						
 						if ( data.errorMessage != '' ) {
 							$rootScope.showErrorMessage = true;
 							$rootScope.ErrMessage = data.errorMessage;
 						}
+
 						$rootScope.noLoadSelected = true;
 						$scope.idSelection = [];
 					}
-					$scope.autoFetchLoads = false;
+					
 				});
 			} else {
 				$rootScope.showErrorMessage = true;
@@ -212,9 +176,9 @@ app.controller('sendPaymentController', ["dataFactory","$scope","$http","$rootSc
 		 * Flag or unflag the load for payment
 		 */
 		
-		$scope.flagUnflagLoad = function(flagStatus, loadId) {
+		$scope.flagUnflagLoad = function(flagStatus, loadId, paymentType) {			
 			$scope.autoFetchLoads = true;
-			dataFactory.httpRequest(URL+'/billings/flagLoad/'+flagStatus+'/'+loadId+'/'+$rootScope.srcPage).then(function(data){
+			dataFactory.httpRequest(URL+'/billings/flagLoad/'+flagStatus+'/'+loadId+'/'+paymentType+'/'+$rootScope.srcPage).then(function(data){
 				if ( flagStatus == 'flag' ) {
 					$scope.showLoadDetail.flag = 1;
 				} else  {
@@ -223,36 +187,50 @@ app.controller('sendPaymentController', ["dataFactory","$scope","$http","$rootSc
 				
 				if ( $scope.showPaymentSidebarLiSelected == 'inbox' ) {
 					$rootScope.SendLoads = data.loadsInfo.loads;
-				} else {
-					$rootScope.SendLoads = data.loadsInfo.flaggedLoads;	
+				} else if ( $scope.showPaymentSidebarLiSelected == 'factoring' ) {
+					$rootScope.SendLoads = data.loadsInfo.factoredLoads;
+					$scope.idSelection = [];
+					if ( data.loadsInfo.triumphIdsArray.length > 0 ) {
+					 	$scope.idSelection = data.loadsInfo.triumphIdsArray;
+					}	
 					$rootScope.noLoadSelected = true;
 				}
-				$scope.sentPaymentCount = data.loadsInfo.sentPaymentCount;
-				$scope.flaggedPaymentCount = data.loadsInfo.flaggedPaymentCount;
-				$rootScope.readyToSendPaymentCount = data.loadsInfo.loads.length;
+				$rootScope.sentPaymentCount 		= data.loadsInfo.sentPaymentCount;
+				$rootScope.factoredPaymentCount 	= data.loadsInfo.factoredPaymentCount;
+				$rootScope.readyToSendPaymentCount  = data.loadsInfo.loads.length;
 				
 				if ( $rootScope.SendLoads.length == 0 ) 
 					$rootScope.noLoadSelected = true;
 					
-				var idx = $scope.idSelection.indexOf(loadId);
-				if (idx > -1) {
-					$scope.idSelection.splice(idx, 1);
-				} else {
-					$scope.idSelection.push(loadId);
-				}
 				$scope.autoFetchLoads = false;
 			});
 		}	
 		
 		/**
+		* process flagged triumph and manual payments
+		*/
+
+		sendPym.processPaymentQueue = function() {
+			$scope.autoFetchLoads = true;
+			dataFactory.httpRequest(URL+'/billings/setFinalFlagLoads').then(function(data){
+				$scope.autoFetchLoads = false;
+				$rootScope.SendLoads 		= data.loads;
+				$rootScope.sentPaymentCount = data.sentPaymentCount;
+				$rootScope.factoredPaymentCount = data.factoredPaymentCount;
+				$rootScope.readyToSendPaymentCount = data.loads.length;
+				$rootScope.noLoadSelected = true;
+			});
+		}
+
+		/**
 		 * Fetching loads already sent for payment
-		 */
+		 *
 		 
-		$scope.showAlreadySentPaymentRecords = function(paymentType) {
-			$scope.showPaymentSidebarLiSelected = 'sent';
+		$scope.showAlreadySentPaymentRecords = function() {
+			$scope.showPaymentSidebarLiSelected = 'outbox';
 			$rootScope.noLoadSelected = true;
 			$scope.autoFetchLoads = true;
-			dataFactory.httpRequest(URL+'/billings/fetchSentPaymentRecords/'+paymentType).then(function(data){
+			dataFactory.httpRequest(URL+'/billings/fetchSentPaymentRecords').then(function(data){
 				$rootScope.SendLoads = data.loads;
 				$scope.autoFetchLoads = false;
 			});
@@ -260,14 +238,18 @@ app.controller('sendPaymentController', ["dataFactory","$scope","$http","$rootSc
 		
 		/**
 		 * Fetching loads whose flag is set
-		 */
+		 *
 		
-		$scope.showFlaggedPaymentRecords = function(paymentType) {
-			$scope.showPaymentSidebarLiSelected = 'flagged';
+		$scope.showFactoredPaymentRecords = function() {
+			$scope.showPaymentSidebarLiSelected = 'factoring';
 			$rootScope.noLoadSelected = true;
 			$scope.autoFetchLoads = true;
-			dataFactory.httpRequest(URL+'/billings/fetchFlaggedPaymentRecords/'+paymentType).then(function(data){
-				$rootScope.SendLoads = data.loads;
+			dataFactory.httpRequest(URL+'/billings/fetchFactoredPaymentRecords').then(function(data){
+				$rootScope.SendLoads = data.factoredLoads;
+				$scope.idSelection = [];
+				if ( data.triumphIdsArray.length > 0 ) {
+				 	$scope.idSelection = data.triumphIdsArray;
+				}
 				$scope.autoFetchLoads = false;
 			});
 		} 
@@ -276,16 +258,16 @@ app.controller('sendPaymentController', ["dataFactory","$scope","$http","$rootSc
 		 * Fetching loads sending for payment
 		 */
 		 
-		$rootScope.showSendPaymentsLoads = function(paymentType) {
+		$rootScope.showSendPaymentsLoads = function() {
 			$scope.showPaymentSidebarLiSelected = 'inbox';
 			$rootScope.noLoadSelected = true;
 			$scope.autoFetchLoads = true;
-			dataFactory.httpRequest(URL+'/billings/sendForPayment/'+paymentType).then(function(data){
+			dataFactory.httpRequest(URL+'/billings/sendForPayment').then(function(data){
 				$rootScope.SendLoads = data.loads;
 				$scope.autoFetchLoads = false;
 			});
 		}
-		 
+		
 		$rootScope.noLoadSelected = true;
 		   var w = angular.element($window);
 		   
@@ -313,5 +295,9 @@ app.controller('sendPaymentController', ["dataFactory","$scope","$http","$rootSc
 			}
 		});
 
+		$scope.exportSendPayment = function (type) {
+			dataFactory.httpRequest(URL+'/billings/exportSendPayment/'+type).then(function(data){
+				$rootScope.donwloadExcelFile(data.fileName);
+			});
+		}
 }]);
-

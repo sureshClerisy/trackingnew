@@ -134,7 +134,7 @@ class Trailer extends Parent_Model {
 	}
 
 	 public function fetchDriversForCSV($search) {
-		$this->db->select('trailers.truck_id,trailers.unit_id,trailers.vin,trailers.owner,trailers.type,trailers.description,trailers.monthly_payment,trailers.due_date,trailers.purchase_price,trailers.interest_rate,trailers.notes,trailers.status,trailers.created');
+		$this->db->select('trailers.truck_id,trailers.unit_id,trailers.vin,trailers.owner,trailers.type,trailers.description,if(trailers.monthly_payment,concat("$",,trailers.monthly_payment),"NA"),trailers.due_date,trailers.purchase_price,trailers.interest_rate,trailers.notes,trailers.status,trailers.created');
 		
 		if(!empty($search['searchText'])){
 			$this->db->like('trailers.unit_id',$search['searchText']); 

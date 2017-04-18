@@ -36,9 +36,11 @@ app.controller('billingsController', ["dataFactory","$scope","$http","$rootScope
 		$rootScope.billingLoads = getBillingData.loads;
 		$scope.total            = getBillingData.total;
 	} 
+
 	$scope.DeliveryDateSortType = "DESC"; 				// intially setting delivery date column to desc		
 	$scope.showReadyForInvoiceLoads = true;				// button to show loads which are ready for generating invoice
-	$rootScope.saveTypeLoad = 'billingLoads';    		// set the save type for dynamic changing the listing on routes
+	$rootScope.saveTypeLoad 	= 'readyForInvoice';    		// set the save type for dynamic changing the listing on routes
+	$scope.listTypeParameter	= 'invoice';			// set value to show invoice ready loads
 
 	if(Object.keys($rootScope.billingLoads).length <= 0){
 		$scope.haveRecords = true;
@@ -67,6 +69,11 @@ app.controller('billingsController', ["dataFactory","$scope","$http","$rootScope
 	var totalCost = 0;
 	var totalPayment = 0;
 	
+	$scope.showPaymentSidebarLiSelected = 'billable';
+	$rootScope.readyToSendPaymentCount =  (getBillingData.sentPaymentData != undefined ) ? getBillingData.sentPaymentData.loadsForPaymentCount : 0;
+    $rootScope.factoredPaymentCount    =  (getBillingData.sentPaymentData != undefined ) ? getBillingData.sentPaymentData.factoredPaymentCount : 0
+    $rootScope.sentPaymentCount        =  (getBillingData.sentPaymentData != undefined ) ? getBillingData.sentPaymentData.sentPaymentCount : 0;
+
 	$scope.getNextDateForIt = 1;
 
 
@@ -180,12 +187,12 @@ app.controller('billingsController', ["dataFactory","$scope","$http","$rootScope
 
 	//-------------- Pagination functions ------------------------- 
 
-	$scope.itemsPerPage     = 20;
+	$scope.itemsPerPage     = $rootScope.globalItemsPerPage;
 	$scope.perPageOptions   = [10, 20, 50];
 	$scope.currentPage      = 1,
 	//$scope.total            = 40;
-	$scope.lastSortedColumn = '';
-    $scope.lastSortType 	= '';
+	$scope.lastSortedColumn = 'DeliveryDate';
+    $scope.lastSortType 	= 'Desc';
     $scope.loadItems = function(){
         $scope.loadNextPage(($scope.currentPage - 1),$scope.searchFilter,$scope.lastSortedColumn,$scope.lastSortType);
     };
@@ -241,7 +248,7 @@ app.controller('billingsController', ["dataFactory","$scope","$http","$rootScope
     		case 'Length'			 	: $scope.LengthSortType = type; break;
     		case 'Weight'			 	: $scope.WeightSortType = type; break;
     		case 'TruckCompanyName'		: $scope.TruckCompanyNameSortType = type; break;
-    		case 'load_source'			: $scope.load_sourceSortType = type; break;
+    		case 'billType'			: $scope.load_sourceSortType = type; break;
     		case 'JobStatus'			: $scope.JobStatusSortType = type; break;
     	}
 
@@ -282,23 +289,10 @@ app.controller('billingsController', ["dataFactory","$scope","$http","$rootScope
 	}
 
 	$scope.exportBillingData = function(){
-    	
     	var searchText = angular.element('input[type="search"]').val();
-
-    	dataFactory.httpRequest(URL+'/billings/fetchDataForCsv','POST',{},{searchText: searchText,InvoiceLoads:$scope.showReadyForInvoiceLoads }).then(function(data){
-			
-			
-			var url = URL+'/assets/ExportExcel/'+data.fileName;
-			var timestamp = Math.floor(Date.now() / 1000);
-			var downloadContainer 	= angular.element('<div data-tap-disabled="true"><a></a></div>');
-			var downloadLink 		= angular.element(downloadContainer.children()[0]);
-			downloadLink.attr('href',url);
-			downloadLink.attr('download', data.fileName);
-			angular.element('body').append(downloadContainer);
-			setTimeout(function(){
-				downloadLink[0].click();
-			  downloadLink.remove();
-			});
+    	dataFactory.httpRequest(URL+'/billings/fetchDataForCsv','POST',{},{searchText: searchText,InvoiceLoads:$scope.showReadyForInvoiceLoads,'export':1 }).then(function(data){
+			$rootScope.donwloadExcelFile(data.fileName);
         });
-    }	 
+    }
 }]);
+        

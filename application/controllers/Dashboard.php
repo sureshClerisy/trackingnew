@@ -105,10 +105,11 @@ class Dashboard extends Admin_Controller {
 			}else{
 				//Created a common function in my_controller for all load data for excell file
 				$todayReport = $this->buildExportLoadData($todayReport);
+				// $otherInfo   = $todayReport['otherInfo'];
+				// unset($todayReport['otherInfo']);
 			}
-
 			$data = array_merge($keys,$todayReport);
-			echo json_encode(array('fileName'=>$this->createExcell($type,$data)));die();
+			echo json_encode(array('fileName'=>$this->createExcell($type,$data,TRUE)));die();
 		}
 		echo json_encode(array("success"=>true,"todayReport"=>$todayReport,"totals"=>$totals));
 	}
@@ -1590,21 +1591,54 @@ class Dashboard extends Admin_Controller {
 				$i++;
 			}
 		}
-		$data['colors'] = $colors;
-		$data['valueIds']['dispatcherId'] = $dispatcherId;
-		$data['valueIds']['driverId'] = $driverId;
+		$data['colors'] 					= $colors;
+		$data['valueIds']['dispatcherId'] 	= $dispatcherId;
+		$data['valueIds']['driverId'] 		= $driverId;
 		$data['valueIds']['secondDriverId'] = $secondDriverId;
-
-		$data['totalDrivers'] = $driversWithoutTruck;
-		$data['trucksNotReporting'] = $trucksNotReporting;
-		$data['vehiclesWithoutDriver'] = $vehiclesWithoutDriver;
-		$data['todayDate'] 	  = date('Y-m-d');
+		$data['totalDrivers'] 				= $driversWithoutTruck;
+		$data['trucksNotReporting'] 		= $trucksNotReporting;
+		$data['vehiclesWithoutDriver'] 		= $vehiclesWithoutDriver;
+		$data['todayDate'] 	  				= date('Y-m-d');
 		
-		// if()
+		if(!empty($args['export'])){$this->createTop5Excell($data);}
+		echo json_encode($data);
+	}
 
-		// ex($data);
+	public function exportLoadStatus(){
+		
+		$args = json_decode(file_get_contents('php://input'),true);
+		$ExportData[] =['Assigned Loads','Booked Loads','Delivered Loads','Inprogress Loads','No-Loads','INVOICES','PAYMENT ON COLLECTION','Waiting Paperwork'];
 
-		echo json_encode($data); 				
+		$ExportData[1][] = ($args['assigned'])?$args['assigned']:'0';
+		$ExportData[1][] = ($args['booked'])?$args['booked']:'0';
+		$ExportData[1][] = ($args['delivered'])?$args['delivered']:'0';
+		$ExportData[1][] = ($args['inprogress'])?$args['inprogress']:'0';
+		$ExportData[1][] = ($args['noLoads'])?$args['noLoads']:'0';
+		$ExportData[1][] = ($args['summary']['invoiceCount'])?$args['summary']['invoiceCount']:'0';
+		$ExportData[1][] = ($args['summary']['sentForPaymentCount'])?$args['summary']['sentForPaymentCount']:'0';
+		$ExportData[1][] = ($args['summary']['waitingPaperworkCount'])?$args['summary']['waitingPaperworkCount']:'0';
+		echo json_encode(array('fileName'=>$this->createExcell('loadStatus',$ExportData)));
+		die();
+	}
+
+	/**
+	* @method createTop5Excell
+	* @param Data
+	* @return NULL
+	* @description Create excel file for top five customers
+	*/
+
+	public function createTop5Excell($rawData=null){
+
+		$paymentAmounts 	= array_column($rawData['paymentAmount'], 'y');
+		$companyName 		= $rawData['cName']['cmpName'];
+		$exportableData[0] 	= ['Company Name','Payment Amount'];//Headers
+
+		foreach ($paymentAmounts as $key => $paymentAmount) {
+			$exportableData[$key+1]['CompanyName']   = $rawData['cName']['cmpName'][$key];
+			$exportableData[$key+1]['paymentAmount'] = '$'.$paymentAmount;
+		}
+		echo json_encode(array('fileName'=>$this->createExcell('top5cuatomers',$exportableData)));die();
 	}
 
 	/**
@@ -1621,4 +1655,41 @@ class Dashboard extends Admin_Controller {
 		echo json_encode($data);
 	}*/
 
+	
+	/**
+	* @method exportWeather
+	* @param NULL
+	* @return file Name
+	* @description Create excel file for current weather
+	*/
+
+	public function exportWeather($rawData=null){
+		
+		$args = json_decode(file_get_contents('php://input'),true);
+
+		$excelData[] = ['DAY','DATE','TEMPERATURE','WIND','HUMIDITY','MIN TEMPERATURE','MAX TEMPERATURE','FEELS LIKE'];
+		$excelData[] = [
+						$args['currentWeather']['today'],
+						$args['currentWeather']['date'],
+						$args['currentWeather']['current_temperature'].'°F',
+						$args['currentWeather']['wind'],
+						$args['currentWeather']['humidity'],
+						$args['currentWeather']['main']['temp_min'].'°F',
+						$args['currentWeather']['main']['temp_max'].'°F',
+						ucwords($args['currentWeather']['weather_description'])
+					];
+		for($counter=0;$counter<2;$counter++){
+			$excelData[] = [
+							$args['dailyForecast']['list'][$counter]['today'],
+							$args['dailyForecast']['list'][$counter]['date'],
+							$args['dailyForecast']['list'][$counter]['current_temperature'].'°F',
+							$args['dailyForecast']['list'][$counter]['wind'],
+							$args['dailyForecast']['list'][$counter]['humidity'],
+							$args['dailyForecast']['list'][$counter]['temp']['min'].'°F',
+							$args['dailyForecast']['list'][$counter]['temp']['max'].'°F',
+							ucwords($args['dailyForecast']['list'][$counter]['weather_description'])
+						];
+		}
+		echo json_encode(array('fileName'=>$this->createExcell('top5cuatomers',$excelData)));die();
+	}
 }

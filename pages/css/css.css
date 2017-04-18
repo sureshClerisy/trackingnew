@@ -510,6 +510,7 @@ a.assign-job {  background: #27a9e3; color: #fff; font-size: 14px; text-transfor
 
 }
 
+
 @keyframes spin {
     from { transform: scale(1) rotate(0deg);}
     to { transform: scale(1) rotate(360deg);}
@@ -2730,11 +2731,19 @@ table.dataTable thead .sorting_desc:after{
 .tab-padding-lang .popup-top-select .form-group .ui-select-match{
 	overflow:visible;
 }
+.list-view li.gry-bg,.split-list li.gry-bg{
+    background: #eee;
+}
+.icon-main-right-1 {
+    position: absolute;
+    right: 17px;
+    max-width: 30px;
+}
 /**@media****/
 /**6 march****/
 
 
-.list-view .list-view-group-container {
+.list-view .list-view-group-container ,.split-list  .list-view-group-container{
     padding: 0 0;
     margin-top: 0px;
 }
@@ -4155,7 +4164,6 @@ table.dataTable thead .broker-office{width:128px}
 }
 /***********************for solving issues -r288 start******************************/
 .commen-heading {
-  background: rgba(0, 0, 0, 0) url("../img/broker.png") no-repeat scroll 0 2px / 32px auto;
   border-bottom: 1px solid #dddddd;
   float: left;
   margin-bottom: 30px;
@@ -4173,6 +4181,7 @@ table.dataTable thead .broker-office{width:128px}
   top: 1px;
   width: auto; padding-left: 40px; color: #60c336;
 } 
+.commen-heading.no-padding h2 {padding-left: 0px;}
 .input-group-addon.align-icon {
   position: relative;
   right: 9px;
@@ -4237,7 +4246,15 @@ table.dataTable thead .broker-office{width:128px}
   .assigned-load-page{background: rgba(0, 0, 0, 0) url("../img/assigned-load.png") no-repeat scroll 0 2px / 32px auto;}
   .plan-page{background: rgba(0, 0, 0, 0) url("../img/plan.png") no-repeat scroll 0 2px / 32px auto;}
   .load-margin.iteration-map{background: rgba(0, 0, 0, 0) url("../img/routemap.png") no-repeat scroll 0 2px / 32px auto; margin-top:33px;}
+  .brokers-page{  background: rgba(0, 0, 0, 0) url("../img/broker.png") no-repeat scroll 0 2px / 32px auto;}
 
+  .waiting-paperwork{ background: rgba(0, 0, 0, 0) url("../img/waiting-paperwork.png") no-repeat scroll 0 2px / 32px auto }
+  .invoices{ background: rgba(0, 0, 0, 0) url("../img/invoices.png") no-repeat scroll 0 2px / 32px auto }
+  .payment-on-collection{ background: rgba(0, 0, 0, 0) url("../img/money-collect.png") no-repeat scroll 0 2px / 32px auto }
+  .last_week_sale, .this_week_sale{ background: rgba(0, 0, 0, 0) url("../img/last-week-sale.png") no-repeat scroll 0 2px / 32px auto }
+  .sent_today{ background: rgba(0, 0, 0, 0) url("../img/sent.png") no-repeat scroll 0 2px / 32px auto }
+  .sent_today_expected{ background: rgba(0, 0, 0, 0) url("../img/expected_bill.png") no-repeat scroll 0 2px / 32px auto }
+  .cash_flow{ background: rgba(0, 0, 0, 0) url("../img/cash_flow.png") no-repeat scroll 0 2px / 32px auto }
 
   #delivery_matrix .highcharts-container {  left: -22px !important;  position: relative;}
 
@@ -6491,9 +6508,14 @@ h3.today-block {
 }
 /******************box-dashboard*************/
 
-#confirm-delete {
-    z-index: 9999;
-}
+#confirm-delete { z-index: 9999; }
+.row-fmain-1 { width: 100%; float: left; position: relative; }
+.row-fmain-1 .half-block-main { width: 50%;float: left; padding-right: 31px; }
+.row-fmain-1 .half-block-main:nth-child(2n) {float: right; padding-right: 0px; padding-left: 30px; }
+.row-fmain-1:before {  content: "OR"; position: absolute; left: 0; right: 0; margin: auto;top: 11px; width: 30px; height: 30px; background: #2099ec; border-radius: 30px; color: #fff;
+    font-weight: 700; text-align: center; padding: 6px 0px; font-size: 13px;
+  }
+
 
 .row-fmain-1 {
     width: 100%;
@@ -6527,6 +6549,41 @@ h3.today-block {
     padding: 6px 0px;
     font-size: 13px;
 }
+
+img.triumph-logo {
+    width: 24px;
+}
+
+.inner-content.visible-overflow {
+    overflow: visible;
+}
+.max-height400{max-height:400px;}
+.pie-jobs #job_status svg, .pie-jobs #job_status .highcharts-container  { width: 100% !important; height: 100% !important;}
+
+img.triumph-logo { width: 24px; }
+.inner-content.visible-overflow { overflow: visible; }
+.max-height400{ max-height:400px; }
+p.change-color { width: auto; color: #0784DC; display : inline-block; }
+.box-shadow-able {
+    box-shadow: 0px 1px 1px rgba(0,0,0,0.3);
+}
+.split-list-width .gry-bg button {
+    float: none;
+}
+.split-list-width .gry-bg {
+        text-align: right;
+}
+.split-view .outbox-height,.split-view .list-view-wrapper,.split-view .list-view-group-container {
+  overflow: hidden !important;
+}
+.split-view .outbox-height ul.no-sp-top {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.bill-dash .panel .panel-heading + .panel-body.height-87per{ height: 87%; position: relative; }
+.appear-middle{ bottom: 0; left: 0; margin: auto; position: absolute; right: 0; top: 50%; vertical-align: middle;}
+
 @media (min-width:2000px){
     .map-load-section .dataTables_wrapper.no-footer table thead tr th.billing-origin{
        width:200px;
@@ -6536,6 +6593,8 @@ h3.today-block {
     .tb-cell-gph:first-child {
     width: 69%;
 }
+.split-view .split-list-width.split-list{width: 600px}
+.split-view .split-list-width .inline.m-l-15.email-check-sub { width: 90%;}
 .tb-cell-gph:last-child {
     width: 29%;
 }

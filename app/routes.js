@@ -599,7 +599,7 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
                         }],
 					getBillingData: function(dataFactory, $stateParams) {
 						if( $stateParams.type == true )
-							return dataFactory.httpRequest(URL+'/billings/index');
+							return dataFactory.httpRequest(URL+'/billings/index/invoice');
 						else
 							return [];
 					}
@@ -648,6 +648,7 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
 				title: 'Send For Payment',
 				templateUrl: 'assets/templates/billings/sendForPayment.html',
 				controller: 'sendPaymentController',
+                controllerAs: 'sendPayment',
 				moduleName: 'loads',
 				resolve: {
 					deps: ['$ocLazyLoad', function($ocLazyLoad) {
@@ -663,15 +664,16 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
                                 });
                         }],
             		getSendBillingData: function(dataFactory, $stateParams) {
-						 return dataFactory.httpRequest(URL+'/billings/sendForPayment/broker');
+						 return dataFactory.httpRequest(URL+'/billings/sendForPayment');
 					}
 				}
 			})
-            .state('sendDirectPayment',{
-                url: '/sendDirectPayment',
-                title: 'Send Direct Payment',
-                templateUrl: 'assets/templates/billings/sendDirectPayment.html',
-                controller: 'sendDirectPaymentController',
+            .state('factoredLoads',{
+                url: '/factoredLoads',
+                title: 'Factored Loads',
+                templateUrl: 'assets/templates/billings/sendForPayment.html',
+                controller: 'sendPaymentController',
+                controllerAs: 'sendPayment',
                 moduleName: 'loads',
                 resolve: {
                     deps: ['$ocLazyLoad', function($ocLazyLoad) {
@@ -686,12 +688,37 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
                                     insertBefore: '#lazyload_placeholder'
                                 });
                         }],
-                    getDirectBillingData: function(dataFactory, $stateParams) {
-                         return dataFactory.httpRequest(URL+'/billings/sendForPayment/shipper');
+                    getSendBillingData: function(dataFactory, $stateParams) {
+                         return dataFactory.httpRequest(URL+'/billings/fetchFactoredPaymentRecords');
                     }
                 }
             })
-			.state('trailers', {
+            .state('outbox',{
+                url: '/outbox',
+                title: 'Outbox',
+                templateUrl: 'assets/templates/billings/outboxPayment.html',
+                controller: 'outboxPaymentController',
+                controllerAs: 'outbox',
+                moduleName: 'loads',
+                resolve: {
+                    deps: ['$ocLazyLoad', function($ocLazyLoad) {
+                            return $ocLazyLoad.load([
+                                    'datepicker',
+                                    'timepicker',
+                                    'autonumeric',
+                                    'wysihtml5',
+                                    'inputMask',
+                                    'menuclipper'
+                                ], {
+                                    insertBefore: '#lazyload_placeholder'
+                                });
+                        }],
+                    getOutboxBillingData: function(dataFactory, $stateParams) {
+                         return dataFactory.httpRequest(URL+'/billings/fetchSentPaymentRecords');
+                    }
+                }
+            })
+           	.state('trailers', {
 				url: '/trailers',
 				title: 'Trailers',
 				templateUrl: 'assets/templates/trailers/trailersListing.html',
@@ -744,14 +771,14 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
                 templateUrl: 'assets/templates/billings/billingDashboard.html',
                 controller: 'billingDashboardController',
                 controllerAs: 'billDash',
-                moduleName: 'dashboard',
+                moduleName: 'loads',
                   resolve: {
                   	billingStats: function(dataFactory, $stateParams) {
 						return dataFactory.httpRequest(URL+'/billings/billingStats');
 					},
                     deps: ['$ocLazyLoad', function($ocLazyLoad) {
                         return $ocLazyLoad.load([
-                                // 'metrojs',
+                                'daterangepicker'
                                 // 'sparkline',
                                 // 'skycons',
                                 // 'switchery'
@@ -829,6 +856,35 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
                     }]
                 }
             })
+            .state('investor', {
+                url: '/investor',
+                title: 'Investor Dashboard',
+                moduleName: 'loads',
+                templateUrl: 'assets/templates/investor/dashboard.html',
+                controller: 'investorController',
+                controllerAs: 'investor',
+                resolve:{ 
+                    
+                    deps: ['$ocLazyLoad', function($ocLazyLoad) {
+                        return $ocLazyLoad.load([
+                            'select',
+                            'markercluster'
+                            ], {
+                            insertBefore: '#lazyload_placeholder'
+                        })
+                    }],
+                    portlets : function(investorService) {
+                        return investorService.getPortletsData();
+                    },
+                    vehicles : function(investorService) {
+                        return investorService.fetchVehiclesList();
+                    },
+                    
+                }
+
+            })
+            
+
 }]);
 
 app.run(function ($rootScope,$location,$state,$cookies,dataFactory, $document) {

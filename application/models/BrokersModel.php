@@ -311,13 +311,19 @@ class BrokersModel extends Parent_Model
         					CASE loads.driver_type 
         						WHEN "team" THEN CONCAT(d.first_name," + ",team.first_name) 
         									ELSE concat(d.first_name," ",d.last_name) 
-        									END AS driverName, loads.driver_type, loads.id, loads.invoiceNo, loads.vehicle_id, loads.truckstopID,loads.Bond,loads.PointOfContactPhone,loads.equipment_options,loads.LoadType,loads.PickupDate,loads.DeliveryDate,loads.OriginCity,loads.OriginState,loads.DestinationCity,loads.DestinationState,loads.PickupAddress,loads.DestinationAddress,loads.PaymentAmount,loads.Mileage, (loads.PaymentAmount/loads.Mileage) as rpm, loads.deadmiles,loads.Weight,loads.Length,loads.JobStatus,loads.totalCost,loads.pickDate,loads.load_source,broker_info.TruckCompanyName as companyName');
+        									END AS driverName, 
+        					CASE loads.billType 
+        							WHEN "shipper" THEN (shippers.shipperCompanyName) 
+        									   ELSE (broker_info.TruckCompanyName)
+        									END AS companyName, 
+        					loads.driver_type, loads.id, loads.invoiceNo, loads.vehicle_id, loads.truckstopID,loads.Bond,loads.PointOfContactPhone,loads.equipment_options,loads.LoadType,loads.PickupDate,loads.DeliveryDate,loads.OriginCity,loads.OriginState,loads.DestinationCity,loads.DestinationState,loads.PickupAddress,loads.DestinationAddress,loads.PaymentAmount,loads.Mileage, (loads.PaymentAmount/loads.Mileage) as rpm, loads.deadmiles,loads.Weight,loads.Length,loads.JobStatus,loads.totalCost,loads.pickDate,loads.load_source,loads.billType');
 		} else {
 			$this->db->select("count(loads.id) as count");
 		}	
 		$this->db->join("vehicles as v", "loads.vehicle_id = v.id","Left");
 		$this->db->join("drivers as d", "loads.driver_id = d.id","Left");
-		$this->db->join('broker_info', 'broker_info.id = loads.broker_id','Left');
+		$this->db->join("broker_info", "broker_info.id = loads.broker_id AND loads.billType = 'broker'","Left");
+		$this->db->join("shippers", "shippers.id = loads.broker_id AND loads.billType = 'shipper'","Left");
 		$this->db->join('drivers as team','v.team_driver_id = team.id','left');	
 		
 		if ( isset($filters['dispatcherId']) && $filters['dispatcherId'] != '' )
@@ -364,7 +370,9 @@ class BrokersModel extends Parent_Model
             $this->db->or_like('loads.Length', $filters['searchQuery']);
             $this->db->or_like('LOWER(loads.JobStatus)', strtolower($filters['searchQuery']) );
             $this->db->or_like('LOWER(loads.load_source)', strtolower($filters['searchQuery']) );
+            $this->db->or_like('LOWER(loads.billType)', strtolower($filters['searchQuery']) );
             $this->db->or_like('LOWER(broker_info.TruckCompanyName)', strtolower($filters['searchQuery']) );
+            $this->db->or_like('LOWER(shippers.shipperCompanyName)', strtolower($filters['searchQuery']) );
             $this->db->group_end();
 		}
 
@@ -376,7 +384,10 @@ class BrokersModel extends Parent_Model
 								     ELSE concat(d.first_name, " ", d.last_name) 
 								 END '.$filters["sortType"]);
 		}else if(in_array($filters["sortColumn"] ,array("TruckCompanyName"))){
-			$this->db->order_by("broker_info.".$filters["sortColumn"],$filters["sortType"]);	
+			$this->db->order_by('CASE 
+								     WHEN loads.billType  = "shipper" THEN (shippers.shipperCompanyName) 
+								     ELSE (broker_info.TruckCompanyName)
+								 END '.$filters["sortType"]);	
 		}else if($filters["sortColumn"] == "rpm"){
 			$this->db->order_by("(loads.PaymentAmount/loads.Mileage) ",$filters["sortType"]);	 
 		}else if($filters["sortColumn"] == "Weight"){

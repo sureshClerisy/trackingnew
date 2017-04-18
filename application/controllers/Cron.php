@@ -13,6 +13,20 @@ class Cron extends CI_Controller{
 		
 		$this->load->model(array('Vehicle','Driver','User','Job'));
 		$this->load->helper('truckstop');
+
+		$this->protocol   = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+		$this->serverAddr = base_url();
+
+		if( (isset($loggedUser_username) && $loggedUser_username != '') && (isset($loggedUser_id) && $loggedUser_id != '') && (isset($user_logged_in) && $user_logged_in == true) ) {
+		} else {
+			die();	
+		}
+
+		$this->id 			= $this->config->item('truck_id');	
+		$this->username 	= $this->config->item('truck_username');
+		$this->password 	= $this->config->item('truck_password');
+		$this->url 			= $this->config->item('truck_url');
+		$this->wsdl_url		= 'http://webservices.truckstop.com/V13/Searching/LoadSearch.svc?wsdl'; //Live Mode Api 
 	}
 	
 	private function in_array_r($needle, $haystack, $strict = false) {
@@ -229,7 +243,7 @@ class Cron extends CI_Controller{
 	*/
 
 	public function updateGoogleKeyByHitAPI(){
-		$gKeys = array("AIzaSyC4BwSAdx7ejol56LQjoZ_ZMTwLXrjYZJ0","AIzaSyBWEM0dXBzFS63qB82dP_jCIf-s6-pGfbg","AIzaSyCEFH2LkKezwk5XJsgBekN2vhfCtdUiyMk","AIzaSyActdBf8AhNG6846b971AmWpUCb4oFlW_M","AIzaSyBzKjQv_GApxMshR6h_Qjj-7ig0jR7le20","AIzaSyBTOC3xsGe8ft7_KZS2YofUlsDOCGLl5zg","AIzaSyAZrLPhQEVo2F3sz-FjmRacWIo1jv8UB4Y","AIzaSyDe5FFx4H0DIrc-PGZmI6U_RbeH7uIV7zQ","AIzaSyC6Msx3qCWtk9UToMJr9ztobJkEkuiq7Ak","AIzaSyCDCxatmrRX80Ft4muozMlhILoa9vsmrog","AIzaSyBGrDwpuVKlXmJA-B0QioXuipZfAr9ZNEg","AIzaSyCAFV1gpJZpE6RDOIjbYhLiAIehZSx8di0","AIzaSyBQB9KIKUv_ivCH21vs8eAw80rm8Cn_kjs","AIzaSyCHjGZD49WvOapXhek-MGeW1kPQ2cAcKz4","AIzaSyAkrSGI9cEXYBJ9EIciM98lLE2uink6weg","AIzaSyBlNHdgx_wxqXcFKX2E9fJV2vXa85A0QV4","AIzaSyDPdWG13xv8O-OcT2SVSdJWBDGG6HuWldg","AIzaSyC-ynfpBawou_Z_bY4LDawXWOcDfTUrb68","AIzaSyBTc3RpmZ8BbUZoRfHgM7utQq8VfnabZb0","AIzaSyCWz4BokVJCI-Yw9Chaa6UZoyQfUilqEgs","AIzaSyCp97kpoW5y0LFekMa-qgHubVQhiFFUWT8","AIzaSyDKPdW5FsxofNPYMp4-pcuzEfBib4eJsfg","AIzaSyC9td9T3s1XOsOy9_AclkIaEvUx3LoM81Y","AIzaSyCZ59YUBNXm3szAYKPIMCYtWVb24avqy1Y","AIzaSyBzYnza3J0g2iMwNsRCi2t82emvFmsoGRA","AIzaSyCraYMxGRdLPDiUDfl_LJzzo2VrglegZUc","AIzaSyBuxdIKh5B_e_t3py4NMIcgQ_Etv-8hgiw","AIzaSyDYzbiGY_K_x2hbrwFGKvQxSKLEzNJGAb8","AIzaSyATf_sXFLiDO8_gZgmA4EAP2X5FY0rJrsI","AIzaSyCv39MHSFSHgb9wkVJf6A5Ni0m695DuLTQ","AIzaSyBg12QRJBuOq-GjF-Iz3SQQw3AnHhQ8n_o","AIzaSyDfm5qM3Hx6hEjEl2a5KAG0IsvVeSrz91Y","AIzaSyCJwXGKQpVqwu7-H_fQAp_iNEaUMpSv53I","AIzaSyDtUGtcMdZDAJqIPx4PEZFFMICAd2OIzwk","AIzaSyCnQO6mPhlhTpZyngV_dBvZdJRH3Id7BFE","AIzaSyBmf1DOY9DXk2UZ7I6t0iVLr-gTiYLmGtg","AIzaSyC2X7Bq_54OiopHUzChgK3tcodLwS_viQE","AIzaSyDeUMQxXJn4do1TRV-vtNohsOLeqfK9xQo","AIzaSyDzNFpaW8mOUS9nA6GnUtngiJVgTqWBtVs","AIzaSyCwI-FmFuz_Ke2ooH_DjZaaSSCjWpgoYNk","AIzaSyBlGhrkkXU1S9Cp07k9-gdch5SfZ8xU4XI","AIzaSyCBNUIWSaHCYIadyPbYLah656-G4o6T0Fw","AIzaSyAs1krawH6JZ5SF0lyTyIWrE0gewZ5SPzI","AIzaSyCJxKWkyvOhA6pAl0mXuGe0phOPWbkCebM","AIzaSyDw20vcbVsxjfg5VYpNeh3DAoEluBAk8AI","AIzaSyAwF0iqNCvpZgXwOs6MFiklA6YkhVMOnV8","AIzaSyBSPVGmxdOqe2yrxzla4iezs00zWe_p6j4", "AIzaSyBUriaO-aK0cbf64cHSe1LPNIoLswUWng8","AIzaSyAhHieDgOmfBZZeaK_YiMQlhnANyUKQt2k","AIzaSyBO4h9EABf5zt1SUeyCqV4qyFmfF8SxDqM","AIzaSyCw9XpjOXlZwsFYVimc5o2lNAVSE8wO5Tc" );
+		$gKeys = array("AIzaSyC4BwSAdx7ejol56LQjoZ_ZMTwLXrjYZJ0","AIzaSyBWEM0dXBzFS63qB82dP_jCIf-s6-pGfbg","AIzaSyCEFH2LkKezwk5XJsgBekN2vhfCtdUiyMk","AIzaSyActdBf8AhNG6846b971AmWpUCb4oFlW_M","AIzaSyBzKjQv_GApxMshR6h_Qjj-7ig0jR7le20","AIzaSyBTOC3xsGe8ft7_KZS2YofUlsDOCGLl5zg","AIzaSyAZrLPhQEVo2F3sz-FjmRacWIo1jv8UB4Y","AIzaSyDe5FFx4H0DIrc-PGZmI6U_RbeH7uIV7zQ","AIzaSyC6Msx3qCWtk9UToMJr9ztobJkEkuiq7Ak","AIzaSyCDCxatmrRX80Ft4muozMlhILoa9vsmrog","AIzaSyBGrDwpuVKlXmJA-B0QioXuipZfAr9ZNEg","AIzaSyCAFV1gpJZpE6RDOIjbYhLiAIehZSx8di0","AIzaSyBQB9KIKUv_ivCH21vs8eAw80rm8Cn_kjs","AIzaSyCHjGZD49WvOapXhek-MGeW1kPQ2cAcKz4","AIzaSyAkrSGI9cEXYBJ9EIciM98lLE2uink6weg","AIzaSyBlNHdgx_wxqXcFKX2E9fJV2vXa85A0QV4","AIzaSyDPdWG13xv8O-OcT2SVSdJWBDGG6HuWldg","AIzaSyC-ynfpBawou_Z_bY4LDawXWOcDfTUrb68","AIzaSyBTc3RpmZ8BbUZoRfHgM7utQq8VfnabZb0","AIzaSyCWz4BokVJCI-Yw9Chaa6UZoyQfUilqEgs","AIzaSyCp97kpoW5y0LFekMa-qgHubVQhiFFUWT8","AIzaSyDKPdW5FsxofNPYMp4-pcuzEfBib4eJsfg","AIzaSyC9td9T3s1XOsOy9_AclkIaEvUx3LoM81Y","AIzaSyCZ59YUBNXm3szAYKPIMCYtWVb24avqy1Y","AIzaSyBzYnza3J0g2iMwNsRCi2t82emvFmsoGRA","AIzaSyCraYMxGRdLPDiUDfl_LJzzo2VrglegZUc","AIzaSyBuxdIKh5B_e_t3py4NMIcgQ_Etv-8hgiw","AIzaSyDYzbiGY_K_x2hbrwFGKvQxSKLEzNJGAb8","AIzaSyATf_sXFLiDO8_gZgmA4EAP2X5FY0rJrsI","AIzaSyCv39MHSFSHgb9wkVJf6A5Ni0m695DuLTQ","AIzaSyBg12QRJBuOq-GjF-Iz3SQQw3AnHhQ8n_o","AIzaSyDfm5qM3Hx6hEjEl2a5KAG0IsvVeSrz91Y","AIzaSyCJwXGKQpVqwu7-H_fQAp_iNEaUMpSv53I","AIzaSyDtUGtcMdZDAJqIPx4PEZFFMICAd2OIzwk","AIzaSyCnQO6mPhlhTpZyngV_dBvZdJRH3Id7BFE","AIzaSyBmf1DOY9DXk2UZ7I6t0iVLr-gTiYLmGtg","AIzaSyC2X7Bq_54OiopHUzChgK3tcodLwS_viQE","AIzaSyDeUMQxXJn4do1TRV-vtNohsOLeqfK9xQo","AIzaSyDzNFpaW8mOUS9nA6GnUtngiJVgTqWBtVs","AIzaSyCwI-FmFuz_Ke2ooH_DjZaaSSCjWpgoYNk","AIzaSyBlGhrkkXU1S9Cp07k9-gdch5SfZ8xU4XI","AIzaSyCBNUIWSaHCYIadyPbYLah656-G4o6T0Fw","AIzaSyAs1krawH6JZ5SF0lyTyIWrE0gewZ5SPzI","AIzaSyDw20vcbVsxjfg5VYpNeh3DAoEluBAk8AI","AIzaSyAwF0iqNCvpZgXwOs6MFiklA6YkhVMOnV8","AIzaSyBSPVGmxdOqe2yrxzla4iezs00zWe_p6j4", "AIzaSyBUriaO-aK0cbf64cHSe1LPNIoLswUWng8","AIzaSyAhHieDgOmfBZZeaK_YiMQlhnANyUKQt2k","AIzaSyBO4h9EABf5zt1SUeyCqV4qyFmfF8SxDqM","AIzaSyCw9XpjOXlZwsFYVimc5o2lNAVSE8wO5Tc" );
         $keyIndex = 0;
         $i=1;
         try
@@ -273,7 +287,7 @@ class Cron extends CI_Controller{
 
 	public function updateGoogleKey(){
 		$keyInUse = $this->User->getMapKey();
-		$gKeys =  array("AIzaSyC4BwSAdx7ejol56LQjoZ_ZMTwLXrjYZJ0","AIzaSyBWEM0dXBzFS63qB82dP_jCIf-s6-pGfbg","AIzaSyCEFH2LkKezwk5XJsgBekN2vhfCtdUiyMk","AIzaSyActdBf8AhNG6846b971AmWpUCb4oFlW_M","AIzaSyBzKjQv_GApxMshR6h_Qjj-7ig0jR7le20","AIzaSyBTOC3xsGe8ft7_KZS2YofUlsDOCGLl5zg","AIzaSyAZrLPhQEVo2F3sz-FjmRacWIo1jv8UB4Y","AIzaSyDe5FFx4H0DIrc-PGZmI6U_RbeH7uIV7zQ","AIzaSyC6Msx3qCWtk9UToMJr9ztobJkEkuiq7Ak","AIzaSyCDCxatmrRX80Ft4muozMlhILoa9vsmrog","AIzaSyBGrDwpuVKlXmJA-B0QioXuipZfAr9ZNEg","AIzaSyCAFV1gpJZpE6RDOIjbYhLiAIehZSx8di0","AIzaSyBQB9KIKUv_ivCH21vs8eAw80rm8Cn_kjs","AIzaSyCHjGZD49WvOapXhek-MGeW1kPQ2cAcKz4","AIzaSyAkrSGI9cEXYBJ9EIciM98lLE2uink6weg","AIzaSyBlNHdgx_wxqXcFKX2E9fJV2vXa85A0QV4","AIzaSyDPdWG13xv8O-OcT2SVSdJWBDGG6HuWldg","AIzaSyC-ynfpBawou_Z_bY4LDawXWOcDfTUrb68","AIzaSyBTc3RpmZ8BbUZoRfHgM7utQq8VfnabZb0","AIzaSyCWz4BokVJCI-Yw9Chaa6UZoyQfUilqEgs","AIzaSyCp97kpoW5y0LFekMa-qgHubVQhiFFUWT8","AIzaSyDKPdW5FsxofNPYMp4-pcuzEfBib4eJsfg","AIzaSyC9td9T3s1XOsOy9_AclkIaEvUx3LoM81Y","AIzaSyCZ59YUBNXm3szAYKPIMCYtWVb24avqy1Y","AIzaSyBzYnza3J0g2iMwNsRCi2t82emvFmsoGRA","AIzaSyCraYMxGRdLPDiUDfl_LJzzo2VrglegZUc","AIzaSyBuxdIKh5B_e_t3py4NMIcgQ_Etv-8hgiw","AIzaSyDYzbiGY_K_x2hbrwFGKvQxSKLEzNJGAb8","AIzaSyATf_sXFLiDO8_gZgmA4EAP2X5FY0rJrsI","AIzaSyCv39MHSFSHgb9wkVJf6A5Ni0m695DuLTQ","AIzaSyBg12QRJBuOq-GjF-Iz3SQQw3AnHhQ8n_o","AIzaSyDfm5qM3Hx6hEjEl2a5KAG0IsvVeSrz91Y","AIzaSyCJwXGKQpVqwu7-H_fQAp_iNEaUMpSv53I","AIzaSyDtUGtcMdZDAJqIPx4PEZFFMICAd2OIzwk","AIzaSyCnQO6mPhlhTpZyngV_dBvZdJRH3Id7BFE","AIzaSyBmf1DOY9DXk2UZ7I6t0iVLr-gTiYLmGtg","AIzaSyC2X7Bq_54OiopHUzChgK3tcodLwS_viQE","AIzaSyDeUMQxXJn4do1TRV-vtNohsOLeqfK9xQo","AIzaSyDzNFpaW8mOUS9nA6GnUtngiJVgTqWBtVs","AIzaSyCwI-FmFuz_Ke2ooH_DjZaaSSCjWpgoYNk","AIzaSyBlGhrkkXU1S9Cp07k9-gdch5SfZ8xU4XI","AIzaSyCBNUIWSaHCYIadyPbYLah656-G4o6T0Fw","AIzaSyAs1krawH6JZ5SF0lyTyIWrE0gewZ5SPzI","AIzaSyCJxKWkyvOhA6pAl0mXuGe0phOPWbkCebM","AIzaSyDw20vcbVsxjfg5VYpNeh3DAoEluBAk8AI","AIzaSyAwF0iqNCvpZgXwOs6MFiklA6YkhVMOnV8","AIzaSyBSPVGmxdOqe2yrxzla4iezs00zWe_p6j4", "AIzaSyBUriaO-aK0cbf64cHSe1LPNIoLswUWng8","AIzaSyAhHieDgOmfBZZeaK_YiMQlhnANyUKQt2k","AIzaSyBO4h9EABf5zt1SUeyCqV4qyFmfF8SxDqM","AIzaSyCw9XpjOXlZwsFYVimc5o2lNAVSE8wO5Tc" );
+		$gKeys =  array("AIzaSyC4BwSAdx7ejol56LQjoZ_ZMTwLXrjYZJ0","AIzaSyBWEM0dXBzFS63qB82dP_jCIf-s6-pGfbg","AIzaSyCEFH2LkKezwk5XJsgBekN2vhfCtdUiyMk","AIzaSyActdBf8AhNG6846b971AmWpUCb4oFlW_M","AIzaSyBzKjQv_GApxMshR6h_Qjj-7ig0jR7le20","AIzaSyBTOC3xsGe8ft7_KZS2YofUlsDOCGLl5zg","AIzaSyAZrLPhQEVo2F3sz-FjmRacWIo1jv8UB4Y","AIzaSyDe5FFx4H0DIrc-PGZmI6U_RbeH7uIV7zQ","AIzaSyC6Msx3qCWtk9UToMJr9ztobJkEkuiq7Ak","AIzaSyCDCxatmrRX80Ft4muozMlhILoa9vsmrog","AIzaSyBGrDwpuVKlXmJA-B0QioXuipZfAr9ZNEg","AIzaSyCAFV1gpJZpE6RDOIjbYhLiAIehZSx8di0","AIzaSyBQB9KIKUv_ivCH21vs8eAw80rm8Cn_kjs","AIzaSyCHjGZD49WvOapXhek-MGeW1kPQ2cAcKz4","AIzaSyAkrSGI9cEXYBJ9EIciM98lLE2uink6weg","AIzaSyBlNHdgx_wxqXcFKX2E9fJV2vXa85A0QV4","AIzaSyDPdWG13xv8O-OcT2SVSdJWBDGG6HuWldg","AIzaSyC-ynfpBawou_Z_bY4LDawXWOcDfTUrb68","AIzaSyBTc3RpmZ8BbUZoRfHgM7utQq8VfnabZb0","AIzaSyCWz4BokVJCI-Yw9Chaa6UZoyQfUilqEgs","AIzaSyCp97kpoW5y0LFekMa-qgHubVQhiFFUWT8","AIzaSyDKPdW5FsxofNPYMp4-pcuzEfBib4eJsfg","AIzaSyC9td9T3s1XOsOy9_AclkIaEvUx3LoM81Y","AIzaSyCZ59YUBNXm3szAYKPIMCYtWVb24avqy1Y","AIzaSyBzYnza3J0g2iMwNsRCi2t82emvFmsoGRA","AIzaSyCraYMxGRdLPDiUDfl_LJzzo2VrglegZUc","AIzaSyBuxdIKh5B_e_t3py4NMIcgQ_Etv-8hgiw","AIzaSyDYzbiGY_K_x2hbrwFGKvQxSKLEzNJGAb8","AIzaSyATf_sXFLiDO8_gZgmA4EAP2X5FY0rJrsI","AIzaSyCv39MHSFSHgb9wkVJf6A5Ni0m695DuLTQ","AIzaSyBg12QRJBuOq-GjF-Iz3SQQw3AnHhQ8n_o","AIzaSyDfm5qM3Hx6hEjEl2a5KAG0IsvVeSrz91Y","AIzaSyCJwXGKQpVqwu7-H_fQAp_iNEaUMpSv53I","AIzaSyDtUGtcMdZDAJqIPx4PEZFFMICAd2OIzwk","AIzaSyCnQO6mPhlhTpZyngV_dBvZdJRH3Id7BFE","AIzaSyBmf1DOY9DXk2UZ7I6t0iVLr-gTiYLmGtg","AIzaSyC2X7Bq_54OiopHUzChgK3tcodLwS_viQE","AIzaSyDeUMQxXJn4do1TRV-vtNohsOLeqfK9xQo","AIzaSyDzNFpaW8mOUS9nA6GnUtngiJVgTqWBtVs","AIzaSyCwI-FmFuz_Ke2ooH_DjZaaSSCjWpgoYNk","AIzaSyBlGhrkkXU1S9Cp07k9-gdch5SfZ8xU4XI","AIzaSyCBNUIWSaHCYIadyPbYLah656-G4o6T0Fw","AIzaSyAs1krawH6JZ5SF0lyTyIWrE0gewZ5SPzI","AIzaSyDw20vcbVsxjfg5VYpNeh3DAoEluBAk8AI","AIzaSyAwF0iqNCvpZgXwOs6MFiklA6YkhVMOnV8","AIzaSyBSPVGmxdOqe2yrxzla4iezs00zWe_p6j4", "AIzaSyBUriaO-aK0cbf64cHSe1LPNIoLswUWng8","AIzaSyAhHieDgOmfBZZeaK_YiMQlhnANyUKQt2k","AIzaSyBO4h9EABf5zt1SUeyCqV4qyFmfF8SxDqM","AIzaSyCw9XpjOXlZwsFYVimc5o2lNAVSE8wO5Tc" );
 		$keyInUseIndex = array_search($keyInUse, $gKeys);
 
 		try
@@ -288,6 +302,80 @@ class Cron extends CI_Controller{
 	    }
         
 	}
-	
+
+
+
+	/*
+	* Request URI : http://siteurl/Truckstop/findJobs
+	* Method : CronJob
+	* Params : null
+	* Return : null
+	* Comment: Search jobs for drivers every hour
+	*/
+
+	public function findJobs(){
+
+	}
+
+
+	/*
+	* Request URI : http://siteurl/Truckstop/findJobs
+	* Method : CronJob
+	* Params : null
+	* Return : null
+	* Comment: Search jobs for drivers every hour
+	*/
+
+	public function findJobsFromTruckStop($params){
+		$client   = new SOAPClient($this->wsdl_url);
+		$params   = array(
+					'searchRequest' => array(
+					'UserName'  => $this->username, 'Password' => $this->password, 'IntegrationId' => $this->id,
+					'Criteria'  => array(
+								'OriginCity'        => $params["origin_city"],
+								'OriginState'       => $params["origin_state"],//Getting records of first state(Dispatcher)
+								'OriginCountry'     => $params["origin_country"],
+								'OriginRange'       => $params["origin_range"],
+								'OriginLatitude'    => '',
+								'OriginLongitude'   => '',
+								'DestinationCity'   => $params["destination_city"],
+								'DestinationState'  => $params["destination_states"],
+								'DestinationCountry'=> $params["dest_country"],
+								'DestinationRange'  => $params["destination_range"],
+								'EquipmentType'     => $params["abbreviation"],
+								'LoadType'          => 'Full',
+								'PickupDates'       => $params["dateTime"],
+								'HoursOld'          => $params["hoursOld"],
+								'EquipmentOptions'  => '',
+								'PageNumber'        => $params["pageNo"],
+								'PageSize'          => 200,
+								'SortBy'            => 'Miles',
+								'SortDescending'    => true
+							)
+						)
+					);
+
+		$return = $client->GetLoadSearchResults($params);
+		
+		if(empty($return->GetLoadSearchResultsResult->SearchResults)  || empty($return->GetLoadSearchResultsResult->SearchResults->LoadSearchItem)){
+			$this->rows   = array();
+		} else if(empty($return->GetLoadSearchResultsResult->Errors->Error)){
+			$this->rows   = $return->GetLoadSearchResultsResult->SearchResults->LoadSearchItem;
+		} else{			
+			$data['no_result'] 	= $return->GetLoadSearchResultsResult->Errors->Error->ErrorMessage;
+		}
+
+		$data['rows'] = array();
+		if(count($this->rows) == 1){
+			$data['rows'][]   = json_decode(json_encode($this->rows),true);
+		}else{
+			$data['rows'] 	  = json_decode(json_encode($this->rows),true);
+		}
+		
+		$dat = array_merge($dat,$data['rows']);
+	}
+
+
+
 	
 }

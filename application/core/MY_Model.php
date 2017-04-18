@@ -137,6 +137,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 									 $table = "loads"; break;
 				case 'truck'	   : $this->db->select("vehicles.id, vehicles.label"); $table = "vehicles";  break;
 				case 'broker'	   : $this->db->select("broker_info.TruckCompanyName"); $table = "broker_info";  break;
+				case 'shipper'	   : $this->db->select("shippers.shipperCompanyName as TruckCompanyName"); $table = "shippers";  break;
 			}
 			$this->db->where($table.'.id', $id);
 			$result = $this->db->get($table);

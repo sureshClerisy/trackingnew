@@ -921,9 +921,8 @@ class Truckstop extends Admin_Controller{
 			$jobRecord = $this->Job->FetchSingleJobForPrint($loadId);
 
 			if ($jobRecord['broker_id'] != 0 && $jobRecord['broker_id'] != '' ) {
-				$data['brokerData'] = $this->Job->getBrokerForLoadDetailForPrint($jobRecord['broker_id']);
-			}
-			
+				$data['brokerData'] = $this->Job->getBrokerForLoadDetailForPrint($jobRecord['broker_id'], $jobRecord['billType']);
+			}			
 			
 			$origin = $jobRecord['OriginCity'].' '.$jobRecord['OriginState'].' '.$jobRecord['OriginCountry'];
 			$destination = $jobRecord['DestinationCity'].' '.$jobRecord['DestinationState'].' '.$jobRecord['DestinationCountry'];
@@ -2158,36 +2157,26 @@ class Truckstop extends Admin_Controller{
 				$extension 						= strtolower(end($extArr));				
 			   	$config['file_name']   			= $config['_prefix'].time().'.'.$extension;
 				$config['upload_path']          = 'assets/uploads/documents/'.$parameter.'/';
+				$config['upload_thumb_path']    = 'assets/uploads/documents/';
 				$config['allowed_types']        = 'pdf|gif|jpg|png|docx|doc|xls|xlsx|txt|ico|bmp|svg';
 				
 				$this->load->library('upload', $config);
 			
 
-				// $this->degradePdfVersion($_FILES,$config,$parameter);
-			
+				if ( $parameter == 'pod' || $parameter == 'rateSheet' &&  strtolower($extension) == 'pdf' ) {
+					$podRateResult = $this->degradePdfVersion($_FILES,$config,$parameter,$result);
+					return $podRateResult;
+					exit();
+				}
+
 				if ( !$this->upload->do_upload('file'))	{
 					$response['error'] 		= true;
 					$response['error_desc'] = $this->upload->display_errors();
 				} else {
 					$response['error'] 		= false;
 					$response['data'] 		= $this->upload->data();
-			
-					if ( ($parameter == 'rateSheet' || $parameter == 'pod') &&  strtolower($extension) == 'pdf' ) {
-						 // $fileCheck = $this->CheckPdfNotCompressed($response['data']['file_name'], $parameter);		// code to check uploaded pdf file is compressed or not
-												
-						 // if ( $fileCheck == 'pdfCompression' ) {
-							// $degradedFileName = $this->degradePdfVersion($response['data']);
-							$response['data']['file_name'] = $this->degradePdfVersion($response['data']);
-							$response['data']['raw_name']  = $response['data']['raw_name'].'_1';
-							unlink($response['data']['full_path']);
-							// $response['compressionError'] = 1;
-							// $response['compressionError'] = 0;
-							// return $response;					// return error response if file is compressed
-						 // }
-					}
-					
+								
 					if (substr(php_uname(), 0, 7) == "Windows"){ 
-				        //pclose(popen("start /B ". $cmd, "r"));  
 				        $response['data']['cmd'] = 'Windows';
 				    } 
 				    else { 
@@ -2206,7 +2195,6 @@ class Truckstop extends Admin_Controller{
 						
 						$response['primary_ID'] = $result['id'];
 					}				    
-					//$this->Job->insertDocumentEntry($response['data']['file_name'], $prefix);
 				}
 			}else{
 				$response['error'] = true;
@@ -2230,46 +2218,39 @@ class Truckstop extends Admin_Controller{
 	* Degrading PDF(1.5+) to 1.4 version
 	*/
 
-	// public function degradePdfVersion( $data = NULL , $config = array(), $parameter = ''){
-	public function degradePdfVersion( $data = NULL ){		
+	public function degradePdfVersion( $data = NULL , $config = array(), $parameter = '', $result = array()){
+		$fileName 	= $config['file_name'];
+		$outputfile = $config['upload_path'].'/'.$fileName;
+		$sourcefile = $data['file']['tmp_name'];
 
-		// $fileName = $data['file']['name'];
-		// $outputfile = $config['upload_path'].'/'.$fileName;
-		// $sourcefile = $data['file']['tmp_name'];
-
-		// $pathGen 	= str_replace('application/', '', APPPATH.'assets/'); 
-		// $gostscript = $pathGen.'ghostscript/gs-920-linux_x86_64';
-		
-		// try{
-		// 	shell_exec("{$gostscript} -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dNOPAUSE -dQUIET -dBATCH -dAutoRotatePages=/None -sOutputFile={$outputfile} {$sourcefile}"); 
-			
-		// 	$fileNameArray = explode('.',$fileName);
-		// 	$newfileName = '';
-		// 	for ( $i = 0; $i < count($fileNameArray) - 1; $i++ ) {
-		// 		$newfileName .= $fileNameArray[$i];
-		// 	}
-		// 	$newfileName = $newfileName.'.jpg';
-
-		// 	$fileName = '/var/www/html/trackingnew/assets/uploads/documents/rateSheet/rateSheet_1491972107_1.pdf';
-		// 	$thumbFolder = 'thumb_'.$parameter;
-		// 	$cmd = 'cd '.$pathGen.'uploads/documents/rateSheet/'.$fileName;
-	 //    	$cmd .= '; convert -thumbnail x600 '.$fileName.'[0] -flatten ../'.$thumbFolder.'/thumb_'.$newfileName;
-	 //    	$response['data']['cmd'] = $cmd;
-	 //        exec($cmd . " > /dev/null &");
-		// 	echo $fileName;
-		// }catch(Exception $e){
-		// 	$e->getMessage();
-		// }
-		$fileName = $data['raw_name'].'_1.pdf';
-		$outputfile = $data['file_path'].'/'.$fileName;
-		$sourcefile = $data['full_path'];
-
-		$pathGen 	= str_replace('application/', '', APPPATH.'assets/');
+		$pathGen 	= str_replace('application/', '', APPPATH.'assets/'); 
 		$gostscript = $pathGen.'ghostscript/gs-920-linux_x86_64';
-		
+	
 		try{
 			shell_exec("{$gostscript} -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dNOPAUSE -dQUIET -dBATCH -dAutoRotatePages=/None -sOutputFile={$outputfile} {$sourcefile}"); 
-			return $fileName;
+			
+			$fileNameArray = explode('.',$fileName);
+			$newfileName = '';
+			for ( $i = 0; $i < count($fileNameArray) - 1; $i++ ) {
+				$newfileName .= $fileNameArray[$i];
+			}
+			$newfileName = $newfileName.'.jpg';
+			$outputfile  = $config['upload_thumb_path'].'/thumb_'.$parameter.'/thumb_'.$newfileName;
+	
+			shell_exec("{$gostscript} -dSAFER -dBATCH -sDEVICE=jpeg -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -r55 -sOutputFile={$outputfile} {$sourcefile}");
+
+			$response = array();
+			$response['error'] 		= false;
+			$response['data'] 		= array();
+			if ( !empty($result) && $result['doc_name'] != '' ) {
+				unlink("assets/uploads/documents/".$parameter."/".$result['doc_name']);
+				$thumbReplace = explode('.',$result['doc_name']);
+				$thumbRe = $thumbReplace[0].'.jpg';
+				unlink("assets/uploads/documents/thumb_".$parameter."/thumb_".$thumbRe);				
+				$response['primary_ID'] = $result['id'];
+			}	
+			$response['data']['file_name']  = $fileName;
+			return $response;
 		}catch(Exception $e){
 			$e->getMessage();
 		}
@@ -2877,17 +2858,22 @@ class Truckstop extends Admin_Controller{
 		}
 		
 		$saveData['equipment_options'] = isset($saveData['EquipmentTypes']['Code']) ? $saveData['EquipmentTypes']['Code'] : '';
-		if ( $loadFrom == 'assignedLoads') {
-			$bufferedInfo  = $this->Job->getEntityInfoById($saveData["broker_id"],"broker");
+		$billType = (isset($saveData['billType']) && $saveData['billType'] != '' ) ? $saveData['billType'] : 'broker';
+		if ( isset($saveData['broker_id']) && $saveData['broker_id'] != '') {
+			$bufferedInfo  = $this->Job->getEntityInfoById($saveData["broker_id"],$billType);
 			$saveData["companyName"] = $bufferedInfo["TruckCompanyName"];
+		}
+
+		if ( $loadFrom == 'assignedLoads') {
 			echo json_encode(array('id' => $result,'savedData' => $saveData, 'checkVehicleDriverFlag' => $vehicleDriverFlag, 'table_title' => $table_title));	
 		} else if ( $loadFrom == 'billingLoads' ) {
 			echo json_encode(array('id' => $result,'savedData' => $saveData));
 		}  else if ( $loadFrom == 'readyForInvoice' ) {				// check if load edited is from ready for invoice loads on billable page
 			echo json_encode(array('id' => $result,'savedData' => $saveData));
 		} else if ( $loadFrom == 'sendForPayment' ) {
-			$jobs = $this->Billing->fetchLoadsForPayment();
-			echo json_encode(array('id' => $result,'savedData' => $saveData, 'billingLoads' => $jobs));
+			// $jobs = $this->Billing->fetchLoadsForPayment();
+			// echo json_encode(array('id' => $result,'savedData' => $saveData, 'billingLoads' => $jobs));
+			echo json_encode(array('id' => $result,'savedData' => $saveData));
 		} else {
 		 	echo json_encode(array('id' => $result,'savedData' => $saveData));
 		}

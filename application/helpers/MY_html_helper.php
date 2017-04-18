@@ -24,6 +24,7 @@ function createScriptOrLinkTag( $filePath , $type = 'stylesheet' , $mediaScreen 
 
 function checkNegativeValue( $value = null ) 
 {
+	$value = round($value,2);
 	if ( $value < 0 ) {
 		$value = '-$'.abs($value);
 	} else {

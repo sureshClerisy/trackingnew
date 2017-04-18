@@ -3,15 +3,21 @@
 	<!-- START PAGE CONTENT -->
 	<div class="content sm-gutter">
 		<!-- START CONTAINER FLUID -->
-		<div class="container-fluid padding-25 sm-padding-10 sm-gutter bill-dash">
+		<div ng-include src="'./assets/templates/billings/sendForPayment_Sidebar.html'" include-replace></div>
+		<div class="container-fluid padding-25 bill-dash inner-content  sendforcover visible-overflow">
 			<div class="row">
 				<div class="col-md-12 col-xlg-12">
 					<div class="commen-heading dashboard-page">
 						<h2 class="oprate-dashbord">Billing Dashboard</h2>
-						<div class="label_select_box m-b-10">
-							
-							<a  href="#/billing" class="cgreen btn btn-info btn-cons " type="button"><i class="fa  fa-file-text "></i> <span class="bold">Billable</span></a>
-							<a  href="#/sendForPayment" class="red btn btn-info btn-cons " type="button"><i class="fa fa-credit-card-alt"></i> <span class="bold">Send for payment</span></a>
+						<div class="label_select_box"> 
+							<div class="input-cal-block">
+								<div class="input-prepend input-group">
+									<span class="add-on input-group-addon">
+										<i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
+									</span>
+								   <input date-range-picker placeholder="Select date range" id="billDash"  class="form-control date-picker customDateRange" type="text" options="billDash.opts" ng-model="billDash.dateRangeSelector" />
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -71,7 +77,7 @@
 					                                        <div class="col-sm-6">
 					                                            <div class="p-l-20">
 					                                            	<div class="block-dash-content1">
-								                                        <h1 class="font-montserrat fs-16  	text-white semi-bold p-b-15 no-margin semi-bold">Last Week Sales </h1>
+								                                        <h1 class="font-montserrat fs-16  	text-white semi-bold p-b-15 no-margin semi-bold">{{billDash.saleCaption}} </h1>
 						                                                <h3 ng-click="billDash.goForDetails('last_week_sale','billings')" class="cursor no-margin p-b-5 text-white p-b-20 ng-binding">{{billDash.lastWeek.sentToTriumph | currency:"$":2}}</h3>
 						                                                <span class="font-montserrat fs-16   text-white  text-white small semi-bold ng-binding">{{billDash.lastWeek.goalCompleted | number:2 }}% of Goal</span>
 						                                            </div>
@@ -135,44 +141,6 @@
 					            </div>
 					         </div>
 		             	</div>
-		             	<div class="col-md-4 col-xlg-4">
-		             		<div class="box-move-able m-b-20">
-			             		<d  iv class="">
-					                <!-- START WIDGET -->
-					                <div class="widget-11 panel no-border  no-margin widget-loader-bar" pg-portlet progress="bar" on-refresh="billDash.refreshTest('.widget-11','expected_billing')">
-					                    <div class="panel-heading heading-tb-moveable ">
-					                        <div class="panel-title font-montserrat bold">Expected Billing
-					                        </div>
-					                        <div class="panel-controls">
-					                            <ul>
-					                                <li><a data-toggle="refresh" class="portlet-refresh text-black" href=""><i class="portlet-icon portlet-icon-refresh"></i></a>
-					                                </li>
-					                            </ul>
-					                        </div>
-					                    </div>
-					                    <div class="widget-11-table1 auto-overflow p-l-20 p-r-20" >
-					                        <table class="table cursor table-condensed table-hover table-striped my-table-move" >
-					                        	<thead>
-					                        		<tr>
-					                        			<th>Billing</th>
-					                        			<th>Date</th>
-					                        		</tr>
-					                        		
-					                        	</thead>
-					                            <tbody>
-					                                <tr ng-click="billDash.goForDetails('expected_billing','billings', record)" ng-repeat="record in billDash.expectedBilling">
-						                                <td>
-					                                        <span class="font-montserrat fs-18">{{record.billing | currency:"$":2}}</span>
-					                                    </td>
-					                                    <td class="font-montserrat all-caps fs-12">{{record.date}}</td>
-					                                </tr>
-					                            </tbody>
-					                        </table>
-					                    </div>
-					                </div>
-					                <!-- END WIDGET -->
-					            </div>
-					        </div>
 		             	
 		             	
 		             	<div class="col-md-4 col-xlg-4">
@@ -189,49 +157,61 @@
 	                                    </ul>
 	                                </div>	
 	                            </div>
-	                            <div class="panel-body">
-		             				<highchart id="job_status" config="billDash.JobStatusPieConfig" class="heighchar-block-css"></highchart>
+	                            <div class="panel-body height-87per pos-rel" >
+		             				<highchart ng-show="billDash.hasPieChartData" id="job_status" config="billDash.JobStatusPieConfig" ></highchart>
+		             				<div class="appear-middle" ng-show="!billDash.hasPieChartData">No Data Available</div>
 	                            </div>
                             </div>
 
 		             		</div>
 		             	</div>
-		             	<div class="col-md-8 col-xlg-8">
+		             	<div class="col-md-12 col-xlg-12">
 		             		 <!-- START WIDGET -->
-		             		 <div class="box-move-able m-b-20">
+		             		 <div class="box-shadow-able m-b-20">
 				                <div class="widget-11 recent-transactions panel no-border  no-margin widget-loader-bar" pg-portlet progress="bar" on-refresh="billDash.refreshTest('.recent-transactions','recent_transactions')">
 				                    <div class="panel-heading heading-tb-moveablepl">
-				                        <div class="panel-title font-montserrat bold">Recent Transmissions</div>
+				                        <div class="panel-title font-montserrat bold">Cash Flow</div>
 				                        <div class="panel-controls">
 				                            <ul>
-				                                <li><a data-toggle="refresh" class="portlet-refresh text-black" href=""><i class="portlet-icon portlet-icon-refresh"></i></a>
+				                                <li>
+				                                	<a data-toggle="refresh" class="portlet-refresh text-black" href="">
+				                                		<i class="portlet-icon portlet-icon-refresh"></i>
+				                                	</a>
+				                                	<a class="portlet-refresh text-black" href="" ng-click="billDash.exportTransmissions()">
+				                                		<i class="fa fa-file-excel-o"></i>
+				                                	</a>
 				                                </li>
 				                            </ul>
 				                        </div>
 				                    </div>
-				                    <div class="widget-11-table1 auto-overflow p-l-20 p-r-20" >
-				                        <table class="table table-condensed table-hover table-striped my-table-move my-table-pl" >
+				                    <div class="widget-11-table1 auto-overflow  p-l-20 p-r-20" >
+				                        <table class="table  table-condensed table-hover table-striped my-table-move my-table-pl" >
 				                        	<thead>
 				                        		<tr>
 				                        			<th>Date</th>
 				                        			<th>Conf No.</th>
 				                        			<th>Inv	</th>
-				                        			<th>Type</th>
-				                        			<th>Amount</th>
-				                        			<th>Payout</th>
+				                        			<th>Expected</th>
+				                        			<th>Actual</th>
+				                        			
 				                        		</tr>
 				                        		
 				                        	</thead>
 				                            <tbody>
-				                                <tr ng-repeat="record in billDash.recentTransactions">
+				                                <tr class="cursor" ng-click="billDash.goForDetails('cash_flow','billings', record)"  ng-repeat="record in billDash.recentTransactions.truimphTxns">
 					                                <td>
 				                                        <span class="font-montserrat fs-18">{{record.date}}</span>
 				                                    </td>
 				                                    <td class="font-montserrat all-caps fs-12">{{record.confirmationCode}}</td>
 				                                    <td class="font-montserrat all-caps fs-12">{{record.inv}}</td>
-				                                    <td class="font-montserrat all-caps fs-12">Purchase</td>
+				                                    <td class="font-montserrat all-caps fs-12">{{record.expected | currency:"$":2}}</td>
 				                                    <td class="font-montserrat all-caps fs-12">{{record.amount | currency:"$":2 }}</td>
-				                                    <td class="font-montserrat all-caps fs-12">WIRE*9995</td>
+				                                </tr>
+				                                <tr class="bold">
+				                                	<td colspan="2">Total</td>
+				                                	<td>{{billDash.recentTransactions.totals.inv}}</td>
+				                                	<td>{{billDash.recentTransactions.totals.expected | currency : "$" : 2}}</td>
+				                                	<td>{{billDash.recentTransactions.totals.actual   | currency : "$" : 2}}</td>
 				                                </tr>
 				                            </tbody>
 				                        </table>

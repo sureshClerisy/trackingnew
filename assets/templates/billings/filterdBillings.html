@@ -2,8 +2,9 @@
       <div class="page-content-wrapper ">
         <!-- START PAGE CONTENT -->
         <div class="content sm-gutter">
+        <div ng-if="includeSidebar" ng-include src="'./assets/templates/billings/sendForPayment_Sidebar.html'" include-replace></div>
           <!-- START CONTAINER FLUID -->
-			<div class="container-fluid padding-25 sm-padding-10">
+			<div class="container-fluid padding-25 sm-padding-10"  ng-class=" includeSidebar ?  'sendforcover inner-content' : '' ">
 				<canvas id="viewport" style="display: none;"></canvas>
 			   <div ng-show="alertdeletemsg == true" class="alert alert-success" role="alert">
 					<button ng-click = "hideloadmessage()" class="close"></button>
@@ -26,8 +27,8 @@
 			  
 			<div class="row">
 				<div class="col-md-12 col-xlg-12">
-					<div class="commen-heading billing-page">
-						<h2 class="oprate-dashbord">{{ languageArray.billingLoadsHeading }}</h2>
+					<div class="commen-heading {{filterArgs.filterType}}">
+						<h2 class="oprate-dashbord">{{ pageTitle }}</h2>
 						<div class="label_select_box " ng-show="showCalendar">
 							<div class="input-cal-block m-r-0">
 								<div class="input-prepend input-group">
@@ -130,7 +131,7 @@
 												<span class="lode-arrow {{TruckCompanyNameSortType}}"> {{ languageArray.planthcompany }} </span>
 											</div>
 											
-											<div class="tb-cell source-bill" ng-click="sortCustom('load_source', load_sourceSortType)">  
+											<div class="tb-cell source-bill stype" ng-click="sortCustom('billType', load_sourceSortType)">  
 												<span class="lode-arrow {{load_sourceSortType}}"> Source</span>	
 											</div>
 											
@@ -207,7 +208,7 @@
 												<span class="text-comp-name">{{ value.TruckCompanyName|capitalize }}</span>
 											</div>
 											<div class="tb-cell source-bill"> 
-												<span>{{ value.load_source }}</span>
+												<p class="change-color">{{(value.billType != '' ) ? value.billType + ' - ' : ''}}</p> <span>{{ value.load_source }}</span>
 											</div>
 											
 											<div class="tb-cell action" ng-click="$event.stopPropagation()">
@@ -290,35 +291,35 @@
 														</span>
 													</div>
 
-													<div class="tb-cell st1-bill	">
+													<div class="tb-cell st1-bill">
 														<span>
 															<div class="heading"> {{ languageArray.planthst }}  <b>:</b></div>
 															<div class="value">{{ value.DestinationState }}</div>
 														</span>
 													</div>
 
-													<div class="tb-cell miles-bill	">
+													<div class="tb-cell miles-bill">
 														<span>
 															<div class="heading"> {{ languageArray.planthmiles }}  <b>:</b></div>
 															<div class="value">{{ value.Mileage }}</div>
 														</span>
 													</div>
 
-													<div class="tb-cell d-miles-bill	">
+													<div class="tb-cell d-miles-bill">
 														<span>
 															<div class="heading"> {{ languageArray.planthdeadmiles }}  <b>:</b></div>
 															<div class="value">{{ value.deadmiles }}</div>
 														</span>
 													</div>
 
-													<div class="tb-cell ppm-bill	">
+													<div class="tb-cell ppm-bill">
 														<span>
 															<div class="heading">{{ languageArray.planthrpm }} <b>:</b></div>
 															<div class="value">{{ value.Mileage != 0 ? (value.PaymentAmount / value.Mileage | currency:"$":2) : '' }}</div>
 														</span>
 													</div>
 
-													<div class="tb-cell payment-bill	">
+													<div class="tb-cell payment-bill">
 														<span>
 															<div class="heading">{{ languageArray.planthpayment }}<b>:</b></div>
 															<div class="value">{{ value.PaymentAmount | currency:"$":2 }}</div>
@@ -335,7 +336,7 @@
 													<div class="tb-cell source-bill">
 														<span>
 															<div class="heading">Source <b>:</b></div>
-															<div class="value">{{ value.load_source }}</div>
+															<div class="value"><p class="change-color">{{(value.billType != '' ) ? value.billType + ' - ' : ''}}</p> {{ value.load_source }}</div>
 														</span>
 													</div>
 													

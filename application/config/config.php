@@ -23,7 +23,7 @@ error_reporting(-1);
 | a PHP script and you can easily do that on your own.
 |
 */
-$config['base_url'] = 'http://localhost/trackingnew';
+$config['base_url'] = 'http://localhost/trackingnew/';
 setlocale(LC_MONETARY, 'en_US.UTF-8');
 /*
 |--------------------------------------------------------------------------
@@ -537,13 +537,12 @@ define("_DISPATCHER", 2);
 // http://testws.truckstop.com:8080/V13/Searching/LoadSearch.svc?wsdl  (Test url)
 // http://webservices.truckstop.com/V13/Searching/LoadSearch.svc  (Live url)
 
-
 $config["entity"] = array("user"	=> "user", 
 						  "truck" 	=> "truck" , 
 						  "driver" 	=> "driver", 
 						  "trailer" => "trailer", 
 						  "broker" 	=> "broker", 
-						  "shipper" => "shipper", 
+						  "shipper"	=> "shipper", 
 						  "ticket" 	=> "ticket", 
 						  "truimph" => "truimph");
 
@@ -568,7 +567,6 @@ $config["event"]  = array("login"				=> "login",
 						  "sent_for_payment"	=> "sent_for_payment",
 						);
 
-
 // Test Mode
 $config['truck_url'] 		= 'http://testws.truckstop.com:8080/V13/Searching/LoadSearch.svc?wsdl';
 
@@ -581,7 +579,7 @@ $config['triumph_url_request']      = 'https://api.mytriumph.com/';
 $config['triumph_user_test']         = 'jpbruzual@vikalogisticscorp.com';
 $config['triumph_pass_test']         = 'jpbruzual@vikalogisticscorp.com';
 $config['triumph_apik_test']         = '133e47a2-4f93-416a-a83c-a45c5cdc3cf5';
-$config['triumph_url_test']          = 'https://testapi.mytriumph.com/v1/login';
+$config['triumph_url_test']             = 'https://testapi.mytriumph.com/v1/login';
 $config['triumph_url_request_test']  = 'https://testapi.mytriumph.com/';
 
 $config['triumph_environment'] 		= 	'development';

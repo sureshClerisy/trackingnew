@@ -286,20 +286,39 @@ class Admin_Controller extends MY_Controller
 		/**
 		* Meytod createExcell
 		* @param $DataArray
+		* @param $boldLastRow[To bold last row of excell file]
+		* @param $moduleName [Name of module being exported]
 		* @return File Name
 		*
 		*/
 		
-		public function createExcell($moduleName = null,$dataArray = null){
-
+		public function createExcell($moduleName = null,$dataArray = null,$boldLastRow=false){
+			
+			$totalRows = count($dataArray);
 			$fileName = time().'_'.$moduleName.'.xlsx';
 			$this->excel->setActiveSheetIndex(0);
 			$this->excel->getActiveSheet()->setTitle($moduleName);
 			$this->excel->getActiveSheet()->getDefaultColumnDimension()->setWidth(16);
-
+			$this->excel->getActiveSheet()->getDefaultRowDimension()->setRowHeight(16); //for set min height
+			$this->excel->getActiveSheet()->getStyle('1:1')->getFont()->setBold(true);
+			
+			if($boldLastRow){ //Bold last row for load 
+				$this->excel->getActiveSheet()->getStyle($totalRows.':'.$totalRows)->getFont()->setBold(true);
+				
+				foreach (['D','E','F'] as $key => $columnLabel) {
+					$this->excel->getActiveSheet()->getStyle($columnLabel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+					$this->excel->getActiveSheet()->getColumnDimension($columnLabel)->setAutoSize(true);
+				}
+			}
+			
 			$this->excel->getActiveSheet()->fromArray($dataArray,NULL,'A1');
 			$objWriter = PHPExcel_IOFactory::createWriter($this->excel, 'Excel2007');
 			$objWriter->save('assets/ExportExcel/'.$fileName);
+			foreach (glob("assets/ExportExcel/*.xlsx") as $oldFilename) {
+				if($oldFilename !='assets/ExportExcel/'.$fileName){
+    				unlink($oldFilename);
+				}
+			}
 			return $fileName;
 		}
 
@@ -311,27 +330,54 @@ class Admin_Controller extends MY_Controller
 		*/
 		
 		public function buildExportLoadData($loads = NULL){
+			
+			$newArray 		= [];
+			$totalPayment 	= 0;
+			$totalMiles 	= 0;
+			$totalDeadMiles = 0;
+			$overallTotalProfitPercent = 0;
+			$overallTotalProfit = 0;
+			$CHARGES 		= 0;
+			$deadMiles 		= 0;
+			$totalRPM 		= 0;
 
-			$newArray = [];
 			foreach ($loads as $key => $load) {
 				
 				$newArray[$key]['DATE'] 		= date('m/d',strtotime($load['created']));
-				$newArray[$key]['CUSTOMER NAME']= (!empty($load['companyName']))?$load['companyName']:$load['TruckCompanyName'];
+				$newArray[$key]['CUSTOMER NAME']= (!empty($load['companyName']))?$load['companyName']:@$load['TruckCompanyName'];
 				$newArray[$key]['DRIVERS'] 		= $load['driverName'];
-				$newArray[$key]['INVOICE'] 		= $load['invoiceNo'];
+				$newArray[$key]['INVOICE'] 		=$load['PaymentAmount'];
 				$newArray[$key]['CHARGES'] 		= $load['totalCost'];
 				$newArray[$key]['PROFIT'] 		= $load['overallTotalProfit'];
-				$newArray[$key]['%PROFIT'] 		= $load['overallTotalProfitPercent'];
+				$PaymentAmount 					= ($load['PaymentAmount']!=0)?$load['PaymentAmount']:1;
+				$profit 						= ($load['totalCost']/$PaymentAmount)*100;
+
+				$newArray[$key]['%PROFIT'] 		= number_format($profit,2); 
 				$newArray[$key]['MILES'] 		= $load['Mileage'];
 				$newArray[$key]['DEAD MILES'] 	= $load['deadmiles'];
-				$newArray[$key]['RATE/MILE'] 	= (!empty($load['rpm']))?$load['rpm']:$load['RPM'];
+				$newArray[$key]['RATE/MILE'] 	= (!empty($load['rpm']))?$load['rpm']:@$load['RPM'];
 				$newArray[$key]['DATE P/U'] 	= date('m/d',strtotime($load['pickDate']));
 				$newArray[$key]['PICK UP'] 		= $load['OriginCity'].', '.$load['OriginState'];
 				$newArray[$key]['DATE DE'] 		= date('m/d',strtotime($load['DeliveryDate']));
 				$newArray[$key]['DELIVERY'] 	= $load['DestinationCity'].', '.$load['DestinationState'];
 				$newArray[$key]['LOLAD ID'] 	= $load['id'];
-				$newArray[$key]['STATUS'] 		= $load['JobStatus'];
+				$newArray[$key]['STATUS'] 		= ucfirst($load['JobStatus']);
+				//Last row data
+				$totalPayment 					+=$load['PaymentAmount'];
+				$totalMiles 					+=$load['Mileage'];
+				$totalDeadMiles 				+=$load['deadmiles'];
+				$overallTotalProfit      		+=$load['overallTotalProfit'];
+				$CHARGES 						+=$load['totalCost'];
+				$deadMiles 						+=$load['totalCost'];
+				$totalRPM 						+=$newArray[$key]['RATE/MILE'];
 			}
+
+			$totalRows 	= count($newArray) ;
+			$totalRPM 	= $totalRPM/$totalRows;
+
+			$overallTotalProfitPercent = number_format(($CHARGES/$totalPayment)*100,2);
+
+			$newArray[] = ['Total Rows:'.$totalRows,'','','$'.number_format($totalPayment,2),'$'.number_format($CHARGES,2),'$'.number_format($overallTotalProfit,2),$overallTotalProfitPercent,$totalMiles,$totalDeadMiles,$totalRPM,'','','','','',''];
 			return $newArray;
 		}
 }

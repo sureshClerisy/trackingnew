@@ -530,7 +530,7 @@ class Driver extends Parent_Model
 		}
 
 		$result = $this->db->get('vehicles as v');
-		//echo $this->db->last_query();die;
+		// echo $this->db->last_query();die;
 		if($total){
 			return $result->row_array()["totalCount"];
 		}
@@ -662,7 +662,7 @@ class Driver extends Parent_Model
 	
 	public function fetchDriversForCSV($userId = null,$search = null){
         
-        $this->db->select('d.first_name,d.last_name,d.email,v.label,d.driver_license_number,CONCAT(u.first_name, " ", u.last_name) AS dispatcher,d.phone,d.status,d.date_of_birth as dob,v.city,v.id as vehicle_id');
+        $this->db->select('d.first_name,d.last_name,d.email,v.label,d.driver_license_number,CONCAT(u.first_name, " ", u.last_name) AS dispatcher,d.phone,if(d.status=1,"Active","In-Active"),d.date_of_birth as dob,v.city,v.id as vehicle_id');
 		
 		$this->db->join("vehicles as v", "d.id = v.driver_id","Left");
 		$this->db->join('drivers as team','v.team_driver_id = team.id','left');	

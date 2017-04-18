@@ -56,18 +56,7 @@ app.controller('driversInsightsController', ["dataFactory","$scope","$rootScope"
 
     vmInsights.exportInsights = function(search){
         dataFactory.httpRequest(URL+'/Loads/getDriversInsightsRecords/','Post',{} ,{ pageNo:'', itemsPerPage:vmInsights.itemsPerPage,searchQuery: search, sortColumn:'', sortType:'',filterArgs:vmInsights.filterArgs,'export':1}).then(function(data){
-            
-            var url = URL+'/assets/ExportExcel/'+data.fileName;
-            var timestamp = Math.floor(Date.now() / 1000);
-            var downloadContainer   = angular.element('<div data-tap-disabled="true"><a></a></div>');
-            var downloadLink        = angular.element(downloadContainer.children()[0]);
-            downloadLink.attr('href',url);
-            downloadLink.attr('download', data.fileName);
-            angular.element('body').append(downloadContainer);
-            setTimeout(function(){
-              downloadLink[0].click();
-              downloadLink.remove();
-            },100);
+            $rootScope.donwloadExcelFile(data.fileName);
         });
     }
 

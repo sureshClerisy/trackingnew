@@ -2,6 +2,7 @@ app.controller('mainController', function (dataFactory,  PubNub, $scope, $sce,$r
 $rootScope.logoutmessage=false;
     $scope.login = {};
 
+    $rootScope.globalItemsPerPage = 20;
     var main = this;
     main.itemsPerPage = 10;
     
@@ -178,6 +179,20 @@ $rootScope.logoutmessage=false;
 
 	}
 
+	$rootScope.donwloadExcelFile = function(fileName){
+
+		var url = URL+'/assets/ExportExcel/'+fileName;
+        var timestamp = Math.floor(Date.now() / 1000);
+        var downloadContainer   = angular.element('<div data-tap-disabled="true"><a></a></div>');
+        var downloadLink        = angular.element(downloadContainer.children()[0]);
+        downloadLink.attr('href',url);
+        downloadLink.attr('download', fileName);
+        angular.element('body').append(downloadContainer);
+        setTimeout(function(){
+           downloadLink[0].click();
+            downloadLink.remove();
+        },100);
+    }
 	
 
 	/**Clicking on load detail changes url withour reload state*/
@@ -3267,6 +3282,8 @@ $rootScope.logoutmessage=false;
 						var returnedData = {fcolumn:data.savedData.id, PickupDate: data.savedData.PickupDate, DeliveryDate: data.savedData.DeliveryDate, miles:data.savedData.Mileage, deadmiles: data.savedData.deadmiles, invoice: data.savedData.PaymentAmount, charges: data.savedData.totalCost, profit: data.savedData.overallTotalProfit,ppercent : data.savedData.overallTotalProfitPercent  };
 						//angular.copy(returnedData, $rootScope.loadPerformance[$rootScope.globalListingIndex]);
 						$rootScope.updateDashboard();
+					} else if (saveType != undefined && saveType == 'outboxLoads') {
+						angular.copy(data.savedData, $rootScope.outboxLoads[$rootScope.globalListingIndex]);
 					}
 					
 					
@@ -4138,7 +4155,7 @@ $rootScope.logoutmessage=false;
 			$rootScope.ExceedMessage = 'Error !: Please save the load details to in order to generate invoice.';
 			return false;
 		}
-		
+	
 		$scope.autoFetchLoads = true;
 		dataFactory.httpRequest(URL+'/assignedloads/generateInvoice/'+loadId+'/'+$rootScope.saveTypeLoad+'/'+$rootScope.srcPage).then(function(data){
 			PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
@@ -4153,7 +4170,11 @@ $rootScope.logoutmessage=false;
 				}else  if ( $rootScope.saveTypeLoad != undefined && $rootScope.saveTypeLoad != 'sendForPayment' ){
 					$rootScope.billingLoads = data.billingLoads;
 				}
-					
+				
+				if ( $rootScope.saveTypeLoad != undefined && $rootScope.saveTypeLoad == 'readyForInvoice') {
+					$rootScope.readyToSendPaymentCount = parseInt($rootScope.readyToSendPaymentCount + 1);
+				}	
+
 				$rootScope.alertloadmsg = true;
 				$rootScope.alertExceedMsg = false;
 				$rootScope.Message = 'Success : The invoice has been generated successfully.';

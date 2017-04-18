@@ -1014,6 +1014,15 @@ $scope.print_todayInsights = function(){
   
 }
 
+$scope.exportWeather = function(){
+    
+    data = {currentWeather:$scope.currentWeather,dailyForecast:$scope.dailyForecast};
+    dataFactory.httpRequest(URL + '/dashboard/exportWeather', 'POST', {}, data).then(function(data) {
+        $rootScope.donwloadExcelFile(data.fileName);
+    });
+
+}
+
 $scope.print_weather = function(){
  var html = '<table cellpadding="0" cellspacing="0" style="width:1170px; margin:0px auto;padding:0px;font-family:arial;padding:30px 0px 0px;"><thead>';
   html = html +'<tr style="background:#f1f1f1;  text-transform: uppercase;font-size:12px; text-align:left;">';
@@ -1053,14 +1062,11 @@ $scope.print_function = function(body , title){
 
 $scope.load_status = function(){
 
-
-  //var data = $scope.printloadchart;
-
+   //var data = $scope.printloadchart;
    var html = '<table cellpadding="0" cellspacing="0" style="width:1170px; margin:0px auto;padding:0px;font-family:arial;padding:30px 0px 0px;">';
-  // html = html + '<thead><tr style="background:#f1f1f1;  text-transform: uppercase;font-size:12px; text-align:left;"><th style="padding:15px 7px;color:#363636; ">Assigned</th><th style="padding:15px 7px;color:#363636; ">Booked</th><th style="padding:15px 7px;color:#363636; ">Delivered</th><th style="padding:15px 7px;color:#363636; ">Inprogress</th><th style="padding:15px 7px;color:#363636; ">No-Loads</th><th style="padding:15px 7px;color:#363636; ">INVOICES</th><th style="padding:15px 7px;color:#363636; ">PAYMENT ON COLLECTION</th><th style="padding:15px 7px;color:#363636; ">Waiting Paperwork</th></thead>';
+   // html = html + '<thead><tr style="background:#f1f1f1;  text-transform: uppercase;font-size:12px; text-align:left;"><th style="padding:15px 7px;color:#363636; ">Assigned</th><th style="padding:15px 7px;color:#363636; ">Booked</th><th style="padding:15px 7px;color:#363636; ">Delivered</th><th style="padding:15px 7px;color:#363636; ">Inprogress</th><th style="padding:15px 7px;color:#363636; ">No-Loads</th><th style="padding:15px 7px;color:#363636; ">INVOICES</th><th style="padding:15px 7px;color:#363636; ">PAYMENT ON COLLECTION</th><th style="padding:15px 7px;color:#363636; ">Waiting Paperwork</th></thead>';
    // html = html +'<tbody><tr style="  text-transform: uppercase;font-size:12px; ">';
    // html = html +'<td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.printloadchart.assigned+'</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.printloadchart.booked+'</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.printloadchart.delivered+'</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.printloadchart.inprogress+'</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.printloadchart.noLoads+'</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.printloadchart.summary.invoiceCount+'</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.printloadchart.summary.sentForPaymentCount+'</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.printloadchart.summary.waitingPaperworkCount+'</td><tr></tbody>';
-
   
    html  = html + '<tr style="  text-transform: uppercase;font-size:12px; "><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">Assigned</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.printloadchart.assigned+'</td></tr>';
    html  = html + '<tr style="  text-transform: uppercase;font-size:12px; "><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">Booked</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.printloadchart.booked+'</td></tr>';
@@ -1070,12 +1076,14 @@ $scope.load_status = function(){
    html  = html + '<tr style="  text-transform: uppercase;font-size:12px; "><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">INVOICES</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.printloadchart.summary.invoiceCount+'</td></tr>';
    html  = html + '<tr style="  text-transform: uppercase;font-size:12px; "><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">PAYMENT ON COLLECTION</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.printloadchart.summary.sentForPaymentCount+'</td></tr>';
    html  = html + '<tr style="  text-transform: uppercase;font-size:12px; "><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">Waiting Paperwork</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.printloadchart.summary.waitingPaperworkCount+'</td></tr>';
-   
    $scope.print_function(html , 'Load Status');   
-          
-            
 }
 
+$scope.exportLoadStatus = function(){
+    dataFactory.httpRequest(URL+'/dashboard/exportLoadStatus','POST',{},$scope.printloadchart).then(function(data){
+        $rootScope.donwloadExcelFile(data.fileName);
+    });
+}
 
 $scope.refresh_loadStatus = function(){
 angular.element('.load_portlet-progress').css('display', 'block');
@@ -1097,7 +1105,7 @@ angular.element('.load_portlet-progress').css('display', 'block');
            chartData.push({name:'No-loads',y:data.loadsChart.noLoads });
            $scope.drawMatrix("delivery_matrix",chartData,'Loads');
              angular.element('.load_portlet-progress').css('display', 'none');
-            });
+           });
 
 
 }
@@ -1265,21 +1273,23 @@ $rootScope.exportTodayReport = function(){
     
     reporttype = ($rootScope.todayInsightActive === 'undefined' )?'booked':$rootScope.todayInsightActive;
     data = {'export':1};
-
     dataFactory.httpRequest(URL+'/dashboard/getTodayReport/'+reporttype,'POST',{},data).then(function(data){
-            
-            var url = URL+'/assets/ExportExcel/'+data.fileName;
-            var downloadContainer   = angular.element('<div data-tap-disabled="true"><a></a></div>');
-            var downloadLink        = angular.element(downloadContainer.children()[0]);
-            downloadLink.attr('href', url);
-            downloadLink.attr('download', data.filename);
-            angular.element('body').append(downloadContainer);
-            $timeout(function () {
-              downloadLink[0].click();
-              downloadLink.remove();
-            }, null);
-
+        $rootScope.donwloadExcelFile(data.fileName);
     });
+}
+
+$rootScope.donwloadFile = function(fileName){
+
+    var url = URL+'/assets/ExportExcel/'+fileName;
+    var downloadContainer   = angular.element('<div data-tap-disabled="true"><a></a></div>');
+    var downloadLink        = angular.element(downloadContainer.children()[0]);
+    downloadLink.attr('href', url);
+    downloadLink.attr('download', fileName);
+    angular.element('body').append(downloadContainer);
+    $timeout(function () {
+      downloadLink[0].click();
+      downloadLink.remove();
+    }, null);
 }
 
 $rootScope.exportTop5 = function(){
@@ -1296,15 +1306,15 @@ $rootScope.exportTop5 = function(){
     }
 
     dataFactory.httpRequest(URL+'/dashboard/topFiveCustomer','POST',{},data).then(function(data){
-       alert(data.fileName);
+       $rootScope.donwloadExcelFile(data.fileName);
     });
 }
 
 $rootScope.exportLeaderBoard = function(item,model,type){
     
-    alert(model);
+    // alert(model);
     
-    alert(type);
+    // alert(type);
 
     $rootScope.ofFilter.startDate = $scope.dateRangeSelector.startDate;
     $rootScope.ofFilter.endDate = $scope.dateRangeSelector.endDate;

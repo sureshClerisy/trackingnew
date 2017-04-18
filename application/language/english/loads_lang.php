@@ -80,6 +80,11 @@ $lang['the'] = 'The';
 $lang['documentAlreadyUploaded'] = 'Document is already uploaded. Do you want to overwrite it ?';
 $lang['proofDelivery'] = 'Upload Proof of Delivery';
 
+
+$lang['dashboard']	= 'Dashboard';
+$lang['inbox']	= 'Inbox';
+$lang['factoring']	= 'Factoring';
+$lang['outbox']	= 'Outbox';
 /**** billing -r288***/
 
 

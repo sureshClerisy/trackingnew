@@ -253,46 +253,6 @@ class Job extends Parent_Model {
 	}	
 
 
-
-	/**
-	 * Fetching loads for listing
-	 */
-	 
-    public function fetchSavedJobs( $loggedUserId = null, $vehicleId = null, $scopeType = '') {				// source for custom added vika dispatch
-		
-        $data =  $condition = array();
-        $this->db->select('CONCAT( d.first_name ," + " ,team.first_name) AS teamdriverName, CONCAT(d.first_name," ", d.last_name) as driverName, loads.driver_type, loads.id, loads.invoiceNo, loads.vehicle_id, loads.truckstopID,loads.Bond,loads.PointOfContactPhone,loads.equipment_options,loads.LoadType,loads.PickupDate,loads.DeliveryDate,loads.OriginCity,loads.OriginState,loads.DestinationCity,loads.DestinationState,loads.PickupAddress,loads.DestinationAddress,loads.PaymentAmount,loads.Mileage,loads.deadmiles,loads.Weight,loads.Length,loads.JobStatus,loads.totalCost,loads.pickDate,loads.load_source,broker_info.TruckCompanyName as companyName');
-		
-		$this->db->join("vehicles as v", "loads.vehicle_id = v.id","Left");
-		$this->db->join("drivers as d", "v.driver_id = d.id","Left");
-		$this->db->join("users as u", "d.user_id = u.id","Left");
-		$this->db->join('broker_info', 'broker_info.id = loads.broker_id','Left');
-		$this->db->join('drivers as team','v.team_driver_id = team.id','left');	
-		if($vehicleId){
-			$this->db->where_in('loads.vehicle_id',$vehicleId);
-		}
-		if($scopeType == "team"){
-			$this->db->where('loads.driver_type',"team");	
-		}else if($scopeType == "driver"){
-			$this->db->where("(loads.driver_type = '' OR loads.driver_type IS NULL || loads.driver_type = 'driver')");	
-		}
-		$this->db->where('delete_status',0);
-		
-		if ( $this->session->userdata('role') != 3 && $this->session->userdata('role') != 1 ) {
-			if( !empty($loggedUserId) && $scopeType == 'dispatcher') 
-				$this->db->or_where('loads.user_id',$loggedUserId);
-				$this->db->where('delete_status',0);	
-		}
-		
-		$this->db->order_by("loads.PickupDate",'ASC');
-		$query = $this->db->get('loads');
-		if ($query->num_rows() > 0) {
-			return $query->result_array();
-		} else {
-			return false;
-		}
-	}
-
 	public function getIdleDriversLoads($filters = array(), $type, $total = false){
 		if($total){
 			$this->db->select('count(loads.id) as total'); 
@@ -498,23 +458,26 @@ class Job extends Parent_Model {
 
 	public function fetchSavedJobsNew( $loggedUserId = null, $vehicleId = null, $scopeType = '', $dispatcherId = null, $driverId = null, $secondDriverId = null, $startDate = '', $endDate = '',$filters = array()) {
 
-		// ex($filters);
-		
 		if(count($filters) <= 0){
 			$filters = array("itemsPerPage"=>20, "limitStart"=>1, "sortColumn"=>"DeliveryDate", "sortType"=>"DESC","status"=>"");
 		}
-
 
 		$data =  $condition = array();
         $this->db->select('loads.id,CONCAT( d.first_name ," + " ,team.first_name) AS teamdriverName, 
         					CASE loads.driver_type 
         						WHEN "team" THEN CONCAT(d.first_name," + ",team.first_name) 
         									ELSE concat(d.first_name," ",d.last_name) 
-        									END AS driverName, loads.driver_type,loads.invoiceNo, loads.vehicle_id, loads.truckstopID,loads.Bond,loads.PointOfContactPhone,loads.equipment_options,loads.LoadType,loads.PickupDate,loads.DeliveryDate,loads.OriginCity,loads.OriginState,loads.DestinationCity,loads.DestinationState,loads.PickupAddress,loads.DestinationAddress,loads.PaymentAmount,loads.Mileage, (loads.PaymentAmount/loads.Mileage) as rpm, loads.deadmiles,loads.Weight,loads.Length,loads.JobStatus,loads.totalCost,loads.pickDate,loads.load_source,broker_info.TruckCompanyName as companyName,loads.created,loads.overallTotalProfit,loads.overallTotalProfitPercent,loads.DeliveryDate,loads.totalCost');
+        									END AS driverName, 
+        						CASE loads.billType 
+        							WHEN "shipper" THEN (shippers.shipperCompanyName) 
+        									   ELSE (broker_info.TruckCompanyName)
+        									END AS companyName, 
+        					loads.driver_type,loads.invoiceNo, loads.vehicle_id, loads.truckstopID,loads.Bond,loads.PointOfContactPhone,loads.equipment_options,loads.LoadType,loads.PickupDate,loads.DeliveryDate,loads.OriginCity,loads.OriginState,loads.DestinationCity,loads.DestinationState,loads.PickupAddress,loads.DestinationAddress,loads.PaymentAmount,loads.Mileage, (loads.PaymentAmount/loads.Mileage) as rpm, loads.deadmiles,loads.Weight,loads.Length,loads.JobStatus,loads.totalCost,loads.pickDate,loads.load_source,loads.created,loads.overallTotalProfit,loads.overallTotalProfitPercent,loads.DeliveryDate,loads.totalCost,loads.billType');
 		
 		$this->db->join("vehicles as v", "loads.vehicle_id = v.id","Left");
 		$this->db->join("drivers as d", "loads.driver_id = d.id","Left");
-		$this->db->join('broker_info', 'broker_info.id = loads.broker_id','Left');
+		$this->db->join("broker_info", "broker_info.id = loads.broker_id AND loads.billType = 'broker'","Left");
+		$this->db->join("shippers", "shippers.id = loads.broker_id AND loads.billType = 'shipper'","Left");
 		$this->db->join('drivers as team','v.team_driver_id = team.id','left');	
 	
 		if($scopeType == "team") {
@@ -563,7 +526,9 @@ class Job extends Parent_Model {
             $this->db->or_like('loads.Length', $filters['searchQuery']);
             $this->db->or_like('LOWER(loads.JobStatus)', strtolower($filters['searchQuery']) );
             $this->db->or_like('LOWER(loads.load_source)', strtolower($filters['searchQuery']) );
+            $this->db->or_like('LOWER(loads.billType)', strtolower($filters['searchQuery']) );
             $this->db->or_like('LOWER(broker_info.TruckCompanyName)', strtolower($filters['searchQuery']) );
+            $this->db->or_like('LOWER(shippers.shipperCompanyName)', strtolower($filters['searchQuery']) );
             //$this->db->or_like('LOWER(CONCAT( d.first_name ," + " ,team.first_name))', strtolower($filters['searchQuery']));
             $this->db->group_end();
 		}
@@ -575,7 +540,11 @@ class Job extends Parent_Model {
 								     ELSE concat(d.first_name, " ", d.last_name) 
 								 END '.$filters["sortType"]);
 		}else if(in_array($filters["sortColumn"] ,array("TruckCompanyName"))){
-			$this->db->order_by("broker_info.".$filters["sortColumn"],$filters["sortType"]);	
+			$this->db->order_by('CASE 
+								     WHEN loads.billType  = "shipper" THEN (shippers.shipperCompanyName) 
+								     ELSE (broker_info.TruckCompanyName)
+								 END '.$filters["sortType"]);
+			//$this->db->order_by("broker_info.".$filters["sortColumn"],$filters["sortType"]);	
 		}else if($filters["sortColumn"] == "rpm"){
 			$this->db->order_by("(loads.PaymentAmount/loads.Mileage) ",$filters["sortType"]);	 
 		}else if($filters["sortColumn"] == "Weight"){
@@ -607,7 +576,8 @@ class Job extends Parent_Model {
         $this->db->select('count(loads.id) as total');
 		$this->db->join("vehicles as v", "loads.vehicle_id = v.id","Left");
 		$this->db->join("drivers as d", "loads.driver_id = d.id","Left");
-		$this->db->join('broker_info', 'broker_info.id = loads.broker_id','Left');
+		$this->db->join("broker_info", "broker_info.id = loads.broker_id AND loads.billType = 'broker'","Left");
+		$this->db->join("shippers", "shippers.id = loads.broker_id AND loads.billType = 'shipper'","Left");
 		$this->db->join('drivers as team','v.team_driver_id = team.id','left');	
 		
 		if($scopeType == "team") {
@@ -658,7 +628,9 @@ class Job extends Parent_Model {
             $this->db->or_like('loads.Length', $filters['searchQuery']);
             $this->db->or_like('LOWER(loads.JobStatus)', strtolower($filters['searchQuery']) );
             $this->db->or_like('LOWER(loads.load_source)', strtolower($filters['searchQuery']) );
+            $this->db->or_like('LOWER(loads.billType)', strtolower($filters['searchQuery']) );
             $this->db->or_like('LOWER(broker_info.TruckCompanyName)', strtolower($filters['searchQuery']) );
+            $this->db->or_like('LOWER(shippers.shipperCompanyName)', strtolower($filters['searchQuery']) );
             $this->db->group_end();
 		}
 		
@@ -807,6 +779,8 @@ class Job extends Parent_Model {
 		
 		$this->db->where(array('loads.sent_for_payment' => 0, 'loads.delete_status' => 0,'loads.ready_for_invoice' => 0));
 		$this->db->where("(SELECT  count(documents.load_id) as c FROM  documents WHERE  documents.load_id  =  loads.id and documents.doc_type in ('pod','rateSheet') )< 2  ");
+		$this->db->where("loads.DeliveryDate <",date("Y-m-d"));
+		$this->db->where_IN('loads.JobStatus',$this->config->item('loadStatus'));
 		$query = $this->db->get('loads');
 		//echo $this->db->last_query();die;
 		if ($query->num_rows() > 0) {
@@ -943,8 +917,12 @@ class Job extends Parent_Model {
 	 */
 	 
 	public function FetchSingleJobCreateInput( $jobId = null ) {
-		$this->db->select('loads.invoiceNo,loads.invoicedDate,loads.woRefno,loads.PaymentAmount,loads.OriginCity,loads.OriginState,loads.OriginZip,loads.PickupDate,loads.PickDate,loads.DestinationCity,loads.DestinationState,loads.DestinationZip,loads.DeliveryDate,broker_info.MCNumber,broker_info.TruckCompanyName');
-		$this->db->join('broker_info', 'broker_info.id = loads.broker_id','LEFT');
+		$this->db->select('CASE loads.billType 
+				WHEN "shipper" THEN (shippers.shipperCompanyName) 
+			   ELSE (broker_info.TruckCompanyName)
+			END AS TruckCompanyName, loads.invoiceNo,loads.invoicedDate,loads.woRefno,loads.PaymentAmount,loads.OriginCity,loads.OriginState,loads.OriginZip,loads.PickupDate,loads.PickDate,loads.DestinationCity,loads.DestinationState,loads.DestinationZip,loads.DeliveryDate,broker_info.MCNumber');
+		$this->db->join("broker_info", "broker_info.id = loads.broker_id AND loads.billType = 'broker'" ,"LEFT");
+		$this->db->join("shippers",	   "shippers.id = loads.broker_id AND loads.billType = 'shipper'"   ,"LEFT");
 		$this->db->where('loads.id', $jobId);
 		
 		return $this->db->get('loads')->row_array();
@@ -2469,7 +2447,7 @@ class Job extends Parent_Model {
 	*/
 
 	public function FetchSingleJobForPrint( $jobId = null ) {
-		$this->db->select('loads.id,loads.vehicle_id, loads.driver_id, loads.second_driver_id, loads.driver_type,loads.shipper_entity, loads.shipper_name, loads.shipper_phone, loads.PickupDate, loads.PickupTime, loads.PickupTimeRangeEnd,loads.PickupAddress, loads.OriginCity, loads.OriginState, loads.OriginCountry, loads.OriginZip, loads.consignee_entity, loads.consignee_phone, loads.consignee_name, loads.DeliveryDate, loads.DeliveryTime, loads.DeliveryTimeRangeEnd, loads.DestinationAddress, loads.DestinationCity, loads.DestinationState, loads.DestinationCountry, loads.DestinationZip, loads.equipment, loads.equipment_options, loads.LoadType, loads.Weight, loads.Length, loads.Mileage, loads.PaymentAmount, loads.Quantity, loads.Stops, loads.commodity, loads.Rate, loads.specInfo, loads.deadmiles, loads.JobStatus, loads.invoiceNo, loads.postedDate, loads.totalCost, loads.overallTotalProfit, loads.overallTotalProfitPercent, loads.woRefno, loads.broker_id, loads.	PointOfContact, loads.PointOfContactPhone, loads.TruckCompanyEmail, loads.TruckCompanyPhone, loads.TruckCompanyFax, concat(drivers.first_name," ",drivers.last_name,"-",vehicles.label) as assignedDriverName');
+		$this->db->select('loads.id,loads.vehicle_id, loads.driver_id, loads.second_driver_id, loads.driver_type,loads.shipper_entity, loads.shipper_name, loads.shipper_phone, loads.PickupDate, loads.PickupTime, loads.PickupTimeRangeEnd,loads.PickupAddress, loads.OriginCity, loads.OriginState, loads.OriginCountry, loads.OriginZip, loads.consignee_entity, loads.consignee_phone, loads.consignee_name, loads.DeliveryDate, loads.DeliveryTime, loads.DeliveryTimeRangeEnd, loads.DestinationAddress, loads.DestinationCity, loads.DestinationState, loads.DestinationCountry, loads.DestinationZip, loads.equipment, loads.equipment_options, loads.LoadType, loads.Weight, loads.Length, loads.Mileage, loads.PaymentAmount, loads.Quantity, loads.Stops, loads.commodity, loads.Rate, loads.specInfo, loads.deadmiles, loads.JobStatus, loads.invoiceNo, loads.postedDate, loads.totalCost, loads.overallTotalProfit, loads.overallTotalProfitPercent, loads.woRefno, loads.broker_id, loads.	PointOfContact, loads.PointOfContactPhone, loads.TruckCompanyEmail, loads.TruckCompanyPhone, loads.TruckCompanyFax, loads.billType, concat(drivers.first_name," ",drivers.last_name,"-",vehicles.label) as assignedDriverName');
 		$this->db->join('drivers', 'drivers.id = loads.driver_id','Left');
 		$this->db->join('vehicles', 'vehicles.id = loads.vehicle_id','Left');
 		$this->db->where('loads.id', $jobId);
@@ -2484,10 +2462,17 @@ class Job extends Parent_Model {
 	* comment : for fetching load detail information for printing ticket
 	*/
 
-	public function getBrokerForLoadDetailForPrint( $brokerId = null ) {
-		$this->db->select('TruckCompanyName, postingAddress, city, state, zipcode, MCNumber, CarrierMC, DOTNumber, brokerStatus');
-		$this->db->where('broker_info.id', $brokerId);
-		return $this->db->get('broker_info')->row_array();
+	public function getBrokerForLoadDetailForPrint( $entityId = null, $billType = '' ) {
+		if ( $billType == 'shipper' ){
+			$this->db->select('shipperCompanyName as TruckCompanyName, postingAddress, city, state, zipcode');
+			$this->db->where('shippers.id', $entityId);
+			return $this->db->get('shippers')->row_array();
+		} else {
+			$this->db->select('TruckCompanyName, postingAddress, city, state, zipcode, MCNumber, CarrierMC, DOTNumber, brokerStatus');
+			$this->db->where('broker_info.id', $entityId);
+			return $this->db->get('broker_info')->row_array();
+		}
+		
 	}
 
 	/*

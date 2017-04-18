@@ -106,7 +106,6 @@
     <?php createScriptOrLinkTag('app/services/myServices.js','script');?>
     <script src="app/services/sample.js"></script>
     <script src="app/helper/myHelper.js"></script>
-    
 
     <!-- App Controller -->
     <?php 
@@ -133,9 +132,12 @@
     createScriptOrLinkTag('app/controllers/driversInsightsController.js','script');
     createScriptOrLinkTag('app/controllers/truckInsightsController.js','script');
     createScriptOrLinkTag('app/controllers/shipperController.js','script');
+    createScriptOrLinkTag('app/controllers/investorController.js','script');
+    createScriptOrLinkTag('app/controllers/outboxPaymentController.js','script');
+    createScriptOrLinkTag('app/services/investorService.js','script');
     createScriptOrLinkTag('app/services/shipperService.js','script');
     createScriptOrLinkTag('app/services/environmentconfig.js','script');
-    createScriptOrLinkTag('app/controllers/sendDirectPaymentController.js','script');
+    
     ?>
     <script src="login/loadLanguages"></script>
     <!--for footable-->

@@ -71,7 +71,10 @@ app.controller('loadsController', ["dataFactory","$scope","$http","$rootScope", 
 		$scope.dateRangeSelector = {startDate: moment().startOf('month').format('YYYY-MM-DD'), endDate: moment().format('YYYY-MM-DD')};    
 	}
 
-	
+	$scope.includeSidebar = false;
+	if( getAllLoads.filterArgs.requestFrom   != undefined && getAllLoads.filterArgs.requestFrom == "billings" ){ 
+		$scope.includeSidebar = true; 
+	}
 	
 	$scope.firstParam = (getAllLoads.filterArgs.firstParam != undefined ) ? getAllLoads.filterArgs.firstParam : 'all'; 
 	$rootScope.assignedLoads = (getAllLoads.assigned_loads != undefined ) ? getAllLoads.assigned_loads : [];
@@ -196,24 +199,9 @@ app.controller('loadsController', ["dataFactory","$scope","$http","$rootScope", 
 
 	$scope.exportLoadData = function(){
 		search = angular.element('.srpSearch1 input').val();
-		// $scope.autoFetchLoads = true;
 		data = { pageNo:'', itemsPerPage:$scope.itemsPerPage,searchQuery: search, sortColumn:'', sortType:'',startDate: $scope.dateRangeSelector.startDate, endDate:$scope.dateRangeSelector.endDate,filterArgs:$scope.filterArgs,'export':'1'}
         dataFactory.httpRequest(URL+'/Loads/getRecords/','Post',{} ,data).then(function(data){
-        	
-            var url = URL+'/assets/ExportExcel/'+data.fileName;
-			var timestamp = Math.floor(Date.now() / 1000);
-			var downloadContainer 	= angular.element('<div data-tap-disabled="true"><a></a></div>');
-			var downloadLink 		= angular.element(downloadContainer.children()[0]);
-			downloadLink.attr('href',url);
-			downloadLink.attr('download', data.fileName);
-			downloadLink.attr('target', '_blank');
-			angular.element('body').append(downloadContainer);
-			$timeout(function () {
-			  downloadLink[0].click();
-			  downloadLink.remove();
-			}, null);
-            // $scope.total = data.total;
-        	// return data;
+           $rootScope.donwloadExcelFile(data.fileName);
 		});		
 	}    
 
@@ -263,7 +251,7 @@ app.controller('loadsController', ["dataFactory","$scope","$http","$rootScope", 
     		case 'Length'			 	: $scope.LengthSortType = type; break;
     		case 'Weight'			 	: $scope.WeightSortType = type; break;
     		case 'TruckCompanyName'		: $scope.TruckCompanyNameSortType = type; break;
-    		case 'load_source'			: $scope.load_sourceSortType = type; break;
+    		case 'billType'				: $scope.load_sourceSortType = type; break;
     		case 'JobStatus'			: $scope.JobStatusSortType = type; break;
     	}
 

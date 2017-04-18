@@ -64,6 +64,18 @@ if (!function_exists('logActivityEvent')){
 	}
 }
 
+if(!function_exists('in_array_multi')){
+	function in_array_multi($needle, $haystack, $strict = false) {
+	    foreach ($haystack as $item) {
+	        if (($strict ? $item === $needle : $item == $needle) || (is_array($item) && in_array_multi($needle, $item, $strict))) {
+	            return true;
+	        }
+	    }
+
+	    return false;
+	}
+}
+
 
 if (!function_exists('getProfitPercent'))
 {

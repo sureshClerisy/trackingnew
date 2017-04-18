@@ -19,13 +19,16 @@ class Filteredbillings extends Admin_Controller{
 	
 	public function index( $parameter = '' ) {
 		$data = array();
+
 		$filters = array("itemsPerPage"=>20, "limitStart"=>1, "sortColumn"=>"DeliveryDate", "sortType"=>"DESC");
 		$filters["filterType"] = isset($_REQUEST["filterType"]) ? $_REQUEST["filterType"] : 'all';
 		$filters["userType"] = isset($_REQUEST["userType"]) ? $_REQUEST["userType"] : 'all';
 		$filters["userId"] = isset($_REQUEST["userToken"]) ? $_REQUEST["userToken"] : false;
-		$filters["deliveryDate"] = isset($_REQUEST["deliveryDate"]) ? $_REQUEST["deliveryDate"] : "";
+		$filters["dateFrom"] = isset($_REQUEST["dateFrom"]) ? $_REQUEST["dateFrom"] : "";
+		$filters["dateTo"] = isset($_REQUEST["dateTo"]) ? $_REQUEST["dateTo"] : "";
 		if ( isset($filters["filterType"]) && $filters["filterType"] == 'sent_today_expected' ) {	
-			$recentTransactions = $this->Billing->getRecentTransactions(1);
+			$filters["dateTo"] = date("Y-m-d", strtotime("yesterday"));
+			$recentTransactions = $this->Billing->getRecentTransactions(date("Y-m-d"), 1);
 			if(isset($recentTransactions[0]["date"])){ 
 				$filters["dateFrom"] =  $recentTransactions[0]["date"]; 
 			}
@@ -44,20 +47,14 @@ class Filteredbillings extends Admin_Controller{
 			$filters["secondDriverId"] = (isset($_REQUEST['secondDriverId']) && $_REQUEST['secondDriverId'] != '' ) ? $_REQUEST['secondDriverId'] : $driverInfo['team_driver_id'];			 
 		}
 
-
 		$jobs = $this->Billing->getFilteredLoads( $filters);
 		$data['total'] = $this->Billing->getFilteredLoads( $filters,true);
-
-		
 		$data['loads'] = $jobs;
 		$data['billType'] = 'billing';
 		$data['filterArgs'] = $_REQUEST;
 		$data['filterArgs']["firstParam"] = $parameter;
-
 		echo json_encode($data);
 	}
-		
-	
 
 	public function getRecords($parameter = ''){
 
@@ -75,20 +72,19 @@ class Filteredbillings extends Admin_Controller{
 		if((isset($params["sortType"]) && empty($params["sortType"])) || !isset($params["sortType"])){ $params["sortType"] = "DESC"; }
 		if(!isset($params["startDate"])){ $params["startDate"] = ''; }
 		if(!isset($params["endDate"])){ $params["endDate"] = ''; }
-
-		
-
 		
 		$params["filterType"] = isset($params["filterArgs"]["filterType"]) ? $params["filterArgs"]["filterType"] : 'all';
-		$params["userType"] = isset($params["filterArgs"]["userType"]) ? $params["filterArgs"]["userType"] : 'all';
-		$params["userId"] = isset($params["filterArgs"]["userToken"]) ? $params["filterArgs"]["userToken"] : false;
-
+		$params["userType"]   = isset($params["filterArgs"]["userType"]) ? $params["filterArgs"]["userType"] : 'all';
+		$params["userId"]     = isset($params["filterArgs"]["userToken"]) ? $params["filterArgs"]["userToken"] : false;
+		$params["dateFrom"]   = isset($params["filterArgs"]["dateFrom"]) ? $params["filterArgs"]["dateFrom"] : false;
+		$params["dateTo"]     = isset($params["filterArgs"]["dateTo"]) ? $params["filterArgs"]["dateTo"] : false;
 		if(isset($params["filterType"]["requestFrom"]) && $params["filterType"]["requestFrom"] == "billings"){
 			$params["startDate"] = $params["endDate"] = "";
 		}
 
 		if ( isset($params["filterType"]) && $params["filterType"] == 'sent_today_expected' ) {	
-			$recentTransactions = $this->Billing->getRecentTransactions(1);
+			$params["dateTo"] = date("Y-m-d", strtotime("yesterday"));
+			$recentTransactions = $this->Billing->getRecentTransactions(date("Y-m-d"), 1);
 			if(isset($recentTransactions[0]["date"])){ 
 				$params["dateFrom"] =  $recentTransactions[0]["date"]; 
 			}
@@ -109,8 +105,8 @@ class Filteredbillings extends Admin_Controller{
 		if(!empty($params['export'])){
 			$keys = [['DATE','CUSTOMER NAME','DRIVERS','INVOICE','CHARGES','PROFIT','%PROFIT','MILES','DEAD MILES','RATE/MILE','DATE P/U','PICK UP','DATE DE','DELIVERY','LOLAD ID','STATUS']];
 			$exportData = $this->buildExportLoadData($jobs);
-			$data = array_merge($keys,$exportData);
-			echo json_encode(array('fileName'=>$this->createExcell('billing',$data)));die();
+			$data 		= array_merge($keys,$exportData);
+			echo json_encode(array('fileName'=>$this->createExcell('billing',$data,TRUE)));die();
 		}
 
 		if(!$jobs){$jobs = array();}

@@ -2,10 +2,10 @@
 
 /**
  * @ngdoc service
- * @name ycspApp.loginService
+ * @name app.shipperService
  * @description
- * # loginService
- * Service in the ycspApp.
+ * # shipperService
+ * Service in the app.
  */
 angular.module('app')
     .service('shipperService', function ($http, EnvironmentConfig, $httpParamSerializerJQLike) {

@@ -159,7 +159,7 @@
 													<span class="lode-arrow {{TruckCompanyNameSortType}}">{{ languageArray.planthcompany }}</span>
 												</div>
 												
-												<div class="tb-cell source" ng-click="sortCustom('load_source', load_sourceSortType)"> 
+												<div class="tb-cell source stype" ng-click="sortCustom('billType', load_sourceSortType)"> 
 													<span class="lode-arrow {{load_sourceSortType}}"> Source</span>	
 												</div>
 												
@@ -173,35 +173,30 @@
 											</div>
 											<div class="table-row-main1 tb-body" data-pickdate="{{value.pickDate}}" data-uinfo="{{value.ID}}" dir-paginate="value in assignedLoads | itemsPerPage: itemsPerPage"  total-items="total" current-page="currentPage" pagination-id="myLoadPage" ng-click="clickMatchLoadDetail(value.truckstopID, value.id, value.deadmiles, value.PaymentAmount, value.totalCost, value.pickDate, value.vehicle_id , $index)">
 												
-												<div class="tb-cell ld-id"> <span> <div class="plus-1" ng-click="$event.stopPropagation();toggleRow($event,$index);"></div>{{ value.id }}</span></div>
-												<div class="tb-cell ph"> <span> {{ value.PointOfContactPhone | bcTelephone:'format'}}</span></div>
-												<div class="tb-cell trlr"> <span>{{ value.equipment_options }}</span></div>
-												<div class="tb-cell fl"> <span>{{ value.LoadType }} </span></div>
-												<div class="tb-cell pickup"> <span>{{ (value.PickupDate != '0000-00-00' && value.PickupDate != '' ) ? value.PickupDate : ''}}</span>
+												<div class="tb-cell ld-id">   <span> <div class="plus-1" ng-click="$event.stopPropagation();toggleRow($event,$index);"></div>{{ value.id }}</span></div>
+												<div class="tb-cell ph">         <span> {{ value.PointOfContactPhone | bcTelephone:'format'}}</span></div>
+												<div class="tb-cell trlr">       <span>{{ value.equipment_options }}</span></div>
+												<div class="tb-cell fl">         <span>{{ value.LoadType }} </span></div>
+												<div class="tb-cell pickup">     <span>{{ (value.PickupDate != '0000-00-00' && value.PickupDate != '' ) ? value.PickupDate : ''}}</span>
 												</div>
-												<div class="tb-cell delivery"> <span>{{ (value.DeliveryDate != '0000-00-00' && value.DeliveryDate != '' ) ? value.DeliveryDate : ''}}</span>
+												<div class="tb-cell delivery">   <span>{{ (value.DeliveryDate != '0000-00-00' && value.DeliveryDate != '' ) ? value.DeliveryDate : ''}}</span>	</div>
+												<div class="tb-cell Origin">     <span>{{ value.OriginCity|capitalize}}</span></div>
+												<div class="tb-cell st"> 	     <span>{{ value.OriginState | uppercase}}</span></div>
+												<div class="tb-cell Destination"><span>{{ value.DestinationCity|capitalize}}</span></div>
+												<div class="tb-cell st1	"> 		 <span>{{ value.DestinationState | uppercase }}</span></div>
+												<div class="tb-cell Driver"> 	 <span>{{value.driverName }}</span>
 												</div>
-												<div class="tb-cell Origin"> <span>{{ value.OriginCity|capitalize}}</span></div>
-												<div class="tb-cell st"> <span>{{ value.OriginState | uppercase}}</span></div>
-												<div class="tb-cell Destination	"> <span>{{ value.DestinationCity|capitalize}}</span></div>
-												<div class="tb-cell st1	"> <span>{{ value.DestinationState | uppercase }}</span></div>
-												<div class="tb-cell Driver	"> <span>{{value.driverName }}</span>
+												<div class="tb-cell Invoice-No"> <span>{{ value.invoiceNo }} </span></div>
+												<div class="tb-cell payment"> 	 <span>{{ value.PaymentAmount | currency:"$":2 }}</span></div>
+												<div class="tb-cell ppm">		 <span>{{ value.Mileage != 0 ? (value.PaymentAmount / value.Mileage | currency:"$":2) : '' }}</span>
 												</div>
-												<div class="tb-cell Invoice-No	"> <span>{{ value.invoiceNo }} </span></div>
-												<div class="tb-cell payment	"> <span>{{ value.PaymentAmount | currency:"$":2 }}</span></div>
-												<div class="tb-cell ppm	"> <span>{{ value.Mileage != 0 ? (value.PaymentAmount / value.Mileage | currency:"$":2) : '' }}</span>
-												</div>
-												<div class="tb-cell miles	"> <span>{{ value.Mileage }}</span></div>
-												<div class="tb-cell d-miles	"> <span>{{ value.deadmiles }}</span></div>
-												<div class="tb-cell length"> <span>{{ value.Length }}</span></div>
-												<div class="tb-cell weight">
-													{{ value.Weight }}
-												</div>
-												<div class="tb-cell company">
-													<span class="text-comp-name">{{ value.companyName|capitalize }}</span>
-												</div>
-												<div class="tb-cell source"> <span>{{ value.load_source }}</span></div>
-												<div class="tb-cell staus"> <span>{{ value.JobStatus }}</span></div>
+												<div class="tb-cell miles"> 	 <span>{{ value.Mileage }}</span></div>
+												<div class="tb-cell d-miles"> 	 <span>{{ value.deadmiles }}</span></div>
+												<div class="tb-cell length"> 	 <span>{{ value.Length }}</span></div>
+												<div class="tb-cell weight">	 <span>{{ value.Weight }}</span></div>
+												<div class="tb-cell company">    <span class="text-comp-name">{{ value.companyName|capitalize }}</span>	</div>
+												<div class="tb-cell source"> 	 <p class="change-color">{{(value.billType != '' ) ? value.billType + ' - ' : ''}}</p> <span>{{ value.load_source }}</span></div>
+												<div class="tb-cell staus"> 	 <span>{{ value.JobStatus }}</span></div>
 												<div class="tb-cell action" ng-click="$event.stopPropagation()">
 													<span class="wid">
 														<a class="btn btn-default DTTT_button_xls" data-original-title="Truck Route" ui-jq="tooltip" ng-click="showAssignedLoad(value)">
@@ -230,25 +225,46 @@
 															</span>
 														</div>
 														<div class="tb-cell trlr">
-															<span><div class="heading">{{ languageArray.trlrLoadTableThHeading }}<b>:</b></div><div class="value">{{ value.equipment_options }}</div></span>
+															<span>
+																<div class="heading">{{ languageArray.trlrLoadTableThHeading }}<b>:</b></div>
+																<div class="value">{{ value.equipment_options }}</div>
+															</span>
 														</div>
 														<div class="tb-cell fl">
-															<span><div class="heading">{{ languageArray.planthfl }} <b>:</b></div><div class="value">{{ value.LoadType }}</div> </span>
+															<span>
+																<div class="heading">{{ languageArray.planthfl }} <b>:</b></div>
+																<div class="value">{{ value.LoadType }}</div>
+															</span>
 														</div>
 														<div class="tb-cell pickup">
-															<span><div class="heading">{{ languageArray.planthpickup }} <b>:</b></div><div class="value">{{ (value.PickupDate != '0000-00-00' && value.PickupDate != '' ) ? value.PickupDate : ''}}</div></span>
+															<span>
+																<div class="heading">{{ languageArray.planthpickup }} <b>:</b></div>
+																<div class="value">{{ (value.PickupDate != '0000-00-00' && value.PickupDate != '' ) ? value.PickupDate : ''}}</div>
+															</span>
 														</div>
 														<div class="tb-cell delivery">
-															<span><div class="heading">{{ languageArray.popupdelivery }} <b>:</b></div><div class="value">{{ (value.DeliveryDate != '0000-00-00' && value.DeliveryDate != '' ) ? value.DeliveryDate : ''}}</div></span>
+															<span>
+																<div class="heading">{{ languageArray.popupdelivery }} <b>:</b></div>
+																<div class="value">{{ (value.DeliveryDate != '0000-00-00' && value.DeliveryDate != '' ) ? value.DeliveryDate : ''}}</div>
+															</span>
 														</div>
 														<div class="tb-cell Origin">
-															<span><div class="heading">{{ languageCommonVariables.origin }} <b>:</b></div><div class="value">{{ value.OriginCity|capitalize}}</div></span>
+															<span>
+																<div class="heading">{{ languageCommonVariables.origin }} <b>:</b></div>
+																<div class="value">{{ value.OriginCity|capitalize}}</div>
+															</span>
 														</div>
 														<div class="tb-cell st">
-															<span><div class="heading">{{ languageArray.planthst }} <b>:</b></div><div class="value">{{ value.OriginState | uppercase}}</div></span>
+															<span>
+																<div class="heading">{{ languageArray.planthst }} <b>:</b></div>
+																<div class="value">{{ value.OriginState | uppercase}}</div>
+															</span>
 														</div>
 														<div class="tb-cell Destination	">
-															<span><div class="heading"> {{ languageCommonVariables.destination }}  <b>:</b></div><div class="value">{{ value.DestinationCity|capitalize}}</div></span>
+															<span>
+																<div class="heading"> {{ languageCommonVariables.destination }}  <b>:</b></div>
+																<div class="value">{{ value.DestinationCity|capitalize}}</div>
+															</span>
 														</div>
 														<div class="tb-cell st1	">
 															<span><div class="heading"> {{ languageArray.planthst }}  <b>:</b></div><div class="value">{{ value.DestinationState | uppercase }}</div></span>
@@ -278,10 +294,16 @@
 															<span><div class="heading">{{ languageArray.planthweight }} <b>:</b></div><div class="value">{{ value.Weight }}</div></span>
 														</div>
 														<div class="tb-cell company">
-															<span> <div class="heading">  {{ languageArray.planthcompany }} <b>:</b></div><div class="value">{{ value.companyName|capitalize }}</div></span>
+															<span>
+																<div class="heading">  {{ languageArray.planthcompany }} <b>:</b></div>
+																<div class="value">{{ value.companyName|capitalize }}</div>
+															</span>
 														</div>
 														<div class="tb-cell source">
-															<span><div class="heading">Source <b>:</b></div><div class="value">{{ value.load_source }}</div></span>
+															<span>
+																<div class="heading">Source <b>:</b></div>
+																<div class="value"><p class="change-color">{{(value.billType != '' ) ? value.billType + ' - ' : ''}}</p> {{ value.load_source }}</div>
+															</span>
 														</div>
 														<div class="tb-cell staus">
 															<span><div class="heading">{{ languageCommonVariables.commonTableThStatus }} <b>:</b></div><div class="value">{{ value.JobStatus }}</div></span>

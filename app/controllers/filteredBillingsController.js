@@ -51,10 +51,25 @@ app.controller('filteredBillingsController', ["dataFactory","$scope","$http","$r
 		$scope.haveRecords = false;
 	}
 
+	$scope.includeSidebar = false;
+
+
 	if($scope.filterArgs.requestFrom != undefined && $scope.filterArgs.requestFrom == "billings"){
 		$scope.showCalendar = false;
+		$scope.includeSidebar = true; 
 	}else{
 		$scope.showCalendar = true;
+	}
+
+	if($scope.filterArgs.filterType != undefined){
+		$scope.pageTitle = $scope.filterArgs.filterType.replace(/-/g, " ");
+		$scope.pageTitle = $scope.pageTitle.replace(/_/g, " ");
+		switch($scope.filterArgs.filterType){
+			case "sent_today_expected": $scope.pageTitle = "Today's Expected"; break;
+			case "sent_today"         : $scope.pageTitle = "Today's Billing"; break;
+		}
+	}else{
+		$scope.pageTitle = "Filtered Loads";
 	}
 
 	if(getBillingData.filterArgs.startDate != undefined){
@@ -208,17 +223,7 @@ app.controller('filteredBillingsController', ["dataFactory","$scope","$http","$r
 
     $scope.exportBilling = function(search){
     	dataFactory.httpRequest(URL+'/Filteredbillings/getRecords/'+$scope.listTypeParameter,'Post',{} ,{ pageNo:'', itemsPerPage:$scope.itemsPerPage,searchQuery: search, sortColumn:'', sortType:'',startDate: $scope.dateRangeSelector.startDate, endDate:$scope.dateRangeSelector.endDate,filterArgs:$scope.filterArgs,'export':1 }).then(function(data){
-        	var url = URL+'/assets/ExportExcel/'+data.fileName;
-            var timestamp = Math.floor(Date.now() / 1000);
-            var downloadContainer   = angular.element('<div data-tap-disabled="true"><a></a></div>');
-            var downloadLink        = angular.element(downloadContainer.children()[0]);
-            downloadLink.attr('href',url);
-            downloadLink.attr('download', data.fileName);
-            angular.element('body').append(downloadContainer);
-            setTimeout(function(){
-              downloadLink[0].click();
-              downloadLink.remove();
-            },100);	
+        	$rootScope.donwloadExcelFile(data.fileName);
 		});
     };
 
@@ -252,7 +257,7 @@ app.controller('filteredBillingsController', ["dataFactory","$scope","$http","$r
     		case 'Length'			 	: $scope.LengthSortType = type; break;
     		case 'Weight'			 	: $scope.WeightSortType = type; break;
     		case 'TruckCompanyName'		: $scope.TruckCompanyNameSortType = type; break;
-    		case 'load_source'			: $scope.load_sourceSortType = type; break;
+    		case 'billType'				: $scope.load_sourceSortType = type; break;
     		case 'JobStatus'			: $scope.JobStatusSortType = type; break;
     	}
 

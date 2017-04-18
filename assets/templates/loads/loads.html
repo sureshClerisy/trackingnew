@@ -1,9 +1,11 @@
+
       <!-- START PAGE CONTENT WRAPPER -->
       <div class="page-content-wrapper ">
         <!-- START PAGE CONTENT -->
         <div class="content sm-gutter">
+        <div ng-if="includeSidebar" ng-include src="'./assets/templates/billings/sendForPayment_Sidebar.html'" include-replace></div>
           <!-- START CONTAINER FLUID -->
-			<div class="container-fluid padding-25 sm-padding-10">
+			<div class="container-fluid padding-25 sm-padding-10 " ng-class=" includeSidebar ?  'sendforcover inner-content' : '' ">
 				<canvas id="viewport" style="display: none;"></canvas>
 			   <div ng-show="alertdeletemsg == true" class="alert alert-success" role="alert">
 					<button ng-click = "hideloadmessage()" class="close"></button>
@@ -143,7 +145,7 @@
 													<span class="lode-arrow {{TruckCompanyNameSortType}}">{{ languageArray.planthcompany }}</span>
 												</div>
 												
-												<div class="tb-cell source" ng-click="sortCustom('load_source', load_sourceSortType)"> 
+												<div class="tb-cell source stype" ng-click="sortCustom('billType', load_sourceSortType)"> 
 													<span class="lode-arrow {{load_sourceSortType}}"> Source</span>	
 												</div>
 												
@@ -178,13 +180,11 @@
 												<div class="tb-cell miles	"> <span>{{ value.Mileage }}</span></div>
 												<div class="tb-cell d-miles	"> <span>{{ value.deadmiles }}</span></div>
 												<div class="tb-cell length"> <span>{{ value.Length }}</span></div>
-												<div class="tb-cell weight">
-													{{ value.Weight }}
-												</div>
+												<div class="tb-cell weight"> <span>{{ value.Weight }}</span>	</div>
 												<div class="tb-cell company">
 													<span class="text-comp-name">{{ value.companyName|capitalize }}</span>
 												</div>
-												<div class="tb-cell source"> <span>{{ value.load_source }}</span></div>
+												<div class="tb-cell source"> <p class="change-color">{{(value.billType != '' ) ? value.billType + ' - ' : ''}}</p><span>{{ value.load_source }}</span></div>
 												<div class="tb-cell staus"> <span>{{ value.JobStatus }}</span></div>
 												<div class="tb-cell action" ng-click="$event.stopPropagation()">
 													<span class="wid">
@@ -265,7 +265,10 @@
 															<span> <div class="heading">  {{ languageArray.planthcompany }} <b>:</b></div><div class="value">{{ value.companyName|capitalize }}</div></span>
 														</div>
 														<div class="tb-cell source">
-															<span><div class="heading">Source <b>:</b></div><div class="value">{{ value.load_source }}</div></span>
+															<span>
+																<div class="heading">Source <b>:</b></div>
+																<div class="value"><p class="change-color">{{(value.billType != '' ) ? value.billType + ' - ' : ''}}</p>{{ value.load_source }}</div>
+															</span>
 														</div>
 														<div class="tb-cell staus">
 															<span><div class="heading">{{ languageCommonVariables.commonTableThStatus }} <b>:</b></div><div class="value">{{ value.JobStatus }}</div></span>

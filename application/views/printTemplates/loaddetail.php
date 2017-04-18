@@ -441,11 +441,14 @@
 		<tr>
 			<td>
 				<div style="text-align:center;width:100%; border-bottom:1px solid #b6b6b6;padding:44px 0px 15px;">
-					<h1 style="font-size:30px; color:#1f1f1f;padding:0px; margin:0px;">BROKER INFORMATION</h1>
+					<h1 style="font-size:30px; color:#1f1f1f;padding:0px; margin:0px;"> <?php echo ( isset($jobDetails['billType']) && $jobDetails['billType'] == 'shipper' ) ? 'SHIPPER' : 'BROKER'; ?> INFORMATION</h1>
 				</div>
 				<h1 style="color: rgb(54, 54, 54); text-transform: uppercase; font-size: 25px; margin: 35px 0 30px;">
-				<?php echo isset($brokerData['TruckCompanyName']) ? $brokerData['TruckCompanyName'] : '';?>
-				<span style="font-size: 13px;padding-left: 8px;position: relative;top: -5px;color: #363636;text-transform: none;">(<?php echo isset($brokerData['brokerStatus']) ? $brokerData['brokerStatus'] : 'NA'; ?>)</span></h1>
+					<?php echo isset($brokerData['TruckCompanyName']) ? $brokerData['TruckCompanyName'] : '';?>
+					<span style="font-size: 13px;padding-left: 8px;position: relative;top: -5px;color: #363636;text-transform: none;">
+						<?php echo ( isset($jobDetails['billType']) && $jobDetails['billType'] == 'shipper' ) ? '' : "(".(isset($brokerData['brokerStatus']) ? $brokerData['brokerStatus'] : 'NA'.")"); ?>
+					</span>
+				</h1>
 				<div style="width:100%; float:left;padding:0 0 44px;font-family:arial;">
 					<div style="width:330px; float:left;">
 						<div>

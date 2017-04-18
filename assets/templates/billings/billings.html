@@ -3,7 +3,8 @@
         <!-- START PAGE CONTENT -->
         <div class="content sm-gutter">
           <!-- START CONTAINER FLUID -->
-			<div class="container-fluid padding-25 sm-padding-10">
+          <div ng-include src="'./assets/templates/billings/sendForPayment_Sidebar.html'" include-replace></div>
+			<div class="container-fluid padding-25 sm-padding-10 inner-content full-height sendforcover visible-overflow">
 				<canvas id="viewport" style="display: none;"></canvas>
 			   <div ng-show="alertdeletemsg == true" class="alert alert-success" role="alert">
 					<button ng-click = "hideloadmessage()" class="close"></button>
@@ -35,9 +36,11 @@
 								   <input date-range-picker id="billingDRPicker" placeholder="Select date range"  options="opts" class="form-control date-picker customDateRange" type="text" ng-model="dateRangeSelector" />
 								</div>
 							</div>
-							<button ng-show = "showReadyForInvoiceLoads == true" ng-click="fetchBillableLoads('invoice')" class="edit-loadDetail edit1Load1 btn btn-info btn-cons " type="button"><i class="fa fa-paste"></i> <span class="bold">Show Invoice Ready Loads</span></button>
+							<!--button ng-show = "showReadyForInvoiceLoads == true" ng-click="fetchBillableLoads('invoice')" class="edit-loadDetail edit1Load1 btn btn-info btn-cons " type="button"><i class="fa fa-paste"></i> <span class="bold">Show Invoice Ready Loads</span></button-->
 							
-							<button ng-show = "showReadyForInvoiceLoads == false" ng-click="fetchBillableLoads('all')" class="edit-loadDetail edit1Load1 btn btn-info btn-cons " type="button"><i class="fa fa-paste"></i> <span class="bold">Show All Loads</span></button>
+							<!--button ng-show = "showReadyForInvoiceLoads == false" ng-click="fetchBillableLoads('all')" class="edit-loadDetail edit1Load1 btn btn-info btn-cons " type="button"><i class="fa fa-paste"></i> <span class="bold">Show All Loads</span></button-->
+
+							<a ui-sref="myLoad" class="edit-loadDetail edit1Load1 btn btn-info btn-cons " type="button"><i class="fa fa-paste"></i> <span class="bold">Show All Loads</span></a>
 						</div>
 					</div>
 				</div>
@@ -55,7 +58,7 @@
 									</div>
 								</div>
 									<div class="pull-right">
-										<a href="" class="add-new-data-button" ng-click="exportBillingData('billings')">
+										<a class="add-new-data-button" ng-click="exportBillingData('billings')">
 		  									<button title="Export" class="btn btn-primary btn-cons m-b-10" type="button">
 		  										<i class="fa fa-file-excel-o"></i> 
 		  										<span class="bold">Export</span>
@@ -123,7 +126,7 @@
 												<span class="lode-arrow {{RpmSortType}}">{{ languageArray.planthrpm }}</span>
 											</div>
 
-											<div class="tb-cell payment-bill	stype" ng-click="sortCustom('PaymentAmount', PaymentAmountSortType)"> 
+											<div class="tb-cell payment-bill stype" ng-click="sortCustom('PaymentAmount', PaymentAmountSortType)"> 
 												<span class="lode-arrow {{PaymentAmountSortType}}">{{ languageArray.planthpayment }}</span>
 											</div>
 											
@@ -131,7 +134,7 @@
 												<span class="lode-arrow {{TruckCompanyNameSortType}}">{{ languageArray.planthcompany }}</span> 
 											</div>
 											
-											<div class="tb-cell source-bill" ng-click="sortCustom('load_source', load_sourceSortType)">  
+											<div class="tb-cell source-bill stype" ng-click="sortCustom('billType', load_sourceSortType)">  
 												<span class="lode-arrow {{load_sourceSortType}}"> Source</span>	
 											</div>
 
@@ -144,7 +147,7 @@
 											</div>
 										</div>
 										<div class="table-row-main1 tb-body" dir-paginate="value in billingLoads | itemsPerPage: itemsPerPage track by value.id"  total-items="total" current-page="currentPage" pagination-id="billingPage" ng-click="clickMatchLoadDetail(value.truckstopID, value.id, value.deadmiles, value.PaymentAmount, value.totalCost, value.pickDate,value.vehicleID, $index )" ng-class="value.ready_for_invoice == 1 ? 'readyForInovice' : ''" >
-											
+										
 											<div class="tb-cell ld-id-bill ld-id"> 
 												<span>
 													<div class="plus-1" ng-click="$event.stopPropagation();toggleRow($event,$index);"></div>
@@ -213,7 +216,7 @@
 											</div>
 
 											<div class="tb-cell source-bill"> 
-												<span>{{ value.load_source }}</span>
+												<p class="change-color">{{(value.billType != '' ) ? value.billType + ' - ' : ''}}</p> <span>{{ value.load_source }}</span>
 											</div>
 
 											<!--div class="tb-cell source-bill"> 
@@ -286,7 +289,7 @@
 														</span>
 													</div>
 
-													<div class="tb-cell st1-bill	">
+													<div class="tb-cell st1-bill">
 														<span>
 															<div class="heading"> {{ languageArray.planthst }}  <b>:</b></div>
 															<div class="value">{{ value.OriginState }}</div>
@@ -300,35 +303,35 @@
 														</span>
 													</div>
 
-													<div class="tb-cell st1-bill	">
+													<div class="tb-cell st1-bill">
 														<span>
 															<div class="heading"> {{ languageArray.planthst }}  <b>:</b></div>
 															<div class="value">{{ value.DestinationState }}</div>
 														</span>
 													</div>
 
-													<div class="tb-cell miles-bill	">
+													<div class="tb-cell miles-bill">
 														<span>
 															<div class="heading"> {{ languageArray.planthmiles }}  <b>:</b></div>
 															<div class="value">{{ value.Mileage }}</div>
 														</span>
 													</div>
 
-													<div class="tb-cell d-miles-bill	">
+													<div class="tb-cell d-miles-bill">
 														<span>
 															<div class="heading"> {{ languageArray.planthdeadmiles }}  <b>:</b></div>
 															<div class="value">{{ value.deadmiles }}</div>
 														</span>
 													</div>
 
-													<div class="tb-cell ppm-bill	">
+													<div class="tb-cell ppm-bill">
 														<span>
 															<div class="heading">{{ languageArray.planthrpm }} <b>:</b></div>
 															<div class="value">{{ value.Mileage != 0 ? (value.PaymentAmount / value.Mileage | currency:"$":2) : '' }}</div>
 														</span>
 													</div>
 
-													<div class="tb-cell payment-bill	">
+													<div class="tb-cell payment-bill">
 														<span>
 															<div class="heading">{{ languageArray.planthpayment }}<b>:</b></div>
 															<div class="value">{{ value.PaymentAmount | currency:"$":2 }}</div>
@@ -345,7 +348,7 @@
 													<div class="tb-cell source-bill">
 														<span>
 															<div class="heading">Source <b>:</b></div>
-															<div class="value">{{ value.load_source }}</div>
+															<div class="value"><p class="change-color">{{(value.billType != '' ) ? value.billType + ' - ' : ''}}</p> {{ value.load_source }}</div>
 														</span>
 													</div>
 

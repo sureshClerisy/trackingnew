@@ -79,6 +79,11 @@ $lang['transportationCompany'] = 'Compañía de transporte';
 $lang['the'] = 'los';
 $lang['documentAlreadyUploaded'] = 'El documento ya está cargado. Quieres sobreescribirlo ?';
 $lang['proofDelivery'] = 'Cargar prueba de entrega';
+
+$lang['dashboard']	= 'Tablero';
+$lang['inbox']	= 'Bandeja de entrada';
+$lang['factoring']	= 'Factorización';
+$lang['outbox']	= 'Bandeja de salida';
 /**** billing -r288***/
 
 /** Plan page listing */

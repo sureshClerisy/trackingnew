@@ -233,10 +233,8 @@ class Shippers extends Admin_Controller {
 	public function fetchDataForCsv() {
 		
 		$postObj 	= json_decode(file_get_contents("php://input"),true);
-		$keys = [['Company Name','PointOfContact','PointOfContactPhone','TruckCompanyEmail','TruckCompanyPhone','TruckCompanyFax','postingAddress','City','State','Zipcode','Status','Rating','Deleted']];
-
+		$keys = [['Company Name','Posting Address','City','State','Zipcode','Status','Rating','Deleted']];
 		$dataRow  	= $this->Shipper->exportShippers($postObj);
-		
 		foreach ($dataRow as $key => $value) {
 			
 			unset($dataRow[$key]['id']);
@@ -247,6 +245,7 @@ class Shippers extends Admin_Controller {
 		$data 		= array_merge($keys,$dataRow);
 		echo json_encode(array('fileName'=>$this->createExcell('brokers',$data)));
 	}
+
 	/**
 	* fetch shipper info based on id
 	*/
