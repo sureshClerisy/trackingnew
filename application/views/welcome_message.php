@@ -137,7 +137,8 @@
     createScriptOrLinkTag('app/services/investorService.js','script');
     createScriptOrLinkTag('app/services/shipperService.js','script');
     createScriptOrLinkTag('app/services/environmentconfig.js','script');
-    
+    createScriptOrLinkTag('app/controllers/aclController.js','script');    
+    createScriptOrLinkTag('app/controllers/usersController.js','script');    
     ?>
     <script src="login/loadLanguages"></script>
     <!--for footable-->

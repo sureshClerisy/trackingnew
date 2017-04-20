@@ -95,8 +95,6 @@ class Dashboard extends Admin_Controller {
 		//For export data to excell file..
 		if(!empty($args['export'])){
 			
-			$keys 	= [['DATE','CUSTOMER NAME','DRIVERS','INVOICE','CHARGES','PROFIT','%PROFIT','MILES','DEAD MILES','RATE/MILE','DATE P/U','PICK UP','DATE DE','DELIVERY','LOLAD ID','STATUS']];
-			
 			if($type == 'idle'){
 				$keys = [['DriverID','Truck','Dispatcher','Driver Name']];
 				foreach ($todayReport as $key => $value) {
@@ -104,12 +102,9 @@ class Dashboard extends Admin_Controller {
 				}
 			}else{
 				//Created a common function in my_controller for all load data for excell file
-				$todayReport = $this->buildExportLoadData($todayReport);
-				// $otherInfo   = $todayReport['otherInfo'];
-				// unset($todayReport['otherInfo']);
+				$todayReport = $this->buildExportLoadData($todayReport,'todayReport');
 			}
-			$data = array_merge($keys,$todayReport);
-			echo json_encode(array('fileName'=>$this->createExcell($type,$data,TRUE)));die();
+			
 		}
 		echo json_encode(array("success"=>true,"todayReport"=>$todayReport,"totals"=>$totals));
 	}
@@ -1674,8 +1669,8 @@ class Dashboard extends Admin_Controller {
 						$args['currentWeather']['current_temperature'].'°F',
 						$args['currentWeather']['wind'],
 						$args['currentWeather']['humidity'],
-						$args['currentWeather']['main']['temp_min'].'°F',
-						$args['currentWeather']['main']['temp_max'].'°F',
+						number_format($args['currentWeather']['main']['temp_min'],2).'°F',
+						number_format($args['currentWeather']['main']['temp_max'],2).'°F',
 						ucwords($args['currentWeather']['weather_description'])
 					];
 		for($counter=0;$counter<2;$counter++){
@@ -1685,8 +1680,8 @@ class Dashboard extends Admin_Controller {
 							$args['dailyForecast']['list'][$counter]['current_temperature'].'°F',
 							$args['dailyForecast']['list'][$counter]['wind'],
 							$args['dailyForecast']['list'][$counter]['humidity'],
-							$args['dailyForecast']['list'][$counter]['temp']['min'].'°F',
-							$args['dailyForecast']['list'][$counter]['temp']['max'].'°F',
+							number_format($args['dailyForecast']['list'][$counter]['temp']['min'],2).'°F',
+							number_format($args['dailyForecast']['list'][$counter]['temp']['max'],2).'°F',
 							ucwords($args['dailyForecast']['list'][$counter]['weather_description'])
 						];
 		}

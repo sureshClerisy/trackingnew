@@ -841,17 +841,7 @@ die;
 		}
 
 		if(!empty($params["export"])){
-			
-			$content = '';
-			$keys 	= [['DATE','CUSTOMER NAME','DRIVERS','INVOICE','CHARGES','PROFIT','%PROFIT','MILES','DEAD MILES','RATE/MILE','DATE P/U','PICK UP','DATE DE','DELIVERY','LOLAD ID','STATUS']];
-			
-			//Created a common function in my_controller for all load data for excell file
-			// ex($jobs);
-			$data = $this->buildExportLoadData($jobs);
-			
-			$data = array_merge($keys,$data);
-			echo json_encode(array('fileName'=>$this->createExcell('myloads',$data,TRUE)));
-			die();
+			$data = $this->buildExportLoadData($jobs,'myloads');
 		}
 
 		echo json_encode(array("data"=>$jobs,"total"=>$total));

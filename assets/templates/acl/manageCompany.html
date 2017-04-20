@@ -1,0 +1,80 @@
+<div class="page-content-wrapper">
+	<div class="content sm-gutter">
+		<div class="container-fluid padding-25 sm-padding-10">
+			<div class="row">
+				<div class="col-md-12 col-xlg-12">
+					<div ng-show="alertmsg == true" class="alert alert-success" role="alert">
+						<button class="close" data-dismiss="alert"></button>						
+						{{message}}
+					</div>
+					<div ng-show="alertdeletemsg == true" class="alert alert-success" role="alert">
+						<button ng-click = "hidedeletemessage()" class="close"></button>
+						{{deleteMessage}}
+					</div>
+					<div class="commen-heading brokers-page">
+						<h2 class="oprate-dashbord"> Assign Permissions</h2>
+					</div>
+				</div>
+			</div>
+			<div class="row invocie-block-row ">
+				<div class="col-md-12 col-xlg-12">
+					<div class="load-new-block-table">
+						<div class="panel-body add-new-data fix-page">
+							<div class="load-tabe-auto map-load-section">
+								
+  							<!-- 	<table class="table tr-hover table-hover table-striped driver-table" id="tableWithExportOptions">
+  									<thead>
+  										<tr>
+  											<th>Module(Controller)</th>
+  										</tr>
+  									</thead>
+  									<tbody>
+  										<tr ng-repeat="value in getAction" ng-class="{abc : value.parent_id === NULL}">
+  											
+                                            <td>{{value.action}}</td>
+  											<td>{{value.action}}</td>
+
+                                            <td class="text-center action-btn-ryt"> 
+  												<div class="export-options-container" ng-show ="value.parent_id">
+  													<div class="exportOptions">
+  														<div class="DTTT btn-group">
+  															<a href="#/editbroker/{{value.id}}" class="btn btn-default DTTT_button_pdf" data-original-title="{{languageCommonVariables.editBroker}}" ui-jq="tooltip" >
+  																<span><i class="fa fa-edit" aria-hidden="true"></i></span>
+  															</a>
+  															<a class="btn btn-default DTTT_button_copy" title="{{languageCommonVariables.deleteBroker}}" ui-jq="tooltip" ng-click='removeBroker(value.id,$index)' >
+  																<span><i class="fa fa-trash" aria-hidden="true"></i></span>
+  															</a>
+  															<a class="btn btn-default DTTT_button_csv" title="{{languageCommonVariables.blackListBroker}}" ui-jq="tooltip" ng-click="blackListBroker(value.id,value.black_list,$index)" ng-if="value.black_list == 0 || value.black_list == ''">
+  																<span><i class="fa fa-thumbs-o-up"></i></span>
+  															</a>
+  															<a class="btn btn-default DTTT_button_csv" title="{{languageCommonVariables.acceptBroker}}" ui-jq="tooltip" ng-click="blackListBroker(value.id,value.black_list,$index)" ng-if="value.black_list == 1">
+  																<span><i class="fa fa-thumbs-down"></i></span>
+  															</a>
+  															<a href="{{value.id}}" class="btn btn-default DTTT_button_csv" title="Manage" ui-jq="tooltip">
+  																<span><i class="fa fa-cog"></i></span>
+  															</a>
+  														</div>
+  													</div>
+  												</div>
+  											</td>
+  										</tr>
+  									</tbody>
+  								</table>-->
+
+                                <div class="truck-detail-block" ng-repeat="value in getAction" on-finish-render="ngRepeatFinished" >
+                                    <div class="truck-detail-heading">
+                                        <h3 ng-click = "getAction(value.id)">
+                                            <span>{{ value.action }}</span>
+                                            <img src="pages/img/arrow-down.png">
+                                        </h3>
+                                    </div>
+                                </div>
+  							</div>
+  						</div>
+  					</div>
+  				</div>
+  			</div>
+  		</div>
+  	</div>
+  </div>
+  <ng-include src="'./assets/templates/common_modals.html'"></ng-include>

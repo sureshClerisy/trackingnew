@@ -500,7 +500,6 @@ class Driver extends Parent_Model
 			return 0;
 		}
 
-		
 		if($total){
 			$this->db->select('count(v.id) as totalCount');	
 		}else{
@@ -512,6 +511,9 @@ class Driver extends Parent_Model
 		$this->db->where("v.driver_id = 0 OR v.driver_id IS NULL OR  v.driver_id = ''");
 		$this->db->group_end();
 
+		if(isset($filters["vehicles"]) && is_array($filters["vehicles"])){
+			$this->db->where_in("v.id", $filters["vehicles"]);
+		}
 
 		if(isset($filters["searchQuery"]) && !empty($filters["searchQuery"])){
             $this->db->group_start();

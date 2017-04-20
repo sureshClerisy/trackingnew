@@ -630,7 +630,7 @@ $rootScope.logoutmessage=false;
 			$cookies.remove("_gDateRangeDashboard");
 			$cookies.remove("_gDateRangeBilling");
 			$cookies.remove("printTicket");
-			PubNub.ngUnsubscribe({channel:$rootScope.channel})
+			PubNub.ngUnsubscribe({channel:$rootScope.channel});
 		}
 
 		$rootScope.selectCommoditySuggestion = function(suggestion){

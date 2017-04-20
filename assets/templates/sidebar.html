@@ -1,58 +1,58 @@
 <!-- BEGIN SIDEBPANEL-->
 <nav class="page-sidebar" data-pages="sidebar" pg-sidebar>
-<!-- BEGIN SIDEBAR MENU TOP TRAY CONTENT-->
-  <div class="sidebar-overlay-slide from-top port-box" id="appMenu">
-    
-    <div class="row">
-      <div class=" portrait-box vis-{{visibility[1]}}" ng-click= "selectPortlet($event,'1')">
+    <!-- BEGIN SIDEBAR MENU TOP TRAY CONTENT-->
+    <div class="sidebar-overlay-slide from-top port-box" id="appMenu">
+
+        <div class="row">
+          <div class=" portrait-box vis-{{visibility[1]}}" ng-click= "selectPortlet($event,'1')">
             <img src="assets/images/{{visibility[1] ==1 ? 'best-safety.jpg' : 'best-safety1.jpg'}}" alt="Best Safety">
+        </div>
+        <div class=" portrait-box vis-{{visibility[6]}}" ng-click= "selectPortlet($event,'6')">
+            <img src="assets/images/{{visibility[6] ==1 ? 'top-customer.jpg' : 'top-customer1.jpg'}}" alt="Top five customer">
+        </div>
     </div>
-    <div class=" portrait-box vis-{{visibility[6]}}" ng-click= "selectPortlet($event,'6')">
-        <img src="assets/images/{{visibility[6] ==1 ? 'top-customer.jpg' : 'top-customer1.jpg'}}" alt="Top five customer">
-    </div>
-</div>
 
-<div class="row">
-    <div class=" portrait-box vis-{{visibility[9]}}" ng-click= "selectPortlet($event,'9')">
-        <img src="assets/images/{{visibility[9] ==1 ? 'Load-Status.jpg' : 'Load-Status1.jpg'}}" alt="Best Safety">
+    <div class="row">
+        <div class=" portrait-box vis-{{visibility[9]}}" ng-click= "selectPortlet($event,'9')">
+            <img src="assets/images/{{visibility[9] ==1 ? 'Load-Status.jpg' : 'Load-Status1.jpg'}}" alt="Best Safety">
+        </div>
+        <div class=" portrait-box vis-{{visibility[8]}}" ng-click= "selectPortlet($event,'8')">
+            <img src="assets/images/{{visibility[8] ==1 ? 'weather-info.jpg' : 'weather-info1.jpg'}}" alt="Weather Info">
+        </div>
     </div>
-    <div class=" portrait-box vis-{{visibility[8]}}" ng-click= "selectPortlet($event,'8')">
-        <img src="assets/images/{{visibility[8] ==1 ? 'weather-info.jpg' : 'weather-info1.jpg'}}" alt="Weather Info">
+    <div class="row">
+        <div class=" portrait-box vis-{{visibility[7]}}" ng-click= "selectPortlet($event,'7')">
+            <img src="assets/images/{{visibility[7] ==1 ? 'leader-boad.jpg' : 'leader-boad1.jpg'}}" alt="Leader Board">
+            
+        </div>
+        <div class=" portrait-box vis-{{visibility[4]}}" ng-click= "selectPortlet($event,'4')">
+            <img src="assets/images/{{visibility[4] ==1 ? 'truck-location.jpg' : 'truck-location1.jpg'}}" alt="Truck Location">
+        </div>
     </div>
-</div>
-<div class="row">
-    <div class=" portrait-box vis-{{visibility[7]}}" ng-click= "selectPortlet($event,'7')">
-        <img src="assets/images/{{visibility[7] ==1 ? 'leader-boad.jpg' : 'leader-boad1.jpg'}}" alt="Leader Board">
-        
+    <div class="row">
+        <div class=" portrait-box vis-{{visibility[3]}}" ng-click= "selectPortlet($event,'3')">
+            <img src="assets/images/{{visibility[3] ==1 ? 'driver-messages.jpg' : 'driver-messages1.jpg'}}" alt="Driver Messages">
+            
+        </div>
+        <div class=" portrait-box vis-{{visibility[5]}}" ng-click= "selectPortlet($event,'5')">
+            <img src="assets/images/{{visibility[5] ==1 ? 'news-feed.jpg' : 'news-feed1.jpg'}}" alt="News Feed">
+        </div>
     </div>
-    <div class=" portrait-box vis-{{visibility[4]}}" ng-click= "selectPortlet($event,'4')">
-        <img src="assets/images/{{visibility[4] ==1 ? 'truck-location.jpg' : 'truck-location1.jpg'}}" alt="Truck Location">
-    </div>
-</div>
-<div class="row">
-    <div class=" portrait-box vis-{{visibility[3]}}" ng-click= "selectPortlet($event,'3')">
-        <img src="assets/images/{{visibility[3] ==1 ? 'driver-messages.jpg' : 'driver-messages1.jpg'}}" alt="Driver Messages">
-        
-    </div>
-    <div class=" portrait-box vis-{{visibility[5]}}" ng-click= "selectPortlet($event,'5')">
-        <img src="assets/images/{{visibility[5] ==1 ? 'news-feed.jpg' : 'news-feed1.jpg'}}" alt="News Feed">
-    </div>
-</div>
 
-<div class="row">
-    <div class=" portrait-box vis-{{visibility[2]}}" ng-click= "selectPortlet($event,'2')">
-        <img src="assets/images/{{visibility[2] ==1 ? 'capacity.jpg' : 'capacity1.jpg'}}" alt="Capacity Analysis">        
+    <div class="row">
+        <div class=" portrait-box vis-{{visibility[2]}}" ng-click= "selectPortlet($event,'2')">
+            <img src="assets/images/{{visibility[2] ==1 ? 'capacity.jpg' : 'capacity1.jpg'}}" alt="Capacity Analysis">        
+        </div>
+        <div class=" portrait-box vis-{{visibility[10]}}" ng-click= "selectPortlet($event,10)">
+            <img src="assets/images/{{visibility[10] ==1 ? 'today-insights.jpg' : 'today-insights1.jpg'}}" alt="Today Insights">
+        </div>
     </div>
-    <div class=" portrait-box vis-{{visibility[10]}}" ng-click= "selectPortlet($event,10)">
-        <img src="assets/images/{{visibility[10] ==1 ? 'today-insights.jpg' : 'today-insights1.jpg'}}" alt="Today Insights">
-    </div>
-</div>
 
-<div class="row">
-    <div class=" portrait-box vis-{{visibility[11]}}" ng-click= "selectPortlet($event,11)">
-        <img src="assets/images/{{visibility[11] ==1 ? 'quick-updates.jpg' : 'quick-updates1.jpg'}}" alt="Quick Updates">
+    <div class="row">
+        <div class=" portrait-box vis-{{visibility[11]}}" ng-click= "selectPortlet($event,11)">
+            <img src="assets/images/{{visibility[11] ==1 ? 'quick-updates.jpg' : 'quick-updates1.jpg'}}" alt="Quick Updates">
+        </div>
     </div>
-</div>
 </div>
 <!-- END SIDEBAR MENU TOP TRAY CONTENT-->
 <!-- BEGIN SIDEBAR MENU HEADER-->
@@ -123,7 +123,7 @@
                             <li>
                                 <a  href="#/trailers">{{ languageCommonVariables.trailer }}
                                     <span class="icon-thumbnail">tl</span></a>
-                            </li>
+                                </li>
               <!-- <li>
                 <a  href="#/maintenance">{{ languageCommonVariables.maintenance }}</a>
                 <span class="icon-thumbnail">MN</span>
@@ -175,17 +175,60 @@
                       <span class="icon-thumbnail">dp</span></a>
             </li>
         </ul-->
+    </li>
+    <li ng-if="loggedUserRoleId != 6 && loggedUserRoleId != 4">
+        <a class="test" href="#/reports">
+            <span class="title">{{ languageCommonVariables.reports }}</span>
+            <span class="icon-thumbnail"><i class="fa fa-bar-chart-o" aria-hidden="true"></i></span>
+        </a>
+    </li>
 
-      </li>
+    <li ng-class="(state=='trucks' || state=='trailers') ? 'open active' : ''">
+        <a class="test" href="javascript:void(0)">
+          <span class="title">Organization</span>
+          <span class=" arrow" ng-class="{'open active':(state=='trucks' || state=='trailers' || state=='maintenance') }"></span>
 
-          <li ng-if="loggedUserRoleId != 6 && loggedUserRoleId != 4">
-            <a class="test" href="#/reports"><span class="title">{{ languageCommonVariables.reports }}</span>
-                <span class="icon-thumbnail"><i class="fa fa-bar-chart-o" aria-hidden="true"></i></span></a>
+          <span class="icon-thumbnail"><i class="icon-pg trucks vehicles"></i></span></a>
+          <ul class="sub-menu">
+            <li>
+                <a  href="#/organization">Organization
+                    <span class="icon-thumbnail">tr</span>
+                </a>
+            </li>
+            <li>
+                <a  href="#/manage">Manage
+                    <span class="icon-thumbnail">tl</span>
+                </a>
+            </li>
+            <li>
+                <a href="#/roles">Roles
+                    <span class="icon-thumbnail">tl</span>
+                </a>
             </li>
         </ul>
-        <div class="clearfix"></div>
-    </div>
-    <!-- END SIDEBAR MENU -->
+    </li>
+    <li ng-class="(state=='trucks' || state=='trailers') ? 'open active' : ''">
+        <a href="javascript:void(0)">
+          <span class="title">Users</span>
+          <span class=" arrow" ng-class="{'open active':(state=='trucks' || state=='trailers' || state=='maintenance') }"></span>
+          <span class="icon-thumbnail">
+            <i class="fa fa-users"></i></span>
+        </a>
+        <ul class="sub-menu">
+            <li>
+                <a href="#/users">Users List
+                    <span class="icon-thumbnail">
+                        <i class="fa fa-user-plus"></i>
+                    </span>
+                </a>
+            </li>
+        </ul>
+    </li>
+
+</ul>
+<div class="clearfix"></div>
+</div>
+<!-- END SIDEBAR MENU -->
 </nav>
 <!-- END SIDEBAR -->
 <!-- END SIDEBPANEL-->

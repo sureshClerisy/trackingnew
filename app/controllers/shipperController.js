@@ -192,6 +192,7 @@ $scope.toggleRow = function($event,index){
 	$scope.addBrokersData = {};
 	$scope.changedRating = 1;
 	shp.stateSelected = '';
+	
 	shp.addshipper = function(){
 		$scope.addBrokersData.rating = $scope.changedRating == 0 ? 1: $scope.changedRating;
 		shipperService.addShipperData($scope.addBrokersData,$rootScope.srcPage)

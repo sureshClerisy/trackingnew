@@ -207,6 +207,10 @@ class User extends CI_Model
 			return array();
 	}
 
+	public function getUsers( $userId = null ) {
+		// $this->db->select('username,CONCAT(first,,last_name)')
+	}
+
 }
 
 ?>

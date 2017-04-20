@@ -1113,11 +1113,7 @@ class Billings extends Admin_Controller{
 
 		$jobs = $this->Billing->getInProgressLoads( $parameter, false, $filters ,true);
 		
-		$keys = [['DATE','CUSTOMER NAME','DRIVERS','INVOICE','CHARGES','PROFIT','%PROFIT','MILES','DEAD MILES','RATE/MILE','DATE P/U','PICK UP','DATE DE','DELIVERY','LOLAD ID','STATUS']];
-
-		$todayReport = $this->buildExportLoadData($jobs);
-		$data = array_merge($keys,$todayReport);
-		echo json_encode(array('fileName'=>$this->createExcell('billing',$data,TRUE)));
+		$todayReport = $this->buildExportLoadData($jobs,'billing');
 	}
 
 	/**
@@ -1157,5 +1153,9 @@ class Billings extends Admin_Controller{
 		$exportData = $this->buildExportLoadData($loads);
 		$data 		= array_merge($keys,$exportData);
 		echo json_encode(array('fileName'=>$this->createExcell('billing',$data,TRUE)));
+	}
+
+	public function testAction(){
+		
 	}
 }

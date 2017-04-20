@@ -534,8 +534,10 @@ $config['truck_id'] 		= '271425';
 $config['with_admin_role'] = array(1,3,5);
 $config['WEEKDAYS'] = array("2"=>"Saturday","1"=>"Sunday");
 define("_DISPATCHER", 2);
+define("_INVESTOR", 7);
 // http://testws.truckstop.com:8080/V13/Searching/LoadSearch.svc?wsdl  (Test url)
 // http://webservices.truckstop.com/V13/Searching/LoadSearch.svc  (Live url)
+$config["investor_rss_feed_url"] = "http://investors.ryder.com/rss/pressrelease.aspx";
 
 $config["entity"] = array("user"	=> "user", 
 						  "truck" 	=> "truck" , 

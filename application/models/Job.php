@@ -29,7 +29,7 @@ class Job extends Parent_Model {
 			$this->db->select("loads.created,b.TruckCompanyName as companyName,CASE loads.driver_type 
     						WHEN 'team' THEN CONCAT(d.first_name,' + ',team.first_name) 
     									ELSE concat(d.first_name,' ',d.last_name) 
-    									END AS driverName,loads.invoiceNo,loads.totalCost,loads.overallTotalProfit,loads.overallTotalProfitPercent,loads.Mileage,CONCAT('Truck - ',v.label) as truckName, CONCAT(u.first_name, ' ', u.last_name) as dispatcher, loads.PickupDate, loads.DeliveryDate, loads.OriginCity, loads.OriginState, loads.DestinationCity,loads.DestinationState, loads.PaymentAmount, (loads.PaymentAmount/loads.Mileage) as RPM, loads.deadmiles,loads.id,loads.JobStatus,loads.pickDate");
+    									END AS driverName,loads.invoiceNo,loads.totalCost,loads.overallTotalProfit,loads.overallTotalProfitPercent,loads.Mileage,CONCAT('Truck - ',v.label) as truckName, CONCAT(u.first_name, ' ', u.last_name) as dispatcher, loads.PickupDate, loads.DeliveryDate, loads.OriginCity, loads.OriginState, loads.DestinationCity,loads.DestinationState, loads.PaymentAmount, (loads.PaymentAmount/loads.Mileage) as RPM, loads.deadmiles,loads.id,loads.JobStatus,loads.pickDate,loads.invoiceNo");
 		}
 
 		$this->db->join("vehicles as v", "loads.vehicle_id = v.id","Left");
@@ -472,7 +472,7 @@ class Job extends Parent_Model {
         							WHEN "shipper" THEN (shippers.shipperCompanyName) 
         									   ELSE (broker_info.TruckCompanyName)
         									END AS companyName, 
-        					loads.driver_type,loads.invoiceNo, loads.vehicle_id, loads.truckstopID,loads.Bond,loads.PointOfContactPhone,loads.equipment_options,loads.LoadType,loads.PickupDate,loads.DeliveryDate,loads.OriginCity,loads.OriginState,loads.DestinationCity,loads.DestinationState,loads.PickupAddress,loads.DestinationAddress,loads.PaymentAmount,loads.Mileage, (loads.PaymentAmount/loads.Mileage) as rpm, loads.deadmiles,loads.Weight,loads.Length,loads.JobStatus,loads.totalCost,loads.pickDate,loads.load_source,loads.created,loads.overallTotalProfit,loads.overallTotalProfitPercent,loads.DeliveryDate,loads.totalCost,loads.billType');
+        					loads.driver_type,loads.invoiceNo, loads.vehicle_id, loads.truckstopID,loads.Bond,loads.PointOfContactPhone,loads.equipment_options,loads.LoadType,loads.PickupDate,loads.DeliveryDate,loads.OriginCity,loads.OriginState,loads.DestinationCity,loads.DestinationState,loads.PickupAddress,loads.DestinationAddress,loads.PaymentAmount,loads.Mileage, (loads.PaymentAmount/loads.Mileage) as rpm, loads.deadmiles,loads.Weight,loads.Length,loads.JobStatus,loads.totalCost,loads.pickDate,loads.load_source,loads.created,loads.overallTotalProfit,loads.overallTotalProfitPercent,loads.DeliveryDate,loads.totalCost,loads.billType,loads.invoiceNo');
 		
 		$this->db->join("vehicles as v", "loads.vehicle_id = v.id","Left");
 		$this->db->join("drivers as d", "loads.driver_id = d.id","Left");

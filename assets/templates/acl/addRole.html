@@ -1,0 +1,75 @@
+{{aclData.name}}
+<!-- START PAGE CONTENT WRAPPER -->
+<div class="page-content-wrapper ">
+	<!-- START PAGE CONTENT -->
+	<div class="content sm-gutter">
+	<!-- START CONTAINER FLUID -->
+		<div class="container-fluid padding-25 sm-padding-10">
+			<div ng-show="dataNotFound == true" class="alert alert-danger" role="alert">
+				<button ng-click = "hideloadmessage()" class="close"></button>
+				{{errorMessage}}
+			</div>
+			<div class="row">
+				<div class="col-md-12 col-xlg-12">
+				<div class="commen-heading">
+					<h2 class="oprate-dashbord ng-binding"> {{ languageCommonVariables.roleHeader }}</h2>
+				</div>
+				</div>
+			</div>
+			<div class="col-middle loader-outer" ng-show = "triumphLoader == true">
+				<!-- START PANEL -->
+				<div class="loader-inner">
+					<div class="full-height">
+						<div class="panel-body text-center">
+							<img class="image-responsive-height demo-mw-50" src="assets/img/demo/progress.svg" alt="Progress">
+						</div>
+					</div>
+				</div>
+				<!-- END PANEL -->
+					
+            </div>
+			<div class="row new-block-padding">
+				<div class="col-lg-12 col-md-12">
+					<div class="panel panel-transparent">
+						<div class="panel-body">
+							<form id="form-project" name="newrole" role="form" autocomplete="off" ng-submit="newrole.$valid && addrole()" novalidate>
+								<!--row-->
+								<div class="row clearfix">
+									<div class="col-sm-6">
+										<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':newrole.name.$invalid && !newrole.name.$pristine || newrole.$submitted && newrole.name.$invalid}">
+											<label>{{ languageArray.brokerListingTableThName }} {{aclData.name}}</label>
+											<input type="text" class="form-control" name="name" ng-model="aclData.name" required />
+										</div>
+										<label class="error" for="name" ng-show="newrole.name.$invalid && !newrole.name.$pristine || newrole.$submitted && newrole.name.$invalid">Please enter role name.</label>
+									</div>
+									<div class="col-sm-6">
+										<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':newrole.alias.$invalid && !newrole.alias.$pristine || newrole.$submitted && newrole.alias.$invalid}">
+											<label>Alias</label>
+											<input type="text" class="form-control" name="alias" ng-model="aclData.alias" required / >
+										</div>
+										<label class="error" for="street_address" ng-show="newrole.alias.$invalid && !newrole.alias.$pristine || newrole.$submitted && newrole.alias.$invalid">Please enter role alias.</label>
+									</div>
+								</div>
+								<!--row-end-->
+								<div class="update-truck-block-btn">
+									<button ng-click="submitted=true" class="btn btn-primary btn-cons m-b-10" type="submit">
+										<i class="fa fa-plus"></i>
+										<span class="bold"> {{ languageArray.brokerListingTableAddbutton|capitalize }}</span>
+									</button>
+									<a href="#/roles">
+										<button class="btn btn-danger btn-cons m-b-10" type="button">
+											<i class="fa fa-ban"></i>
+											<span class="bold"> {{ languageCommonVariables.cancelbutton|capitalize }} </span>
+										</button>
+									</a>
+								</div>
+							</form>
+						</div>
+					<!---->
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<ng-include src="'./assets/templates/vehicles/common-modal.html'"></ng-include>

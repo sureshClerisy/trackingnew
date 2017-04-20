@@ -35,7 +35,7 @@ class Billing extends CI_Model {
 			WHEN "shipper" THEN (shippers.shipperCompanyName) 
 					   ELSE (broker_info.TruckCompanyName)
 					END AS TruckCompanyName,
-				 loads.LoadType, loads.PickupDate, loads.PickupAddress, loads.OriginCity, loads.OriginState, loads.DestinationCity, loads.DestinationState, loads.DestinationAddress, loads.PaymentAmount, loads.Mileage, loads.deadmiles, loads.DeliveryDate, loads.JobStatus, loads.truckstopID, loads.id, loads.deadmiles, loads.totalCost, loads.pickDate, loads.invoiceNo, loads.load_source,loads.ready_for_invoice,loads.billType,vehicles.id as vehicleID,loads.created,loads.totalCost,loads.overallTotalProfit,loads.overallTotalProfitPercent,(loads.PaymentAmount/loads.Mileage) as rpm');
+				 loads.LoadType, loads.PickupDate, loads.PickupAddress, loads.OriginCity, loads.OriginState, loads.DestinationCity, loads.DestinationState, loads.DestinationAddress, loads.PaymentAmount, loads.Mileage, loads.deadmiles, loads.DeliveryDate, loads.JobStatus, loads.truckstopID, loads.id, loads.deadmiles, loads.totalCost, loads.pickDate, loads.invoiceNo, loads.load_source,loads.ready_for_invoice,loads.billType,vehicles.id as vehicleID,loads.created,loads.totalCost,loads.overallTotalProfit,loads.overallTotalProfitPercent,(loads.PaymentAmount/loads.Mileage) as rpm,loads.invoiceNo');
 		
 		$this->db->join("broker_info", "broker_info.id = loads.broker_id AND loads.billType = 'broker'","LEFT");
 		$this->db->join("shippers", "shippers.id = loads.broker_id AND loads.billType = 'shipper'","LEFT");
@@ -93,7 +93,9 @@ class Billing extends CI_Model {
 			$this->db->where("DATE(loads.PickupDate) <= ",date("Y-m-d",strtotime($filters["endDate"])));
 		}
 		
-
+		if(isset($filters["vehicles"]) && is_array($filters["vehicles"])){
+			$this->db->where_in("vehicles.id", $filters["vehicles"]);
+		}
 
 		if ( isset($filters["filterType"]) && $filters["filterType"] == 'invoices' ) {	
 			$this->db->where_in('loads.id', $in_aray);
@@ -129,6 +131,14 @@ class Billing extends CI_Model {
 
 			$lastWeekStartDay   = date("Y-m-d", strtotime('monday last week'));
 			$lastWeekEndDay     = date("Y-m-d", strtotime('sunday last week'));
+			if(isset($filters["dateFrom"]) && !empty($filters["dateFrom"])){
+				$lastWeekStartDay   = date("Y-m-d",strtotime($filters["dateFrom"]));
+			}
+
+			if(isset($filters["dateTo"]) && !empty($filters["dateTo"])){
+				$lastWeekEndDay     = date("Y-m-d",strtotime($filters["dateTo"]));
+			}
+
 			$this->db->where("FIND_IN_SET( loads.id, ( SELECT GROUP_CONCAT( sp.loadids ) AS id FROM `save_payment_confirmCode` AS `sp` WHERE DATE( sp.created ) >= '".$lastWeekStartDay."' AND DATE( sp.created ) <= '".$lastWeekEndDay."'))");
 
 		}else if ( isset($filters["filterType"]) && $filters["filterType"] == 'this_week_sale' ) {	
@@ -179,6 +189,7 @@ class Billing extends CI_Model {
 		$this->db->where('loads.id >',9999);
 		
 		$result = $this->db->get('loads');
+		//echo $this->db->last_query();die;
 		if($total){
 			return $result->num_rows();
 		}
@@ -225,7 +236,7 @@ class Billing extends CI_Model {
 				WHEN "shipper" THEN (shippers.shipperCompanyName) 
 			   ELSE (broker_info.TruckCompanyName)
 			END AS TruckCompanyName, 
-		loads.invoiceNo,loads.totalCost,loads.overallTotalProfit,loads.overallTotalProfitPercent,loads.Mileage,loads.deadmiles, (loads.PaymentAmount/loads.Mileage) as rpm,loads.pickDate,concat(loads.OriginCity," ,",loads.OriginState) as pickup,loads.DeliveryDate,concat(loads.DestinationCity," ,",loads.DestinationState) as delivery,loads.id,loads.JobStatus,loads.LoadType,loads.DeliveryDate,loads.PickupAddress, loads.OriginCity, loads.OriginState,loads.DeliveryDate,loads.PickupAddress, loads.OriginCity, loads.OriginState, loads.DestinationCity, loads.DestinationState, loads.DestinationAddress, loads.PaymentAmount, loads.Mileage,loads.DeliveryDate,  loads.truckstopID,  loads.deadmiles, loads.PickupDate, loads.load_source,loads.ready_for_invoice,loads.billType,vehicles.id as vehicleID,loads.created');
+		loads.invoiceNo,loads.totalCost,loads.overallTotalProfit,loads.overallTotalProfitPercent,loads.Mileage,loads.deadmiles, (loads.PaymentAmount/loads.Mileage) as rpm,loads.pickDate,concat(loads.OriginCity," ,",loads.OriginState) as pickup,loads.DeliveryDate,concat(loads.DestinationCity," ,",loads.DestinationState) as delivery,loads.id,loads.JobStatus,loads.LoadType,loads.DeliveryDate,loads.PickupAddress, loads.OriginCity, loads.OriginState,loads.DeliveryDate,loads.PickupAddress, loads.OriginCity, loads.OriginState, loads.DestinationCity, loads.DestinationState, loads.DestinationAddress, loads.PaymentAmount, loads.Mileage,loads.DeliveryDate,  loads.truckstopID,  loads.deadmiles, loads.PickupDate, loads.load_source,loads.ready_for_invoice,loads.billType,vehicles.id as vehicleID,loads.created,loads.invoiceNo');
 
 		$this->db->join("broker_info", "broker_info.id = loads.broker_id AND loads.billType = 'broker'","LEFT");
 		$this->db->join("shippers", "shippers.id = loads.broker_id AND loads.billType = 'shipper'","LEFT");

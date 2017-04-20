@@ -22,7 +22,7 @@ angular.module('app')
          **/
         function fetchVehiclesList() {
              return $http({
-                    url: EnvironmentConfig.api + 'investors/fetchVehiclesList',
+                    url   : EnvironmentConfig.api + 'investors/fetchVehiclesList',
                     method: 'POST',
                     //data: $httpParamSerializerJQLike(shipperData)
                 })
@@ -30,23 +30,71 @@ angular.module('app')
                 .catch(getDataFailed);
         }
 
+        
         /**************************
          *   fetch portlets data  *
          **************************/
         function getPortletsData(filters) {
              return $http({
-                    url: EnvironmentConfig.api + 'investors/getPortletsData',
+                    url   : EnvironmentConfig.api + 'investors/getPortletsData',
                     method: 'POST',
-                    data: $httpParamSerializerJQLike(filters)
+                    data  : $httpParamSerializerJQLike(filters)
                 })
                 .then(getDataComplete)
                 .catch(getDataFailed);
         }
 
+
+        /*****************************
+         *   Refresh portlets data   *
+         *****************************/
+        function refreshPortlets(portlet, params) {
+             return $http({
+                    url   : EnvironmentConfig.api + 'investors/getSpecificPortletData/'+portlet,
+                    method: 'POST',
+                    data  : $httpParamSerializerJQLike(params)
+                })
+                .then(getDataComplete)
+                .catch(getDataFailed);
+        }
+
+
+        /****************************
+         *       Get RSS Feeds      *
+         ****************************/
+        function getRssFeeds() {
+             return $http({
+                    url   : EnvironmentConfig.api + 'investors/getRssFeeds/',
+                    method: 'POST',
+                    //data  : $httpParamSerializerJQLike(params)
+                })
+                .then(getDataComplete)
+                .catch(getDataFailed);
+        }
+
+
+        /****************************
+         *     Get vehicles jobs    *
+         ****************************/
+        function getVehiclesJobs() {
+             return $http({
+                    url   : EnvironmentConfig.api + 'investors/getVehiclesJobs/',
+                    method: 'POST',
+                    //data  : $httpParamSerializerJQLike(params)
+                })
+                .then(getDataComplete)
+                .catch(getDataFailed);
+        }
+
+
+
        
 
         return {
             fetchVehiclesList : fetchVehiclesList,
-            getPortletsData   : getPortletsData
+            getPortletsData   : getPortletsData,
+            refreshPortlets   : refreshPortlets,
+            getRssFeeds       : getRssFeeds,
+            getVehiclesJobs   : getVehiclesJobs
         };
     });

@@ -11,10 +11,9 @@ class Filteredbillings extends Admin_Controller{
 
 	function __construct(){
 		parent::__construct();
-		
+		$this->userRoleId   = $this->session->role;
 		$this->userId 		= $this->session->loggedUser_id;
-		$this->load->model('Billing');
-		$this->load->model('Driver');
+		$this->load->model( array('Billing','Investor','Driver' ));
 	}
 	
 	public function index( $parameter = '' ) {
@@ -45,6 +44,12 @@ class Filteredbillings extends Admin_Controller{
 			$filters["vehicleId"] = isset($driverInfo["vehicleId"])  ? $driverInfo["vehicleId"] : '';
 			$filters["dispatcherId"] = isset($driverInfo["dispatcherId"])  ? $driverInfo["dispatcherId"] : '';
 			$filters["secondDriverId"] = (isset($_REQUEST['secondDriverId']) && $_REQUEST['secondDriverId'] != '' ) ? $_REQUEST['secondDriverId'] : $driverInfo['team_driver_id'];			 
+		}
+
+
+		if( $this->userRoleId  == _INVESTOR ) {
+			$vehicles = $this->Investor->fetchVehiclesList($this->userId);
+			$filters["vehicles"]  = array_column($vehicles, 'id');
 		}
 
 		$jobs = $this->Billing->getFilteredLoads( $filters);
@@ -103,10 +108,8 @@ class Filteredbillings extends Admin_Controller{
 		$total = $this->Billing->getFilteredLoads( $params,true);
 		
 		if(!empty($params['export'])){
-			$keys = [['DATE','CUSTOMER NAME','DRIVERS','INVOICE','CHARGES','PROFIT','%PROFIT','MILES','DEAD MILES','RATE/MILE','DATE P/U','PICK UP','DATE DE','DELIVERY','LOLAD ID','STATUS']];
-			$exportData = $this->buildExportLoadData($jobs);
-			$data 		= array_merge($keys,$exportData);
-			echo json_encode(array('fileName'=>$this->createExcell('billing',$data,TRUE)));die();
+			
+			$exportData = $this->buildExportLoadData($jobs,'Billing');
 		}
 
 		if(!$jobs){$jobs = array();}

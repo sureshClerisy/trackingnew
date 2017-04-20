@@ -331,3 +331,9 @@ $lang['invoiced'] = 'Invoiced';
 $lang['jobStatusPlaceholder'] = 'No status';
 $lang['noStatusValue'] = 'No status';
 /**loads status **/
+
+//Roles section
+$lang['addRole'] 		= 'Add Role';
+$lang['editRole'] 		= 'Update Role';
+$lang['deleteRole'] 	= 'Delete Role';
+$lang['roleHeader'] 	= 'Roles';

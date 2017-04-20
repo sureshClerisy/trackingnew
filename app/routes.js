@@ -748,7 +748,7 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
 				templateUrl: 'assets/templates/trailers/addEditTrailer.html',
                 controller: 'addEditTrailerController',
                 moduleName: 'trailers',
-                resolve:{            
+                resolve:{
 					getAddTrailerData: function(dataFactory, $stateParams) {
 						return dataFactory.httpRequest(URL+'/trailers/edit/'+ $stateParams.id);
 					}
@@ -868,7 +868,11 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
                     deps: ['$ocLazyLoad', function($ocLazyLoad) {
                         return $ocLazyLoad.load([
                             'select',
-                            'markercluster'
+                            'datepicker',
+                            'daterangepicker',
+                            'markercluster',
+                            'metrojs'
+                            
                             ], {
                             insertBefore: '#lazyload_placeholder'
                         })
@@ -882,16 +886,117 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
                     
                 }
 
-            })
-            
-
+            }).state('investor.trucks', {
+                url: '/trucks',
+                title: 'Truck Listing',
+                moduleName: 'loads',
+                templateUrl: 'assets/templates/investor/dashboard.html',
+                controller: 'investorController',
+                controllerAs: 'investor',
+                resolve:{ 
+                    
+                    deps: ['$ocLazyLoad', function($ocLazyLoad) {
+                        return $ocLazyLoad.load([
+                            'select',
+                            'datepicker',
+                            'daterangepicker',
+                            'markercluster'
+                            
+                            ], {
+                            insertBefore: '#lazyload_placeholder'
+                        })
+                    }],
+                    portlets : function(investorService) {
+                        return investorService.getPortletsData();
+                    },
+                    vehicles : function(investorService) {
+                        return investorService.fetchVehiclesList();
+                    },                    
+                }
+            }).state('organization', {
+                url: '/organization',
+                title: 'Management Section',
+                moduleName: 'loads',
+                templateUrl: 'assets/templates/acl/organisations.html',
+                controller: 'aclController',
+                controllerAs: 'acl',
+                resolve:{
+                    getOrganisations: function(dataFactory, $stateParams) {
+                        return dataFactory.httpRequest(URL+'/acl/organisations');
+                    }
+                }              
+            }).state('manage', {
+                url: '/manage/:id',
+                title: 'Management Company',
+                moduleName: 'loads',
+                templateUrl: 'assets/templates/acl/manageCompany.html',
+                controller: 'aclManage',
+                controllerAs: 'acl',
+                resolve:{
+                    getAction: function(dataFactory, $stateParams) {
+                        return dataFactory.httpRequest(URL+'/acl/getController');
+                    }
+                }              
+            }).state('roles', {
+                url: '/roles',
+                title: 'Roles',
+                moduleName: 'loads',
+                templateUrl: 'assets/templates/acl/role.html',
+                controller: 'roleManage',
+                controllerAs: 'acl',
+                resolve:{
+                    getRoles: function(dataFactory, $stateParams) {
+                        return dataFactory.httpRequest(URL+'/acl/getRoles');
+                    }
+                }              
+            }).state('addrole', {
+                url: '/addrole',
+                title: 'Add Roles',
+                moduleName: 'loads',
+                templateUrl: 'assets/templates/acl/addRole.html',
+                controller: 'roleManage',
+                controllerAs: 'acl',
+                resolve:{
+                    getAction: function(dataFactory, $stateParams) {
+                        return [];
+                    },
+                    getRoles: function(dataFactory, $stateParams) {
+                        return [];
+                    }
+                }              
+            }).state('edit', {
+                url: '/editrole/:id',
+                title: 'Update Roles',
+                moduleName: 'loads',
+                templateUrl: 'assets/templates/acl/addRole.html',
+                controller: 'roleManage',
+                controllerAs: 'acl',
+                resolve:{
+                    getRoles: function(dataFactory, $stateParams) {
+                        return dataFactory.httpRequest(URL+'/acl/getRoles/'+$stateParams.id);
+                    }
+                }
+            }).state('users', {
+                url: '/users',
+                title: 'User List',
+                moduleName: 'loads',
+                templateUrl: 'assets/templates/users/usersList.html',
+                controller: 'usersController',
+                controllerAs: 'users',
+                resolve:{
+                    getUsers: function(dataFactory, $stateParams) {
+                        return dataFactory.httpRequest(URL+'/users/getusers/');
+                    }
+                }
+            });
 }]);
 
 app.run(function ($rootScope,$location,$state,$cookies,dataFactory, $document) {
 	 
-/*	$rootScope.$on( '$locationChangeStart', function(e, newUrl  , oldUrl , newState, oldState) {
-			alert(oldState);
-	});*/
+    /*	$rootScope.$on( '$locationChangeStart', function(e, newUrl  , oldUrl , newState, oldState) {
+    			alert(oldState);
+    	});
+    */
 
 	$rootScope.$on( '$stateChangeStart', function(e, toState  , toParams , fromState, fromParams) {
 		$rootScope.srcPage = fromState.name;

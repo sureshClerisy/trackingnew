@@ -19,10 +19,9 @@ class Loads extends Admin_Controller{
 
 		parent::__construct();
 		
-		$this->userRoleId = $this->session->role;
+		$this->userRoleId   = $this->session->role;
 		$this->userId 		= $this->session->loggedUser_id;
-		
-		$this->load->model(array('Vehicle','Driver','Job','BrokersModel','Billing'));
+		$this->load->model(array('Vehicle','Driver','Job','BrokersModel','Billing',"Investor"));
 		$this->load->helper('truckstop');
 		
 		$this->finalArray = array();
@@ -46,7 +45,7 @@ class Loads extends Admin_Controller{
 			}
 		}
 		$newDestlabel = array();
-		if(isset($_REQUEST["requestFrom"]) && $_REQUEST["requestFrom"] == "billings"){
+		if(isset($_REQUEST["requestFrom"]) && $_REQUEST["requestFrom"] == "billings" || $_REQUEST["requestFrom"] == "investor"){
 			$startDate = $endDate = "";
 			if(isset($_REQUEST["dateFrom"]) && $_REQUEST["dateFrom"] != "null"){ 
 				$startDate = date("Y-m-d", strtotime($_REQUEST["dateFrom"])); 
@@ -259,10 +258,8 @@ class Loads extends Admin_Controller{
 
 		//Export loads to excell file Start
 		if(!empty($params['export'])){
-			$keys 	= [['DATE','CUSTOMER NAME','DRIVERS','INVOICE','CHARGES','PROFIT','%PROFIT','MILES','DEAD MILES','RATE/MILE','DATE P/U','PICK UP','DATE DE','DELIVERY','LOLAD ID','STATUS']];
-			$todayReport = $this->buildExportLoadData($jobs);
-			$data = array_merge($keys,$todayReport);
-			echo json_encode(array('fileName'=>$this->createExcell('loads',$data,TRUE)));die();
+			
+			$todayReport = $this->buildExportLoadData($jobs,'Loads');
 		}
 		//Export loads to excell file End
 
@@ -397,6 +394,10 @@ class Loads extends Admin_Controller{
 		$filters["requestFrom"] = 'capacity_analysis';
 
 		if(isset($filters["filterType"]) && $filters["filterType"] == "trucksWithoutDriver"){
+			if( $this->userRoleId  == _INVESTOR ) {
+				$vehicles = $this->Investor->fetchVehiclesList($this->userId);
+				$filters["vehicles"]  = array_column($vehicles, 'id');
+			}
 			$response["trucksList"] = $this->Driver->fetchTrucksWithoutDriver($filters);
 			$response["total"] = $this->Driver->fetchTrucksWithoutDriver($filters,true);
 		}else if(isset($filters["filterType"]) && $filters["filterType"] == "trucksReporting"){
@@ -436,6 +437,10 @@ class Loads extends Admin_Controller{
 			$params["sortType"] = "ASC"; 
 		}
 		if(isset($params["filterArgs"]["filterType"]) && $params["filterArgs"]["filterType"] == "trucksWithoutDriver"){
+			if( $this->userRoleId  == _INVESTOR ) {
+				$vehicles = $this->Investor->fetchVehiclesList($this->userId);
+				$params["vehicles"]  = array_column($vehicles, 'id');
+			}
 
 			$jobs  	= $this->Driver->fetchTrucksWithoutDriver($params);
 			$total 	= $this->Driver->fetchTrucksWithoutDriver($params,true);

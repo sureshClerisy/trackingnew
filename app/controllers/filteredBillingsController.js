@@ -76,7 +76,7 @@ app.controller('filteredBillingsController', ["dataFactory","$scope","$http","$r
 		$scope.dateRangeSelector.startDate = getBillingData.filterArgs.startDate; 	
 		$scope.dateRangeSelector.endDate = getBillingData.filterArgs.endDate; 	
 	}else{
-		if(getBillingData.filterArgs.requestFrom != undefined && getBillingData.filterArgs.requestFrom != "billings"){
+		if(getBillingData.filterArgs.requestFrom != undefined && getBillingData.filterArgs.requestFrom != "billings" && getBillingData.filterArgs.requestFrom != "investor"){
 			$scope.dateRangeSelector = {startDate: moment().startOf('month').format('YYYY-MM-DD'), endDate: moment().format('YYYY-MM-DD')};    
 		}
 	}

@@ -115,7 +115,7 @@ app.controller('billingDashboardController', ["dataFactory","$scope",  "$rootSco
             args = "filterType="+type+"&userType=all&requestFrom=billings"; 
             //$state.go(page, { 'key': keyParam, q:args, type:true }, { reload: true } );    
         }
-        if(type == "waiting-paperwork" || type =="inprogress" || type == "delivered" || type == "booked"){
+        if(type == "waiting-paperwork" || type =="inprogress" || type == "delivered" || type == "booked" || type =="last_week_sale"){
             if(vm.dateRangeSelector.startDate != null && vm.dateRangeSelector.endDate != null){
                 args += "&dateFrom="+vm.dateRangeSelector.startDate +"&dateTo="+vm.dateRangeSelector.endDate;     
             }

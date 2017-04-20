@@ -139,7 +139,7 @@ class Departments extends Admin_Controller {
 	}
 	
 	
-	function GetDrivingDistance($location1, $location2) {//  AIzaSyBsZPuC5cca9gr4qPZ-p1O9hPzp3serepk 
+	protected function GetDrivingDistance($location1, $location2) {//  AIzaSyBsZPuC5cca9gr4qPZ-p1O9hPzp3serepk 
 		$location1 = urlencode($location1);
 		$location2 = urlencode($location2);
 		//$url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins=".$lat1.",".$long1."&destinations=".$lat2.",".$long2."&mode=driving&language=pl-PL";

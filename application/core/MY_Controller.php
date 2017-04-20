@@ -39,7 +39,9 @@ class Admin_Controller extends MY_Controller
 
 		if( (isset($loggedUser_username) && $loggedUser_username != '') && (isset($loggedUser_id) && $loggedUser_id != '') && (isset($user_logged_in) && $user_logged_in == true) ) {
 		} else {
-			die();	
+			
+			redirect($this->config->item('base_url'));
+			die('//');
 		}
 
 		$this->id 			= $this->config->item('truck_id');	
@@ -50,7 +52,7 @@ class Admin_Controller extends MY_Controller
 			$this->finalArray	= array();
 		}
 		
-		public function commonApiHits($abbreviation = 'F', $dateTime = array() , $hoursOld = '', $origin_country = 'USA', $origin_range = 300 ,$destination_city = '', $destination_states = '', $destination_range = 300, $dest_country = 'USA', $load_type = 'Full') {
+		protected function commonApiHits($abbreviation = 'F', $dateTime = array() , $hoursOld = '', $origin_country = 'USA', $origin_range = 300 ,$destination_city = '', $destination_states = '', $destination_range = 300, $dest_country = 'USA', $load_type = 'Full') {
 			if ( strpos($this->origin_state,',') !== false ) {
 				$states = explode(',',$this->origin_state);
 				$statesCount = count($states);
@@ -137,7 +139,7 @@ class Admin_Controller extends MY_Controller
 		 * Fetching saved loads for one vehicle
 		 */
 		
-		public function getSingleVehicleLoads($userId = null , $vehicleId = null ,$scopeType = '', $dispatcherId = null, $driverId = null, $secondDriverId = null, $startDate = '', $endDate = '',$filters = array() ) {	//dispatcher id to get loads of particular dispatcher only if driver is selected
+		protected function getSingleVehicleLoads($userId = null , $vehicleId = null ,$scopeType = '', $dispatcherId = null, $driverId = null, $secondDriverId = null, $startDate = '', $endDate = '',$filters = array() ) {	//dispatcher id to get loads of particular dispatcher only if driver is selected
 			$jobs = array();
 			$jobs = $this->Job->fetchSavedJobsNew($userId, $vehicleId, $scopeType, $dispatcherId, $driverId, $secondDriverId, $startDate, $endDate,$filters);
 			if( !empty($jobs) && count($jobs) > 0){
@@ -160,7 +162,7 @@ class Admin_Controller extends MY_Controller
 		 * Fetching estimate time and distance for given miles or b/w two locations using google api
 		 */
 		
-		function GetDrivingDistance($location_ori, $location_dest) {
+		protected function GetDrivingDistance($location_ori, $location_dest) {
 			$location1 = urlencode($location_ori);
 			$location2 = urlencode($location_dest);
 			
@@ -221,7 +223,7 @@ class Admin_Controller extends MY_Controller
 		 * Change phone number format
 		 */
 
-		function sanitize_phone( $phone ) {
+		protected function sanitize_phone( $phone ) {
 			$format = "/(?:(?:\+?1\s*(?:[.-]\s*)?)?(?:\(\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9])\s*\)|([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\s*(?:[.-]\s*)?)?([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]{4})(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+))?$/";
 			$phone = preg_replace( '/\s+(#|x|ext(ension)?)\.?:?\s*(\d+)/', ' ext \3', $phone );
 			$phone = preg_replace( $format, "($2) $3-$4", $phone );
@@ -235,8 +237,7 @@ class Admin_Controller extends MY_Controller
 		* Comment: Used for uploading contract documents
 		*/
 		
-		public function uploadContractDocsToServer( $files, $prefix = '', $uploadFolder = "" ) 
-		{
+		protected function uploadContractDocsToServer( $files, $prefix = '', $uploadFolder = "" ){
 			$_FILES = $files;
 			$config['_prefix'] 	= $prefix.'_';
 			
@@ -292,7 +293,7 @@ class Admin_Controller extends MY_Controller
 		*
 		*/
 		
-		public function createExcell($moduleName = null,$dataArray = null,$boldLastRow=false){
+		protected function createExcell($moduleName = null,$dataArray = null,$boldLastRow=false){
 			
 			$totalRows = count($dataArray);
 			$fileName = time().'_'.$moduleName.'.xlsx';
@@ -305,7 +306,7 @@ class Admin_Controller extends MY_Controller
 			if($boldLastRow){ //Bold last row for load 
 				$this->excel->getActiveSheet()->getStyle($totalRows.':'.$totalRows)->getFont()->setBold(true);
 				
-				foreach (['D','E','F'] as $key => $columnLabel) {
+				foreach (['G','H','I'] as $key => $columnLabel) {
 					$this->excel->getActiveSheet()->getStyle($columnLabel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
 					$this->excel->getActiveSheet()->getColumnDimension($columnLabel)->setAutoSize(true);
 				}
@@ -329,7 +330,7 @@ class Admin_Controller extends MY_Controller
 		*
 		*/
 		
-		public function buildExportLoadData($loads = NULL){
+		protected function buildExportLoadData($loads = NULL,$fileLabel=NULL){
 			
 			$newArray 		= [];
 			$totalPayment 	= 0;
@@ -343,25 +344,25 @@ class Admin_Controller extends MY_Controller
 
 			foreach ($loads as $key => $load) {
 				
+				$newArray[$key]['LOLADID'] 		= $load['id'];
+				$newArray[$key]['INVOICEID'] 	= ($load['invoiceNo'])?$load['invoiceNo']:'NA';
 				$newArray[$key]['DATE'] 		= date('m/d',strtotime($load['created']));
-				$newArray[$key]['CUSTOMER NAME']= (!empty($load['companyName']))?$load['companyName']:@$load['TruckCompanyName'];
+				$newArray[$key]['STATUS'] 		= ucfirst($load['JobStatus']);
+				$newArray[$key]['CUSTOMERNAME'] = (!empty($load['companyName']))?$load['companyName']:@$load['TruckCompanyName'];
 				$newArray[$key]['DRIVERS'] 		= $load['driverName'];
-				$newArray[$key]['INVOICE'] 		=$load['PaymentAmount'];
+				$newArray[$key]['INVOICE'] 		= $load['PaymentAmount'];
 				$newArray[$key]['CHARGES'] 		= $load['totalCost'];
 				$newArray[$key]['PROFIT'] 		= $load['overallTotalProfit'];
 				$PaymentAmount 					= ($load['PaymentAmount']!=0)?$load['PaymentAmount']:1;
 				$profit 						= ($load['totalCost']/$PaymentAmount)*100;
-
-				$newArray[$key]['%PROFIT'] 		= number_format($profit,2); 
+				$newArray[$key]['%PROFIT'] 		= number_format($profit); 
 				$newArray[$key]['MILES'] 		= $load['Mileage'];
-				$newArray[$key]['DEAD MILES'] 	= $load['deadmiles'];
-				$newArray[$key]['RATE/MILE'] 	= (!empty($load['rpm']))?$load['rpm']:@$load['RPM'];
-				$newArray[$key]['DATE P/U'] 	= date('m/d',strtotime($load['pickDate']));
-				$newArray[$key]['PICK UP'] 		= $load['OriginCity'].', '.$load['OriginState'];
-				$newArray[$key]['DATE DE'] 		= date('m/d',strtotime($load['DeliveryDate']));
+				$newArray[$key]['DEADMILES'] 	= $load['deadmiles'];
+				$newArray[$key]['RATE/MILE'] 	= number_format((!empty($load['rpm']))?$load['rpm']:@$load['RPM'],2);
+				$newArray[$key]['DATEP/U'] 		= date('m/d',strtotime($load['pickDate']));
+				$newArray[$key]['PICKUP'] 		= $load['OriginCity'].', '.$load['OriginState'];
+				$newArray[$key]['DATEDE'] 		= date('m/d',strtotime($load['DeliveryDate']));
 				$newArray[$key]['DELIVERY'] 	= $load['DestinationCity'].', '.$load['DestinationState'];
-				$newArray[$key]['LOLAD ID'] 	= $load['id'];
-				$newArray[$key]['STATUS'] 		= ucfirst($load['JobStatus']);
 				//Last row data
 				$totalPayment 					+=$load['PaymentAmount'];
 				$totalMiles 					+=$load['Mileage'];
@@ -373,11 +374,15 @@ class Admin_Controller extends MY_Controller
 			}
 
 			$totalRows 	= count($newArray) ;
-			$totalRPM 	= $totalRPM/$totalRows;
+			$totalRPM 	= number_format($totalRPM/$totalRows,2);
 
-			$overallTotalProfitPercent = number_format(($CHARGES/$totalPayment)*100,2);
+			$overallTotalProfitPercent = number_format(($CHARGES/$totalPayment)*100);
+			$newArray[] =[];
+			$newArray[] = ['','','Total Rows:'.$totalRows,'','','','$'.number_format($totalPayment,2),'$'.number_format($CHARGES,2),'$'.number_format($overallTotalProfit,2),$overallTotalProfitPercent,$totalMiles,$totalDeadMiles,$totalRPM,'','','',''];
+			
+			array_unshift($newArray, ['LOLAD ID','INVOICE ID','DATE','STATUS','CUSTOMER NAME','DRIVERS','INVOICE','CHARGES','PROFIT','%PROFIT','MILES','DEAD MILES','RATE/MILE','DATE P/U','PICK UP','DATE DE','DELIVERY']);
 
-			$newArray[] = ['Total Rows:'.$totalRows,'','','$'.number_format($totalPayment,2),'$'.number_format($CHARGES,2),'$'.number_format($overallTotalProfit,2),$overallTotalProfitPercent,$totalMiles,$totalDeadMiles,$totalRPM,'','','','','',''];
-			return $newArray;
+			echo json_encode(array('fileName'=>$this->createExcell($fileLabel,$newArray,TRUE)));
+			die();
 		}
 }
