@@ -74,3 +74,6 @@ $lang['truckNumbetTableThinspolvalid'] = 'Seguro válido até';
 $lang['truckNumbetTableThinspolnum2'] = 'Número de apólice de seguro 2';
 $lang['dispatcher'] = 'Expedidor'; 
 /** Truck Add Page */
+
+$lang['single'] = 'solteiro';
+$lang['team'] = 'Equipe';

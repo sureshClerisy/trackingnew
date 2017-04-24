@@ -396,7 +396,7 @@
 								<div class="popup-load-detail-section">
 									<div class="table-input-head">
 										<h1>{{ languageCommonVariables.popuploaddetails }}<span ng-if="editSavedLoad.PostedOn != ''">(Posted: {{ editSavedLoad.PostedOn }})</span></h1>
-											<a href="{{encodedUrl}}" target="_blank" ng-if="primaryLoadId != '' && primaryLoadId != undefined && primaryLoadId != 0" class="ratesheet-loadDetail btn btn-success btn-cons m-b-10 duplicate">
+											<a href="{{encodedUrl}}" target="_blank" ng-if="primaryLoadId != '' && primaryLoadId != undefined && primaryLoadId != 0 && showInvestorSidebar == false" class="ratesheet-loadDetail btn btn-success btn-cons m-b-10 duplicate">
 												<i class="fa fa-files-o" aria-hidden="true"></i>
 												<span class="bold">Duplicate It</span>
 											</a>

@@ -26,9 +26,9 @@
                                             <p class="Summary-heading no-marign-top">{{ languageCommonVariables.commonSummaryHeading }}</p>
 											<!--div pg-form-group class="form-group form-group-default th-select required" ng-class="{'has-error':addDrivers.dispatchersList.$invalid && !addDrivers.dispatchersList.$pristine || addDrivers.$submitted && addDrivers.dispatchersList.$invalid}"-->
 											 <div pg-form-group class="form-group form-group-default th-select">
-                                                <label>Select Dispatcher</label>
+                                                <label>{{ languageArray.selectdispatcher }}</label>
 												<ui-select class="mdrivers" name="dispatchersList" ng-model="dispatcher.selected" theme="bootstrap" on-select="onSelectDispatcherCallback($item, $model);" >
-													<ui-select-match class="ui-select-match" placeholder="Select Dispatcher">{{$select.selected.username}}</ui-select-match>
+													<ui-select-match class="ui-select-match" placeholder="{{ languageArray.selectdispatcher }}">{{$select.selected.username}}</ui-select-match>
 													<ui-select-choices class="ui-select-choices" repeat="item in dispatcherList | filter: $select.search">
 														<span ng-bind-html="trustAsHtml((item.username | highlight: $select.search))"></span>
 													</ui-select-choices>

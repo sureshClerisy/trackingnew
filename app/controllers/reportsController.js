@@ -1,5 +1,5 @@
 app.controller('reportsController', function(dataFactory,$scope,$http ,$rootScope , $window, $location , $cookies, $localStorage, $filter, $compile, $timeout, initialData){
-	
+
 	if($rootScope.loggedInUser == false)
 		$location.path('login');
 	
@@ -34,8 +34,8 @@ app.controller('reportsController', function(dataFactory,$scope,$http ,$rootScop
 									],*/
 									Performance:[
 									//{name:"alert_report", title:"Alert Report", context:"Record of events meriting notifications" },
-									{name:"breadcrumb_detail", title:"Breadcrumb Detail Report", context:"Chronological list of events per Vehicle" },
-									{name:"loads_performance", title:"Loads Tracking Report", context:"Report of loads performance" },
+									{name:"breadcrumb_detail", title:$rootScope.languageArray.breadcrumbdetailtitle, context:$rootScope.languageArray.breadcrumbdetailcontext },
+									{name:"loads_performance", title:$rootScope.languageArray.loadsperformancetitle, context:$rootScope.languageArray.loadsperformancecontext },
 									//{name:"generate_idle", title:"Generate Idle Report", context:"Idle time calculations for generators" }
 									]
 								};
@@ -405,6 +405,23 @@ app.controller('reportsController', function(dataFactory,$scope,$http ,$rootScop
 
 
 	$scope.exportToHTML = function(report,print){
+
+		
+		 print_headers = {
+			'daterange':$rootScope.languageCommonVariables.daterange,
+			'scope':$rootScope.languageArray.scope,
+			'generatedby':$rootScope.languageCommonVariables.generatedby,
+			'filteronstatus':$rootScope.languageArray.filteronstatus,
+			'timezone':$rootScope.languageCommonVariables.timezone
+			// 'vehicleid': $scope.languageArray.vehicleid ,
+			// 'location': $scope.languageArray.location ,
+			// 'truckno': $scope.languageArray.truckno ,
+			// 'speedlimit': $scope.languageArray.speedlimit ,
+			// 'latitude': $scope.languageArray.longitude ,
+			// 'longitude': $scope.languageArray.latitude ,
+			// 'odometer': $scope.languageArray.odometer 
+		};
+
 		if ( angular.isObject($scope.formFilter.startDate)) {
 			$scope.formFilter.startDate = $scope.formFilter.startDate.format("YYYY-MM-DD");
 			$scope.formFilter.endDate   = $scope.formFilter.endDate.format("YYYY-MM-DD");
@@ -414,8 +431,9 @@ app.controller('reportsController', function(dataFactory,$scope,$http ,$rootScop
 		}
 
 		var url = URL+'/reports/export_html_irp_'+report.name+"/?";
-		var queryArgs = $.param({args:$scope.formFilter,report: report});
+		var queryArgs = $.param({args:$scope.formFilter,report: report , phead : print_headers});
 		url +=queryArgs; 
+		console.log(queryArgs);
 		var winPrint = $window.open(url,'_blank');
 		if(print){
 			winPrint.focus();

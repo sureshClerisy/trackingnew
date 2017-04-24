@@ -45,7 +45,7 @@ class Loads extends Admin_Controller{
 			}
 		}
 		$newDestlabel = array();
-		if(isset($_REQUEST["requestFrom"]) && $_REQUEST["requestFrom"] == "billings" || $_REQUEST["requestFrom"] == "investor"){
+		if(isset($_REQUEST["requestFrom"]) && ( $_REQUEST["requestFrom"] == "billings" || $_REQUEST["requestFrom"] == "investor")) {
 			$startDate = $endDate = "";
 			if(isset($_REQUEST["dateFrom"]) && $_REQUEST["dateFrom"] != "null"){ 
 				$startDate = date("Y-m-d", strtotime($_REQUEST["dateFrom"])); 
@@ -65,6 +65,12 @@ class Loads extends Admin_Controller{
 		if(!empty($urlArgs) && isset($_REQUEST["userType"]) && $urlArgs != "drivers"){
 			$filterArgs = array("itemsPerPage"=>20, "limitStart"=>1, "sortColumn"=>"DeliveryDate", "sortType"=>"DESC","status"=>"");
 			$filterArgs["status"] = (isset($_REQUEST["filterType"]) && $_REQUEST['filterType'] != 'reports') ? $_REQUEST["filterType"] : "";
+				
+			if( $filterArgs['status'] == 'pastLoadsIncomplete') {
+				$_REQUEST['newUserType'] = $_REQUEST['userType'];
+				$_REQUEST["userType"] = $filterArgs['status'];
+			}
+
 			switch ($_REQUEST["userType"]) {
 				case ''	  : 
 				case 'all': 
@@ -107,7 +113,6 @@ class Loads extends Admin_Controller{
 								$this->data["total"] = $this->Job->fetchSavedJobsTotal($tempUserId,$vehicleIdRepeat,"team",$dispatcherId,$_REQUEST["userToken"], $secondDriverId,$startDate,$endDate, $filterArgs); 
 
 							} else{
-								//pr($gDropdown);die;
 								$jobs = $this->getSingleVehicleLoads($tempUserId, $vehicleIdRepeat, "driver", $dispatcherId, $_REQUEST["userToken"], $secondDriverId,$startDate,$endDate,$filterArgs);	
 								$this->data["total"] = $this->Job->fetchSavedJobsTotal($this->userId,$vehicleIdRepeat,"driver",$dispatcherId,$_REQUEST["userToken"],$secondDriverId, $startDate,$endDate, $filterArgs); 
 							}
@@ -120,6 +125,22 @@ class Loads extends Admin_Controller{
 					$this->data["total"] = $this->BrokersModel->getBrokerRelatedLoads($_REQUEST["userToken"], $startDate, $endDate, $filterArgs, true); 
 					$this->data["total"] = $this->data["total"][0]['count'];
 					$this->data['table_title'] = isset($jobs[0]['companyName']) ? $jobs[0]['companyName'] : '';
+				break;
+				case 'pastLoadsIncomplete':
+
+					$filterArgs['dispatcherId']   = (isset($_REQUEST['newUserType']) && $_REQUEST['newUserType'] == 'dispatcher') ? $_REQUEST['userToken'] : ( isset($_REQUEST['dispId']) ? $_REQUEST['dispId'] : '' );
+					if (isset($_REQUEST['newUserType']) && ( $_REQUEST['newUserType'] == 'driver' || $_REQUEST['newUserType'] == 'team')) 
+						$driverId = $_REQUEST['userToken'];
+					else 
+						$driverId = '';
+
+					$filterArgs['driverId']       = $driverId;
+					$filterArgs['secondDriverId'] = isset($_REQUEST['secondDriverId']) ? $_REQUEST['secondDriverId'] : '';
+
+					$jobs = $this->Job->fetchPastLoadsIncomplete($filterArgs, false);	
+					$this->data["total"] = $this->Job->fetchPastLoadsIncomplete($filterArgs, true); 
+					$this->data["total"] = count($this->data["total"]);
+					$this->data['table_title'] = 'Incomplete Loads';
 				break;
 
 			}
@@ -175,7 +196,6 @@ class Loads extends Admin_Controller{
 		$total 	= 0;
 		$jobs 	= array();
 		
-
 		if($params["pageNo"] < 1){
 			$params["limitStart"] = ($params["pageNo"] * $params["itemsPerPage"] + 1);	
 		}else{
@@ -204,54 +224,80 @@ class Loads extends Admin_Controller{
 				$params["secondDriverId"] = $params["filterArgs"]["secondDriverId"];
 				$jobs  = $this->Job->getIdleDriversLoads($params,$params["filterArgs"]["userType"]);
 				$total = $this->Job->getIdleDriversLoads($params,$params["filterArgs"]["userType"],true);	
-			}else if($params["filterArgs"]["filterType"] == "active"){
+			} else if($params["filterArgs"]["filterType"] == "active") {
 				$jobs = $this->Job->getActiveDrivers($params,$params["filterArgs"]["userType"],  $params["filterArgs"]["fromDate"]);
 				$total = $this->Job->getActiveDrivers($params,$params["filterArgs"]["userType"],  $params["filterArgs"]["fromDate"],true);
 			}	
 
-		} else if (isset($params["filterArgs"]["userType"]) && $params["filterArgs"]["userType"] == "dispatcher") {  //A Dispatcher's All drivers
-			$dispId = isset($params["filterArgs"]['userToken']) ? $params["filterArgs"]['userToken'] : false;
-			$jobs = $this->getSingleVehicleLoads($this->userId,array(),"dispatcher", $dispId,false,false,$params["startDate"],$params["endDate"],$params);
-			$total = $this->Job->fetchSavedJobsTotal($this->userId,array(),"dispatcher",$dispId,false,false,$params["startDate"],$params["endDate"],$params); 
-		} else if (isset($params["filterArgs"]["userType"]) && ($params["filterArgs"]["userType"] == "all" || $params["filterArgs"]["userType"] == "" )){  
-			$jobs = $this->getSingleVehicleLoads($this->userId,array(),"all",false,false,false,$params["startDate"],$params["endDate"],$params); 
-			$total = $this->Job->fetchSavedJobsTotal($this->userId,array(),"all",false,false,false,$params["startDate"],$params["endDate"],$params); 
-		} else if (isset($params["filterArgs"]["userType"]) && ($params["filterArgs"]["userType"] == "driver" || $params["filterArgs"]["userType"] == "team" )){ 
-			
-			$driverInfo = $this->Driver->getInfoByDriverId($params["filterArgs"]["userToken"]);
-			if(isset($driverInfo[0])){
-				$driverInfo = $driverInfo[0];
-			}
-			$gVehicleId 		= isset($driverInfo["vehicleId"])  ? $driverInfo["vehicleId"] : '';
-			$dispatcherId 		= isset($driverInfo["dispatcherId"])  ? $driverInfo["dispatcherId"] : '';
-			$secondDriverId 	= isset($driverInfo["team_driver_id"])  ? $driverInfo["team_driver_id"] : '';
-			$statesAddress 		= $this->Vehicle->get_vehicles_address($this->userId,$gVehicleId);
-			$driverId 			= isset($params["filterArgs"]["userToken"]) ? $params["filterArgs"]["userToken"] : false ;
-			$vehicleIdRepeat 	= $statesAddress[0]['id'];	
-			$results 			= $this->Vehicle->getLastLoadRecord($statesAddress[0]['id'], $statesAddress[0]['driver_id']);
+		} else {
+			switch ($params['filterArgs']['userType']) {
+				case ''	  : 
+				case 'all': 
+							$jobs = $this->getSingleVehicleLoads($this->userId,array(),"all",false,false,false,$params["startDate"],$params["endDate"],$params); 
+							$total = $this->Job->fetchSavedJobsTotal($this->userId,array(),"all",false,false,false,$params["startDate"],$params["endDate"],$params); 
+				break;
 
-			if($params["filterArgs"]["userType"] == "team") {
-				$jobs = $this->getSingleVehicleLoads($this->userId, $vehicleIdRepeat,"team", $dispatcherId, $driverId, $secondDriverId, $params["startDate"],$params["endDate"],$params);	
-				$total = $this->Job->fetchSavedJobsTotal($this->userId, $vehicleIdRepeat,"team", $dispatcherId, $driverId, $secondDriverId, $params["startDate"],$params["endDate"],$params);	
-			} else{
-				$jobs = $this->getSingleVehicleLoads($this->userId, $vehicleIdRepeat, "driver", $dispatcherId, $driverId, $secondDriverId, $params["startDate"],$params["endDate"],$params);	
-				$total = $this->Job->fetchSavedJobsTotal($this->userId, $vehicleIdRepeat,"driver", $dispatcherId, $driverId, $secondDriverId, $params["startDate"],$params["endDate"],$params);	
-			}
-		} else if (isset($params["filterArgs"]["userType"]) && $params["filterArgs"]["userType"] == "broker") {
-			$params['dispatcherId']   = $params['filterArgs']['dispatcherId'];
-			$params['driverId']       = $params['filterArgs']['driverId'];
-			$params['secondDriverId'] = $params['filterArgs']['secondDriverId'];
-			unset($params['filterArgs']['dispatcherId']);
-			unset($params['filterArgs']['driverId']);
-			unset($params['filterArgs']['secondDriverId']);
-			
-			$jobs = $this->BrokersModel->getBrokerRelatedLoads($params["filterArgs"]["userToken"], $params['startDate'], $params['endDate'], $params, false);	
-			$this->data["total"] = $this->BrokersModel->getBrokerRelatedLoads($params["filterArgs"]["userToken"], $params['startDate'], $params['endDate'], $params, true); 
-			$total = $this->data["total"][0]['count'];
-		} else{
+				case 'dispatcher':
+							$dispId = isset($params["filterArgs"]['userToken']) ? $params["filterArgs"]['userToken'] : false;
+							$jobs = $this->getSingleVehicleLoads($this->userId,array(),"dispatcher", $dispId,false,false,$params["startDate"],$params["endDate"],$params);
+							$total = $this->Job->fetchSavedJobsTotal($this->userId,array(),"dispatcher",$dispId,false,false,$params["startDate"],$params["endDate"],$params); 
+				break;
 
-			$jobs = $this->getSingleVehicleLoads($this->userId,array(),"all",false,false,false,$params["startDate"],$params["endDate"],$params); 
-			$total = $this->Job->fetchSavedJobsTotal($this->userId,array(),"all",false,false,false,$params["startDate"],$params["endDate"],$params); 
+				case 'team': 
+				case 'driver':
+						$driverInfo = $this->Driver->getInfoByDriverId($params["filterArgs"]["userToken"]);
+						if(isset($driverInfo[0])){
+							$driverInfo = $driverInfo[0];
+						}
+						$gVehicleId 		= isset($driverInfo["vehicleId"])  ? $driverInfo["vehicleId"] : '';
+						$dispatcherId 		= isset($driverInfo["dispatcherId"])  ? $driverInfo["dispatcherId"] : '';
+						$secondDriverId 	= isset($driverInfo["team_driver_id"])  ? $driverInfo["team_driver_id"] : '';
+						$statesAddress 		= $this->Vehicle->get_vehicles_address($this->userId,$gVehicleId);
+						$driverId 			= isset($params["filterArgs"]["userToken"]) ? $params["filterArgs"]["userToken"] : false ;
+						$vehicleIdRepeat 	= $statesAddress[0]['id'];	
+						$results 			= $this->Vehicle->getLastLoadRecord($statesAddress[0]['id'], $statesAddress[0]['driver_id']);
+
+						if($params["filterArgs"]["userType"] == "team") {
+							$jobs = $this->getSingleVehicleLoads($this->userId, $vehicleIdRepeat,"team", $dispatcherId, $driverId, $secondDriverId, $params["startDate"],$params["endDate"],$params);	
+							$total = $this->Job->fetchSavedJobsTotal($this->userId, $vehicleIdRepeat,"team", $dispatcherId, $driverId, $secondDriverId, $params["startDate"],$params["endDate"],$params);	
+						} else {
+							$jobs = $this->getSingleVehicleLoads($this->userId, $vehicleIdRepeat, "driver", $dispatcherId, $driverId, $secondDriverId, $params["startDate"],$params["endDate"],$params);	
+							$total = $this->Job->fetchSavedJobsTotal($this->userId, $vehicleIdRepeat,"driver", $dispatcherId, $driverId, $secondDriverId, $params["startDate"],$params["endDate"],$params);	
+						}
+				break;
+
+				case 'broker':
+						$params['dispatcherId']   = $params['filterArgs']['dispatcherId'];
+						$params['driverId']       = $params['filterArgs']['driverId'];
+						$params['secondDriverId'] = $params['filterArgs']['secondDriverId'];
+						unset($params['filterArgs']['dispatcherId']);
+						unset($params['filterArgs']['driverId']);
+						unset($params['filterArgs']['secondDriverId']);
+						
+						$jobs = $this->BrokersModel->getBrokerRelatedLoads($params["filterArgs"]["userToken"], $params['startDate'], $params['endDate'], $params, false);	
+						$this->data["total"] = $this->BrokersModel->getBrokerRelatedLoads($params["filterArgs"]["userToken"], $params['startDate'], $params['endDate'], $params, true); 
+						$total = $this->data["total"][0]['count'];
+				break;
+
+				case 'pastLoadsIncomplete' :
+						if (isset($params['filterArgs']['newUserType']) && ( $params['filterArgs']['newUserType'] == 'driver' || $params['filterArgs']['newUserType'] == 'team')) 
+							$driverId = $params['filterArgs']['userToken'];
+						else 
+							$driverId = '';				
+					
+						$params['dispatcherId']   = (isset($params['filterArgs']['newUserType']) && $params['filterArgs']['newUserType'] == 'dispatcher') ? $params['filterArgs']['userToken'] : ( isset($params['filterArgs']['dispId']) ? $params['filterArgs']['dispId'] : '' );
+						$params['driverId']       = $driverId;
+						$params['secondDriverId'] = isset($params['filterArgs']['secondDriverId']) ? $params['filterArgs']['secondDriverId'] : '';
+						unset($params['filterArgs']['dispId']);
+						unset($params['filterArgs']['driverId']);
+						unset($params['filterArgs']['secondDriverId']);
+						unset($params['filterArgs']['userToken']);
+						$jobs = $this->Job->fetchPastLoadsIncomplete($params, false);	
+						$this->data["total"] = $this->Job->fetchPastLoadsIncomplete($params, true); 
+						$total = count($this->data["total"]);
+				break;	
+			}
+
 		}
 
 		if(!$jobs){$jobs = array();}
@@ -300,6 +346,7 @@ class Loads extends Admin_Controller{
 		$response['filterArgs']["firstParam"] = $urlArgs;
 		echo json_encode($response);
 	}
+
 	public function getDriversInsightsRecords(){
 		$params = json_decode(file_get_contents('php://input'),true);
 

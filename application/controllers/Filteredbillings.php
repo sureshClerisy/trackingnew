@@ -21,9 +21,11 @@ class Filteredbillings extends Admin_Controller{
 
 		$filters = array("itemsPerPage"=>20, "limitStart"=>1, "sortColumn"=>"DeliveryDate", "sortType"=>"DESC");
 		$filters["filterType"] = isset($_REQUEST["filterType"]) ? $_REQUEST["filterType"] : 'all';
-		$filters["userType"] = isset($_REQUEST["userType"]) ? $_REQUEST["userType"] : 'all';
-		$filters["userId"] = isset($_REQUEST["userToken"]) ? $_REQUEST["userToken"] : false;
-		$filters["dateFrom"] = isset($_REQUEST["dateFrom"]) ? $_REQUEST["dateFrom"] : "";
+		$filters["userType"]   = isset($_REQUEST["userType"]) ? $_REQUEST["userType"] : 'all';
+		$filters["userId"]     = isset($_REQUEST["userToken"]) ? $_REQUEST["userToken"] : false;
+		$filters["dateFrom"]   = isset($_REQUEST["dateFrom"]) ? $_REQUEST["dateFrom"] : "";
+		$filters["token"]      = isset($_REQUEST["token"]) ? $_REQUEST["token"] : "";
+
 		$filters["dateTo"] = isset($_REQUEST["dateTo"]) ? $_REQUEST["dateTo"] : "";
 		if ( isset($filters["filterType"]) && $filters["filterType"] == 'sent_today_expected' ) {	
 			$filters["dateTo"] = date("Y-m-d", strtotime("yesterday"));
@@ -77,12 +79,18 @@ class Filteredbillings extends Admin_Controller{
 		if((isset($params["sortType"]) && empty($params["sortType"])) || !isset($params["sortType"])){ $params["sortType"] = "DESC"; }
 		if(!isset($params["startDate"])){ $params["startDate"] = ''; }
 		if(!isset($params["endDate"])){ $params["endDate"] = ''; }
+
+		if( $this->userRoleId  == _INVESTOR ) {
+			$vehicles = $this->Investor->fetchVehiclesList($this->userId);
+			$params["vehicles"]  = array_column($vehicles, 'id');
+		}
 		
 		$params["filterType"] = isset($params["filterArgs"]["filterType"]) ? $params["filterArgs"]["filterType"] : 'all';
 		$params["userType"]   = isset($params["filterArgs"]["userType"]) ? $params["filterArgs"]["userType"] : 'all';
 		$params["userId"]     = isset($params["filterArgs"]["userToken"]) ? $params["filterArgs"]["userToken"] : false;
 		$params["dateFrom"]   = isset($params["filterArgs"]["dateFrom"]) ? $params["filterArgs"]["dateFrom"] : false;
 		$params["dateTo"]     = isset($params["filterArgs"]["dateTo"]) ? $params["filterArgs"]["dateTo"] : false;
+		$params["token"]      = isset($params["filterArgs"]["token"]) ? $params["filterArgs"]["token"] : false;
 		if(isset($params["filterType"]["requestFrom"]) && $params["filterType"]["requestFrom"] == "billings"){
 			$params["startDate"] = $params["endDate"] = "";
 		}

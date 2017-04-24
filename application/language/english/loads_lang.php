@@ -247,3 +247,63 @@ $lang['billingLoadsHeading'] = 'Billable';
 $lang['driversHeading'] = 'Drivers';
 /***Billing Page ends***/
 
+$lang['searchfrom'] = 'Search From';
+$lang['export'] = 'Export';
+$lang['selectdaterange'] = 'Select Date Range';
+
+/*Reports page*/
+$lang['performancereport'] = 'Performance Report';
+$lang['commingsoon'] = 'Coming Soon..';
+$lang['breadcrumdetailreport'] = 'Bread Crum Detail Report';
+$lang['loadstrackingreport'] = 'Loads Trackng Report';
+$lang['chronologicallistevent'] = 'Chronological list of events per Vehicle';
+$lang['reportofloadsperformance'] = 'report of loads performance';
+$lang['backtoreportlist'] = 'Back to report list';
+
+
+$lang['scope'] = 'Scope';
+$lang['selectvehicle'] = 'Select Vehicle';
+$lang['filtersandoptions'] = 'Filters and options';
+$lang['daterangepicker'] = 'Date Range Picker';
+$lang['reporttype'] = 'Report Type';
+$lang['reportaction'] = 'Report Action';
+$lang['generate'] = 'Generate';
+$lang['reporton'] = 'Report on';
+$lang['filteronstatus'] = 'Filter on status';
+$lang['selectscope'] = 'Select Scope';
+$lang['selectdate'] = 'Select Date';
+$lang['individual'] = 'Individual';
+$lang['performance'] = 'Performance';
+$lang['deliverydate'] = 'Delivery Date';
+
+$lang['vehicleid'] = 'Vehicle Id';
+$lang['truckno'] = 'Truck No';
+$lang['drivername'] = 'Driver Name';
+$lang['timestamp'] = 'Timestamp (GMT)';
+$lang['event'] = 'Event';
+$lang['latitude'] = 'Latitude';
+$lang['longitude'] = 'longitude';
+$lang['location'] = 'Location';
+$lang['speed'] = 'Speed (MPH)';
+$lang['odometer'] = 'Odometer (MI)';
+$lang['loadid'] = 'LoadId';
+
+$lang['showallloads'] = 'Show All Loads';
+$lang['noloadsfound'] = 'No Loads Found';
+
+
+								
+$lang['breadcrumbdetailtitle'] = 'Breadcrumb Detail Report';
+$lang['breadcrumbdetailcontext'] = 'Chronological list of events per Vehicle';
+$lang['loadsperformancetitle'] = 'Loads Tracking Report';
+$lang['loadsperformancecontext'] = 'Report of loads performance';
+
+$lang['allnotification'] = 'All Notifications';
+$lang['loadmorenotification'] = 'Load More Notifications';
+
+
+//Roles section
+$lang['usersHeading'] 		= 'Users';
+$lang['editUser'] 		= 'Update User';
+$lang['addUser'] 		= 'Add User';
+$lang['deleteUser'] 	= 'Delete User';

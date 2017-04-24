@@ -207,24 +207,22 @@
             </li>
         </ul>
     </li>
-    <li ng-class="(state=='trucks' || state=='trailers') ? 'open active' : ''">
-        <a href="javascript:void(0)">
+
+    <li ng-class="(state=='users' || state=='addUser') ? 'open active' : ''">
+        <a class="test" href="javascript:void(0)">
           <span class="title">Users</span>
-          <span class=" arrow" ng-class="{'open active':(state=='trucks' || state=='trailers' || state=='maintenance') }"></span>
-          <span class="icon-thumbnail">
-            <i class="fa fa-users"></i></span>
-        </a>
-        <ul class="sub-menu">
+          <span class=" arrow" ng-class="{'open active':(state=='users' || state=='addUser' || state=='editUser') }"></span>
+          <span class="icon-thumbnail"><i class="fa fa-users"></i></span></a>
+          <ul class="sub-menu">
             <li>
-                <a href="#/users">Users List
-                    <span class="icon-thumbnail">
-                        <i class="fa fa-user-plus"></i>
+                <a  href="#/users">Users List
+                    <span class="icon-thumbnail"> 
+                         <i class="fa fa-user-plus"></i>
                     </span>
                 </a>
             </li>
         </ul>
     </li>
-
 </ul>
 <div class="clearfix"></div>
 </div>

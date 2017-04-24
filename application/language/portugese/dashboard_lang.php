@@ -70,6 +70,35 @@ $lang['loadno'] = 'Carga #';
 $lang['pickupdate'] = 'captador Data';
 $lang['deliverdate'] = 'Data de entrega';
 
+$lang['todayinsights'] = 'INSIGHTS HOJE';
+$lang['pickup'] = 'PEGAR';
+$lang['inprogress'] = 'EM PROGRESSO';
+$lang['delivery'] = 'ENTREGA';
+$lang['idle'] = 'Ocioso';
+$lang['driver'] = 'MOTORISTA';
+$lang['truck'] = 'CAMINHÃO';
+$lang['origin'] = 'ORIGEM';
+$lang['st'] = 'ST';
+$lang['destination'] = 'DESTINO';
+$lang['payment'] = 'FORMA DE PAGAMENTO';
+$lang['rpm'] = 'RPM';
+$lang['company'] = 'EMPRESA';
+$lang['leaderboard'] = 'ENTRE OS MELHORES';
+$lang['message'] = 'mensagem';
+
+$lang['weatherreport'] = 'Previsão do tempo';
+$lang['day'] = 'Dia';
+$lang['temperature'] = 'Temperatura';
+$lang['wind'] = 'Vento';
+$lang['humidity'] = 'Umidade';
+$lang['mintemperature'] = 'Min. Temperatura';
+$lang['maxtemperature'] = 'Max. Temperatura';
+$lang['feelslike'] = 'Parece';
+
+$lang['driverwithouttr'] = 'Drivers ativos sem caminhão';
+$lang['trucksnotrep'] = 'Os caminhões não informam a localização atual';
+$lang['truckwithoutdriver'] = 'Camiões sem condutor';
+$lang['incompleteLoads'] = 'Cargas Incompletas';
 
 
 

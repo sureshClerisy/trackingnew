@@ -20,6 +20,7 @@ $lang['driverName']	= 'Name';
 $lang['drivertrucknum']	= 'Truck Number';	
 $lang['driveroperatorlic'] = "Operator's License";
 $lang['dispatcher'] = 'Dispatcher'; 
+$lang['Export'] = 'Export';
 /** Drivers listing Page */
 
 /** Drivers Add Page */
@@ -41,4 +42,6 @@ $lang['driverlocation'] = 'Location';
 $lang['driverprofileimg'] = ' Profile Image'; 
 $lang['driveraddress'] = 'Address'; 
 $lang['driveraddressPlaceholder'] = 'Enter the address'; 
+$lang['selectdispatcher'] = 'Select Dispatcher';
 /** Drivers Add Page */
+

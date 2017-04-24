@@ -1,6 +1,6 @@
 <?php
 
-class User extends CI_Model
+class User extends Parent_Model
 {
 	function __construct()
 	{
@@ -207,10 +207,68 @@ class User extends CI_Model
 			return array();
 	}
 
-	public function getUsers( $userId = null ) {
-		// $this->db->select('username,CONCAT(first,,last_name)')
+	public function getUsers() {
+		
+		$column = 'users.id,username,CONCAT(first_name, ,last_name) as fullName,email,users.status,role_id';
+
+		$this->db->join("roles", "users.role_id = roles.id","Left");
+		$this->db->select($column)->where('users.status',1);
+		
+		if(!$this->superAdmin){
+			$this->db->where('users.parent_id',$this->userID);
+		}
+
+		$data = $this->db->get('users')
+			 ->result_array();
+		return $data;
 	}
 
+
+	public function getUsersById( $userId = null ) {
+		
+		$column = 'users.id,username,CONCAT(first_name, ,last_name) as fullName,email,users.status,role_id';
+		if(!empty($userId)){
+
+			$column .= ',phone,first_name,last_name,city,address,zipcode,roles.name as rname';
+			$this->db->where(['users.id'=>$userId]);
+			$this->db->join("roles", "users.role_id = roles.id","Left");
+		}
+
+		$this->db->select($column)
+			 ->where('users.status',1);
+		$data =  $this->db->get('users')
+			 ->result_array();
+			 
+		// echo $this->db->last_query();
+		return $data;
+	}
+
+	public function checkUnique(){
+		
+		$postData = json_decode(file_get_contents('php://input'));
+		$this->db->select('count(id) as count')->like('username',$postData->data->username);
+		if(!empty($postData->data->id)){
+			$this->db->where('id!=',$postData->data->id);
+		}
+
+		$userExists =  $this->db->get('users')->result_array();
+		return $userExists[0]['count'];
+	}	
+
+	public function addEditUser($data,$userID=null){
+		
+		if(!empty($userID)){
+			return $this->db->where('id',$userID)->update('users',$data);
+		}
+		return $this->db->insert('users',$data);
+	}
+
+	public function changeStatus(){
+
+		$postData 			= json_decode(file_get_contents('php://input'));
+		$status 			= ($postData->data->status==1)?'0':'1';
+		$this->db->where('id',$postData->data->userID)->update('users',['status'=>$status]);
+	}
 }
 
 ?>

@@ -1437,9 +1437,9 @@ class Dashboard extends Admin_Controller {
 				$this->singleMilesGoal	    += $single * $goalValues['singleMiles'] * $daysdiff;
 				$this->teamMilesGoal	 	+= $team * $goalValues['teamMiles'] * $daysdiff;
 
-				if ( $driversList['createdDate'] > $rparam['endDate'] && empty($driverLastLog)) {
+				if ( isset($driversList['createdDate']) && $driversList['createdDate'] > $rparam['endDate'] && empty($driverLastLog)) {
 					$showDispatcher = 0;
-				} else if( $driversList['single'] <= 0 && $driversList['team'] <= 0 ) {
+				} else if( isset($driversList['single']) && $driversList['single'] <= 0 && $driversList['team'] <= 0 ) {
 					$showDispatcher = 0;
 				}
 			}									
@@ -1568,10 +1568,11 @@ class Dashboard extends Admin_Controller {
 		$filters["sortColumn"] ="DeliveryDate"; 
 		$filters["sortType"] ="DESC"; 
 
-		$driversWithoutTruck = $this->Driver->fetchDriversWithoutTruck($filters,true);
-		$trucksNotReporting = $this->Driver->trucksReporting($filters,true);
+		$driversWithoutTruck   = $this->Driver->fetchDriversWithoutTruck($filters,true);
+		$trucksNotReporting    = $this->Driver->trucksReporting($filters,true);
 		$vehiclesWithoutDriver = $this->Driver->fetchTrucksWithoutDriver($filters,true);
-
+		$pastLoadsIncomplete   = count($this->Job->fetchPastLoadsIncomplete($filters,true));
+	
 		$dispatcherId = isset($args['dispatcherId']) ? $args['dispatcherId'] : '';
 		$driverId = isset($args['driverId']) ? $args['driverId'] : '';
 		$secondDriverId = isset($args['secondDriverId']) ? $args['secondDriverId'] : '';
@@ -1593,6 +1594,7 @@ class Dashboard extends Admin_Controller {
 		$data['totalDrivers'] 				= $driversWithoutTruck;
 		$data['trucksNotReporting'] 		= $trucksNotReporting;
 		$data['vehiclesWithoutDriver'] 		= $vehiclesWithoutDriver;
+		$data['pastLoadsIncomplete'] 		= $pastLoadsIncomplete;
 		$data['todayDate'] 	  				= date('Y-m-d');
 		
 		if(!empty($args['export'])){$this->createTop5Excell($data);}
@@ -1631,7 +1633,7 @@ class Dashboard extends Admin_Controller {
 
 		foreach ($paymentAmounts as $key => $paymentAmount) {
 			$exportableData[$key+1]['CompanyName']   = $rawData['cName']['cmpName'][$key];
-			$exportableData[$key+1]['paymentAmount'] = '$'.$paymentAmount;
+			$exportableData[$key+1]['paymentAmount'] = '$'.number_format($paymentAmount,2);
 		}
 		echo json_encode(array('fileName'=>$this->createExcell('top5cuatomers',$exportableData)));die();
 	}
@@ -1666,7 +1668,7 @@ class Dashboard extends Admin_Controller {
 		$excelData[] = [
 						$args['currentWeather']['today'],
 						$args['currentWeather']['date'],
-						$args['currentWeather']['current_temperature'].'°F',
+						number_format($args['currentWeather']['current_temperature']).'°F',
 						$args['currentWeather']['wind'],
 						$args['currentWeather']['humidity'],
 						number_format($args['currentWeather']['main']['temp_min'],2).'°F',
@@ -1677,7 +1679,7 @@ class Dashboard extends Admin_Controller {
 			$excelData[] = [
 							$args['dailyForecast']['list'][$counter]['today'],
 							$args['dailyForecast']['list'][$counter]['date'],
-							$args['dailyForecast']['list'][$counter]['current_temperature'].'°F',
+							number_format($args['dailyForecast']['list'][$counter]['current_temperature']).'°F',
 							$args['dailyForecast']['list'][$counter]['wind'],
 							$args['dailyForecast']['list'][$counter]['humidity'],
 							number_format($args['dailyForecast']['list'][$counter]['temp']['min'],2).'°F',

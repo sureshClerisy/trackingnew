@@ -20,13 +20,14 @@ class Trailers extends Admin_Controller {
 		$this->data = array();
 	}
 	
-	/*
-	* Request URL: http://domain/trailers/index
-	* Method: get
-	* Params: null
-	* Return: list array
-	* Comment: Used for fetching trailers listing
+	/**
+	* Request URL: http://domain.com/api/trailers/index
+	* Method  : get
+	* @param  : null
+	* @return : list array
+	* Comment : Used for fetching trailers listing
 	*/
+	
 	public function index() {
 		$this->data['rows'] = $this->Trailer->getTrailersList();
 		echo json_encode($this->data);

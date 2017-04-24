@@ -17,7 +17,7 @@
                                 <div class="panel panel-default green-border wpanel" id="1" pg-portlet>
                                     <div class="panel-heading">
                                         <div class="panel-title">
-                                            <h2 class="oprate-dashbord">Performance Report</h2>
+                                            <h2 class="oprate-dashbord">{{ languageArray.performancereport }}</h2>
                                         </div>
                                     </div>
                                     <div class="panel-body">
@@ -54,7 +54,7 @@
                         <div class="panel panel-default green-border wpanel" id="1" pg-portlet>
                             <div class="panel-heading">
                                 <div class="panel-title">
-                                    <h2 class="oprate-dashbord">Coming Soon...</h2>
+                                    <h2 class="oprate-dashbord">{{ languageArray.commingsoon }}</h2>
                                 </div>
                             </div>
                             <div class="panel-body">
@@ -129,7 +129,7 @@
 <!-- Breadcrumb Detail Report Section Start-->
 <div class="padding-20 report-section-start" ng-show="panelTransparent == false" >
     <span style="margin-left: 4px;cursor: pointer;" ng-click = "backToList()"> 
-        <i class="fa fa-arrow-left"></i> Back to report lists 
+        <i class="fa fa-arrow-left"></i> {{ languageArray.backtoreportlist }}
     </span>
 
 
@@ -178,11 +178,11 @@
 <div class='other-filters'>
   <form ng-show="report.name == 'breadcrumb_detail'"> 
       <div class="report-filter filter-1">
-        <h2>Scope</h2>
+        <h2>{{ languageArray.scope }}</h2>
         <div class="drange-block" style="position:relative;z-index:999;">
           <div class="data-range filter-range">
             <div class="outer-range-block">
-              <span>Select Vehicles: 
+              <span>{{ languageArray.selectvehicle }}: 
                 <input type="checkbox" ng-model="selectVehicles" name="selectVehicles" ng-click="toggleSelectVehicles()">
             </span>
             <div class="date-wrapper">
@@ -199,11 +199,11 @@
 </div>
 
 <div class="report-filter filter-2">
-    <h2>Date Range</h2>
+    <h2>{{ languageArray.daterange }}</h2>
     <div class="drange-block">
       <div class="data-range">
         <div class=" dat-sec-1 form-group form-group-default">
-          <label>Report On :</label>
+          <label>{{ languageArray.reporton }}:</label>
           <div class="dashbord-select-dropdown">
             <select ng-model="formFilter.forDate" class=" report-for cs-select cs-skin-slide" cs-select ng-change="toggleCustomDate(formFilter.forDate)">
               <option value="today">Today</option>
@@ -215,7 +215,7 @@
 </div>
 <div class="data-range" ng-show="showCustomDate">
     <div class=" dat-sec-1 form-group form-group-default">
-        <label>Date Range: </label>
+        <label>{{ languageArray.selectdaterange }}: </label>
         <div class="date-wrapper">
             <div class="input-prepend input-group breadcumdate">
                 <span class="add-on input-group-addon">
@@ -229,12 +229,12 @@
 </div>
 </div>
 <div class="report-filter filter-3">
-  <h2>Filters and Options</h2>
+  <h2>{{ languageArray.filtersandoptions }}</h2>
   <div class="drange-block">
     <div class="data-range filter-range">
         <div class="outer-range-block">
             <span>
-                Filters On Status: 
+                {{ languageArray.filteronstatus }}: 
                 <input type="checkbox" ng-model="filterStatus" name = "filterStatus" ng-click="toggleSelectStatus(report.name)">
             </span>
             <div class="date-wrapper">
@@ -251,10 +251,10 @@
 </div>
 </div>
 <div class="report-filter filter-action">
-  <h2>Report Actions</h2>
+  <h2>{{ languageArray.reportaction }}</h2>
   <button ng-click="generateReport(report)" class="btn btn-success" type="button">
     <i class="fa fa-file"></i> 
-    <span class="bold">Generate</span>
+    <span class="bold">{{ languageArray.generate }}</span>
 </button>
 
 </div>
@@ -262,9 +262,9 @@
 
 <form ng-show="report.name == 'loads_performance'"> 
     <div class="report-filter filter-1">
-      <h2>Scope</h2>
+      <h2>{{ languageArray.scope }}</h2>
       <div class=" dat-sec-1 form-group form-group-default">
-         <label>select scope</label>
+         <label>{{ languageArray.selectscope }}</label>
          <div class="dashbord-select-dropdown">
           <ui-select class="mdrivers" ng-model="selectedScope" theme="bootstrap" on-select="onSelectVehicleCallback($item, $model);">
             <ui-select-match class="ui-select-match" placeholder="Select Scope">{{$select.selected.label == "_idispatcher" ? "Dispatcher : " + $select.selected.username : $select.selected.driverName}}</ui-select-match>
@@ -279,9 +279,9 @@
 </div>
 
 <div class="report-filter filter-2">
-  <h2>Filters and Options</h2>
+  <h2>{{languagueArray.filtersandoptions}}</h2>
   <div class=" dat-sec-1 form-group form-group-default">
-     <label>Select Date: </label>
+     <label>{{ languageArray.reporttype }}: </label>
      <div class="date-wrapper">
         <select ng-model="formFilter.reportType" class=" report-for cs-select cs-skin-slide" cs-select >
             <option value="individual">Individual</option>
@@ -293,9 +293,9 @@
 </div>
 
 <div class="report-filter filter-3">
-    <h2>Date Range Picker</h2>
+    <h2>{{ languageArray.selectdaterange }}</h2>
     <div class=" dat-sec-1 form-group form-group-default">
-      <label>Report Type: </label>
+      <label>{{ languageArray.selectdate }}: </label>
       <div class="date-wrapper">
         <div class="input-prepend input-group">
             <span class="add-on input-group-addon">
@@ -310,8 +310,8 @@
 </div>
 
 <div class="report-filter filter-action">
-  <h2>Report Actions</h2>
-  <button type="button" ng-disable="isQueued" ng-click="generateReport(report)" class="btn btn-success">Generate</button>
+  <h2>{{ languageArray.reporttype }}</h2>
+  <button type="button" ng-disable="isQueued" ng-click="generateReport(report)" class="btn btn-success">{{ languageArray.generate }}</button>
   <!-- <button type="button" class="btn btn-danger">Save</button> -->
 </div>
 </form>
@@ -326,16 +326,16 @@
   <table width="100%" class=" report-table fixed-thead table table-striped" cell-padding="0" cell-spacing="0" ng-show="report.name == 'breadcrumb_detail'" style="position: relative;">
       <thead>
         <tr>
-          <th><a href="javascript:void(0)" >Vehicle ID</a> </th>
-          <th><a href="javascript:void(0)" >Truck No</a></th>
-          <th><a href="javascript:void(0)" >Driver Name</a></th>
-          <th><a href="javascript:void(0)" >Timestamp (GMT)</a></th>
-          <th><a href="javascript:void(0)" >Event </a></th>
-          <th><a href="javascript:void(0)" >Latitude </a></th>
-          <th><a href="javascript:void(0)" >Longitude</a></th>
-          <th><a href="javascript:void(0)" >Location </a></th>
-          <th><a href="javascript:void(0)" >Speed (MPH)</a></th>
-          <th><a href="javascript:void(0)" >Odometer (Mi)</a></th>
+          <th><a href="javascript:void(0)" >{{ languageArray.vehicleid }}</a> </th>
+          <th><a href="javascript:void(0)" >{{ languageArray.truckno }}</a></th>
+          <th><a href="javascript:void(0)" >{{ languageArray.drivername }}</a></th>
+          <th><a href="javascript:void(0)" >{{ languageArray.timestamp }}</a></th>
+          <th><a href="javascript:void(0)" >{{ languageArray.event }} </a></th>
+          <th><a href="javascript:void(0)" >{{ languageArray.latitude }} </a></th>
+          <th><a href="javascript:void(0)" >{{ languageArray.longitude }}</a></th>
+          <th><a href="javascript:void(0)" >{{ languageArray.location }} </a></th>
+          <th><a href="javascript:void(0)" >{{ languageArray.speed }}</a></th>
+          <th><a href="javascript:void(0)" >{{ languageArray.odometer }}</a></th>
       </tr>
   </thead>
   <tbody>
@@ -352,7 +352,7 @@
       <td>{{row.odometer}}</td>
   </tr>
   <tr ng-show="noRecords">
-      <td colspan="10">There is no record for seletect filters</td>
+      <td colspan="10">{{ languageCommonVariables.norecordfound }}</td>
   </tr>
 </tbody>
 </table>
@@ -384,7 +384,7 @@
     <td class="text-center-td">{{overAllTotal.totProfitPercent}}</td>
 </tr>
 <tr ng-show="noRecords">
-    <td colspan="8">There is no record for seletect filters</td>
+    <td colspan="8">{{ languageCommonVariables.norecordfound }}</td>
 </tr>
 </tbody>
 </table>
@@ -411,7 +411,7 @@
           </div>
 
           <div class="tb-cell dis-report stype" ng-click="sortCustom('dispatcher', dispatcherSortType)"> 
-              <span class="lode-arrow {{dispatcherSortType}}">Dispatcher</span>
+              <span class="lode-arrow {{dispatcherSortType}}">{{ languageArray.dispatcher }}</span>
           </div>
 
           <div class="tb-cell driver-report stype" ng-click="sortCustom('driver', driverSortType)"> 
@@ -419,59 +419,59 @@
           </div>
 
           <div class="tb-cell broker-report stype" ng-click="sortCustom('broker', brokerSortType)"> 
-              <span class="lode-arrow {{brokerSortType}}">Broker</span>
+              <span class="lode-arrow {{brokerSortType}}">{{ languageArray.popupbroker }}</span>
           </div>
 
           <div class="tb-cell invoice-report stype" ng-click="sortCustom('PaymentAmount', paymentAmountSortType)" >
-              <span class="lode-arrow {{paymentAmountSortType}}">BOOKED</span>
+              <span class="lode-arrow {{paymentAmountSortType}}">{{ languageArray.booked }}</span>
           </div>
 
           <div class="tb-cell charges-report stype" ng-click="sortCustom('totalCost', totalCostSortType)" >
-              <span class="lode-arrow {{totalCostSortType}}">CHARGES</span>
+              <span class="lode-arrow {{totalCostSortType}}">{{ languageArray.tollcharges }}</span>
           </div>
 
           <div class="tb-cell profit-report stype" ng-click="sortCustom('overallTotalProfit', overallTotalProfitSortType)" >
-              <span class="lode-arrow {{overallTotalProfitSortType}}">{{ languageCommonVariables.planthprofit }}</span>
+              <span class="lode-arrow {{overallTotalProfitSortType}}">{{ languageArray.planthprofit }}</span>
           </div>
 
           <div class="tb-cell profirper-report stype" ng-click="sortCustom('overallTotalProfitPercent', overallTotalProfitPercentSortType)" >
-              <span class="lode-arrow {{overallTotalProfitPercentSortType}}"> Profit %</span>
+              <span class="lode-arrow {{overallTotalProfitPercentSortType}}"> {{ languageArray.planthprofit }} %</span>
           </div>
 
           <div class="tb-cell miles-report stype" ng-click="sortCustom('Mileage', MileageSortType)"> 
-              <span class="lode-arrow {{MileageSortType}}">Miles</span>
+              <span class="lode-arrow {{MileageSortType}}">{{ langaugeArray.planthmiles }}</span>
           </div>
 
           <div class="tb-cell dmiles-report stype" ng-click="sortCustom('deadmiles', deadmilesSortType)"> 
-              <span class="lode-arrow {{deadmilesSortType}}">Deadmiles</span>
+              <span class="lode-arrow {{deadmilesSortType}}">{{ languageArray.planthdeadmiles }}</span>
           </div>
 
           <div class="tb-cell rpm-report stype" ng-click="sortCustom('rpm', RpmSortType)"> 
-              <span class="lode-arrow {{RpmSortType}}">RPM</span>
+              <span class="lode-arrow {{RpmSortType}}">{{ langaugeArray.planthrpm }}</span>
           </div>
 
           <div class="tb-cell pickup-report stype" ng-click="sortCustom('PickupDate', pickupDateSortType)"> 
-              <span class="lode-arrow {{pickupDateSortType}}">Pickup </span>
+              <span class="lode-arrow {{pickupDateSortType}}">{{ languageArray.popuppickup }} </span>
           </div>
 
           <div class="tb-cell origin-report stype" ng-click="sortCustom('OriginState', OriginCitySortType)"> 
-              <span class="lode-arrow {{OriginCitySortType}}">Origin</span>
+              <span class="lode-arrow {{OriginCitySortType}}">{{ languageArray.planthorigin }}</span>
           </div>
 
           <div class="tb-cell originst-report stype" ng-click="sortCustom('OriginState', OriginStateSortType)"> 
-              <span class="lode-arrow {{OriginStateSortType}}">ST</span>
+              <span class="lode-arrow {{OriginStateSortType}}">{{ languageArray.planthst }}</span>
           </div>
 
           <div class="tb-cell del-report stype" ng-click="sortCustom('DeliveryDate', DeliveryDateSortType)">
-              <span class="lode-arrow {{DeliveryDateSortType}}">Del Date</span>
+              <span class="lode-arrow {{DeliveryDateSortType}}">{{languageArray.deliverydate}}</span>
           </div>
 
           <div class="tb-cell delivery-report stype" ng-click="sortCustom('DestinationCity', DestinationCitySortType)">
-              <span class="lode-arrow {{DestinationCitySortType}}">Delivery</span>
+              <span class="lode-arrow {{DestinationCitySortType}}">{{languageArray.popupdelivery}}</span>
           </div>
 
           <div class="tb-cell destst-report stype" ng-click="sortCustom('DestinationState', DestinationStateSortType)">
-              <span class="lode-arrow {{DestinationStateSortType}}">ST</span>
+              <span class="lode-arrow {{DestinationStateSortType}}">{{ languageArray.planthst }}</span>
           </div>
       </div>
 
@@ -533,117 +533,117 @@
         <div class="open-block" id="hblock{{$index}}" style="display:none"> 
             <div class="tb-cell ld-id">
               <span> 
-                <div class="heading"> LoadId  <b>:</b></div>
+                <div class="heading"> {{ languageArray.loadid }}  <b>:</b></div>
                 <div class="value">{{ value.loadid }} </div>
             </span>
         </div>
 
         <div class="tb-cell dis-report  ">
           <span>
-              <div class="heading"> Dispatcher <b>:</b></div>
+              <div class="heading"> {{ languageCommonVariables.dispatcher }} <b>:</b></div>
               <div class="value">{{ value.dispatcher }} </div>
           </span>
       </div>
 
       <div class="tb-cell driver-report  ">
           <span>
-            <div class="heading"> Driver <b>:</b></div>
+            <div class="heading"> {{ languageArray.driver }} <b>:</b></div>
             <div class="value">{{ value.driver }} </div>
         </span>
     </div>
 
     <div class="tb-cell broker-report ">
       <span>
-        <div class="heading"> broker <b>:</b></div>
+        <div class="heading"> {{ languageCommonArray.broker }} <b>:</b></div>
         <div class="value">{{ value.broker }} </div>
     </span>
 </div>
 
 <div class="tb-cell invoice-report ">
   <span>
-      <div class="heading">Amount Inv<b>:</b></div>
+      <div class="heading">{{ languageArray.popupamountinvoice }}<b>:</b></div>
       <div class="value">{{ value.invoice | currency:"$":2 }}</div>
   </span>
 </div>
 
 <div class="tb-cell charges-report ">
   <span>
-      <div class="heading">Total Charges<b>:</b></div>
+      <div class="heading">{{ languageArray.popuptotalcharge }}<b>:</b></div>
       <div class="value">{{ value.charges | currency:"$":2 }}</div>
   </span>
 </div>
 
 <div class="tb-cell profit-report ">
   <span>
-      <div class="heading">Profit<b>:</b></div>
+      <div class="heading">{{ languageArray.profit }}<b>:</b></div>
       <div class="value">{{ value.profit | currency:"$":2 }}</div>
   </span>
 </div>
 
 <div class="tb-cell profirper-report  ">
-  <span><div class="heading"> Profit Percent <b>:</b></div>
+  <span><div class="heading"> {{ languageArray.profitper }} <b>:</b></div>
       <div class="value">{{ value.overallTotalProfitPercent }} </div>
   </span>
 </div>
 
 <div class="tb-cell miles-report  ">
-  <span><div class="heading"> Miles <b>:</b></div>
+  <span><div class="heading"> {{ languageArray.planthmiles }} <b>:</b></div>
       <div class="value">{{ value.miles }} </div>
   </span>
 </div>
 
 <div class="tb-cell dmiles-report  ">
   <span>
-      <div class="heading"> DeadMiles <b>:</b></div>
+      <div class="heading"> {{ languaageArray.deadMiles }} <b>:</b></div>
       <div class="value">{{ value.deadmiles }} </div>
   </span>
 </div>
 
 <div class="tb-cell rpm-report ">
   <span>
-      <div class="heading">RPM<b>:</b></div>
+      <div class="heading">{{ laguageArray.planthrpm }}<b>:</b></div>
       <div class="value">{{ value.miles != 0 ? (value.invoice / value.miles | currency:"$":2) : '' }}</div>
   </span>
 </div>
 
 <div class="tb-cell pickup-report">
   <span>
-      <div class="heading">Pickup <b>:</b></div>
+      <div class="heading">{{ langaugeArray.popuppickup }} <b>:</b></div>
       <div class="value">{{ (value.PickupDate != '0000-00-00' && value.PickupDate != '' ) ? value.PickupDate : ''}}</div>
   </span>
 </div>
 
 <div class="tb-cell origin-report">
   <span>
-      <div class="heading">Origin <b>:</b></div>
+      <div class="heading">{{ langauaeArray.planthorigin }} <b>:</b></div>
       <div class="value">{{ value.OriginCity|capitalize}}</div>
   </span>
 </div>
 
 <div class="tb-cell originst-report">
   <span>
-      <div class="heading">ST <b>:</b></div>
+      <div class="heading">{{ languageArray.planthst }} <b>:</b></div>
       <div class="value">{{ value.OriginState|capitalize}}</div>
   </span>
 </div>
 
 <div class="tb-cell del-report">
   <span>
-      <div class="heading">Del Date<b>:</b></div>
+      <div class="heading">{{ languageArray.deliverydate }}<b>:</b></div>
       <div class="value">{{ (value.DeliveryDate != '0000-00-00' && value.DeliveryDate != '' ) ? value.DeliveryDate : ''}}</div>
   </span>
 </div>
 
 <div class="tb-cell delivery-report ">
   <span>
-      <div class="heading"> Destination <b>:</b></div>
+      <div class="heading"> {{ languageArray.planthdesti }} <b>:</b></div>
       <div class="value">{{ value.DestinationCity|capitalize}}</div>
   </span>
 </div>
 
 <div class="tb-cell destst-report ">
   <span>
-      <div class="heading"> ST <b>:</b></div>
+      <div class="heading"> { languageArray.planthst }}  <b>:</b></div>
       <div class="value">{{ value.DestinationState|uppercase}}</div>
   </span>
 </div>
@@ -651,7 +651,7 @@
 </div>
 <!--open-block-->
 </div>
-<div ng-show="haveRecords" class="no-record-found">Oops! No record found</div>
+<div ng-show="haveRecords" class="no-record-found">{{ languageArray.noRecordFound }}</div>
 
 </div>
 </div><!-- table-structure-main-block -->

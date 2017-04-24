@@ -9,6 +9,7 @@ app.controller('aclController', ["dataFactory","$scope","$http","$rootScope", "$
 	$scope.deleteMessage 	='';
 	$scope.organisations = getOrganisations.data;
 
+
 }]);
 
 app.controller('aclManage', ["dataFactory","$scope","$http","$rootScope", "$state","$location","$cookies","$stateParams", "getAction","$compile","$filter","$log", 'Sample', 'ganttMouseOffset', 'ganttDebounce', 'moment','$q','$window','$sce','$timeout',function(dataFactory,$scope,$http ,$rootScope ,$state, $location ,  $cookies, $stateParams, getAction , $compile,$filter,$log,utils, Sample, mouseOffset, debounce, moment,$q,$window,$sce,$timeout){
@@ -16,10 +17,11 @@ app.controller('aclManage', ["dataFactory","$scope","$http","$rootScope", "$stat
 	if($rootScope.loggedInUser == false)
 		$location.path('login');
 	
-	$scope.alertmsg 		='';	
-	$scope.alertdeletemsg 	='';
-	$scope.message 		 	='';	
-	$scope.deleteMessage 	='';
+	$scope.alertmsg 		= '';	
+	$scope.alertdeletemsg 	= '';
+	$scope.message 		 	= '';	
+	$scope.deleteMessage 	= '';
+
 	$scope.getAction = getAction.data;
 
 
@@ -30,12 +32,19 @@ app.controller('roleManage', ["dataFactory","$scope","$http","$rootScope", "$sta
 	if($rootScope.loggedInUser == false)
 		$location.path('login');
 	
-	$scope.alertmsg 		='';	
-	$scope.alertdeletemsg 	='';
-	$scope.message 		 	='';	
-	$scope.deleteMessage 	='';
+	$scope.alertmsg 		= '';	
+	$scope.alertdeletemsg 	= '';
+	$scope.message 		 	= '';	
+	$scope.deleteMessage 	= '';
+	$scope.aclData			= getRoles.data;
+	$scope.currentuserid 	= getRoles.currentUserId;
+	$scope.superadmin 		= getRoles.superadmin;
+	
+	if($state.current.name == 'editrole'){
+		$scope.aclData 	= getRoles.data[0];
+	}
 
-	$scope.aclData	= getRoles.data;
+
 	$scope.addrole = function(){
 		dataFactory.httpRequest(URL + '/acl/addroles/','POST',{},{data:$scope.aclData,srcPage:$rootScope.srcPage}).then(function(data) {
 			$scope.message 	= 'Role added successfully.';

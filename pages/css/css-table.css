@@ -474,6 +474,52 @@ body .dataTables_paginate ul {
 .tb-cell.shipper-dead-miles {    width: 119px;}
 .tb-head {    border-bottom: 3px solid #0784DC!important;    padding: 3px 0;}
 .shipper-control-table .tb-cell.action {    width: 148px;}
+
+.load-delivertable .tb-cell.ld-id  ,
+.load-delivertable .tb-cell.Invoice-No  ,
+.load-delivertable .tb-cell.staus ,
+.load-delivertable .tb-cell.pickup,
+.load-delivertable .tb-cell.delivery ,
+.load-delivertable .tb-cell.fl ,
+.load-delivertable .tb-cell.Driver ,
+.load-delivertable .tb-cell.Origin,
+.load-delivertable .tb-cell.st ,
+.load-delivertable .tb-cell.Destination ,
+.load-delivertable .tb-cell.st1 ,
+.load-delivertable .tb-cell.miles ,
+.load-delivertable .tb-cell.d-miles,
+.load-delivertable .tb-cell.ppm ,
+.load-delivertable .tb-cell.payment,
+.load-delivertable .tb-cell.company,
+.load-delivertable .tb-cell.source
+{
+display:inline-block;
+float: left;
+}
+.load-delivertable .open-block .tb-cell.ld-id  ,
+.load-delivertable .open-block .tb-cell.Invoice-No  ,
+.load-delivertable .open-block .tb-cell.staus ,
+.load-delivertable .open-block .tb-cell.pickup,
+.load-delivertable .open-block .tb-cell.delivery ,
+.load-delivertable .open-block .tb-cell.fl ,
+.load-delivertable .open-block .tb-cell.Driver ,
+.load-delivertable .open-block .tb-cell.Origin,
+.load-delivertable .open-block .tb-cell.st ,
+.load-delivertable .open-block .tb-cell.Destination ,
+.load-delivertable .open-block .tb-cell.st1 ,
+.load-delivertable .open-block .tb-cell.miles ,
+.load-delivertable .open-block .tb-cell.d-miles,
+.load-delivertable .open-block .tb-cell.ppm ,
+.load-delivertable .open-block .tb-cell.payment,
+.load-delivertable .open-block .tb-cell.company,
+.load-delivertable .open-block .tb-cell.source,
+.load-delivertable .open-block .tb-cell.action
+{
+display:none;
+}
+.load-delivertable .tb-cell.source {
+    width: 190px;
+}
 @media (min-width:2500px){
 .tb-my .tb-cell {
   display: table-cell;
@@ -534,6 +580,28 @@ body .dataTables_paginate ul {
   display: table;
   width: 100%;
 }
+
+.load-delivertable .tb-cell.ld-id  ,
+.load-delivertable .tb-cell.Invoice-No  ,
+.load-delivertable .tb-cell.staus ,
+.load-delivertable .tb-cell.pickup,
+.load-delivertable .tb-cell.delivery ,
+.load-delivertable .tb-cell.fl ,
+.load-delivertable .tb-cell.Driver ,
+.load-delivertable .tb-cell.Origin,
+.load-delivertable .tb-cell.st ,
+.load-delivertable .tb-cell.Destination ,
+.load-delivertable .tb-cell.st1 ,
+.load-delivertable .tb-cell.miles ,
+.load-delivertable .tb-cell.d-miles,
+.load-delivertable .tb-cell.ppm ,
+.load-delivertable .tb-cell.payment,
+.load-delivertable .tb-cell.company,
+.load-delivertable .tb-cell.source,
+.load-delivertable .tb-cell.action
+{
+display:table-cell;float:none;
+}
 }
 @media (max-width:2200px){
 .report-section.tb-my .tb-cell {
@@ -553,6 +621,10 @@ body .dataTables_paginate ul {
 .report-section.tb-my .ld-id span{padding-left:0px;}
 .shipper-control-table .open-block .tb-cell{display:none;}
 
+.load-delivertable .tb-cell.ld-id, .load-delivertable .tb-cell.Invoice-No, .load-delivertable .tb-cell.staus, .load-delivertable .tb-cell.pickup, .load-delivertable .tb-cell.delivery, .load-delivertable .tb-cell.fl, .load-delivertable .tb-cell.Driver, .load-delivertable .tb-cell.Origin, .load-delivertable .tb-cell.st, .load-delivertable .tb-cell.Destination, .load-delivertable .tb-cell.st1, .load-delivertable .tb-cell.miles, .load-delivertable .tb-cell.d-miles, .load-delivertable .tb-cell.ppm, .load-delivertable .tb-cell.payment, .load-delivertable .tb-cell.company, .load-delivertable .tb-cell.source, .load-delivertable .tb-cell.action {
+  display: inline-block;
+  float: left;
+}
 }
 /*
 @media (min-width:2530px){
@@ -700,8 +772,8 @@ body .dataTables_paginate ul {
 .open-block .tb-cell.fuel-cost-plan{display:block;}
 .tb-cell.weight{display:none;}
 .open-block .tb-cell.weight{display:block;}
-
-
+.load-delivertable .tb-cell.source{display:none;}
+.load-delivertable .open-block .tb-cell.source{display:inline-none;}
 }
 @media (max-width:1960px){
 
@@ -732,6 +804,17 @@ body .dataTables_paginate ul {
 
 .tb-cell.miles-bill{display:none;}
 .open-block .tb-cell.miles-bill{display:block;}
+
+
+.load-delivertable .tb-cell.source
+{
+display:none;
+}
+.load-delivertable .open-block  .tb-cell.source
+{
+display:inline-block;
+}
+.load-delivertable .tb-cell.action{float:right;}
 
 }
 @media (max-width:1765px){

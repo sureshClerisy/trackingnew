@@ -3,13 +3,13 @@
 /**
 * 
 */
-class AclModel extends CI_Model {
+class AclModel extends Parent_Model {
 	
 	private $controller;
 	private $action;
 	private $controllerID;
 	private $dateTime;
-
+	
 	function __construct() {
 		parent::__construct();
 		$this->dateTime = date('Y-m-d H:m:s');
@@ -75,17 +75,26 @@ class AclModel extends CI_Model {
 		return $this->db->select('*')->limit(30)->get('acl_actions')->result_array();
 	}
 
-	public function getRoles($organisationID = null){
+	public function getRoles($roleID = null){
+
+		
+
 		$this->db->select('roles.*,users.username')
 				 ->join("users", "users.id = roles.user_id");
-		if(!empty($organisationID)){
-			$this->db->where('roles.id',$organisationID);
+		
+		if(!empty($roleID)){
+			$this->db->where('roles.id',$roleID);
+		}
+
+		if(empty($this->superAdminId)){
+			$this->db->where('roles.user_id',$this->userID);
+			$this->db->or_where('roles.id',$this->role);
 		}
 		
 		$data = $this->db->limit(30)
 				 ->get('roles')
 				 ->result_array();
-				 
+
 		return $data;
 	}	
 
@@ -100,10 +109,16 @@ class AclModel extends CI_Model {
 	}
 	
 	public function addRole($data){
-		// ex($data);
+		
+		$dateTime 	= date('Y-m-d h:m:s');
+		$filterData = [
+						'name'=>$data['data']['name'],
+						'alias'=>$data['data']['alias'],
+						'user_id'=>$this->session->loggedUser_id,
+						'created'=>$dateTime,
+						'updated'=>$dateTime
+					];
 
-		$dateTime = date('Y-m-d h:m:s');
-		$filterData = ['name'=>$data['data']['name'],'alias'=>$data['data']['alias'],'user_id'=>$this->session->loggedUser_id,'created'=>$dateTime,'updated'=>$dateTime];
 		$this->db->insert('roles',$filterData);
 	}
 }

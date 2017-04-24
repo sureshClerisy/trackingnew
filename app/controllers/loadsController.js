@@ -22,7 +22,7 @@ app.controller('loadsController', ["dataFactory","$scope","$http","$rootScope", 
 		$rootScope.editSavedLoad.Stops = item.key;
 	};
 
-	
+	console.log(getAllLoads);
 
 	//----------drop-down ---------------------------	
 
@@ -62,7 +62,15 @@ app.controller('loadsController', ["dataFactory","$scope","$http","$rootScope", 
 	$rootScope.Docs = [];
 	$scope.vDriversList = [];
 	$scope.dateRangeSelector = {};
-	if( getAllLoads.filterArgs.requestFrom   != undefined && getAllLoads.filterArgs.filterType != "withoutTruck" ){ $scope.showCalendar = false; }
+
+	if( getAllLoads.filterArgs.requestFrom != undefined && getAllLoads.filterArgs.filterType != "withoutTruck" ){
+		$scope.showCalendar = false; 
+	}
+
+	if( getAllLoads.filterArgs.userType != undefined && getAllLoads.filterArgs.userType == "pastLoadsIncomplete" ){
+		$scope.showCalendar = false; 
+	}
+
 
 	if(getAllLoads.filterArgs.startDate != undefined){
 		$scope.dateRangeSelector.startDate = getAllLoads.filterArgs.startDate; 	

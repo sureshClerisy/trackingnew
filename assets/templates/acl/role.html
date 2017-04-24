@@ -41,22 +41,22 @@
   										<tr ng-repeat="value in aclData">
   											<td>{{value.name}}</td>
                                             <td>{{value.alias}}</td>
-  											<td>{{value.username}}</td>
+  											<td>{{value.username}}{{supeadmin}}</td>
   											<td class="text-center action-btn-ryt"> 
   												<div class="export-options-container">
   													<div class="exportOptions">
-  														<div class="DTTT btn-group">
-  															<a href="#/editrole/{{value.id}}" class="btn btn-default DTTT_button_pdf" data-original-title="{{languageCommonVariables.editRole}}" ui-jq="tooltip" >
+  														<div class="DTTT btn-group" >
+  															<a href="#/editrole/{{value.id}}" ng-disabled="currentuserid != value.user_id && superadmin != 1" class="btn btn-default DTTT_button_pdf" data-original-title="{{languageCommonVariables.editRole}}" ui-jq="tooltip" >
   																<span>
                                                                     <i class="fa fa-edit" aria-hidden="true"></i>
                                                                 </span>
   															</a>
-  															<a class="btn btn-default" title="{{languageCommonVariables.deleteRole}}" ui-jq="tooltip" ng-click='removeRole(value.id,$index)' >
+  															<a class="btn btn-default" ng-disabled="currentuserid != value.user_id && superadmin != 1" title="{{languageCommonVariables.deleteRole}}" ui-jq="tooltip" ng-click='removeRole(value.id,$index)' >
   																<span>
                                                                     <i class="fa fa-trash" aria-hidden="true"></i>
                                                                 </span>
   															</a>
-  															<a href="#/manage/{{value.id}}" class="btn btn-default DTTT_button_csv" title="Manage Permissions" ui-jq="tooltip">
+  															<a href="#/manage/{{value.id}}" ng-disabled="currentuserid != value.user_id && superadmin != 1" class="btn btn-default DTTT_button_csv" title="Manage Permissions" ui-jq="tooltip">
   																<span><i class="fa fa-cog"></i></span>
   															</a>
   														</div>

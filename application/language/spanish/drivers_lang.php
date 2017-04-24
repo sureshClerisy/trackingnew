@@ -15,7 +15,8 @@ $lang['driversHeading'] = 'conductores';
 $lang['driverName']	= 'Nombre';		
 $lang['drivertrucknum']	= 'Numero de camion';	
 $lang['driveroperatorlic'] = 'Licencia de Operador';
-$lang['dispatcher'] = 'Transportista'; 
+$lang['dispatcher'] = 'Transportista';
+$lang['export'] = 'Exportar'; 
 /** Drivers listing Page */
 
 /** Drivers Add Page */
@@ -36,4 +37,5 @@ $lang['driverlocation'] = 'Ubicación';
 $lang['driverprofileimg'] = 'Imagen de perfil'; 
 $lang['driveraddress'] = 'Dirección'; 
 $lang['driveraddressPlaceholder'] = 'Introduzca la dirección';
+$lang['selectdispatcher'] = 'Seleccione Dispatcher';
 /** Drivers Add Page */

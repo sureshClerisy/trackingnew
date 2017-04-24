@@ -320,7 +320,7 @@ app.controller('addDriversController', function(dataFactory,$scope, PubNub, $htt
 		}
 
 		$scope.addDriversData.address=document.getElementById('pac-input').value;
-		var file = $scope.myFile;
+			var file = $scope.myFile;
 			var fd = new FormData();
             var data = JSON.stringify($scope.addDriversData);
             fd.append('profile_image', file);

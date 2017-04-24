@@ -79,11 +79,12 @@ app.controller('AdminController', function($scope,$interval, $document,$timeout,
 
 
    $scope.showRecordsWithFilter = function(type,page, disType, username, dispatcherId, secondDriverId,extra){
+   
         if(type != undefined && type == 'idleloads'){
                 disType = (extra.team_driver_id == 0 || extra.team_driver_id == "" ) ? 'driver' : 'team';
             args = "filterType=idle&userType="+disType+"&driverId="+extra.driver_id+"&secondDriverId="+extra.team_driver_id+"&cilckedEntity="+extra.driverName;
             $state.go(page, { 'key': 'drivers', q:args, type:true }, { reload: true } );
-        }else if ( type != undefined && type == 'broker' ) {
+        } else if ( type != undefined && type == 'broker' ) {
             var brokerId = page;
             args = "userType="+type+"&userToken="+brokerId+"&dispatcherId="+dispatcherId+"&driverId="+username+"&secondDriverId="+secondDriverId+"&startDate="+$scope.dateRangeSelector.startDate+"&endDate="+$scope.dateRangeSelector.endDate;
             $state.go('loads', { 'key': 'broker', q:args, type:true }, { reload: true } );
@@ -114,29 +115,32 @@ app.controller('AdminController', function($scope,$interval, $document,$timeout,
                         args = "filterType="+type+"&userType=dispatcher&userToken="+tempBuffer.dispId;
                     }
 
-                }else  if(tempBuffer.vid !="" && tempBuffer.vid != undefined ){
+                } else  if(tempBuffer.vid !="" && tempBuffer.vid != undefined ){
                     keyParam = tempBuffer.driverName.toLowerCase().replace(/[\s+]/g, '');
                     if(tempBuffer.label == "_team"){
                         args = "filterType="+type+"&userType=team&userToken="+tempBuffer.id+"&secondDriverId="+tempBuffer.team_driver_id+"&dispId="+tempBuffer.dispId;
                     }else{
                         args = "filterType="+type+"&userType=driver&userToken="+tempBuffer.id+"&dispId="+tempBuffer.dispId;
                     }
-                }else{
+                } else {
                     args = "filterType="+type+"&userType=all";keyParam = "all";
                 }
 
             if( type == "withoutTruck"  || type == "trucksWithoutDriver" || type == "trucksReporting"){
                 keyParam = type;    
-                //args += "&fromDate="+extra ;
-            }else if(keyParam != "" && ( extra == "" || extra == undefined )  ){
+            } else if (type == 'pastLoadsIncomplete') {
+                var newParam = keyParam.split('&fromDate');
+                keyParam = newParam[0];
+            } else if(keyParam != "" && ( extra == "" || extra == undefined )  ){
                 args += "&startDate="+$scope.dateRangeSelector.startDate+"&endDate="+$scope.dateRangeSelector.endDate;
-            }else if(extra != undefined){
+            } else if(extra != undefined){
                 args += "&fromDate="+extra.date ;
                 keyParam = "drivers";    
                 if(extra.type == 'idle'){
                     keyParam = extra.type;  
                 }
             }
+           
             $state.go(page, { 'key': keyParam, q:args, type:true }, { reload: true } );
         }
     }
@@ -152,7 +156,7 @@ app.controller('AdminController', function($scope,$interval, $document,$timeout,
         yAxis: {
             min: 0,
             title: {
-                text: 'Values'
+                text: $rootScope.languageCommonVariables.values
             }
         },
         plotOptions: {
@@ -188,7 +192,6 @@ app.controller('AdminController', function($scope,$interval, $document,$timeout,
     * Top five customers highchart
     */
 
-// ["five","four","three","two","one"]
     $scope.topCustomersConfig = {
         chart: { type: 'line' },
         xAxis:{
@@ -258,7 +261,8 @@ app.controller('AdminController', function($scope,$interval, $document,$timeout,
             globalDash.activeDriversWTruck    = data.totalDrivers;
             globalDash.activeDriversDate      = data.todayDate;
             globalDash.trucksNotReporting     = data.trucksNotReporting;
-            globalDash.vehiclesWithoutDriver   = data.vehiclesWithoutDriver;
+            globalDash.vehiclesWithoutDriver  = data.vehiclesWithoutDriver;
+            globalDash.pastLoadsIncomplete    = data.pastLoadsIncomplete;
             
         });         
 
@@ -694,27 +698,27 @@ app.controller('AdminController', function($scope,$interval, $document,$timeout,
             ];
 
             switch($scope.typeOfData){
-                case "_iall"        : $scope.fColumn = $scope.languageArray.dispatcher; $scope.skipClick = true;break;
-                case "_idispatcher" : $scope.fColumn = $scope.languageArray.driver; $scope.skipClick = true;break;
+                case "_iall"        : $scope.fColumn = $rootScope.languageArray.dispatcher; $scope.skipClick = true;break;
+                case "_idispatcher" : $scope.fColumn = $rootScope.languageArray.driver; $scope.skipClick = true;break;
                 case "_iteam"       :
-                case "_idriver"     : $scope.fColumn = $scope.languageArray.loadno; $scope.skipClick = false;break;
-                default             : $scope.fColumn = $scope.languageArray.dispatcher;$scope.skipClick = true;break;
+                case "_idriver"     : $scope.fColumn = $rootScope.languageArray.loadno; $scope.skipClick = false;break;
+                default             : $scope.fColumn = $rootScope.languageArray.dispatcher;$scope.skipClick = true;break;
             }
             $scope.chartConfig.xAxis    = { categories: data.chartStack.xaxis };
             if ( $scope.typeOfData == '_iteam' || $scope.typeOfData == '_idriver') {
                 $scope.chartConfig.series   = [
-                    {"name": "Profit",    "data" : data.chartStack.profitAmount, type: "column", id: 's5', color : '#90ED7D'},
-                    {"name": "Charges",   "data" : data.chartStack.charges,      type: "column", id: 's4', color : '#5C5C61'},
+                    {"name":  $rootScope.languageCommonVariables.profit,    "data" : data.chartStack.profitAmount, type: "column", id: 's5', color : '#90ED7D'},
+                    {"name":  $rootScope.languageCommonVariables.charges,   "data" : data.chartStack.charges,      type: "column", id: 's4', color : '#5C5C61'},
                 ];
             } else {
                 $scope.chartConfig.series   = [
-                    {"name": "Profit",    "data" : data.chartStack.profitAmount, type: "column", id: 's5', color : '#90ED7D'},
-                    {"name": "Charges",   "data" : data.chartStack.charges,      type: "column", id: 's4', color : '#5C5C61'},
-                    {"name": "Goal", "data" : data.chartStack.goalsAchievement, type: 'spline', id: 's6', color : '#95CEFF'},
+                    {"name":  $rootScope.languageCommonVariables.profit,    "data" : data.chartStack.profitAmount, type: "column", id: 's5', color : '#90ED7D'},
+                    {"name":  $rootScope.languageCommonVariables.charges,   "data" : data.chartStack.charges,      type: "column", id: 's4', color : '#5C5C61'},
+                    {"name":  $rootScope.languageCommonVariables.goal, "data" : data.chartStack.goalsAchievement, type: 'spline', id: 's6', color : '#95CEFF'},
                 ];
             }
             // -------------- Stacked Chart Update ------------------
-            /********** for getting selected driver label - r288****/
+         
             $scope.weatherNotFound = data.weatherNotFound.status;
             if($scope.weatherNotFound){
                 $scope.weatherStatus = true;  
@@ -725,10 +729,10 @@ app.controller('AdminController', function($scope,$interval, $document,$timeout,
                $scope.weatherShow = true;
            }
            var chartData = [];
-           chartData.push({name:'Delivered',y:data.loadsChart.delivered });
-           chartData.push({name:'Booked',y:data.loadsChart.booked });
-           chartData.push({name:'In-progress',y:data.loadsChart.inprogress });
-           chartData.push({name:'No-loads',y:data.loadsChart.noLoads });
+           chartData.push({name:$rootScope.languageArray.loadstatusdelivered,y:data.loadsChart.delivered });
+           chartData.push({name:$rootScope.languageArray.loadstatusbooked,y:data.loadsChart.booked });
+           chartData.push({name:$rootScope.languageArray.loadstatusinprogress,y:data.loadsChart.inprogress });
+           chartData.push({name:$rootScope.languageArray.loadstatusnoloads,y:data.loadsChart.noLoads });
            $scope.drawMatrix("delivery_matrix",chartData,'Loads');
 
             // ---------------------------------------
@@ -778,17 +782,17 @@ $scope.print_xl =function(){
     }
 
     if (typeof $scope.PrintchartStack[0].pickDate !== 'undefined') {
-        ext_head = '<th style="padding:15px 7px;color:#363636; ">LOAD</th><th style="padding:15px 7px;color:#363636; ">PICKUP DATE</th><th style="padding:15px 7px;color:#363636; ">DELIVERY DATE</th>';
+        ext_head = '<th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.loadno+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.pickupdate+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.deliverdate+'</th>';
         total_row = total_row + '<td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+tot_var+'</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "></td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "></td>';
         tot_var = "";
     }
     var cont = '<table cellpadding="0" cellspacing="0" style="width:1170px; margin:0px auto;padding:0px;font-family:arial;padding:30px 0px 0px;"><thead><tr style="background:#f1f1f1;  text-transform: uppercase;font-size:12px; text-align:left;">' + ext_head;
     
     if ($scope.typeOfData === "_idispatcher") {
-        cont = cont + '<th style="padding:15px 7px;color:#363636; ">Driver</th>';
+        cont = cont + '<th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.driver+'</th>';
         total_row = total_row + '<td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; " >'+tot_var+'</td>';
     } else {
-        cont = cont + '<th style="padding:15px 7px;color:#363636; ">DISPATCHER</th>';
+        cont = cont + '<th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.dispatcher+'</th>';
         total_row = total_row + '<td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+tot_var+'</td>';
     }
 
@@ -796,7 +800,7 @@ $scope.print_xl =function(){
         cont = cont + '<th style="padding:15px 7px;color:#363636; ">$-Goals</th><th style="padding:15px 7px;color:#363636; ">Mile-Goals</th>';
     }
 
-    cont = cont + '<th style="padding:15px 7px;color:#363636; ">MILES</th><th style="padding:15px 7px;color:#363636; ">DEAD MILES</th><th style="padding:15px 7px;color:#363636; ">INVOICED</th><th style="padding:15px 7px;color:#363636; ">CHARGES</th><th style="padding:15px 7px;color:#363636; ">PROFIT</th><th style="padding:15px 7px;color:#363636; ">PROFIT %</th></tr></thead></tbody>';
+    cont = cont + '<th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.miles+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.deadmiles+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.invoiced+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.charges+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.profit+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.profit+' %</th></tr></thead></tbody>';
     var innerContents = "";
     var $goals = $goalsProfit = mileGoals = mileGoalsProfit = miles = deadMiles = booked = charged = profit = profitPercent = 0;
 
@@ -909,7 +913,7 @@ $scope.print_xl =function(){
     
     var total_row_all = total_row + '<td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + miles.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,") + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + deadMiles.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,") + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + booked.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,") + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + charged.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,") + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + profit.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,") + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + profitPercent.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,") + ' %</td></tr>';
     cont = cont + innerContents + total_row_all + "</tbody></table>";
-    $scope.print_function(cont, 'Loads Tracking');  
+    $scope.print_function(cont, $rootScope.languageArray.leaderboard);  
 }
 
 
@@ -931,10 +935,10 @@ $scope.print_todayInsights = function(){
     dataFactory.httpRequest(URL + '/dashboard/getTodayReport/booked', 'POST', {}, data).then(function(data) {
         if (data.todayReport.length != 0) {
             console.log(data);
-            html = html + "</br><table cellpadding='0' cellspacing='0' style='width:1170px; margin:0px auto;padding:0px;font-family:arial;padding:30px 0px 15px;'><tr><td><h3 style='font-size:18px;margin:0px; padding:0px;'>Booked</h3></td></tr></table>";
+            html = html + "</br><table cellpadding='0' cellspacing='0' style='width:1170px; margin:0px auto;padding:0px;font-family:arial;padding:30px 0px 15px;'><tr><td><h3 style='font-size:18px;margin:0px; padding:0px;'>"+$rootScope.languageArray.pickup+"</h3></td></tr></table>";
             html = html + '<table cellpadding="0" cellspacing="0" style="width:1170px; margin:0px auto;padding:0px;font-family:arial;padding:30px 0px 0px;"><thead>';
             html = html + '<tr style="background:#f1f1f1;  text-transform: uppercase;font-size:12px; text-align:left;">';
-            html = html + '<th style="padding:15px 7px;color:#363636; ">Driver</th><th style="padding:15px 7px;color:#363636; ">truck</th><th style="padding:15px 7px;color:#363636; ">Dispatcher</th><th style="padding:15px 7px;color:#363636; ">Pickup</th><th style="padding:15px 7px;color:#363636; ">Delivery</th><th style="padding:15px 7px;color:#363636; ">Origin</th><th style="padding:15px 7px;color:#363636; ">ST</th><th style="padding:15px 7px;color:#363636; ">Destination</th><th style="padding:15px 7px;color:#363636; ">ST</th><th style="padding:15px 7px;color:#363636; ">Payment</th><th style="padding:15px 7px;color:#363636; ">RPM</th><th style="padding:15px 7px;color:#363636; ">Miles</th><th style="padding:15px 7px;color:#363636; ">Dead Miles</th><th style="padding:15px 7px;color:#363636; "><span style="min-width:250px; float:left;">Company Name</span></th></tr></thead><tbody>';
+            html = html + '<th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.driver+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.truck+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.dispatcher+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.pickup+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.delivery+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.origin+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.st+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.destination+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.st+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.payment+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.rpm+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.miles+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.deadmiles+'</th><th style="padding:15px 7px;color:#363636; "><span style="min-width:250px; float:left;">'+$rootScope.languageArray.company+'</span></th></tr></thead><tbody>';
             var rPayment = rRPM = rMileage = rDeadMile = 0;
             angular.forEach(data.todayReport, function(value, key) {
                 html = html + '<tr style=" text-transform: uppercase;font-size:12px; "><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + value.driverName + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + value.truckName + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + value.dispatcher + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + value.PickupDate + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + value.DeliveryDate + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + value.OriginCity + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + value.OriginState + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + value.DestinationCity + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + value.DestinationState + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">$' + parseFloat(value.PaymentAmount).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,") + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">$' + parseFloat(parseInt(value.RPM * 100)) / 100 + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + parseInt(value.Mileage).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,") + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + parseInt(value.deadmiles).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,") + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "><span style="min-width:250px; float:left;">' + value.companyName + '</span></td><tr>';
@@ -948,10 +952,10 @@ $scope.print_todayInsights = function(){
     });
     dataFactory.httpRequest(URL + '/dashboard/getTodayReport/inprogress', 'POST', {}, data).then(function(data) {
         if (data.todayReport.length != 0) {
-            html = html + "</br></br><table cellpadding='0' cellspacing='0' style='width:1170px; margin:0px auto;padding:0px;font-family:arial;padding:30px 0px 15px;'><tr><td><h3 style='font-size:18px;margin:0px; padding:0px;'>In Progress</h3></td></tr></table>";
+            html = html + "</br></br><table cellpadding='0' cellspacing='0' style='width:1170px; margin:0px auto;padding:0px;font-family:arial;padding:30px 0px 15px;'><tr><td><h3 style='font-size:18px;margin:0px; padding:0px;'>"+$rootScope.languageArray.inprogress+"</h3></td></tr></table>";
             html = html + '<table cellpadding="0" cellspacing="0" style="width:1170px; margin:0px auto;padding:0px;font-family:arial;padding:30px 0px 0px;"><thead>';
             html = html + '<tr style="background:#f1f1f1;  text-transform: uppercase;font-size:12px; text-align:left;">';
-            html = html + '<th style="padding:15px 7px;color:#363636; ">Driver</th><th style="padding:15px 7px;color:#363636; ">truck</th><th style="padding:15px 7px;color:#363636; ">Dispatcher</th><th style="padding:15px 7px;color:#363636; ">Pickup</th><th style="padding:15px 7px;color:#363636; ">Delivery</th><th style="padding:15px 7px;color:#363636; ">Origin</th><th style="padding:15px 7px;color:#363636; ">ST</th><th style="padding:15px 7px;color:#363636; ">Destination</th><th style="padding:15px 7px;color:#363636; ">ST</th><th style="padding:15px 7px;color:#363636; ">Payment</th><th style="padding:15px 7px;color:#363636; ">RPM</th><th style="padding:15px 7px;color:#363636; ">Miles</th><th style="padding:15px 7px;color:#363636; ">Dead Miles</th><th style="padding:15px 7px;color:#363636; "><span style="min-width:250px; float:left;">Company Name</span></th></tr></thead><tbody>';
+            html = html + '<th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.driver+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.truck+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.dispatcher+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.pickup+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.delivery+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.origin+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.st+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.destination+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.st+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.payment+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.rpm+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.miles+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.deadmiles+'</th><th style="padding:15px 7px;color:#363636; "><span style="min-width:250px; float:left;">'+$rootScope.languageArray.company+'</span></th></tr></thead><tbody>';
             var rPayment = rRPM = rMileage = rDeadMile = 0;
             angular.forEach(data.todayReport, function(value, key) {
                 html = html + '<tr style="text-transform: uppercase;font-size:12px; "><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + value.driverName + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + value.truckName + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + value.dispatcher + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + value.PickupDate + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + value.DeliveryDate + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + value.OriginCity + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + value.OriginState + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + value.DestinationCity + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + value.DestinationState + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">$' + parseFloat(value.PaymentAmount).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,") + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">$' + parseFloat(parseInt(value.RPM * 100)) / 100 + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + parseInt(value.Mileage).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,") + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + parseInt(value.deadmiles).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,") + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "><span style="min-width:250px; float:left;">' + value.companyName + '</span></td><tr>';
@@ -965,10 +969,10 @@ $scope.print_todayInsights = function(){
     });
     dataFactory.httpRequest(URL + '/dashboard/getTodayReport/delivery', 'POST', {}, data).then(function(data) {
         if (data.todayReport.length != 0) {
-            html = html + "</br></br><table cellpadding='0' cellspacing='0' style='width:1170px; margin:0px auto;padding:0px;font-family:arial;padding:30px 0px 15px;'><tr><td><h3 style='font-size:18px;margin:0px; padding:0px;'>Deliverey</h3></td></tr></table>";
+            html = html + "</br></br><table cellpadding='0' cellspacing='0' style='width:1170px; margin:0px auto;padding:0px;font-family:arial;padding:30px 0px 15px;'><tr><td><h3 style='font-size:18px;margin:0px; padding:0px;'>"+$rootScope.languageArray.delivery+"</h3></td></tr></table>";
             html = html + '<table cellpadding="0" cellspacing="0" style="width:1170px; margin:0px auto;padding:0px;font-family:arial;padding:30px 0px 0px;"><thead>';
             html = html + '<tr style="background:#f1f1f1;  text-transform: uppercase;font-size:12px; text-align:left;">';
-            html = html + '<th style="padding:15px 7px;color:#363636; ">Driver</th><th style="padding:15px 7px;color:#363636; ">truck</th><th style="padding:15px 7px;color:#363636; ">Dispatcher</th><th style="padding:15px 7px;color:#363636; ">Pickup</th><th style="padding:15px 7px;color:#363636; ">Delivery</th><th style="padding:15px 7px;color:#363636; ">Origin</th><th style="padding:15px 7px;color:#363636; ">ST</th><th style="padding:15px 7px;color:#363636; ">Destination</th><th style="padding:15px 7px;color:#363636; ">ST</th><th style="padding:15px 7px;color:#363636; ">Payment</th><th style="padding:15px 7px;color:#363636; ">RPM</th><th style="padding:15px 7px;color:#363636; ">Miles</th><th style="padding:15px 7px;color:#363636; ">Dead Miles</th><th style="padding:15px 7px;color:#363636; "><span style="min-width:250px; float:left;">Company Name</span></th></tr></thead><tbody>';
+            html = html + '<th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.driver+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.truck+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.dispatcher+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.pickup+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.delivery+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.origin+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.st+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.destination+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.st+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.payment+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.rpm+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.miles+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.deadmiles+'</th><th style="padding:15px 7px;color:#363636; "><span style="min-width:250px; float:left;">'+$rootScope.languageArray.company+'</span></th></tr></thead><tbody>';
             var rPayment = rRPM = rMileage = rDeadMile = 0;
             angular.forEach(data.todayReport, function(value, key) {
                 html = html + '<tr style="text-transform: uppercase;font-size:12px; "><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + value.driverName + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + value.truckName + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + value.dispatcher + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + value.PickupDate + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + value.DeliveryDate + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + value.OriginCity + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + value.OriginState + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + value.DestinationCity + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + value.DestinationState + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">$' + parseFloat(value.PaymentAmount).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,") + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">$' + parseFloat(parseInt(value.RPM * 100)) / 100 + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + parseInt(value.Mileage).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,") + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">' + parseInt(value.deadmiles).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,") + '</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "><span style="min-width:250px; float:left;">' + value.companyName + '</span></td><tr>';
@@ -984,10 +988,10 @@ $scope.print_todayInsights = function(){
 
         if (data.todayReport.length != 0) {
             console.log(data);
-            html = html + "</br></br><table cellpadding='0' cellspacing='0' style='width:1170px; margin:0px auto;padding:0px;font-family:arial;padding:30px 0px 15px;'><tr><td><h3 style='font-size:18px;margin:0px; padding:0px;'>Idle</h3></td></tr></table>";
+            html = html + "</br></br><table cellpadding='0' cellspacing='0' style='width:1170px; margin:0px auto;padding:0px;font-family:arial;padding:30px 0px 15px;'><tr><td><h3 style='font-size:18px;margin:0px; padding:0px;'>"+$rootScope.languageArray.idle+"</h3></td></tr></table>";
             html = html + '<table cellpadding="0" cellspacing="0" style="width:1170px; margin:0px auto;padding:0px;font-family:arial;padding:30px 0px 0px;"><thead>';
             html = html + '<tr style="background:#f1f1f1;  text-transform: uppercase;font-size:12px; text-align:left;">';
-            html = html + '<th style="padding:15px 7px;color:#363636; ">Driver</th><th style="padding:15px 7px;color:#363636; ">truck</th><th style="padding:15px 7px;color:#363636; ">Dispatcher</th></tr></thead><tbody>';
+            html = html + '<th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.driver+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.truck+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.dispatcher+'</th></tr></thead><tbody>';
             angular.forEach(data.todayReport, function(value, key) {
                 var driver = value.driverName;
                 var truckName = value.truckName;
@@ -1007,7 +1011,7 @@ $scope.print_todayInsights = function(){
     $interval(function() {
         if (html != "") {
 
-            $scope.print_function(html, 'Today Insights');
+            $scope.print_function(html,$rootScope.languageArray.todayinsights);
         }
     }, 1000, 1);  
 
@@ -1026,16 +1030,17 @@ $scope.exportWeather = function(){
 $scope.print_weather = function(){
  var html = '<table cellpadding="0" cellspacing="0" style="width:1170px; margin:0px auto;padding:0px;font-family:arial;padding:30px 0px 0px;"><thead>';
   html = html +'<tr style="background:#f1f1f1;  text-transform: uppercase;font-size:12px; text-align:left;">';
-  html = html +'<th style="padding:15px 7px;color:#363636; ">Day</th><th style="padding:15px 7px;color:#363636; ">Date</th><th style="padding:15px 7px;color:#363636; ">Temperature</th><th style="padding:15px 7px;color:#363636; ">Wind</th><th style="padding:15px 7px;color:#363636; ">Humidity</th><th style="padding:15px 7px;color:#363636; ">Min. Temperature</th><th style="padding:15px 7px;color:#363636; ">Max. Temperature</th><th style="padding:15px 7px;color:#363636; ">Feels Like</th><tr></thead>';
+  html = html +'<th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.day+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageCommonVariables.date+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.temperature+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.wind+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.humidity+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.mintemperature+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.maxtemperature+'</th><th style="padding:15px 7px;color:#363636; ">'+$rootScope.languageArray.feelslike+'</th><tr></thead>';
   html = html +'<tbody><tr style="  text-transform: uppercase;font-size:12px; ">';
   html = html +'<td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.currentWeather.today+'</td><td style="text-transform:none;padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.currentWeather.date.replace(' ,' ,',')+'</td><td  style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.currentWeather.current_temperature+' °F</td><td  style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.currentWeather.wind+' m/h</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.currentWeather.humidity+' %</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.currentWeather.main.temp_min+' °F</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.currentWeather.main.temp_max+' °F</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.currentWeather.weather_description+'</td><tr>';
   html = html +'<tr  style="  text-transform: uppercase;font-size:12px; "><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.dailyForecast.list[0].today+'</td><td style="text-transform:none; ;padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.dailyForecast.list[0].date.replace(' ,' ,',')+'</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.dailyForecast.list[0].current_temperature+' °F</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.dailyForecast.list[0].wind+' m/h</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.dailyForecast.list[0].humidity+' %</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.dailyForecast.list[0].temp.min+' °F</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.dailyForecast.list[1].temp.max+' °F</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.dailyForecast.list[0].weather_description+'</td><tr>';
   html = html +'<tr style="  text-transform: uppercase;font-size:12px; "><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.dailyForecast.list[1].today+'</td><td style="text-transform:none;padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.dailyForecast.list[1].date.replace(' ,' ,',')+'</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "> '+$scope.dailyForecast.list[1].current_temperature+' °F</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.dailyForecast.list[1].wind+' m/h</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "> '+$scope.dailyForecast.list[1].humidity+' %</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.dailyForecast.list[1].temp.min+' °F</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.dailyForecast.list[1].temp.max+' °F</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.dailyForecast.list[1].weather_description+' </td><tr></tbody>';
   html = html +"</table>";
-  $scope.print_function(html , 'Weather Report');
+  $scope.print_function(html , $rootScope.languageArray.weatherreport);
   }
 
 $scope.print_function = function(body , title){
+
 
     var html = '<table cellpadding="0" cellspacing="0" style="width:1170px; margin:0px auto;padding:0px;font-family:arial;padding:40px 0px 34px;border-bottom:1px solid #b6b6b6;">';
     html = html +'<tr>';
@@ -1068,15 +1073,15 @@ $scope.load_status = function(){
    // html = html +'<tbody><tr style="  text-transform: uppercase;font-size:12px; ">';
    // html = html +'<td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.printloadchart.assigned+'</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.printloadchart.booked+'</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.printloadchart.delivered+'</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.printloadchart.inprogress+'</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.printloadchart.noLoads+'</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.printloadchart.summary.invoiceCount+'</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.printloadchart.summary.sentForPaymentCount+'</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.printloadchart.summary.waitingPaperworkCount+'</td><tr></tbody>';
   
-   html  = html + '<tr style="  text-transform: uppercase;font-size:12px; "><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">Assigned</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.printloadchart.assigned+'</td></tr>';
-   html  = html + '<tr style="  text-transform: uppercase;font-size:12px; "><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">Booked</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.printloadchart.booked+'</td></tr>';
-   html  = html + '<tr style="  text-transform: uppercase;font-size:12px; "><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">Delivered</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.printloadchart.delivered+'</td></tr>';
-   html  = html + '<tr style="  text-transform: uppercase;font-size:12px; "><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">Inprogress</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.printloadchart.inprogress+'</td></tr>';
-   html  = html + '<tr style="  text-transform: uppercase;font-size:12px; "><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">No-Loads</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.printloadchart.noLoads+'</td></tr>';
-   html  = html + '<tr style="  text-transform: uppercase;font-size:12px; "><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">INVOICES</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.printloadchart.summary.invoiceCount+'</td></tr>';
-   html  = html + '<tr style="  text-transform: uppercase;font-size:12px; "><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">PAYMENT ON COLLECTION</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.printloadchart.summary.sentForPaymentCount+'</td></tr>';
-   html  = html + '<tr style="  text-transform: uppercase;font-size:12px; "><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">Waiting Paperwork</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.printloadchart.summary.waitingPaperworkCount+'</td></tr>';
-   $scope.print_function(html , 'Load Status');   
+   html  = html + '<tr style="  text-transform: uppercase;font-size:12px; "><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$rootScope.languageArray.loadstatusassigned+'</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.printloadchart.assigned+'</td></tr>';
+   html  = html + '<tr style="  text-transform: uppercase;font-size:12px; "><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$rootScope.languageArray.loadstatusbooked+'</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.printloadchart.booked+'</td></tr>';
+   html  = html + '<tr style="  text-transform: uppercase;font-size:12px; "><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$rootScope.languageArray.loadstatusdelivered+'</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.printloadchart.delivered+'</td></tr>';
+   html  = html + '<tr style="  text-transform: uppercase;font-size:12px; "><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$rootScope.languageArray.loadstatusinprogress+'</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.printloadchart.inprogress+'</td></tr>';
+   html  = html + '<tr style="  text-transform: uppercase;font-size:12px; "><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$rootScope.languageArray.loadstatusnoloads+'</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.printloadchart.noLoads+'</td></tr>';
+   html  = html + '<tr style="  text-transform: uppercase;font-size:12px; "><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$rootScope.languageArray.loadstatusinvoice+'</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.printloadchart.summary.invoiceCount+'</td></tr>';
+   html  = html + '<tr style="  text-transform: uppercase;font-size:12px; "><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$rootScope.languageArray.loadstatusinvoicpayoncoll+'</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.printloadchart.summary.sentForPaymentCount+'</td></tr>';
+   html  = html + '<tr style="  text-transform: uppercase;font-size:12px; "><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$rootScope.languageArray.loadstatusinvoicwaitppr+'</td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; ">'+$scope.printloadchart.summary.waitingPaperworkCount+'</td></tr>';
+   $scope.print_function(html , $rootScope.languageArray.loadstatus);   
 }
 
 $scope.exportLoadStatus = function(){
@@ -1099,10 +1104,10 @@ angular.element('.load_portlet-progress').css('display', 'block');
                
             $scope.summary        = data.loadsChart.summary;
             var chartData = [];
-           chartData.push({name:'Delivered',y:data.loadsChart.delivered });
-           chartData.push({name:'Booked',y:data.loadsChart.booked });
-           chartData.push({name:'In-progress',y:data.loadsChart.inprogress });
-           chartData.push({name:'No-loads',y:data.loadsChart.noLoads });
+           chartData.push({name:$rootScope.languageArray.loadstatusdelivered ,y:data.loadsChart.delivered });
+           chartData.push({name:$rootScope.languageArray.loadstatusbooked,y:data.loadsChart.booked });
+           chartData.push({name:$rootScope.languageArray.loadstatusinprogress,y:data.loadsChart.inprogress });
+           chartData.push({name:$rootScope.languageArray.loadstatusnoloads,y:data.loadsChart.noLoads });
            $scope.drawMatrix("delivery_matrix",chartData,'Loads');
              angular.element('.load_portlet-progress').css('display', 'none');
            });
@@ -1387,25 +1392,25 @@ $scope.getWeatherInfo = function(){
             $scope.totalAllArray = data.chartStack.totals;
             $scope.typeOfData = data.chartStack.type;                 
             switch($scope.typeOfData){
-                case "_all"         : $scope.fColumn = $scope.languageArray.dispatcher;break;
-                case "_idispatcher" : $scope.fColumn = $scope.languageArray.driver;break;
+                case "_all"         : $scope.fColumn = $rootScope.languageArray.dispatcher;break;
+                case "_idispatcher" : $scope.fColumn = $rootScope.languageArray.driver;break;
                 case "_iteam"       :
-                case "_idriver"     : $scope.fColumn = $scope.languageArray.loadno;break;
-                default             : $scope.fColumn = $scope.languageArray.dispatcher;break;
+                case "_idriver"     : $scope.fColumn = $rootScope.languageArray.loadno;break;
+                default             : $scope.fColumn = $rootScope.languageArray.dispatcher;break;
             }
 
               
             $scope.chartConfig.xAxis    = { categories: data.chartStack.xaxis };
             if ( $scope.typeOfData == '_iteam' || $scope.typeOfData == '_idriver') {
                 $scope.chartConfig.series   = [
-                {"name": "Profit",    "data" : data.chartStack.profitAmount, type: "column", id: 's5', color : '#90ED7D'},
-                {"name": "Charges",   "data" : data.chartStack.charges,      type: "column", id: 's4', color : '#5C5C61'},
+                {"name": $rootScope.languageCommonVariables.profit,    "data" : data.chartStack.profitAmount, type: "column", id: 's5', color : '#90ED7D'},
+                {"name": $rootScope.languageCommonVariables.charges,   "data" : data.chartStack.charges,      type: "column", id: 's4', color : '#5C5C61'},
                 ];
             } else {
                 $scope.chartConfig.series   = [
-                     {"name": "Profit",    "data" : data.chartStack.profitAmount, type: "column", id: 's5', color : '#90ED7D'},
-                     {"name": "Charges",   "data" : data.chartStack.charges,      type: "column", id: 's4', color : '#5C5C61'},
-                     {"name": "Goal", "data" : data.chartStack.goalsAchievement, type: 'spline', id: 's6', color : '#95CEFF'},
+                     {"name": $rootScope.languageCommonVariables.profit,    "data" : data.chartStack.profitAmount, type: "column", id: 's5', color : '#90ED7D'},
+                     {"name": $rootScope.languageCommonVariables.charges,   "data" : data.chartStack.charges,      type: "column", id: 's4', color : '#5C5C61'},
+                     {"name": $rootScope.languageCommonVariables.goal, "data" : data.chartStack.goalsAchievement, type: 'spline', id: 's6', color : '#95CEFF'},
                 ];
             }
           
@@ -1423,10 +1428,10 @@ $scope.getWeatherInfo = function(){
                  $scope.weatherShow = true;
              }   
              var chartData = [];
-             chartData.push({name:'Delivered',y:data.loadsChart.delivered });
-             chartData.push({name:'Booked',y:data.loadsChart.booked });
-             chartData.push({name:'In-progress',y:data.loadsChart.inprogress });
-             chartData.push({name:'No-loads',y:data.loadsChart.noLoads });
+             chartData.push({name:$rootScope.languageArray.loadstatusdelivered,y:data.loadsChart.delivered });
+             chartData.push({name:$rootScope.languageArray.loadstatusbooked,y:data.loadsChart.booked });
+             chartData.push({name:$rootScope.languageArray.loadstatusinprogress,y:data.loadsChart.inprogress });
+             chartData.push({name:$rootScope.languageArray.loadstatusnoloads,y:data.loadsChart.noLoads });
              $scope.drawMatrix("delivery_matrix",chartData,'Loads');
              $scope.renderGoogleMap();
         });
@@ -1464,14 +1469,14 @@ $rootScope.updateDashboard = function(){
           $scope.chartConfig.xAxis    = { categories: data.chartStack.xaxis };
              if ( $scope.typeOfData == '_iteam' || $scope.typeOfData == '_idriver') {
                 $scope.chartConfig.series   = [
-                    {"name": "Profit",    "data" : data.chartStack.profitAmount, type: "column", id: 's5', color : '#90ED7D'},
-                    {"name": "Charges",   "data" : data.chartStack.charges,      type: "column", id: 's4', color : '#5C5C61'},
+                    {"name": $rootScope.languageCommonVariables.profit,    "data" : data.chartStack.profitAmount, type: "column", id: 's5', color : '#90ED7D'},
+                    {"name": $rootScope.languageCommonVariables.charges,   "data" : data.chartStack.charges,      type: "column", id: 's4', color : '#5C5C61'},
                 ];
             } else {
                 $scope.chartConfig.series   = [
-                    {"name": "Profit",    "data" : data.chartStack.profitAmount, type: "column", id: 's5', color : '#90ED7D'},
-                    {"name": "Charges",   "data" : data.chartStack.charges,      type: "column", id: 's4', color : '#5C5C61'},
-                     {"name": "Goal", "data" : data.chartStack.goalsAchievement, type: 'spline', id: 's6', color : '#95CEFF'},
+                    {"name": $rootScope.languageCommonVariables.profit,    "data" : data.chartStack.profitAmount, type: "column", id: 's5', color : '#90ED7D'},
+                    {"name": $rootScope.languageCommonVariables.charges,   "data" : data.chartStack.charges,      type: "column", id: 's4', color : '#5C5C61'},
+                     {"name": $rootScope.languageCommonVariables.goal, "data" : data.chartStack.goalsAchievement, type: 'spline', id: 's6', color : '#95CEFF'},
                 ];
             }
 
@@ -1483,10 +1488,10 @@ $rootScope.updateDashboard = function(){
           // ];
             // -------------- Stacked Chart Update ------------------
             var chartData = [];
-            chartData.push({name:'Delivered',y:data.loadsChart.delivered });
-            chartData.push({name:'Booked',y:data.loadsChart.booked });
-            chartData.push({name:'In-progress',y:data.loadsChart.inprogress });
-            chartData.push({name:'No-loads',y:data.loadsChart.noLoads });
+            chartData.push({name:$rootScope.languageArray.loadstatusdelivered,y:data.loadsChart.delivered });
+            chartData.push({name:$rootScope.languageArray.loadstatusbooked,y:data.loadsChart.booked });
+            chartData.push({name:$rootScope.languageArray.loadstatusinprogress,y:data.loadsChart.inprogress });
+            chartData.push({name:$rootScope.languageArray.loadstatusnoloads,y:data.loadsChart.noLoads });
             $scope.drawMatrix("delivery_matrix",chartData,'Loads');
         });
     }
@@ -1743,10 +1748,10 @@ $rootScope.updateDashboard = function(){
             name: 'Sevices',
             innerSize: '60%',
             data: [
-            ['In Emergency', 7],
-            ['High Priority',30],
-            ['Opened', 40],
-            ['Un Opened', 23],
+            [$rootScope.languageArray.drivermsginemncy, 7],
+            [$rootScope.languageArray.drivermsgonhighprior,30],
+            [$rootScope.languageArray.drivermsgopened, 40],
+            [$rootScope.languageArray.drivermsgunopened, 23],
 
 
             ]
@@ -1787,13 +1792,13 @@ $rootScope.updateDashboard = function(){
         },
         series: [{
             type: 'pie',
-            name: 'Message',
+            name: $rootScope.languageArray.message,
             innerSize: '60%',
             data: [
-            ['In Emergency', 7],
-            ['High Priority',30],
-            ['Opened', 40],
-            ['Un Opened', 23],
+            [$rootScope.languageArray.drivermsginemncy, 7],
+            [$rootScope.languageArray.drivermsgonhighprior,30],
+            [$rootScope.languageArray.drivermsgopened, 40],
+            [$rootScope.languageArray.drivermsgunopened, 23],
 
 
             ]

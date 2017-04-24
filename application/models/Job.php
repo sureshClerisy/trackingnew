@@ -2475,6 +2475,122 @@ class Job extends Parent_Model {
 		
 	}
 
+	/**
+	* method  : post
+	* @param  : loadId
+	* @return : load detail array
+	* comment : for fetching load whose delivery date is past and load is not completed
+	*/
+
+	public function fetchPastLoadsIncomplete($args = array(), $total = false) {
+		$todayDate = date('Y-m-d');
+		
+		if($total){
+			$this->db->select('loads.id');
+		} else {
+			$this->db->select('loads.id,CONCAT( d.first_name ," + " ,team.first_name) AS teamdriverName, 
+	        					CASE loads.driver_type 
+	        						WHEN "team" THEN CONCAT(d.first_name," + ",team.first_name) 
+	        									ELSE concat(d.first_name," ",d.last_name) 
+	        									END AS driverName, 
+	        						CASE loads.billType 
+	        							WHEN "shipper" THEN (shippers.shipperCompanyName) 
+	        									   ELSE (broker_info.TruckCompanyName)
+	        									END AS companyName, 
+	        					loads.driver_type,loads.invoiceNo, loads.vehicle_id, loads.truckstopID,loads.Bond,loads.PointOfContactPhone,loads.equipment_options,loads.LoadType,loads.PickupDate,loads.DeliveryDate,loads.OriginCity,loads.OriginState,loads.DestinationCity,loads.DestinationState,loads.PickupAddress,loads.DestinationAddress,loads.PaymentAmount,loads.Mileage, (loads.PaymentAmount/loads.Mileage) as rpm, loads.deadmiles,loads.Weight,loads.Length,loads.JobStatus,loads.totalCost,loads.pickDate,loads.load_source,loads.created,loads.overallTotalProfit,loads.overallTotalProfitPercent,loads.DeliveryDate,loads.totalCost,loads.billType,loads.invoiceNo');
+		}
+
+		$this->db->join("vehicles as v", "loads.vehicle_id = v.id","Left");
+		$this->db->join("drivers as d", "loads.driver_id = d.id","Left");
+		$this->db->join("broker_info", "broker_info.id = loads.broker_id AND loads.billType = 'broker'","Left");
+		$this->db->join("shippers", "shippers.id = loads.broker_id AND loads.billType = 'shipper'","Left");
+		$this->db->join('drivers as team','v.team_driver_id = team.id','left');	
+		
+		if(isset($args["searchQuery"]) && !empty($args["searchQuery"])){
+            $this->db->group_start();
+            $this->db->like('LOWER(CONCAT(TRIM(d.first_name)," ",TRIM(d.last_name)))', strtolower($args['searchQuery']));
+            $this->db->or_like('loads.id', $args['searchQuery'] );
+            $this->db->or_like('loads.invoiceNo', $args['searchQuery'] );
+            $this->db->or_like('loads.PointOfContactPhone', $args['searchQuery'] );
+            $this->db->or_like('LOWER(loads.equipment_options)', strtolower($args['searchQuery']) );
+            $this->db->or_like('LOWER(loads.LoadType)', strtolower($args['searchQuery']) );
+            $this->db->or_like('loads.PickupDate', $args['searchQuery'] );
+            $this->db->or_like('loads.DeliveryDate', $args['searchQuery'] );
+            $this->db->or_like('LOWER(loads.OriginCity)', strtolower($args['searchQuery']) );
+            $this->db->or_like('LOWER(loads.OriginState)', strtolower($args['searchQuery']) );
+            $this->db->or_like('LOWER(loads.DestinationCity)', strtolower($args['searchQuery']) );
+            $this->db->or_like('LOWER(loads.DestinationState)', strtolower($args['searchQuery']) );
+            $this->db->or_like('LOWER(loads.PickupAddress)', strtolower($args['searchQuery']) );
+            $this->db->or_like('LOWER(loads.DestinationAddress)', strtolower($args['searchQuery']) );
+            $this->db->or_like('loads.PaymentAmount', $args['searchQuery']);
+            $this->db->or_like('loads.Mileage', $args['searchQuery']);
+            $this->db->or_like('loads.deadmiles', $args['searchQuery']);
+            $this->db->or_like('loads.Weight', $args['searchQuery']);
+            $this->db->or_like('loads.Length', $args['searchQuery']);
+            $this->db->or_like('LOWER(loads.JobStatus)', strtolower($args['searchQuery']) );
+            $this->db->or_like('LOWER(loads.load_source)', strtolower($args['searchQuery']) );
+            $this->db->or_like('LOWER(loads.billType)', strtolower($args['searchQuery']) );
+            $this->db->or_like('LOWER(broker_info.TruckCompanyName)', strtolower($args['searchQuery']) );
+            $this->db->or_like('LOWER(shippers.shipperCompanyName)', strtolower($args['searchQuery']) );
+            //$this->db->or_like('LOWER(CONCAT( d.first_name ," + " ,team.first_name))', strtolower($filters['searchQuery']));
+            $this->db->group_end();
+		}
+		
+	
+		if(isset($args["sortColumn"]) && $args["sortColumn"] == "driverName"){
+			$this->db->order_by('CASE 
+								     WHEN loads.driver_type  = "team" THEN CONCAT(TRIM(d.first_name), " + ", TRIM(team.first_name)) 
+								     ELSE concat(d.first_name, " ", d.last_name) 
+								 END '.$args["sortType"]);
+		}else if(in_array($args["sortColumn"] ,array("TruckCompanyName"))){
+			$this->db->order_by('CASE 
+								     WHEN loads.billType  = "shipper" THEN (shippers.shipperCompanyName) 
+								     ELSE (broker_info.TruckCompanyName)
+								 END '.$args["sortType"]);
+		}else if($args["sortColumn"] == "rpm"){
+			$this->db->order_by("(loads.PaymentAmount/loads.Mileage) ",$args["sortType"]);	 
+		}else if($args["sortColumn"] == "Weight"){
+			$this->db->order_by("CAST(loads.".$args["sortColumn"]."  AS DECIMAL)",$args["sortType"]);	
+		}else{
+			$this->db->order_by("loads.".$args["sortColumn"],$args["sortType"]);	
+		}
+
+		$this->db->join('documents','documents.load_id = loads.id','LEFT');
+		$this->db->where('loads.DeliveryDate <',$todayDate);
+
+		if( isset($args['driverId']) && !empty($args['driverId']) ) {
+			$this->db->where('loads.driver_id', $args['driverId']);
+		} 
+
+		if ( isset($args['secondDriverId']) && !empty($args['secondDriverId']) && $args['secondDriverId'] > 0 ) {
+			$this->db->where(array('loads.second_driver_id' => $args['secondDriverId'], 'loads.driver_type' => 'team'));
+		}
+
+		if( isset($args['dispatcherId']) && !empty($args['dispatcherId']) ) {
+			$this->db->where('loads.dispatcher_id', $args['dispatcherId']);
+		}
+
+
+		$this->db->where('broker_id is NOT NULL', NULL, FALSE);
+		$this->db->where(array('loads.vehicle_id != ' => null, 'loads.vehicle_id != ' => 0, 'loads.delete_status' => 0 ));			
+		$this->db->where_IN('documents.doc_type',array('pod','rateSheet'));
+		$this->db->group_by('documents.load_id');
+		$this->db->having('count(*) < 2', null, false );
+
+		if(!$total){
+			$args["limitStart"] = $args["limitStart"] == 1 ? 0 : $args["limitStart"];
+			$this->db->limit($args["itemsPerPage"],$args["limitStart"]);
+		}
+		$result = $this->db->get('loads');
+		//echo $this->db->last_query();
+		
+		if( $result->num_rows() > 0 )
+			return $result->result_array();
+		else
+			return array();
+
+	}
+
 	/*
 	* method  : post
 	* params  : loadId

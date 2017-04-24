@@ -30,7 +30,8 @@ $lang['shipperExistingSuccMsg'] 	= 'Success : The shipper details already exist 
 /** Message for broker Add Start*/
 $lang['brokerListingAddButton'] = 'Add Broker';
 $lang['shipperListingAddButton'] = 'Add Shipper';
-$lang['brokerListingTableAddbutton'] = 'ADD';
+$lang['brokerListingTableAddbutton'] 	= 'ADD';
+$lang['brokerListingTableEditbutton'] 	= 'Update';
 $lang['noDetailError'] 			= 'Error : No details found!';
 /** Message for broker Add Start*/
 

@@ -314,7 +314,7 @@
 											</div>
 
 											<div class="not-having-customer" ng-if="dashboard.showTopCustomers == false" >
-												No Information Available
+												{{ languageCommonVariables.norecordfound }}
 											</div>
 				                        </div><!-- panel-body -->
 				                        <div class="topfive_portlet-progress portlet-progress" style="background-color: rgba(255, 255, 255, 0.8); display: none;">
@@ -324,7 +324,7 @@
 
 				                    <div class="panel panel-default green-border wpanel" id="7" ng-show ="visibility[7] ==1" pg-portlet>
 				                        <div class="panel-heading">
-				                            <div class="panel-title">Leader Board
+				                            <div class="panel-title">{{ languageArray.leaderboard }}
 				                            </div>
 				                            <div class="panel-controls ">
 				                                <ul>
@@ -423,7 +423,7 @@
 																	<td  class="text-center v-align-middle">{{totalAllArray.totProfit | currency:"$":2}}</td>
 																	<td  class="text-center v-align-middle">{{totalAllArray.totProfitPercent}}%</td>
 															 	</tr>
-															  <tr ng-show="!haveRecords"><td class="semi-bold" style="text-align: center;" colspan="9"> Oops! No Record Found</td></tr>
+															  <tr ng-show="!haveRecords"><td class="semi-bold" style="text-align: center;" colspan="9"> {{ languageCommonVariables.norecordfound }}</td></tr>
 															</tbody>
 														  </table>
 														</div>
@@ -679,7 +679,7 @@
 
 				                    <div class="panel panel-default blue-border wpanel" id="10" ng-show ="visibility[10] ==1" pg-portlet>
 				                        <div class="panel-heading">
-				                            <div class="panel-title">Today Insights </div>
+				                            <div class="panel-title">{{ languageArray.todayinsights }}</div>
 				                            <div class="panel-controls">
 				                                <ul>
 				                                    <li ng-show="otherIcon" >
@@ -708,16 +708,16 @@
 				                        <div class="panel-body">
 							                <ul class="nav nav-tabs nav-tabs-simple" id="tinsights" role="tablist" ui-jq="tabCollapse">
 							                    <li class="active tpickup" ng-click="getTodayReport('booked')"  >
-							                    	<a href="#todayPickup"  data-toggle="tab" pg-tab role="tab">Pickup</a> 
+							                    	<a href="#todayPickup"  data-toggle="tab" pg-tab role="tab">{{ languageArray.pickup }}</a> 
 							                    </li>
 							                    <li class="tinprogress"> 
-							                    	<a href="#todayInprogress" ng-click="getTodayReport('inprogress')" data-toggle="tab" pg-tab role="tab">Inprogress</a> 
+							                    	<a href="#todayInprogress" ng-click="getTodayReport('inprogress')" data-toggle="tab" pg-tab role="tab">{{ languageArray.inprogress }}</a> 
 							                    </li>
 							                    <li class="tdelivery"> 
-							                    	<a href="#todayDelivery"  ng-click="getTodayReport('delivery')" data-toggle="tab" pg-tab role="tab">Delivery</a> 
+							                    	<a href="#todayDelivery"  ng-click="getTodayReport('delivery')" data-toggle="tab" pg-tab role="tab">{{ languageArray.delivery }}</a> 
 							                    </li>
 							                    <li class="tidle"> 
-							                    	<a href="#todayIdle" ng-click="getTodayReport('idle')" data-toggle="tab" pg-tab role="tab">Idle</a> 
+							                    	<a href="#todayIdle" ng-click="getTodayReport('idle')" data-toggle="tab" pg-tab role="tab">{{ languageArray.idle }}</a> 
 							                    </li>
 							                </ul>
 							                <div class="tab-content no-padding">
@@ -728,20 +728,20 @@
 								                                <table class="lperform table table-hover table-condensed table-detailed" id="todayReportPickup">
 																	<thead>
 																	  <tr>
-																		<th>Driver</th>
-																		<th>Truck</th>
-																		<th>Dispatcher</th>
-																		<th>Pickup</th>
-																		<th>Delivery</th>
-																		<th>Origin</th>
-																		<th>St</th>
-																		<th>Destination</th>
-																		<th>St</th>
-																		<th>Payment</th>
-																		<th>RPM</th>
-																		<th>Miles</th>
-																		<th>Deadmiles</th>
-																		<th>Company</th>
+																		<th>{{ languageArray.driver }}</th>
+																		<th>{{ languageArray.truck }}</th>
+																		<th>{{ languageArray.dispatcher }}</th>
+																		<th>{{ languageArray.pickup }}</th>
+																		<th>{{ languageArray.delivery }}</th>
+																		<th>{{ languageArray.origin }}</th>
+																		<th>{{ languageArray.st }}</th>
+																		<th>{{ languageArray.destinaiton }}</th>
+																		<th>{{ languageArray.st }}</th>
+																		<th>{{ languageArray.payment }}</th>
+																		<th>{{ languageArray.rpm }}</th>
+																		<th>{{ languageArray.miles }}</th>
+																		<th>{{ languageArray.deadmiles }}</th>
+																		<th>{{ languageArray.company }}</th>
 																	  </tr>
 																	</thead>
 																	<tbody>
@@ -769,7 +769,7 @@
 																	 		<td>{{todayReport.totals.deadmiles | number:0}}</td>
 																	 		<td>&nbsp;</td>
 																	 	</tr>
-																	 	<tr ng-show="todayReport.length <= 0"><td class="	semi-bold" style="text-align: center;" colspan="14"> Oops! No Record found</td></tr>
+																	 	<tr ng-show="todayReport.length <= 0"><td class="	semi-bold" style="text-align: center;" colspan="14">  {{ languageCommonVariables.norecordfound }}</td></tr>
 																	</tbody>
 															  	</table>
 															</div>
@@ -783,20 +783,20 @@
 								                                <table class="lperform table table-hover table-condensed table-detailed" id="todayReportInprogress">
 																	<thead>
 																	  <tr>
-																		<th>Driver</th>
-																		<th>Truck</th>
-																		<th>Dispatcher</th>
-																		<th>Pickup</th>
-																		<th>Delivery</th>
-																		<th>Origin</th>
-																		<th>St</th>
-																		<th>Destination</th>
-																		<th>St</th>
-																		<th>Payment</th>
-																		<th>RPM</th>
-																		<th>Miles</th>
-																		<th>Deadmiles</th>
-																		<th>Company</th>
+																		<th>{{ languageArray.driver }}</th>
+																		<th>{{ languageArray.truck }}</th>
+																		<th>{{ languageArray.dispatcher }}</th>
+																		<th>{{ languageArray.pickup }}</th>
+																		<th>{{ languageArray.delivery }}</th>
+																		<th>{{ languageArray.origin }}</th>
+																		<th>{{ languageArray.st }}</th>
+																		<th>{{ languageArray.destination }}</th>
+																		<th>{{ languageArray.st }}</th>
+																		<th>{{ languageArray.payment }}</th>
+																		<th>{{ languageArray.rpm }}</th>
+																		<th>{{ languageArray.miles }}</th>
+																		<th>{{ languageArray.deadmiles }}</th>
+																		<th>{{ languageArray.company }}</th>
 																	  </tr>
 																	</thead>
 																	<tbody>
@@ -824,7 +824,7 @@
 																	 		<td>{{todayReport.totals.deadmiles | number:0}}</td>
 																	 		<td>&nbsp;</td>
 																	 	</tr>
-																	 	<tr ng-show="todayReport.length <= 0"><td class="semi-bold" style="text-align: center;" colspan="14"> Oops! No Record Found</td></tr>
+																	 	<tr ng-show="todayReport.length <= 0"><td class="semi-bold" style="text-align: center;" colspan="14">  {{ languageCommonVariables.norecordfound }}</td></tr>
 																	</tbody>
 															  	</table>
 															</div>
@@ -838,20 +838,20 @@
 								                                <table class="lperform table table-hover table-condensed table-detailed" id="todayReportDelivery">
 																	<thead>
 																	  <tr>
-																		<th>Driver</th>
-																		<th>Truck</th>
-																		<th>Dispatcher</th>
-																		<th>Pickup</th>
-																		<th>Delivery</th>
-																		<th>Origin</th>
-																		<th>St</th>
-																		<th>Destination</th>
-																		<th>St</th>
-																		<th>Payment</th>
-																		<th>RPM</th>
-																		<th>Miles</th>
-																		<th>Deadmiles</th>
-																		<th>Company</th>
+																		<th>{{ languageArray.driver }}</th>
+																		<th>{{ languageArray.truck }}</th>
+																		<th>{{ languageArray.dispatcher }}</th>
+																		<th>{{ languageArray.pickup }}</th>
+																		<th>{{ languageArray.delivery }}</th>
+																		<th>{{ languageArray.origin }}</th>
+																		<th>{{ languageArray.st }}</th>
+																		<th>{{ languageArray.destination }}</th>
+																		<th>{{ languageArray.st }}</th>
+																		<th>{{ languageArray.payent }}</th>
+																		<th>{{ languageArray.rpm }}</th>
+																		<th>{{ languageArray.miles }}</th>
+																		<th>{{ languageArray.deadmiles }}</th>
+																		<th>{{ languageArray.company }}</th>
 																	  </tr>
 																	</thead>
 																	<tbody>
@@ -879,7 +879,7 @@
 																	 		<td>{{todayReport.totals.deadmiles | number:0}}</td>
 																	 		<td>&nbsp;</td>
 																	 	</tr>
-																	 	<tr ng-show="todayReport.length <= 0"><td class="semi-bold" style="text-align: center;" colspan="14"> Oops! No Record Found</td></tr>
+																	 	<tr ng-show="todayReport.length <= 0"><td class="semi-bold" style="text-align: center;" colspan="14">  {{ languageCommonVariables.norecordfound }}</td></tr>
 																	</tbody>
 															  	</table>
 															</div>
@@ -894,9 +894,9 @@
 								                                <table class="lperform table table-hover table-condensed table-detailed" id="todayReportIdle">
 																	<thead>
 																	  <tr>
-																		<th>Driver</th>
-																		<th>Truck</th>
-																		<th>Dispatcher</th>
+																		<th>{{ languageArray.driver }}</th>
+																		<th>{{ languageArray.truck }}</th>
+																		<th>{{ languageArray.dispatcher }}</th>
 																	  </tr>
 																	</thead>
 																	<tbody>
@@ -905,7 +905,7 @@
 																			<td>{{record.truckName == null ? "NA" : record.truckName}}</td>
 																			<td>{{record.dispatcher}}</td>
 																	 	</tr>
-																	 	<tr ng-show="todayReport.length <= 0"><td class="semi-bold" style="text-align: center;" colspan="3"> Oops! No Record Found</td></tr>
+																	 	<tr ng-show="todayReport.length <= 0"><td class="semi-bold" style="text-align: center;" colspan="3"> {{ languageCommonVariables.norecordfound }}</td></tr>
 																	</tbody>
 															  	</table>
 															</div>
@@ -935,12 +935,39 @@
 							                                </div>
 							                            </div>
 							                            <div class="panel-body">
-							                                <div class="  top-left bottom-right padding-25 p-t-50">
-							                                    <span class="number " ng-click="showRecordsWithFilter('withoutTruck','driversInsights', 'driver', '', '', '',dashboard.activeDriversDate)">{{ dashboard.activeDriversWTruck }}</span>
-							                                    <br>
-							                                    <h3 class="text-white ltext">active drivers without truck</h3>
-							                                    <!-- <p class="text-white hint-text hidden-md">Learn More at Project Pages</p> -->
-							                                </div>
+								                            <div class="metro live-tile" data-mode="carousel" data-start-now="true" data-delay="3000" ui-jq="liveTile">
+								                                <div class="slide-front tiles slide active">
+									                                <div class="  top-left bottom-right padding-25 p-t-50">
+									                                    <span class="number " ng-click="showRecordsWithFilter('withoutTruck','driversInsights', 'driver', '', '', '',dashboard.activeDriversDate)">{{ dashboard.activeDriversWTruck }}</span>
+									                                    <br>
+									                                    <h3 class="text-white ltext">{{
+									                                    languageArray.driverwithouttr }}</h3>
+									                                    
+									                                </div>
+									                            </div>
+									                            <div class="slide-back tiles " ng-repeat="record in predictedJobs.data">
+									                            	<div class="">
+									                            		<h1>Top loads for {{record.driverName}}</h1>
+									                            		<ul class="slide-blockdrive">
+									                            			<li>
+									                            				<div class="tile-origin">Pickup</div>
+									                            				<div class="tile-origin">Origin</div>
+									                            				<div class="tile-origin">Destination</div>
+									                            				<div class="tile-origin">Profit</div>
+									                            				<div class="tile-origin">Profit %</div> 
+									                            			</li>
+									                            			<li class="cursor" ng-click="clickMatchLoadDetail(jobs.ID,'',jobs.deadmiles,jobs.Payment,jobs.TotalCost,jobs.pickDate)"  ng-repeat="jobs in record.jobs">
+									                            				<div class="tile-origin">{{jobs.PickUpDate}}</div>
+									                            				<div class="tile-origin">{{jobs.OriginCity + ", " + jobs.OriginState}}</div>
+									                            				<div class="tile-origin" >{{jobs.DestinationCity + ", " + jobs.DestinationState}}</div>	
+									                            				<div class="tile-origin" >{{jobs.profitAmount}}</div>
+									                            				<div class="tile-origin" >{{jobs.percent}}%</div>
+									                            			</li>
+									                            		</ul>
+									                            	</div>
+
+									                            </div>
+									                        </div>
 							                            </div>
 							                        </div>
 							                        <!-- END WIDGET -->
@@ -960,19 +987,27 @@
 							                                </div>
 							                            </div>
 							                            <div class="panel-body second-body-panel">
-							                            	 <div class="metro live-tile" data-mode="carousel" data-start-now="true" data-delay="3000" ui-jq="liveTile">
+							                            	<div class="metro live-tile" data-mode="carousel" data-start-now="true" data-delay="3000" ui-jq="liveTile">
 							                                    <div class="slide-front tiles slide active">
 							                                       <div class="  top-right bottom-right  p-t-50">
 									                                    <span class="number " ng-click="showRecordsWithFilter('trucksReporting','truckInsights', 'trucksReporting', '', '', '',dashboard.activeDriversDate)">{{ dashboard.trucksNotReporting }}</span>
 									                                    <br>
-									                                    <h3 class="text-white ltext">Trucks are not reporting current location</h3>
+									                                    <h3 class="text-white ltext">{{ languageArray.trucksnotrep }}</h3>
 									                                </div>
 							                                    </div>
 							                                    <div class="slide-back tiles">
 							                                        <div class="  top-right bottom-right  p-t-50">
 									                                    <span class="number " ng-click="showRecordsWithFilter('trucksWithoutDriver','truckInsights', 'trucksWithoutDriver', '', '', '',dashboard.activeDriversDate)">{{ dashboard.vehiclesWithoutDriver }}</span>
 									                                    <br>
-									                                    <h3 class="text-white ltext">Trucks without driver</h3>
+									                                    <h3 class="text-white ltext">{{ languageArray.truckwithoutdriver }}</h3>
+									                                </div>
+							                                    </div>
+							                                   
+							                                    <div class="slide-back tiles">
+							                                        <div class="  top-right bottom-right  p-t-50">
+									                                    <span class="number " ng-click="showRecordsWithFilter('pastLoadsIncomplete','loads', 'trucksWithoutDriver', '', '', '',dashboard.activeDriversDate)">{{ dashboard.pastLoadsIncomplete }}</span>
+									                                    <br>
+									                                    <h3 class="text-white ltext">{{ languageArray.incompleteLoads }}</h3>
 									                                </div>
 							                                    </div>
 							                                </div>

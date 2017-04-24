@@ -28,7 +28,6 @@ class Shippers extends Admin_Controller {
 	*/
 
 	public function index(){
-		
 		if ( isset($_POST) && count($_POST) > 0 ) {
 			$filters = $_POST;
 			if($filters["pageNo"] < 1){

@@ -28,19 +28,19 @@
 			<div class="row">
 				<div class="col-md-12 col-xlg-12">
 					<div class="commen-heading assigned-load-page">
-						<h2 class="oprate-dashbord">{{ languageArray.billingLoadsHeading }}</h2>
+						<h2 class="oprate-dashbord">{{ languageCommonVariables.billingHeading }}</h2>
 						<div class="label_select_box m-b-10">
 							<div class="input-cal-block">
 								<div class="input-prepend input-group">
 									<span class="add-on input-group-addon"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i></span>
-								   <input date-range-picker id="billingDRPicker" placeholder="Select date range"  options="opts" class="form-control date-picker customDateRange" type="text" ng-model="dateRangeSelector" />
+								   <input date-range-picker id="billingDRPicker" placeholder="{{ languageCommonVariables.selectdaterange }}"  options="opts" class="form-control date-picker customDateRange" type="text" ng-model="dateRangeSelector" />
 								</div>
 							</div>
 							<!--button ng-show = "showReadyForInvoiceLoads == true" ng-click="fetchBillableLoads('invoice')" class="edit-loadDetail edit1Load1 btn btn-info btn-cons " type="button"><i class="fa fa-paste"></i> <span class="bold">Show Invoice Ready Loads</span></button-->
 							
 							<!--button ng-show = "showReadyForInvoiceLoads == false" ng-click="fetchBillableLoads('all')" class="edit-loadDetail edit1Load1 btn btn-info btn-cons " type="button"><i class="fa fa-paste"></i> <span class="bold">Show All Loads</span></button-->
 
-							<a ui-sref="myLoad" class="edit-loadDetail edit1Load1 btn btn-info btn-cons " type="button"><i class="fa fa-paste"></i> <span class="bold">Show All Loads</span></a>
+							<a ui-sref="myLoad" class="edit-loadDetail edit1Load1 btn btn-info btn-cons " type="button"><i class="fa fa-paste"></i> <span class="bold">{{ languageArray.showallloads }}</span></a>
 						</div>
 					</div>
 				</div>
@@ -53,7 +53,7 @@
 							<div class="load-tabe-auto job-list truckstopJobs map-load-section">	
 							<div class="srpSearchDiv searchinput search-list-fix">
 									<div class="srpSearch1">
-										<label for="search" class="ng-binding">Search</label>
+										<label for="search" class="ng-binding">{{ languageCommonVariables.searchbutton }}</label>
 										<input type="search" ng-model-options="{ updateOn: 'default blur', debounce: { default: 300, blur: 0 } }" class="form-control" ng-model="searchFilter" ng-change="callSearchFilter(searchFilter);" />
 									</div>
 								</div>
@@ -61,7 +61,7 @@
 										<a class="add-new-data-button" ng-click="exportBillingData('billings')">
 		  									<button title="Export" class="btn btn-primary btn-cons m-b-10" type="button">
 		  										<i class="fa fa-file-excel-o"></i> 
-		  										<span class="bold">Export</span>
+		  										<span class="bold">{{ languageCommonVariables.exportbutton }}</span>
 		  									</button>
 		      							</a>
 										</div>
@@ -374,7 +374,7 @@
 											</div>
 											<!--open-block-->
 										</div>
-										<div ng-show="haveRecords" class="no-record-found">Oops! No record found</div>
+										<div ng-show="haveRecords" class="no-record-found">{{ languageCommonVariables.norecordfound }}</div>
 									</div>
 								</div><!-- table-structure-main-block -->
 								<div class="dataTables_wrapper">

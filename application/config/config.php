@@ -598,6 +598,10 @@ $config['teamFinancialGoal']   = 25000;
 $config['singleMilesGoal'] = 12000;
 $config['teamMilesGoal']   = 20000;
 
+// $config['superAdminIds']   = [1,2,4]; //Super admin IDs
+$config['superAdminIds']   = [1,2]; //Super admin IDs
+
+
 function pr($data){
     echo '<pre>';
     print_r($data);

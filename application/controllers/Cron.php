@@ -6,6 +6,25 @@
 */
 
 class Cron extends CI_Controller{
+
+
+	public $id;
+	private  $username;
+	private $password;
+	private $url;
+	private $wsdl_url;
+
+	public $diesel_rate_per_gallon;
+	public $driver_pay_miles_cargo;
+	public $driver_pay_miles_cargo_team;
+	public $total_tax;
+	public $todayDate;
+	public $defaultTruckAvg;
+	public $load_source;
+
+
+	
+
 	
 	function __construct()
 	{
@@ -13,20 +32,21 @@ class Cron extends CI_Controller{
 		
 		$this->load->model(array('Vehicle','Driver','User','Job'));
 		$this->load->helper('truckstop');
-
-		$this->protocol   = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
 		$this->serverAddr = base_url();
-
-		if( (isset($loggedUser_username) && $loggedUser_username != '') && (isset($loggedUser_id) && $loggedUser_id != '') && (isset($user_logged_in) && $user_logged_in == true) ) {
-		} else {
-			die();	
-		}
 
 		$this->id 			= $this->config->item('truck_id');	
 		$this->username 	= $this->config->item('truck_username');
 		$this->password 	= $this->config->item('truck_password');
 		$this->url 			= $this->config->item('truck_url');
 		$this->wsdl_url		= 'http://webservices.truckstop.com/V13/Searching/LoadSearch.svc?wsdl'; //Live Mode Api 
+
+		$this->diesel_rate_per_gallon = 2.50;
+		$this->driver_pay_miles_cargo = 0.45;						// for single driver
+		$this->driver_pay_miles_cargo_team = 0.58;					// for team of drivers
+		$this->total_tax = 50;
+		$this->todayDate = date('m/d/y');
+		$this->defaultTruckAvg = 6;
+
 	}
 	
 	private function in_array_r($needle, $haystack, $strict = false) {
@@ -306,7 +326,7 @@ class Cron extends CI_Controller{
 
 
 	/*
-	* Request URI : http://siteurl/Truckstop/findJobs
+	* Request URI : http://siteurl/Cron/findJobs
 	* Method : CronJob
 	* Params : null
 	* Return : null
@@ -314,8 +334,252 @@ class Cron extends CI_Controller{
 	*/
 
 	public function findJobs(){
+		$this->load->library("Realtime");
+		$allJobs = array();
+		$pubnub  = new Realtime();	
+		$this->load->model(array("Utility"));
+		//$driversList         = $this->Utility->getIdleDrivers();
+		$driversList         = $this->Utility->getAllDrivers();
+		$vehiclesWithParams  = array();
+		$channel = "";
+		/*$driversList = array(  array(
+								"driver_id" => 27,
+								"vehicle_id" => 22,
+								"team_driver_id" => 0,
+								"dispatcher_id" => 35,
+								"driver_type" => "single",
+							),
+						array(
+								"driver_id" => 152,
+								"vehicle_id" => 53,
+								"team_driver_id" => 0,
+								"dispatcher_id" => 35,
+								"driver_type" => "single",
+						),
 
+			);
+        */
+		foreach ($driversList as $key => $driver) {
+			if($driver["dispatcher_id"] == 12){
+				continue;
+			}
+			$isProcessed = $this->Utility->isAlreadyPredict($driver);
+			if( $isProcessed ){
+				continue;
+			}
+
+			if( is_null( $driver["driver_type"]) || empty($driver["driver_type"])){
+				$driver["driver_type"] = "single";
+			}
+
+			$results = $this->Vehicle->getLastLoadRecord( $driver["vehicle_id"], $driver["driver_id"] );
+			if ( !empty($results) ){
+				$driversList[$key]["state"]        = $results['DestinationState'];
+				$driversList[$key]["city"]         = $results['DestinationCity'];
+				$driversList[$key]["country"]      = $results['DestinationCountry'];
+				$driversList[$key]["vehicle_type"] = $results['vehicle_type'];
+				$driversList[$key]["searchDate"]   =  $this->CalculateNextLoadDate($results);
+				$this->todayDate = date('m/d/y',strtotime($driversList[$key]["searchDate"]));
+			} else {
+				$vehicleAddress = $this->Vehicle->get_vehicles_address( null, $driver["vehicle_id"] );
+				$driversList[$key]["state"]        = $vehicleAddress['0']['state'];
+				$driversList[$key]["city"]         = $vehicleAddress['0']['city'];
+				$driversList[$key]["country"]      = "USA";
+				$driversList[$key]["vehicle_type"] = $vehicleAddress['0']['vehicle_type'];
+				$driversList[$key]["searchDate"]   = "";
+			}
+
+			$jobs = $this->findJobsFromTruckStop($driversList[$key]);
+			if(!empty($jobs)){
+				if ( !empty($jobs) ) {
+					$bestJobs = $this->giveBestLoads( $jobs, $this->todayDate, $driver["vehicle_id"] ,  $driversList[$key]["vehicle_type"], $driver["driver_type"]);
+					$this->Utility->savePredictedJobs($driver, $bestJobs);
+					$channel = "predict_next_job_".$driver["dispatcher_id"];
+					$publish = $pubnub->publish("predict_next_job_".$driver["dispatcher_id"], array( "message" => array("content"=>"activity", "sender_uuid"=>$driver["dispatcher_id"])));
+				}
+				
+				break;
+			}
+		}
+		//echo $channel;
 	}
+
+	/*$unFinishedChain = $this->getUnFinishedChain((int)$driver["vehicle_id"]);
+	if(count($unFinishedChain) > 0){
+		$savedChain = end($unFinishedChain[0]);
+		$driversList[$key]["city"]         =  $savedChain['encodedJobRecord']['DestinationCity'];
+		$driversList[$key]["state"]        = $savedChain['encodedJobRecord']['DestinationState'];
+		$driversList[$key]["country"]      = $savedChain['encodedJobRecord']['DestinationCountry'];
+		$driversList[$key]["vehicle_type"] = $savedChain['encodedJobRecord']['EquipmentTypes']['Code'];
+		$driversList[$key]["searchDate"]   = $savedChain['valuesArray']['nextPickupDate1'];
+	}*/
+
+	private function giveBestLoads( $loads = array(),$todayDate = '', $vehicleId = null ,  $abbreviation = '', $driverType="driver") {	// abbreviation to filer records with particular search type
+
+		$finalArray 		= array();
+		$price 	= array();
+		$havePayment        = array();
+
+		if ( !empty($loads) ) {
+			
+			$truckAverage 	= $this->defaultTruckAvg;
+			$defaultWeight 	= 48000;
+			$defaultLength 	= 45;
+
+			if ( $vehicleId != '' && $vehicleId != null ) {
+				$vehicle_details = $this->Vehicle->get_vehicles_fuel_consumption(null, $vehicleId);
+				if ( !empty($vehicle_details) ) {
+					$truckAverage =round( 100/$vehicle_details[0]['fuel_consumption'],2);
+					$defaultWeight = ( $vehicle_details[0]['cargo_capacity'] != '' ) ? $vehicle_details[0]['cargo_capacity'] : $defaultWeight;
+					$defaultLength = ( $vehicle_details[0]['cargo_bay_l'] != '' ) ? $vehicle_details[0]['cargo_bay_l'] : $defaultLength;
+				}
+			} 				
+			
+			if ( count($loads) > 1) {
+				$this->load->model('BrokersModel');
+
+				$blackListedBrokers = $this->BrokersModel->getListOfBlacklisted(); //Getting all blacklisted compnies array
+				foreach ($loads as $key => $value) {
+					$loadWeight = str_replace(',','',$value['Weight']);
+					if ( strlen($loadWeight) == 2 ) {
+						$loadWeight = $loadWeight * 1000;
+					} else if ( strpos($loadWeight, 'K') !== false ){
+						$loadWeight = str_replace('K','',$loadWeight);
+						$loadWeight = trim($loadWeight) * 1000;
+					} else if ( strpos($loadWeight, '.') !== false ) {
+						$loadw = explode('.',$loadWeight);
+						if ( strlen($loadw[0]) < 3 )
+							$loadWeight = $loadWeight * 1000;
+					} 
+					
+					$loadWeight = (double)$loadWeight;
+					if ( strpos($value['Length'], 'FT') !== false ){
+						$length = explode('FT',$value['Length']);
+						$value['Length'] = $length[0];
+					}
+
+					$compayName = strtolower($value['CompanyName']);
+					
+				   	if ( (double)$value['Length'] > $defaultLength || $loadWeight > $defaultWeight ||  (in_array($compayName, $blackListedBrokers)) ) {
+				   		continue;
+					}
+
+					$want_to_see = explode(",", $abbreviation);
+					$current_user_can_see = explode(",", $value['Equipment']);
+					$show = array_intersect($want_to_see, $current_user_can_see);
+					
+					if ( empty($show) )  {					
+						continue;
+					}
+
+					//$finalArray[$key] = $value;
+					 
+					$finalArray[$key]["ID"]                 = $value["ID"];
+					$finalArray[$key]["OriginCity"]         = ucfirst( strtolower( $value["OriginCity"] ) );
+					$finalArray[$key]["OriginState"]        = $value["OriginState"];
+					$finalArray[$key]["OriginCountry"]      = $value["OriginCountry"];
+					$finalArray[$key]["DestinationCity"]    = ucfirst( strtolower( $value["DestinationCity"] ));
+					$finalArray[$key]["DestinationState"]   = $value["DestinationState"];
+					$finalArray[$key]["DestinationCountry"] = $value["DestinationCountry"];
+					$finalArray[$key]["PickUpDate"]         = $value['PickUpDate'];
+					
+					$finalArray[$key]['deadmiles'] = $value['OriginDistance'];
+					$total_complete_distance = $value['Miles'] + $finalArray[$key]['deadmiles'];
+					$gallon_needed =  ($total_complete_distance / $truckAverage);
+					
+					$total_diesel_cost = $this->diesel_rate_per_gallon * $gallon_needed;
+					
+					$driverPayMileCargo = $this->driver_pay_miles_cargo;
+					if($driverType == "team"){
+						$driverPayMileCargo = $this->driver_pay_miles_cargo_team;
+					}
+					
+					$total_driver_cost = $driverPayMileCargo * $total_complete_distance;
+					$total_cost = round(($total_diesel_cost + $total_driver_cost + $this->total_tax),2);
+					if ( $value['Payment'] != 0 && $value['Payment'] != '' && $value['Payment'] != null ) {
+						if ( ((double)$value['Payment'] < (double)$total_cost) && $value['Payment'] != null ) {
+							unset($finalArray[$key]);
+							continue;
+						}
+
+					if ( $value['Miles'] != 0 )
+						$finalArray[$key]['highlight'] = 0;
+						$finalArray[$key]['profitAmount'] = round(($value['Payment'] - $total_cost),2); 
+						$finalArray[$key]['percent'] = getProfitPercent($finalArray[$key]['profitAmount'], $value['Payment']);
+						$finalArray[$key]['Payment'] = (float)$value["Payment"];
+					} else {
+						$finalArray[$key]['highlight'] = 1;
+						$calPayment = getPaymentFromProfitMargin($total_cost, 30);
+						$finalArray[$key]['percent'] =  30;
+						$finalArray[$key]['Payment'] = (float)$calPayment;
+						$finalArray[$key]['profitAmount'] =  round(($finalArray[$key]['Payment'] - $total_cost),2);
+					} 
+					
+
+					$finalArray[$key]['Miles'] =(float)trim(str_replace(',','',$value["Miles"]));
+					$finalArray[$key]['deadmiles'] = (float)trim(str_replace(',','',$finalArray[$key]['deadmiles']));
+					$finalArray[$key]['TotalCost'] = $total_cost;
+
+					
+					if ( strtolower($value['PickUpDate']) == 'daily' ) {
+						$finalArray[$key]['pickDate'] = $todayDate;
+							} else {
+						$finalArray[$key]['pickDate'] = $value['PickUpDate'];
+					}
+					$price[$key]       =  $finalArray[$key]['profitAmount'];
+					$havePayment[$key] = $finalArray[$key]['highlight'];	
+				}
+
+				array_multisort($havePayment, SORT_ASC, $price, SORT_DESC, $finalArray); //Loads with payment and have heighest profit amount will be on top
+			} else {
+				$finalArray[] = $loads;
+			}
+		}
+		$response = array();
+		if( count($finalArray) > 5 ){
+			$response = array_slice($finalArray, 0, 5); 
+			unset($finalArray);
+			return $response;
+		}else{
+			return $finalArray;	
+		}
+		
+	}
+
+
+	private function getUnFinishedChain($vehicleId){
+		$allChains = $this->Job->getUnFinishedChain($vehicleId);
+		$userChain = array();
+		
+		if ( !empty($allChains) ) {
+			foreach ($allChains as $key => $chain) {
+				foreach ($chain as $laneKey => $laneValue) {
+					$loadDetail = getLoadDetail($laneValue, null, $this->username, $this->password, $this->id, $this->Job);
+					if(empty($loadDetail['encodedJobRecord']['ID']) && $key == 0){
+						$this->destroyLoadsChain($vehicleId);
+					}else{
+						$userChain[$key][] = $loadDetail;
+					}
+				}
+			}
+		}
+		return $userChain;
+	}
+
+
+	private function CalculateNextLoadDate( $result = array() ) {
+		if ( $result['DeliveryDate'] != '' && $result['DeliveryDate'] != '0000-00-00' && $result['DeliveryDate'] != null ) {
+			$dateSearch = $result['DeliveryDate'];
+		} else {
+			$dateSearch = date('Y-m-d', strtotime($result['pickday'] . ' +1 day'));
+		} 
+
+		if ( $dateSearch < date('Y-m-d') ){
+			$dateSearch = "";
+		}
+		return $dateSearch;
+	}
+
 
 
 	/*
@@ -326,28 +590,28 @@ class Cron extends CI_Controller{
 	* Comment: Search jobs for drivers every hour
 	*/
 
-	public function findJobsFromTruckStop($params){
+	private function findJobsFromTruckStop($params){
 		$client   = new SOAPClient($this->wsdl_url);
 		$params   = array(
 					'searchRequest' => array(
 					'UserName'  => $this->username, 'Password' => $this->password, 'IntegrationId' => $this->id,
 					'Criteria'  => array(
-								'OriginCity'        => $params["origin_city"],
-								'OriginState'       => $params["origin_state"],//Getting records of first state(Dispatcher)
-								'OriginCountry'     => $params["origin_country"],
-								'OriginRange'       => $params["origin_range"],
+								'OriginCity'        => $params["city"],
+								'OriginState'       => $params["state"],//Getting records of first state(Dispatcher)
+								'OriginCountry'     => $params["country"],
+								'OriginRange'       => 300,
 								'OriginLatitude'    => '',
 								'OriginLongitude'   => '',
-								'DestinationCity'   => $params["destination_city"],
-								'DestinationState'  => $params["destination_states"],
-								'DestinationCountry'=> $params["dest_country"],
-								'DestinationRange'  => $params["destination_range"],
-								'EquipmentType'     => $params["abbreviation"],
+								'DestinationCity'   => '',
+								'DestinationState'  => '',
+								'DestinationCountry'=> '',
+								'DestinationRange'  => '',
+								'EquipmentType'     => $params["vehicle_type"],
 								'LoadType'          => 'Full',
-								'PickupDates'       => $params["dateTime"],
-								'HoursOld'          => $params["hoursOld"],
+								'PickupDates'       => $params["searchDate"],
+								'HoursOld'          => 9,
 								'EquipmentOptions'  => '',
-								'PageNumber'        => $params["pageNo"],
+								'PageNumber'        => 1,
 								'PageSize'          => 200,
 								'SortBy'            => 'Miles',
 								'SortDescending'    => true
@@ -356,7 +620,6 @@ class Cron extends CI_Controller{
 					);
 
 		$return = $client->GetLoadSearchResults($params);
-		
 		if(empty($return->GetLoadSearchResultsResult->SearchResults)  || empty($return->GetLoadSearchResultsResult->SearchResults->LoadSearchItem)){
 			$this->rows   = array();
 		} else if(empty($return->GetLoadSearchResultsResult->Errors->Error)){
@@ -371,11 +634,7 @@ class Cron extends CI_Controller{
 		}else{
 			$data['rows'] 	  = json_decode(json_encode($this->rows),true);
 		}
-		
-		$dat = array_merge($dat,$data['rows']);
+		return $data['rows'];
 	}
 
-
-
-	
 }

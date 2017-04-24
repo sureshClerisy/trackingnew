@@ -11,41 +11,26 @@ $rootScope.logoutmessage=false;
     };
 
 	$rootScope.notificationChannel = "notification";
+
 	PubNub.init({
 		publishKey  : "pub-c-22610cc5-0f26-47ad-bce5-5f768a26b9f7",
 		subscribeKey: "sub-c-3367f186-12ce-11e7-b568-0619f8945a4f",
-		ssl : true
+		//ssl : true
 	});
 
+	PubNub.ngSubscribe({ channel: $rootScope.notificationChannel });		
 
 	//~~~~~~~~~~~~~~~~~~~~~~~ Pubnub Code ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	PubNub.ngSubscribe({ channel: $rootScope.notificationChannel });		
-	
-	/*if (typeof Notification !== 'undefined') {
-		Notification.requestPermission(function() {
-			if (Notification.permission === 'granted') {
-				// Now your page can send the user notifications!
-			}
-		});
-	}*/
+
 	// handle message events
 	$rootScope.$on(PubNub.ngMsgEv($rootScope.notificationChannel), function(event, payload) { 
 		if(payload.env[0][0].sender_uuid  != undefined && payload.env[0][0].sender_uuid != $rootScope.activeUser){
 			$rootScope.getNotifications();
-			/*if (Notification.permission === 'granted' && $scope.haveUnread > 0) {
-				console.log(payload);
-				var notification = new Notification('Yeah!', {
-					body: 'You got a new notification !!!' ,
-					tag: "",
-				});
-				notification.onclick = function(x) { parent.focus(); window.focus(); this.close(); };
-				notification.onshow = function() {
-					setTimeout(notification.close, 30000);
-				};
-				
-			}*/
 		}
 	});
+	
+
+
 	//~~~~~~~~~~~~~~~~~~~~~~~ Pubnub Code ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     /**Fetching language values*/
 	$scope.ticketActivity   = []; 	//For activities in timeline tab of job ticket
@@ -69,6 +54,10 @@ $rootScope.logoutmessage=false;
 		}
 		/******************for solving prb at load detail popup heading*************/
 	}
+
+	$rootScope.showInvestorSidebar = false;
+	if ( $cookies.get('loggedUserRoleId') != undefined && $cookies.get('loggedUserRoleId') == 7 ) 
+		$rootScope.showInvestorSidebar = true;						// showing investro sidebar if investor logins
 
 	$scope.modalSlideLeft = function() {
         setTimeout(function() {
@@ -107,9 +96,7 @@ $rootScope.logoutmessage=false;
 		$scope.autoFetchLoads = false;
     }
 
-     // $scope.toggleAll = function() {
-     // 	angular.element('.page-sidebar').removeAttr('style');
-     // }
+  
 
     $scope.showHidePortlet = function() {
     	if(!angular.element('#appMenu').hasClass('show')){
@@ -132,17 +119,30 @@ $rootScope.logoutmessage=false;
 		//~ if ( $cookies.get('userIsLoggedIn') == 1 ) {
 		dataFactory.httpRequest(URL + '/login/checkLogin').then(function(data) {
 			if ( data.success == true ) {
+				$rootScope.loggedUserFirstName = $cookies.get('loggedUserFirstNameCookie');
+				$rootScope.LastName = $cookies.get('LastName');
+				$rootScope.color = $cookies.get('color');
+				$rootScope.loggedUserRoleId = $cookies.get('loggedUserRoleId');
+				$rootScope.activeUser = $cookies.get('loggedUserId');
+
+				if($rootScope.loggedUserRoleId == 2){ //Is Dispatcher
+					$rootScope.predictJobChannel = "predict_next_job_"+$rootScope.activeUser;		
+					PubNub.ngSubscribe({ channel: $rootScope.predictJobChannel });
+					// handle predict jobs
+					$rootScope.$on(PubNub.ngMsgEv($rootScope.predictJobChannel), function(event, payload) { 
+						var msgFor = payload.env[0][0].message.sender_uuid;
+						if( msgFor  != undefined && msgFor == $rootScope.activeUser ){
+							//alert("gotcha");
+							$rootScope.getNextPredictedJobs();
+						}
+					});
+				}
+
+				$rootScope.getNextPredictedJobs();
 				$rootScope.getNotifications();
 				$rootScope.loggedInUser = true;
 				$rootScope.showHeader = true;
 				$rootScope.showBackground = false;
-				$rootScope.loggedUserFirstName = $cookies.get('loggedUserFirstNameCookie');
-				
-				$rootScope.LastName = $cookies.get('LastName');
-				$rootScope.color = $cookies.get('color');
-
-				$rootScope.loggedUserRoleId = $cookies.get('loggedUserRoleId');
-				$rootScope.activeUser = $cookies.get('loggedUserId');
 				
 				$rootScope.profileImage = $cookies.get('profileImage');
 				if ( $rootScope.previousUrl != undefined && $rootScope.previousUrl != '' ) {
@@ -150,8 +150,12 @@ $rootScope.logoutmessage=false;
 					if ( prevUrl[1] != 'login' )
 						$location.path(prevUrl[1]);
 				} else {
-					if( currentState == 'login' )
-						$location.path('dashboard');
+					if( currentState == 'login' ) {
+						if ( $cookies.get('loggedUserRoleId') != undefined && $cookies.get('loggedUserRoleId') == 7 )
+							$location.path('investor');
+						else
+							$location.path('dashboard');
+					}
 				}
 				$rootScope.previousUrl = ''; 
 			} else {
@@ -177,6 +181,13 @@ $rootScope.logoutmessage=false;
             $scope.haveNotifications = data.notifications.length;
 		});
 
+	}
+
+
+	$rootScope.getNextPredictedJobs = function(){
+		$http.post(URL + '/Utilities/getNextPredictedJobs/'+$rootScope.activeUser).then(function(data){
+    		$scope.predictedJobs = data;
+    	});
 	}
 
 	$rootScope.donwloadExcelFile = function(fileName){
@@ -630,7 +641,7 @@ $rootScope.logoutmessage=false;
 			$cookies.remove("_gDateRangeDashboard");
 			$cookies.remove("_gDateRangeBilling");
 			$cookies.remove("printTicket");
-			PubNub.ngUnsubscribe({channel:$rootScope.channel});
+			PubNub.ngUnsubscribe({channel:$rootScope.notificationChannel});
 		}
 
 		$rootScope.selectCommoditySuggestion = function(suggestion){
@@ -1063,7 +1074,7 @@ $rootScope.logoutmessage=false;
 							main.showSelectedShipOrBrok = 'broker';
 
 						$scope.showEditButton = true;
-						if ( $rootScope.editSavedLoad.flag != undefined && $rootScope.editSavedLoad.flag == '1' && data.userRoleId != '1' && data.userRoleId != '3' && data.userRoleId != '5' ) {
+						if ( ($rootScope.editSavedLoad.flag != undefined && $rootScope.editSavedLoad.flag == '1' && data.userRoleId != '1' && data.userRoleId != '3' && data.userRoleId != '5') || (data.userRoleId == 7 ) ) {
 							$scope.showEditButton = false;
 						}
 						
@@ -4430,7 +4441,12 @@ $rootScope.logoutmessage=false;
 		if ( url != '' && url != undefined && url != 'undefined' ) {
 			$state.go('searchresults', {q:url}, {notify: false,reload: false});
 		} else {
-			$state.go('myLoad');	
+			if( $rootScope.showInvestorSidebar ){
+				$state.go('investor');	
+			}else{
+				$state.go('myLoad');		
+			}
+			
 		}	
 	}
 	
@@ -4443,7 +4459,11 @@ $rootScope.logoutmessage=false;
 			if ( url != '' && url != undefined && url != 'undefined' ) {
 				$state.go('searchresults', {q:url}, {notify: false,reload: false});
 			} else {
-				$state.go('myLoad');	
+				if( $rootScope.showInvestorSidebar ){
+					$state.go('investor');	
+				}else{
+					$state.go('myLoad');		
+				}
 			}	
 		}
 	}); 

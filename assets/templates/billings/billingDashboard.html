@@ -8,14 +8,14 @@
 			<div class="row">
 				<div class="col-md-12 col-xlg-12">
 					<div class="commen-heading dashboard-page">
-						<h2 class="oprate-dashbord">Billing Dashboard</h2>
+						<h2 class="oprate-dashbord">{{ languageArray.billingdashboard }}</h2>
 						<div class="label_select_box"> 
 							<div class="input-cal-block">
 								<div class="input-prepend input-group">
 									<span class="add-on input-group-addon">
 										<i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
 									</span>
-								   <input date-range-picker placeholder="Select date range" id="billDash"  class="form-control date-picker customDateRange" type="text" options="billDash.opts" ng-model="billDash.dateRangeSelector" />
+								   <input date-range-picker placeholder="{{ languageCommonVariables.selectdaterange }}" id="billDash"  class="form-control date-picker customDateRange" type="text" options="billDash.opts" ng-model="billDash.dateRangeSelector" />
 								</div>
 							</div>
 						</div>
@@ -38,12 +38,12 @@
 			                                </div>
 			                            </div>
 			                            <div class="panel-body">
-			                            	<h3 class="no-margin p-b-5 text-white p-b-25 today-block">Sent Today</h3>
+			                            	<h3 class="no-margin p-b-5 text-white p-b-25 today-block">{{ languageArray.senttoday }}</h3>
 			                                <div class=" bottom-left bottom-right padding-25 m-b-2	5 ">
 			                                	<div class="block-dash-content1">
 				                                    <!-- <h1 class="font-montserrat fs-16 all-caps 	text-white semi-bold p-b-15 no-margin semi-bold">Sent Today</h1> -->
 				                                    <h3 ng-click="billDash.goForDetails('sent_today','billings')" class="no-margin p-b-5 cursor text-white p-b-25 ng-binding">{{billDash.sentTodayCount | currency:"$":2}}</h3>
-				                                    <span ng-click="billDash.goForDetails('sent_today_expected','billings')" class="font-montserrat fs-16 all-caps cursor	text-white  text-white small semi-bold"> out of {{billDash.expectedBillingToday | currency:"$":2}}</span>
+				                                    <span ng-click="billDash.goForDetails('sent_today_expected','billings')" class="font-montserrat fs-16 all-caps cursor	text-white  text-white small semi-bold"> {{ languageArray.outof }} {{billDash.expectedBillingToday | currency:"$":2}}</span>
 				                                </div>
 			                                </div>
 			                            </div>
@@ -79,7 +79,7 @@
 					                                            	<div class="block-dash-content1">
 								                                        <h1 class="font-montserrat fs-16  	text-white semi-bold p-b-15 no-margin semi-bold">{{billDash.saleCaption}} </h1>
 						                                                <h3 ng-click="billDash.goForDetails('last_week_sale','billings')" class="cursor no-margin p-b-5 text-white p-b-20 ng-binding">{{billDash.lastWeek.sentToTriumph | currency:"$":2}}</h3>
-						                                                <span class="font-montserrat fs-16   text-white  text-white small semi-bold ng-binding">{{billDash.lastWeek.goalCompleted | number:2 }}% of Goal</span>
+						                                                <span class="font-montserrat fs-16   text-white  text-white small semi-bold ng-binding">{{billDash.lastWeek.goalCompleted | number:2 }}% {{ languageArray.ofgoal }}</span>
 						                                            </div>
 					                                            </div>
 					                                        </div>
@@ -119,7 +119,7 @@
 					                                <div class="col-xs-height col-top">
 					                                    <div class="p-l-20 p-r-20 p-t-15">
 					                                    	<div class="block-dash-content1">
-						                                        <h1 class="font-montserrat fs-16 text-right	text-white semi-bold p-b-15 no-margin semi-bold">This Week
+						                                        <h1 class="font-montserrat fs-16 text-right	text-white semi-bold p-b-15 no-margin semi-bold">{{languageArray.thisweek}}
 						                                                    </h1>
 				                                                <h3 ng-click="billDash.goForDetails('this_week_sale','billings')" class=" cursor no-margin p-b-5 text-white text-right p-b-20 ng-binding">{{billDash.thisWeek.sentToTriumph | currency :"$": 2}}</h3>
 				                                                <span  class="font-montserrat fs-16 text-right   text-white  text-white small semi-bold ng-binding">{{billDash.thisWeek.target | number : 2}}% {{billDash.thisWeek.targetType}} week's target </span>
@@ -149,7 +149,7 @@
 		             		<div class="panel pie-jobs" pg-portlet progress="bar" on-refresh="billDash.refreshTest('.pie-jobs','job_status')">
 		             			
 		             			<div class="panel-heading main-control-move1 heading-tb-moveable ">
-		             				<div class="panel-title font-montserrat bold">Job Ticket Status</div>
+		             				<div class="panel-title font-montserrat bold">{{ languageArray.jobticketstatus }}</div>
 		             				<div class="panel-controls " >
 	                                    <ul>
 	                                        <li><a  class="portlet-refresh text-black" data-toggle="refresh"><i class="portlet-icon portlet-icon-refresh text-black"></i></a>
@@ -159,7 +159,7 @@
 	                            </div>
 	                            <div class="panel-body height-87per pos-rel" >
 		             				<highchart ng-show="billDash.hasPieChartData" id="job_status" config="billDash.JobStatusPieConfig" ></highchart>
-		             				<div class="appear-middle" ng-show="!billDash.hasPieChartData">No Data Available</div>
+		             				<div class="appear-middle" ng-show="!billDash.hasPieChartData">{{ languageCommonVariables.norecordfound }}</div>
 	                            </div>
                             </div>
 
@@ -170,7 +170,7 @@
 		             		<div class="box-shadow-able m-b-20">
 				                <div class="widget-11 recent-transactions panel no-border  no-margin widget-loader-bar" pg-portlet progress="bar" on-refresh="billDash.refreshTest('.recent-transactions','recent_transactions')">
 				                    <div class="panel-heading heading-tb-moveablepl">
-				                        <div class="panel-title font-montserrat bold">Cash Flow</div>
+				                        <div class="panel-title font-montserrat bold">{{ languageArray.cashflow }}</div>
 				                        <div class="panel-controls">
 				                            <ul>
 				                                <li>
@@ -188,24 +188,24 @@
 				                        <table class="table  table-condensed table-hover table-striped my-table-move my-table-pl" >
 				                        	<thead>
 				                        		<tr>
-				                        			<th>Date</th>
-				                        			<th>Conf No.</th>
-				                        			<th>Inv	</th>
-				                        			<th>Expected</th>
-				                        			<th>Actual</th>
+				                        			<th>{{ languageCommonVariables.date }}</th>
+				                        			<th>{{ languageArray.confno }}</th>
+				                        			<th>{{ languageArray.inv }}</th>
+				                        			<th>{{ languageArray.expected }}</th>
+				                        			<th>{{ languageCommonVariables.diselcalculationact }}</th>
 				                        			
 				                        		</tr>
 				                        		
 				                        	</thead>
 				                            <tbody>
-				                                <tr class="cursor" ng-click="billDash.goForDetails('cash_flow','billings', record)"  ng-repeat="record in billDash.recentTransactions.truimphTxns">
+				                                <tr  ng-repeat="record in billDash.recentTransactions.truimphTxns">
 					                                <td>
 				                                        <span class="font-montserrat fs-18">{{record.date}}</span>
 				                                    </td>
 				                                    <td class="font-montserrat all-caps fs-12">{{record.confirmationCode}}</td>
 				                                    <td class="font-montserrat all-caps fs-12">{{record.inv}}</td>
-				                                    <td class="font-montserrat all-caps fs-12">{{record.expected | currency:"$":2}}</td>
-				                                    <td class="font-montserrat all-caps fs-12">{{record.amount | currency:"$":2 }}</td>
+				                                    <td ng-click="billDash.goForDetails('cash_flow_expected','billings', record)" class="font-montserrat cursor hover-green all-caps fs-12">{{record.expected | currency:"$":2}}</td>
+				                                    <td ng-click="billDash.goForDetails('cash_flow_actual','billings', record)" class="font-montserrat cursor  hover-green all-caps fs-12">{{record.amount | currency:"$":2 }}</td>
 				                                </tr>
 				                                <tr class="bold">
 				                                	<td colspan="2">Total</td>

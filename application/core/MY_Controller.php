@@ -20,13 +20,16 @@ class Admin_Controller extends MY_Controller
 	public $event;
 	public $serverAddr;
 	public $protocol;
+	protected $userID;
+	protected $superAdmin = 0;
+
 
 	function __construct() {
 
 		parent::__construct();
 		$this->load->library(array('session'));
 		$loggedUser_username 	= $this->session->userdata('loggedUser_username');
-		$loggedUser_id 			= $this->session->userdata('loggedUser_id');
+		$this->userID   		= $loggedUser_id = $this->session->userdata('loggedUser_id');
 		$user_logged_in 		= $this->session->userdata('loggedUser_loggedin');
 
 		$this->entity     = $this->config->item('entity');
@@ -48,11 +51,16 @@ class Admin_Controller extends MY_Controller
 		$this->username 	= $this->config->item('truck_username');
 		$this->password 	= $this->config->item('truck_password');
 		$this->url 			= $this->config->item('truck_url');
-			$this->wsdl_url		= 'http://webservices.truckstop.com/V13/Searching/LoadSearch.svc?wsdl'; //Live Mode Api 
-			$this->finalArray	= array();
-		}
+		$this->wsdl_url		= 'http://webservices.truckstop.com/V13/Searching/LoadSearch.svc?wsdl'; //Live Mode Api 
+		$this->finalArray	= array();
 		
-		protected function commonApiHits($abbreviation = 'F', $dateTime = array() , $hoursOld = '', $origin_country = 'USA', $origin_range = 300 ,$destination_city = '', $destination_states = '', $destination_range = 300, $dest_country = 'USA', $load_type = 'Full') {
+		
+		if(in_array($this->userID, $this->config->item('superAdminIds'))){
+			$this->superAdmin = 1;
+		}
+	}
+		
+	protected function commonApiHits($abbreviation = 'F', $dateTime = array() , $hoursOld = '', $origin_country = 'USA', $origin_range = 300 ,$destination_city = '', $destination_states = '', $destination_range = 300, $dest_country = 'USA', $load_type = 'Full') {
 			if ( strpos($this->origin_state,',') !== false ) {
 				$states = explode(',',$this->origin_state);
 				$statesCount = count($states);
@@ -303,10 +311,13 @@ class Admin_Controller extends MY_Controller
 			$this->excel->getActiveSheet()->getDefaultRowDimension()->setRowHeight(16); //for set min height
 			$this->excel->getActiveSheet()->getStyle('1:1')->getFont()->setBold(true);
 			
-			if($boldLastRow){ //Bold last row for load 
+			if($boldLastRow){ //Bold last row for load 0.00%
+
 				$this->excel->getActiveSheet()->getStyle($totalRows.':'.$totalRows)->getFont()->setBold(true);
+				//$this->excel->getActiveSheet()->getStyle('J')->getNumberFormat()->setFormatCode('0%');
+				// $this->excel->getActiveSheet()->getStyle('C')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_DATE_DDMMYYYY);
 				
-				foreach (['G','H','I'] as $key => $columnLabel) {
+				foreach (['G','H','I','M'] as $key => $columnLabel) {
 					$this->excel->getActiveSheet()->getStyle($columnLabel)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
 					$this->excel->getActiveSheet()->getColumnDimension($columnLabel)->setAutoSize(true);
 				}
@@ -333,7 +344,7 @@ class Admin_Controller extends MY_Controller
 		protected function buildExportLoadData($loads = NULL,$fileLabel=NULL){
 			
 			$newArray 		= [];
-			$totalPayment 	= 0;
+			$totalInvoice 	= 0;
 			$totalMiles 	= 0;
 			$totalDeadMiles = 0;
 			$overallTotalProfitPercent = 0;
@@ -344,43 +355,69 @@ class Admin_Controller extends MY_Controller
 
 			foreach ($loads as $key => $load) {
 				
-				$newArray[$key]['LOLADID'] 		= $load['id'];
-				$newArray[$key]['INVOICEID'] 	= ($load['invoiceNo'])?$load['invoiceNo']:'NA';
-				$newArray[$key]['DATE'] 		= date('m/d',strtotime($load['created']));
+				$newArray[$key]['LOADID'] 		= $load['id'];
+				$newArray[$key]['INVOICEID'] 	= ($load['invoiceNo'])?$load['invoiceNo']:'';
+				$newArray[$key]['DATE'] 		= date('d/m/Y',strtotime($load['created']));
 				$newArray[$key]['STATUS'] 		= ucfirst($load['JobStatus']);
 				$newArray[$key]['CUSTOMERNAME'] = (!empty($load['companyName']))?$load['companyName']:@$load['TruckCompanyName'];
 				$newArray[$key]['DRIVERS'] 		= $load['driverName'];
 				$newArray[$key]['INVOICE'] 		= $load['PaymentAmount'];
 				$newArray[$key]['CHARGES'] 		= $load['totalCost'];
 				$newArray[$key]['PROFIT'] 		= $load['overallTotalProfit'];
+
+				
 				$PaymentAmount 					= ($load['PaymentAmount']!=0)?$load['PaymentAmount']:1;
-				$profit 						= ($load['totalCost']/$PaymentAmount)*100;
-				$newArray[$key]['%PROFIT'] 		= number_format($profit); 
+				$profit 						= ($load['overallTotalProfit']/$PaymentAmount)*100;
+
+
+				$newArray[$key]['%PROFIT'] 		= number_format($profit,2).'%'; 
+
+
 				$newArray[$key]['MILES'] 		= $load['Mileage'];
 				$newArray[$key]['DEADMILES'] 	= $load['deadmiles'];
 				$newArray[$key]['RATE/MILE'] 	= number_format((!empty($load['rpm']))?$load['rpm']:@$load['RPM'],2);
-				$newArray[$key]['DATEP/U'] 		= date('m/d',strtotime($load['pickDate']));
+				$newArray[$key]['DATEP/U'] 		= date('d/m/Y',strtotime($load['pickDate']));
 				$newArray[$key]['PICKUP'] 		= $load['OriginCity'].', '.$load['OriginState'];
-				$newArray[$key]['DATEDE'] 		= date('m/d',strtotime($load['DeliveryDate']));
+				$newArray[$key]['DATEDE'] 		= date('d/m/Y',strtotime($load['DeliveryDate']));
 				$newArray[$key]['DELIVERY'] 	= $load['DestinationCity'].', '.$load['DestinationState'];
 				//Last row data
-				$totalPayment 					+=$load['PaymentAmount'];
+				$totalInvoice 					+=$load['PaymentAmount'];
 				$totalMiles 					+=$load['Mileage'];
 				$totalDeadMiles 				+=$load['deadmiles'];
 				$overallTotalProfit      		+=$load['overallTotalProfit'];
 				$CHARGES 						+=$load['totalCost'];
-				$deadMiles 						+=$load['totalCost'];
 				$totalRPM 						+=$newArray[$key]['RATE/MILE'];
 			}
 
 			$totalRows 	= count($newArray) ;
 			$totalRPM 	= number_format($totalRPM/$totalRows,2);
 
-			$overallTotalProfitPercent = number_format(($CHARGES/$totalPayment)*100);
-			$newArray[] =[];
-			$newArray[] = ['','','Total Rows:'.$totalRows,'','','','$'.number_format($totalPayment,2),'$'.number_format($CHARGES,2),'$'.number_format($overallTotalProfit,2),$overallTotalProfitPercent,$totalMiles,$totalDeadMiles,$totalRPM,'','','',''];
+			$overallTotalProfitPercent = number_format(($overallTotalProfit/$totalInvoice)*100,2);
+
 			
-			array_unshift($newArray, ['LOLAD ID','INVOICE ID','DATE','STATUS','CUSTOMER NAME','DRIVERS','INVOICE','CHARGES','PROFIT','%PROFIT','MILES','DEAD MILES','RATE/MILE','DATE P/U','PICK UP','DATE DE','DELIVERY']);
+			$newArray[] =[];
+			
+			$newArray[] = [
+							'',
+							'',
+							'Total Rows:'.$totalRows,
+							'',
+							'',
+							'',
+							'$'.number_format($totalInvoice,2),
+							'$'.number_format($CHARGES,2),
+							'$'.number_format($overallTotalProfit,2),
+							$overallTotalProfitPercent.'%',
+							$totalMiles,
+							$totalDeadMiles,
+							'$'.$totalRPM,
+							'',
+							'',
+							'',
+							''
+						];
+			
+			array_unshift($newArray, ['LOADID','INVOICE ID','DATE','STATUS','CUSTOMER NAME','DRIVERS','INVOICE','CHARGES','PROFIT','%PROFIT','MILES','DEAD MILES','RATE/MILE','DATE P/U','PICK UP','DATE DE','DELIVERY']);
 
 			echo json_encode(array('fileName'=>$this->createExcell($fileLabel,$newArray,TRUE)));
 			die();

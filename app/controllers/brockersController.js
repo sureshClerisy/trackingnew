@@ -187,9 +187,9 @@ app.controller('addBrokersController', function(dataFactory,$scope, PubNub , $ht
 	if($rootScope.loggedInUser == false)
 		$location.path('login');
 	$rootScope.dataNotFound = false;	
-	$rootScope.showHeader = true;
-	$scope.addBrokersData = {};
-	$scope.changedRating = 1;
+	$rootScope.showHeader 	= true;
+	$scope.addBrokersData 	= {};
+	$scope.changedRating 	= 1;
 	
 	$scope.dropzoneConfigBrokerAdd = {
 		parallelUploads: 5,

@@ -1,4 +1,4 @@
-f<?php
+<?php
 $lang['allDriver'] = 'Todos los conductores';
 $lang['dashboardHeading'] = 'Tablero';
 $lang['bestSafetyHeading'] = 'Mejor Seguridad';
@@ -68,3 +68,34 @@ $lang['driver'] = 'Conductor';
 $lang['loadno'] = 'Carga #';
 $lang['pickupdate'] = 'Fecha de recogida';
 $lang['deliverdate'] = 'Fecha de entrega';
+
+$lang['todayinsights'] = 'HOY INSIGHTS';
+$lang['pickup'] = 'RECOGER';
+$lang['inprogress'] = 'EN PROGRESO';
+$lang['delivery'] = 'ENTREGA';
+$lang['idle'] = 'OCIOSO';
+$lang['driver'] = 'CONDUCTOR';
+$lang['truck'] = 'CAMIÓN';
+$lang['origin'] = 'ORIGEN';
+$lang['st'] = 'ST';
+$lang['destination'] = 'DESTINO';
+$lang['payment'] = 'PAGO';
+$lang['rpm'] = 'RPM';
+$lang['company'] = 'EMPRESA';
+$lang['leaderboard'] = 'JUNTA DIRECTIVA';
+$lang['message'] = 'Mensaje';
+
+$lang['weatherreport'] = 'Reporte del clima';
+$lang['day'] = 'Día';
+$lang['temperature'] = 'Temperatura';
+$lang['wind'] = 'Viento';
+$lang['humidity'] = 'Humedad';
+$lang['mintemperature'] = 'Min. Temperatura';
+$lang['maxtemperature'] = 'Max. Temperatura';
+$lang['feelslike'] = 'Se siente como';
+
+
+$lang['driverwithouttr'] = 'Conductores activos sin camión';
+$lang['trucksnotrep'] = 'Camiones no informan ubicación actual';
+$lang['truckwithoutdriver'] = 'Camiones sin conductor';
+$lang['incompleteLoads'] = 'Cargas incompletas';

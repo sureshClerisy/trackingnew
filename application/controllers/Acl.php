@@ -8,14 +8,13 @@ class Acl extends Admin_Controller {
 	private $actions 			= [];
 	private $fileName;
 	private $parentID;
-
-
 	
 
 	public function __construct(){	
 
 		parent::__construct();
 		$this->load->model('AclModel','Acl');
+		
 	}
 
 	public function organisations(){
@@ -44,8 +43,10 @@ class Acl extends Admin_Controller {
 		
 		if(!empty($this->className)){
 			require_once APPPATH . 'controllers/'.$this->fileName;
-			$reflectorObj = new ReflectionClass($this->className);
-			$methodNames =[];
+			
+			$reflectorObj 	= new ReflectionClass($this->className);
+			$methodNames 	=[];
+
 			foreach ($reflectorObj->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
 				if($method->name !='__construct' && $method->name !='get_instance'){
 					$this->actions[$this->className][] = $method->name;
@@ -71,24 +72,24 @@ class Acl extends Admin_Controller {
 		return $this->className = ucfirst($fileArray['0']);
 	}
 
-	public function getController($id=null){
+	public function getController($id = null){
 		$this->data = $this->Acl->getController();
 		echo json_encode(['success'=>true,'data'=>$this->data]);
 	}
 
-	public function getActions($id=null){
+	public function getActions($id = null){
 		$this->data = $this->Acl->getActions();
 		echo json_encode(['success'=>true,'data'=>$this->data]);
 	}
 
 	public function getRoles($roleId=null){
+
 		$this->data = $this->Acl->getRoles($roleId);
-		echo json_encode(['success'=>true,'data'=>$this->data]);
+		echo json_encode(['success'=>true,'data'=>$this->data,'currentUserId'=>$this->userID,'superadmin'=>$this->superAdmin]);
 	}
 
 	public function addroles(){
 		$objPost = json_decode(file_get_contents('php://input'),true);
-
 		$this->Acl->addRole($objPost);
 		echo json_encode(['success'=>true]);	
 	}

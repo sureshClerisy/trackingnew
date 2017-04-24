@@ -76,3 +76,6 @@ $lang['truckNumbetTableThinspolvalid'] = 'Insurance valid till';
 $lang['truckNumbetTableThinspolnum2'] = 'Insurance 2 policy number';
 $lang['dispatcher'] = 'Dispatcher'; 
 /** Truck Add Page */
+
+$lang['single'] = 'Single';
+$lang['team'] = 'Team';

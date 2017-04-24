@@ -48,8 +48,12 @@
 </head>
 <body class="fixed-header" ng-class="showBackground == true ? 'login-bg-head' : ''" ng-controller="mainController as mctrl">
    
-    <div ng-if="showHeader == true">
+    <div ng-if="showHeader == true && showInvestorSidebar == false" >
         <ng-include src="'./assets/templates/sidebar.html'"></ng-include>
+    </div>
+
+    <div ng-if="showHeader == true && showInvestorSidebar == true" >
+        <ng-include src="'./assets/templates/investorSidebar.html'"></ng-include>
     </div>
            
     <div class="page-container">

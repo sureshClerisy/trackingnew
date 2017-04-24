@@ -64,7 +64,16 @@ app.controller('authCtrl', function (dataFactory,$scope, PubNub, $rootScope, $lo
 				}
 				$rootScope.showHeader = true;
 				$rootScope.showBackground = false;
-				$location.path('dashboard');
+
+				if ( data.loggedUserRole_id == 7 ) {
+					$location.path('investor');
+					$rootScope.showInvestorSidebar = true;
+				}
+				else {
+					$location.path('dashboard');
+					$rootScope.showInvestorSidebar = false;
+				}
+
 			} else {
 				$scope.showLogin=true;
 				$scope.Message = $rootScope.languageCommonVariables.InvalidUsernamePassword;

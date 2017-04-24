@@ -1,0 +1,81 @@
+      <!-- START PAGE CONTENT WRAPPER -->
+      <div class="page-content-wrapper ">
+        <!-- START PAGE CONTENT -->
+        <div class="content sm-gutter">
+          <!-- START CONTAINER FLUID -->
+          <div class="container-fluid padding-25 sm-padding-10">
+			<div class="row">
+				<div class="col-md-12 col-xlg-12">
+					<div ng-show="alertmsg == true" class="alert alert-success" role="alert">
+						<button class="close" data-dismiss="alert"></button>
+						{{Message}}
+						</div>
+						<div ng-show="alertdeletemsg == true" class="alert alert-error" role="alert">
+						<button data-dismiss="alert" class="close"></button>
+						{{errMessage}}
+						</div>
+					<div class="commen-heading">
+						<h2 class="oprate-dashbord"><i class="fa fa-users"></i>{{languageArray.usersHeading}}</h2>
+					</div>
+				</div>
+			</div>
+			
+			<div class="row invocie-block-row">
+				<div class="col-md-12 col-xlg-12">
+					<div class="load-new-block-table">
+						<div class="panel-body add-new-data">
+							<div class="load-tabe-auto map-load-section">
+								<a href="#/addUser" class="add-new-data-button">
+									<button class="btn btn-primary">
+										<i class="fa fa-plus" style="margin-right:3px"></i>
+										<span class="bold">{{languageArray.addUser}}</span>
+									</button>
+								</a>
+								<table datatable="ng" dt-options="dtOptions" class=" table tr-hover table-hover table-striped driver-table" id="tableWithExportOptions">
+									<thead>
+										<tr>
+											<th>ID</th>
+											<th>Full Name</th>
+											<th>Username</th>
+											<th>Email</th>
+											<th class="text-center">{{ languageCommonVariables.commonTableThAction }}</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr ng-repeat="value in usersData" >
+											
+											<td>{{ value.id }} </td>
+											<td>{{ value.fullName }}</td>
+											<td>{{ value.username }}</td>
+											<td>{{ value.email }}</td>
+											<td class="text-center action-btn-ryt"> 
+												<div class="export-options-container">
+													<div class="exportOptions">
+														<div class="DTTT btn-group">
+															<a href="#/editUser/{{value.id}}" class="btn btn-default DTTT_button_pdf" title="{{languageCommonVariables.editTrailer}}" ui-jq="tooltip" >
+																<span><i class="fa fa-edit" aria-hidden="true"></i></span>
+															</a>
+															<a class="btn btn-default DTTT_button_csv" title = "Deactivate User" ui-jq="tooltip" ng-click="changeUserStatus(value.id,value.status,$index)">
+																<span><i class="fa fa-check-square"></i></span>
+															</a>
+															<a class="btn btn-default DTTT_button_csv" title = "Delete User" ui-jq="tooltip" ng-click="delete(value.id)">
+																<span><i class="fa fa-check-square"></i></span>
+															</a>
+														</div>
+													</div>
+												</div>
+												
+											</td>
+										</tr>
+									</tbody>
+								</table>
+
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<ng-include src="'./assets/templates/common_modals.html'"></ng-include>

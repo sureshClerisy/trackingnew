@@ -40,5 +40,6 @@ $lang['brokerListingTableThStreetAddress'] = 'Dirección';
 $lang['brokerListingTableThCity'] = 'Ciudad';
 $lang['brokerListingTableThState'] = 'Estado';
 $lang['brokerListingTableThZipCode'] = 'Código postal';
+$lang['shipperListingAddButton'] = 'Añadir remitente';
 
 /** End of Common in broker **/

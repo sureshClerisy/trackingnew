@@ -92,8 +92,7 @@
                                                 <label>{{ languageCommonVariables.commonTableThEmail }}</label>
                                                 <input type="email" class="form-control" name="email" ng-model="driversData.email"  >
                                             </div>
-                                            <label class="error" for="email" ng-show="editDrivers.email.$invalid && !editDrivers.email.$pristine">Please enter valid email address.</label>
-                                                                                        
+                                            <label class="error" for="email" ng-show="editDrivers.email.$invalid && !editDrivers.email.$pristine">Please enter valid email address.</label>                                                                                        
                                        </div>
                                      
                                         <div class="col-sm-6 col-xs-12">
@@ -103,7 +102,6 @@
                                                     <label>{{ languageArray.driverdlnum }}</label>
                                                     <input type="text" class="form-control" name="driverlicencenumber" ng-model="driversData.driver_license_number" required ng-blur="checkUniqueFields(driversData.driver_license_number, 'driver_license_number', 'drivers', driversData.id)" >
                                                 </div>
-
                                                 <label class="error" for="driverlicencenumber" ng-show="editDrivers.driverlicencenumber.$invalid && !editDrivers.driverlicencenumber.$pristine || editDrivers.$submitted && editDrivers.driverlicencenumber.$invalid">Please enter driver licence number.</label>
                                                 <label class="error" ng-if="uniqueFieldsValue == false">This licence number is already attached to another driver.</label>
 

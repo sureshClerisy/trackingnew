@@ -247,7 +247,7 @@ class Login extends CI_Controller {
 			$cookie = array(
 				'name'   => 'setLanguageGlobalVariable',
 				'value'  => 'english',
-				'expire' => time()+86500,
+				// 'expire' => time()+86500,
 			 );
 			set_cookie($cookie);
 		}		
@@ -283,6 +283,10 @@ class Login extends CI_Controller {
 		$this->lang->load('trailers');
 		$languageArray['trailers'] = json_encode($this->lang->language);
 		echo "languageArr['trailers']=".$languageArray['trailers'].';';
+
+		$this->lang->load('billing');
+		$languageArray['billing'] = json_encode($this->lang->language);
+		echo "languageArr['billing']=".$languageArray['billing'].';';
 		
 		//~ $this->lang->load('loads');	
 		//~ $load = json_encode($this->lang->language);

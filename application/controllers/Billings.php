@@ -848,7 +848,7 @@ class Billings extends Admin_Controller{
 			if($billingDay !== "Monday" && $key !=0 && !in_array_multi($considerDate, $recentTransactions) && !in_array_multi($value["date"], $truimphTxns)){
 				while (strtotime($considerDate) <= strtotime($toDate) ) {
 					$xdate = date ("Y-m-d", strtotime("-1 day", strtotime($considerDate)));
-					$temp  = array("confirmationCode"=>"--", "date"=>$considerDate, "inv"=> 0, "amount"=>0);
+					$temp  = array("confirmationCode"=>"--", "date"=>$considerDate, "inv"=> 0, "amount"=>0, "justToken"=>-1);
 					$temp["fromDate"] = $xdate;
 					$temp["toDate"]   = $xdate;
 					$temp["expected"] = $this->Billing->expectedBillingOnDate($xdate,$xdate,"past");	
@@ -896,7 +896,7 @@ class Billings extends Admin_Controller{
 				}
 
 
-				$temp  = array("confirmationCode"=>"--", "date"=>$fromDate, "inv"=> 0, "amount"=>0);
+				$temp  = array("confirmationCode"=>"--", "date"=>$fromDate, "inv"=> 0, "amount"=>0, "justToken"=>-1);
 				$temp["fromDate"]   = $considerFromDate;
 				$temp["toDate"]     = $considerToDate;
 				$expected           = $this->Billing->expectedBilling($considerFromDate, $considerToDate);
@@ -1052,9 +1052,9 @@ class Billings extends Admin_Controller{
 				$singleFinancialGoal  += $single * $goalValues['singleFinancial'] * $daysdiff;
 				$teamFinancialGoal	+= $team * $goalValues['teamFinancial'] * $daysdiff;
 				
-				if ( $driversList['createdDate'] > $rparam['endDate'] && empty($driverLastLog)) {
+				if ( isset($driversList['createdDate']) && $driversList['createdDate'] > $rparam['endDate'] && empty($driverLastLog)) {
 					$showDispatcher = 0;
-				} else if( $driversList['single'] <= 0 && $driversList['team'] <= 0 ) {
+				} else if( isset($driversList['single']) && $driversList['single'] <= 0 && $driversList['team'] <= 0 ) {
 					$showDispatcher = 0;
 				}
 			}									
@@ -1130,7 +1130,6 @@ class Billings extends Admin_Controller{
 			exit();
 		}
 
-		$keys = [['DATE','CUSTOMER NAME','DRIVERS','INVOICE','CHARGES','PROFIT','%PROFIT','MILES','DEAD MILES','RATE/MILE','DATE P/U','PICK UP','DATE DE','DELIVERY','LOLAD ID','STATUS']];
 
 		$args = array(
 			'sortColumn' => 'DeliveryDate',
@@ -1150,9 +1149,7 @@ class Billings extends Admin_Controller{
 				break;
 		}
 		
-		$exportData = $this->buildExportLoadData($loads);
-		$data 		= array_merge($keys,$exportData);
-		echo json_encode(array('fileName'=>$this->createExcell('billing',$data,TRUE)));
+		$exportData = $this->buildExportLoadData($loads,'billing');
 	}
 
 	public function testAction(){

@@ -91,7 +91,7 @@
         </div>
         <!--mail-icon block-->
         <div class="mail-icons-block pull-right">
-			<button ng-click="addNewGlobalLoad()" class="header-addButton btn btn-primary btn-cons m-b-10" type="button"><i class="fa fa-plus"></i> <span class="bold">Add Load</span></button>
+			<button ng-click="addNewGlobalLoad()" ng-if="showInvestorSidebar == false" class="header-addButton btn btn-primary btn-cons m-b-10" type="button"><i class="fa fa-plus"></i> <span class="bold">{{ languageCommonVariables.addload }}</span></button>
 			<div class="icon mail"><img src="assets/img/mail.png"></div>
 			<div class="icon list"><img src="assets/img/list.png"></div>
 			<div class="icon bell" data-target="#modalSlideLeft" data-toggle="modal" ng-click="modalSlideLeft()"> <img src="assets/img/bell.png">
@@ -366,13 +366,13 @@
 									<div class="table-input-head">
 										<h1>{{ languageCommonVariables.popuploaddetails }}</h1>
 										<div class="save-cancel" ng-show="add_load_div == true">
-											<button ng-click="saveAddLoad()" class="btn btn-primary btn-cons m-b-10" type="button"><i class="pg-form"></i> <span class="bold">Save</span></button>
+											<button ng-click="saveAddLoad()" class="btn btn-primary btn-cons m-b-10" type="button"><i class="pg-form"></i> <span class="bold">{{ languageCommonVariables.savebutton }}</span></button>
 											<button href="javascript:void(0)" ng-show= "saveAddPrimaryId == ''" ng-click="resetAllForm()" class="btn btn-danger btn-cons m-b-10" type="button"><i class="fa fa-close"></i>
-												<span class="bold"> Reset </span>
+												<span class="bold"> {{ languageCommonVariables.resetbutton }} </span>
 											</button>
 											
 											<button href="javascript:void(0)" ng-show= "saveAddPrimaryId != ''" ng-click="changeSaveStatus()" class="cancelTheLoad1 btn btn-danger btn-cons m-b-10" type="button">
-												<i class="fa fa-close"></i><span class="bold">Close</span>
+												<i class="fa fa-close"></i><span class="bold">{{ languageCommonVariables.closebutton }}</span>
 											</button>
 										</div>
 										
@@ -444,7 +444,7 @@
 											<label>{{ driverAssignValue }}</label>
 											<div class="se-driver" >
 											<ui-select ng-disabled="disablePerm" name="driver_assign_name" ng-model="editSavedLoad.driver_id" theme="bootstrap" on-select="onSelectChangeDriverCallback($item, $model, 'addRequest')" >
-												<ui-select-match class="ui-select-match" placeholder="Select Driver">{{driverPlaceholder}}</ui-select-match>
+												<ui-select-match class="ui-select-match" placeholder="{{ languageCommonVariables.popupselectdriver }}">{{driverPlaceholder}}</ui-select-match>
 												<ui-select-choices class="ui-select-choices" group-by="'username'" repeat="item in listDrivers | propsFilter: {driverName: $select.search, username: $select.search}">
 													<span ng-bind-html="trustAsHtml((item.driverName | highlight: $select.search))"></span>
 												</ui-select-choices>
@@ -462,9 +462,9 @@
 						<div class="col-xs-12 popup-input-edit-fields">
 									<div class="row row-float shipper-start bg-blue"> 
 										<div class="table-input-head">
-											<h1>Origin Detail</h1>
+											<h1>{{ languageCommonVariables.popuporginaldetail }}</h1>
 											<button ng-click="addingNewExtraStop(extraStopsLength,'addRequest')" href="javascript:void(0)" type="button" class="extra-add-btn disable-anchor" title="Add Extra Stop">
-											<span>+</span>Add Extra Stop</button>
+											<span>+</span>{{ languageCommonVariables.popupaddextrastop }}</button>
 										</div>
 
 										<!-- <button ng-click="addingNewExtraStop(extraStopsLength,'addRequest')" href="javascript:void(0)" type="button" class="extra-add-btn disable-anchor" title="Add Extra Stop">
@@ -532,26 +532,26 @@
 										<div class="col-xs-12 no-padding">
 											<div class="col-md-3 popup-input-edit-grid pad-remove-left">
 												<div class="form-group form-group-default noBackground">
-													<label>City</label>
+													<label>{{ languageCommonVariables.city}}</label>
 													<input type="text" class="form-control" id="OriginCity" ng-disabled="disablePerm" ng-blur="changeAddMilesDistance('origin')" ng-model="editSavedLoad.OriginCity" name="OriginCity"  />
 												</div>
 											</div>
 
 											<div class="col-md-3 popup-input-edit-grid">
 												<div class="form-group form-group-default noBackground">
-													<label>State</label>
+													<label>{{ languageCommonVariables.state }}</label>
 													<input type="text" class="form-control" id="OriginState" ng-disabled="disablePerm" ng-blur="changeAddMilesDistance('origin')" ng-model="editSavedLoad.OriginState" name="OriginState" />
 												</div>
 											</div>
 											<div class="col-md-3 popup-input-edit-grid">
 												<div class="form-group form-group-default">
-													<label>Zip Code</label>
+													<label>{{ languageCommonVariables.zipcode }}</label>
 													<input type="text" name="originAddZipCode" class="form-control" ng-disabled="disablePerm" ng-model="editSavedLoad.OriginZip" />
 												</div>
 											</div>
 											<div class="col-md-3 popup-input-edit-grid pad-remove-rightpad-remove-left">
 												<div class="form-group form-group-default noBackground">
-													<label>Country</label>
+													<label>{{ languageCommonVariables.country }}</label>
 													<input type="text" class="form-control" id="OriginCountry" ng-disabled="disablePerm" ng-blur="changeAddMilesDistance('origin')" ng-model="editSavedLoad.OriginCountry" name="OriginCountry" />
 												</div>
 											</div>
@@ -628,25 +628,25 @@
 											
 										<div class="col-md-3 popup-input-edit-grid pad-remove-left">
 											<div class="form-group form-group-default noBackground">
-												<label>City</label>
+												<label>{{ languageCommonVariables.city }}</label>
 												<input type="text" class="form-control" ng-disabled="disablePerm" id="DestinationCity" ng-blur="changeExtraStopsMilesDistance($index)" ng-model="extraStops['extraStopCity_' + $index]" name="extraStopCity_{{$index}}" />
 											</div>
 										</div>
 										<div class="col-md-3 popup-input-edit-grid">
 											<div class="form-group form-group-default noBackground">
-												<label>State</label>
+												<label>{{ languageCommonVariables.state }}</label>
 												<input type="text" class="form-control" ng-disabled="disablePerm" id="DestinationState" ng-blur="changeExtraStopsMilesDistance($index)" ng-model="extraStops['extraStopState_' + $index]" name="extraStopState_{{$index}}" />
 											</div>
 										</div>
 										<div class="col-md-3 popup-input-edit-grid">
 											<div class="form-group form-group-default">
-												<label>Zip Code</label>
+												<label>{{ languageCommonVariables.zipcode }}</label>
 												<input type="text" name="extraStopZipCode_{{$index}}" ng-disabled="disablePerm" class="form-control" ng-model="extraStops['extraStopZipCode_' + $index]" />
 											</div>
 										</div>
 										<div class="col-md-3 popup-input-edit-grid pad-remove-rightpad-remove-left">
 											<div class="form-group form-group-default noBackground">
-												<label>Country</label>
+												<label>{{ languageCommonVariables.country }}</label>
 												<input type="text" class="form-control" id="DestinationCountry" ng-disabled="disablePerm" ng-blur="changeExtraStopsMilesDistance($index)" ng-model="extraStops['extraStopCountry_' + $index]" name="extraStopCountry_{{$index}}" />
 											</div>
 										</div>
@@ -664,7 +664,7 @@
 							<div class="row consignee-start"> 
 
 								<div class="table-input-head">
-									<h1>DESTINATION</h1>										
+									<h1>{{ languageCommonVariables.destination}}</h1>										
 								</div>
 
 								<div class="col-sm-4 col-md-4 popup-input-edit-grid pad-remove-left">
@@ -725,25 +725,25 @@
 								<div class="col-xs-12 no-padding">
 									<div class="col-md-3 popup-input-edit-grid pad-remove-left">
 										<div class="form-group form-group-default noBackground">
-											<label>City</label>
+											<label>{{ languageCommonVariables.city }}</label>
 											<input type="text" class="form-control" ng-disabled="disablePerm" id="DestinationCity" ng-blur="changeAddMilesDistance('origin')" ng-model="editSavedLoad.DestinationCity" name="destinationCity" />
 										</div>
 									</div>
 									<div class="col-md-3 popup-input-edit-grid">
 										<div class="form-group form-group-default noBackground">
-											<label>State</label>
+											<label>{{ languageCommonVariables.state }}</label>
 											<input type="text" class="form-control" ng-disabled="disablePerm" id="DestinationState" ng-blur="changeAddMilesDistance('origin')" ng-model="editSavedLoad.DestinationState" name="DestinationState" />
 										</div>
 									</div>
 									<div class="col-md-3 popup-input-edit-grid">
 										<div class="form-group form-group-default">
-											<label>Zip Code</label>
+											<label>{{ languageCommonVariables.zipcode }}</label>
 											<input type="text" name="destinationZip" ng-disabled="disablePerm" class="form-control" ng-model="editSavedLoad.DestinationZip" />
 										</div>
 									</div>
 									<div class="col-md-3 popup-input-edit-grid pad-remove-right">
 										<div class="form-group form-group-default noBackground">
-											<label>Country</label>
+											<label>{{ languageCommonVariables.country }}</label>
 											<input type="text" class="form-control" ng-disabled="disablePerm" id="DestinationCountry" ng-blur="changeAddMilesDistance('origin')" ng-model="editSavedLoad.DestinationCountry" name="DestinationCountry" />
 										</div>
 									</div>
@@ -756,7 +756,7 @@
 									
 							<div class="load-det-main">	
 								<div class="table-input-head">
-									<h1 class="ng-binding">lOAD DETAILS</h1>
+									<h1 class="ng-binding">{{ languageCommonVariables.popuploaddetails }}</h1>
 								</div>
 								<div class="row row-float">
 									<div class="col-md-3 popup-input-edit-grid pad-remove-left">
@@ -887,9 +887,9 @@
 						<div class="row-fmain-1">
 							<div class="half-block-main">
 								<div class="form-group form-group-default th-select broker-detail-dropdown">
-									<label>Select Broker</label>								
+									<label>{{ languageCommonVariables.popupselectbroker }}</label>								
 									<ui-select ng-model="brokerSelectedId" theme="bootstrap" on-select="onSelectChangeBrokerCallback($item, $model, 'addRequest')" >
-										<ui-select-match class="ui-select-match" placeholder="Select Broker">{{selectedBrokerName}}</ui-select-match>
+										<ui-select-match class="ui-select-match" placeholder="{{ languageCommonVariables.popupselectbroker }}">{{selectedBrokerName}}</ui-select-match>
 										<ui-select-choices class="ui-select-choices" repeat="item in brokersList | filter: $select.search">
 											<span ng-bind-html="trustAsHtml((item.TruckCompanyName | highlight: $select.search))"></span>
 										</ui-select-choices>
@@ -898,9 +898,9 @@
 							</div>
 							<div class="half-block-main">
 								<div class="form-group form-group-default th-select broker-detail-dropdown">
-									<label>Select Shipper</label>								
+									<label>{{ languageCommonVariables.popupselectshipper }}</label>								
 									<ui-select ng-model="shipperSelectedId" theme="bootstrap" on-select="mctrl.onSelectChangeShipperCallback($item, $model, 'addRequest')" >
-										<ui-select-match class="ui-select-match" placeholder="Select Shipper">{{mctrl.selectedShipperName}}</ui-select-match>
+										<ui-select-match class="ui-select-match" placeholder="{{ languageCommonVariables.popupselectshipper }}">{{mctrl.selectedShipperName}}</ui-select-match>
 										<ui-select-choices class="ui-select-choices" repeat="item in mctrl.shippersList | filter: $select.search">
 											<span ng-bind-html="trustAsHtml((item.shipperCompanyName | highlight: $select.search))"></span>
 										</ui-select-choices>
@@ -920,19 +920,19 @@
 										</h4>
 										<div class="save-cancel" ng-show="add_broker_div == true">
 										
-											<button style="float: right" ng-click="mctrl.uploadBrokerDocument(saveAddPrimaryId,editSavedLoad.broker_id)" ng-if="mctrl.showUploadBrokerButton == true" class="ratesheet-tripDetail btn btn-success btn-cons m-b-10" type="button"><i class="fa fa-cloud-upload"></i> <span class="bold">Upload Document</span>
+											<button style="float: right" ng-click="mctrl.uploadBrokerDocument(saveAddPrimaryId,editSavedLoad.broker_id)" ng-if="mctrl.showUploadBrokerButton == true" class="ratesheet-tripDetail btn btn-success btn-cons m-b-10" type="button"><i class="fa fa-cloud-upload"></i> <span class="bold">{{ languageCommonVariables.uploaddoc }}</span>
 											</button>
 										
-											<button ng-click="saveBrokerShipper(saveAddPrimaryId,'broker')" ng-disabled="addBrokerLoad.$invalid" class="btn btn-primary btn-cons m-b-10" type="button"><i class="pg-form"></i> <span class="bold">Save</span>
+											<button ng-click="saveBrokerShipper(saveAddPrimaryId,'broker')" ng-disabled="addBrokerLoad.$invalid" class="btn btn-primary btn-cons m-b-10" type="button"><i class="pg-form"></i> <span class="bold">{{ languageCommonVariables.savebutton}}</span>
 											</button>
 											<button href="javascript:void(0)" ng-show= "saveAddPrimaryId == ''" ng-click="resetTheForm('broker')" class="btn btn-danger btn-cons m-b-10" type="button"><i class="fa fa-close"></i>
-												<span class="bold"> Reset </span>
+												<span class="bold"> {{ languageCommonVariables.resetbutton}} </span>
 											</button>
 											
-											<button href="javascript:void(0)" ng-show= "saveAddPrimaryId != ''" ng-click="changeSaveStatus()" class="cancelTheLoad btn btn-danger btn-cons m-b-10" type="button"><i class="fa fa-close"></i><span class="bold"> Close </span></button>
+											<button href="javascript:void(0)" ng-show= "saveAddPrimaryId != ''" ng-click="changeSaveStatus()" class="cancelTheLoad btn btn-danger btn-cons m-b-10" type="button"><i class="fa fa-close"></i><span class="bold"> {{ languagaeCommonVariables.closebutton }} </span></button>
 											
 										</div>
-										<button href="javascript:void(0);" ng-click="changeEditStatus()" ng-show = "save_edit_div == true && saveAddPrimaryId != ''" class="edit-loadDetail edit1Load btn btn-info btn-cons m-b-10" type="button"><i class="fa fa-paste"></i> <span class="bold">Edit</span>
+										<button href="javascript:void(0);" ng-click="changeEditStatus()" ng-show = "save_edit_div == true && saveAddPrimaryId != ''" class="edit-loadDetail edit1Load btn btn-info btn-cons m-b-10" type="button"><i class="fa fa-paste"></i> <span class="bold">{{ languagaeCommonVariables.editbutton }}</span>
 										</button>
 									</div>
 								</div>
@@ -1024,31 +1024,31 @@
 					<!-- end of location load section -->
 							<div class="col-xs-12 company-autority-section comp-authority-new">
 								<div class="table-input-head">
-									<h1>address</h1>
+									<h1>{{languageCommonVariables.address}}</h1>
 								</div>
 								<div class="company-autority-popup">
 									<div class="row">
 										<div class="col-xs-12 col-sm-3 col-md-3">
 											<div class="form-group form-group-default">
-												<label class="">Street Address </label>
+												<label class="">{{ languageCommonVariables.streetaddress}}</label>
 												<input type="text" name="street_address" class="form-control" ng-model="editBrokerLoadInfo.postingAddress" />
 											</div>
 										</div>
 										<div class="col-xs-12 col-sm-3 col-md-3 ">
 											<div class="form-group form-group-default">
-												<label class="">City</label>
+												<label class="">{{ languageCommonVariables.city }}</label>
 												<input type="text" name="city" class="form-control" ng-model="editBrokerLoadInfo.city" />
 											</div>
 										</div>
 										<div class="col-xs-12 col-sm-3 col-md-3">
 											<div class="form-group form-group-default">
-												<label class="">State</label>
+												<label class="">{{ languageCommonVariables.state }}</label>
 												<input type="text" name="state" class="form-control" ng-model="editBrokerLoadInfo.state" />
 											</div>
 										</div>
 										<div class="col-xs-12 col-sm-3 col-md-3">
 											<div class="form-group form-group-default">
-												<label class="">Zip Code </label>
+												<label class="">{{ languageCommonVariables.zipcode }}</label>
 												<input type="text" name="zipcode" class="form-control" ng-model="editBrokerLoadInfo.zipcode" />
 											</div>
 										</div>
@@ -1537,7 +1537,7 @@
 							<div class="notification-popup">
 								<div class="notification-heading">
 									<img src="assets/img/close-icon-main.png" data-dismiss="modal" class="close-icon-main"/>
-									<span>NOTIFICATIONS</span>
+									<span>{{ languageCommonVariables.notification }}</span>
 								</div>
 								<div class="notification-block-lt">
 									<ul>
@@ -1550,7 +1550,7 @@
 											<p class="small">{{notification.created_at}}</p>
 										</li>
 									</ul>
-									<div ng-show="haveNotifications >= 8" ng-click="hideMe();" class="see-all"><a  href="#/notifications">See all notifications</a></div>
+									<div ng-show="haveNotifications >= 8" ng-click="hideMe();" class="see-all"><a  href="#/notifications">{{ languageCommonVariables.seeallnotification }}</a></div>
 								</div>
 								
 								

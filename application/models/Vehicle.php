@@ -709,12 +709,15 @@ class Vehicle extends Parent_Model
 	 */
 	
 	public function getLastLoadRecord( $vehicle_id = null , $driverId = null ) {
-		$this->db->select('DestinationCity,DestinationState,DestinationCountry,DeliveryDate,DATE_FORMAT(STR_TO_DATE(pickDate, \'%m/%d/%y\'), \'%Y-%m-%d\') as pickday');
+		$this->db->select('v.vehicle_type, DestinationCity,DestinationState,DestinationCountry,DeliveryDate,DATE_FORMAT(STR_TO_DATE(pickDate, \'%m/%d/%y\'), \'%Y-%m-%d\') as pickday');
 		if ( $driverId != null && $driverId != 0 )  
-			$this->db->where(array('vehicle_id' => $vehicle_id, 'driver_id' => $driverId, 'delete_status' => 0, 'JobStatus !=' => 'cancel'));
+			$this->db->where(array('vehicle_id' => $vehicle_id, 'loads.driver_id' => $driverId, 'delete_status' => 0, 'JobStatus !=' => 'cancel'));
 		else
 			$this->db->where(array('vehicle_id' => $vehicle_id, 'delete_status' => 0, 'JobStatus !=' => 'cancel'));
-		$this->db->order_by('PickupDate','DESC');
+		
+        $this->db->join("vehicles as v","loads.vehicle_id = v.id","left");
+        $this->db->order_by('PickupDate','DESC');
+
 		$results = $this->db->get('loads');
 		//~ echo $this->db->last_query(); die;
 		if ( $results->num_rows() > 0 ) {

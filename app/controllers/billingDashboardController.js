@@ -107,20 +107,23 @@ app.controller('billingDashboardController', ["dataFactory","$scope",  "$rootSco
     vm.goForDetails = function (type, page, entity){
         var args = "";
         var keyParam = "all";
+        args = "filterType="+type+"&userType=all&requestFrom=billings";
         if(angular.isObject(entity)){
-            args = "filterType="+type+"&userType=all&requestFrom=billings&dateFrom="+entity.fromDate+"&dateTo="+entity.toDate; 
-        }else if(type == "last_week_sale" || type == "this_week_sale" || type =="sent_today_expected"){
-            args = "filterType="+type+"&userType=all&requestFrom=billings";
-        }else{
-            args = "filterType="+type+"&userType=all&requestFrom=billings"; 
-            //$state.go(page, { 'key': keyParam, q:args, type:true }, { reload: true } );    
+            if(type == "cash_flow_actual"){
+                args += "&token="+entity.justToken;            
+            }else{
+                args += "&dateFrom="+entity.fromDate+"&dateTo="+entity.toDate; 
+            }
+
         }
+
         if(type == "waiting-paperwork" || type =="inprogress" || type == "delivered" || type == "booked" || type =="last_week_sale"){
+            console.log("hello");
             if(vm.dateRangeSelector.startDate != null && vm.dateRangeSelector.endDate != null){
+                console.log("how");
                 args += "&dateFrom="+vm.dateRangeSelector.startDate +"&dateTo="+vm.dateRangeSelector.endDate;     
             }
         }
-
         $state.go(page, { 'key': keyParam, q:args, type:true }, { reload: true } );
     }
 

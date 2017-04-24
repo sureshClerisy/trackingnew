@@ -242,3 +242,63 @@ $lang['planthmiles'] = 'milhas';
 $lang['billingLoadsHeading'] = 'Faturável';
 $lang['driversHeading'] = 'motoristas';
 /***Billing Page ends***/
+
+$lang['searchfrom'] = 'Pesquisar a partir de';
+$lang['export'] = 'Exportar';
+$lang['selectdaterange'] = 'Selecionar Intervalo de datas';
+
+/*Reports page*/
+$lang['performancereport'] = 'Relatório de desempenho';
+$lang['commingsoon'] = 'Em breve..';
+$lang['breadcrumdetailreport'] = 'Bread Crum Detail Report';
+$lang['loadstrackingreport'] = 'Bread Crum Detalhe Relatório';
+$lang['chronologicallistevent'] = 'Lista cronológica de eventos por veículo';
+$lang['reportofloadsperformance'] = 'Desempenho das cargas';
+$lang['backtoreportlist'] = 'Voltar à lista de relatórios';
+
+
+$lang['scope'] = 'Scope';
+$lang['selectscope'] = 'Select Scope';
+$lang['filtersandoptions'] = 'Filters and options';
+$lang['daterangepicker'] = 'Date Range Picker';
+$lang['reporttype'] = 'Report Type';
+$lang['reportaction'] = 'Report Action';
+$lang['generate'] = 'Generate';
+
+$lang['scope'] = 'Escopo';
+$lang['selectvehicle'] = 'Selecionar veículo';
+$lang['filtersandoptions'] = 'Filtros e opções';
+$lang['daterangepicker'] = 'Interruptor de intervalo de data';
+$lang['reporttype'] = 'Tipo de relatório';
+$lang['reportaction'] = 'Ação do relatório';
+$lang['generate'] = 'Gerar';
+$lang['reporton'] = 'Informar sobre';
+$lang['filteronstatus'] = 'Filtrar no status';
+$lang['selectscope'] = 'Selecionar Escopo';
+$lang['selectdate'] = 'Selecionar data';
+$lang['individual'] = 'Individual';
+$lang['performance'] = 'atuação';
+$lang['deliverydate'] = 'Data de entrega';
+
+$lang['vehicleid'] = 'ID do veículo';
+$lang['truckno'] = 'Caminhão Não';
+$lang['drivername'] = 'Nome do motorista';
+$lang['timestamp'] = 'Timestamp (GMT)';
+$lang['event'] = 'Evento';
+$lang['latitude'] = 'Latitude';
+$lang['longitude'] = 'longitude';
+$lang['location'] = 'Localização';
+$lang['speed'] = 'Velocidade (MPH)';
+$lang['odometer'] = 'Odômetro (MI)';
+$lang['loadid'] = 'LoadId';
+
+$lang['showallloads'] = 'Mostrar todos os carregamentos';
+$lang['noloadsfound'] = 'Nenhuma carga encontrada';
+
+$lang['breadcrumbdetailtitle'] = 'Relatório detalhado Breadcrumb';
+$lang['breadcrumbdetailcontext'] = 'Lista cronológica de eventos por veículo';
+$lang['loadsperformancetitle'] = 'Relatório de acompanhamento de carregamentos';
+$lang['loadsperformancecontext'] = 'Relatório de desempenho de cargas';
+
+$lang['allnotification'] = 'Todas as notificações';
+$lang['loadmorenotification'] = 'Carregar Mais Notificações';

@@ -70,6 +70,37 @@ $lang['loadno'] = 'Load #';
 $lang['pickupdate'] = 'Pickup Date';
 $lang['deliverdate'] = 'Delivery Date';
 
+$lang['todayinsights'] = 'TODAY INSIGHTS';
+$lang['pickup'] = 'PICKUP';
+$lang['inprogress'] = 'INPROGRESS';
+$lang['delivery'] = 'DELIVERY';
+$lang['idle'] = 'IDLE';
+$lang['driver'] = 'DRIVER';
+$lang['truck'] = 'TRUCK';
+$lang['origin'] = 'ORIGIN';
+$lang['st'] = 'ST';
+$lang['destination'] = 'DESTINATION';
+$lang['payment'] = 'PAYMENT';
+$lang['rpm'] = 'RPM';
+$lang['company'] = 'COMPANY';
+$lang['leaderboard'] = 'LEADER BOARD';
+$lang['message'] = 'Message';
+
+$lang['weatherreport'] = 'Weather Report';
+$lang['day'] = 'Day';
+$lang['temperature'] = 'Temperature';
+$lang['wind'] = 'Wind';
+$lang['humidity'] = 'Humidity';
+$lang['mintemperature'] = 'Min. Temperature';
+$lang['maxtemperature'] = 'Max. Temperature';
+$lang['feelslike'] = 'Feels Like';
+
+$lang['driverwithouttr'] = 'active drivers without truck';
+$lang['trucksnotrep'] = 'Trucks are not reporting current location';
+$lang['truckwithoutdriver'] = 'Trucks without driver';
+$lang['incompleteLoads'] = 'Incomplete Loads';
+
+
 
 
 

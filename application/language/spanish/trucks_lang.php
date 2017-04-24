@@ -65,3 +65,6 @@ $lang['truckNumbetTableThinspolvalid'] = 'Seguro válido hasta';
 $lang['truckNumbetTableThinspolnum2'] = 'Número de póliza de seguro 2';
 $lang['dispatcher'] = 'Transportista'; 
 /** Truck Add Page */
+
+$lang['single'] = 'Soltero';
+$lang['team'] = 'Tean';

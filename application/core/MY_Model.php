@@ -8,10 +8,20 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 		}
 	}
 	   
-    class Parent_Model extends MY_Model
-	{		
+    class Parent_Model extends MY_Model {
+
+		public  $superAdmin;
+		public  $role;
+		public  $userID;
+
 		function __construct() {
 			parent::__construct();
+			$this->userID 	= $this->session->loggedUser_id;
+			$this->role 	= $this->session->role;
+			if(in_array($this->userID, $this->config->item('superAdminIds'))){
+				$this->superAdmin = true;
+			}
+
 		}
 		
 		/**
@@ -36,11 +46,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 			return true;
 		}
 		
-		/*
+		/**
 		* Request URL: 
-		* Method: get
-		* Params: entityId, entity_type
-		* Return: documents array or empty array
+		* Method  : get
+		* @param  : entityId, entity_type
+		* @return  : documents array or empty array
 		* Comment: Used for fetching documents list for driver or trailer or truck or broker
 		*/
 		

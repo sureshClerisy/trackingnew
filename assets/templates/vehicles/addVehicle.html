@@ -49,10 +49,10 @@
 									<!-- Driver Choice button -->
 									<div class="radio radio-success">
 					                    <input type="radio"  checked="checked" ng-change="changeDriverType('single')" ng-model="addTruckData.driverType" value="single" name="driverType" id="single">
-					                    <label for="single">Single</label>
+					                    <label for="single">{{ languageArray.single }}</label>
 					                    
 					                    <input type="radio" value="team" ng-change="changeDriverType('team')" ng-model="addTruckData.driverType" name="driverType" id="team" >
-					                    <label for="team">Team</label>
+					                    <label for="team">{{ languageArray.team }}</label>
 					                </div>
 									<!-- Driver Choice Button end -->
 									<!--row-->

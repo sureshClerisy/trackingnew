@@ -242,3 +242,54 @@ $lang['planthmiles'] = 'millas';
 $lang['billingLoadsHeading'] = 'Facturable';
 $lang['driversHeading'] = 'conductores';
 /***Billing Page ends***/
+
+$lang['searchfrom'] = 'Buscar desde';
+$lang['export'] = 'Exportar';
+$lang['selectdaterange'] = 'Seleccione Rango de fechas';
+
+/*Reports page*/
+$lang['performancereport'] = 'Reporte de desempeño';
+$lang['commingsoon'] = 'Próximamente..';
+$lang['breadcrumdetailreport'] = 'Bread Crum Informe detallado';
+$lang['loadstrackingreport'] = 'Carga el informe Trackng';
+$lang['chronologicallistevent'] = 'Lista cronológica de eventos por vehículo';
+$lang['reportofloadsperformance'] = 'Informe del rendimiento de las cargas';
+$lang['backtoreportlist'] = 'Volver a la lista de reportes';
+
+$lang['scope'] = 'Alcance';
+$lang['selectvehicle'] = 'Seleccione vehículo';
+$lang['filtersandoptions'] = 'Filtros y opciones';
+$lang['daterangepicker'] = 'Selector de intervalo de fechas';
+$lang['reporttype'] = 'Tipo de informe';
+$lang['reportaction'] = 'Acción del informe';
+$lang['generate'] = 'Generar';
+$lang['reporton'] = 'Informar sobre';
+$lang['filteronstatus'] = 'Filtrar el estado';
+$lang['selectscope'] = 'Seleccionar ámbito de aplicación';
+$lang['selectdate'] = 'Seleccione fecha';
+$lang['individual'] = 'Individual';
+$lang['performance'] = 'Actuación';
+$lang['deliverydate'] = 'Fecha de entrega';
+
+$lang['vehicleid'] = 'ID del vehículo';
+$lang['truckno'] = 'Camión no';
+$lang['drivername'] = 'Nombre del conductor';
+$lang['timestamp'] = 'Timestamp (GMT)';
+$lang['event'] = 'Evento';
+$lang['latitude'] = 'Latitud';
+$lang['longitude'] = 'longitud';
+$lang['location'] = 'Ubicación';
+$lang['speed'] = 'Velocidad (MPH)';
+$lang['odometer'] = 'Cuentakilómetros (MI)';
+$lang['loadid'] = 'LoadId';
+
+$lang['showallloads'] = 'Mostrar todas las cargas';
+$lang['noloadsfound'] = 'No se han encontrado cargas';
+
+$lang['breadcrumbdetailtitle'] = 'Informe detallado Breadcrumb';
+$lang['breadcrumbdetailcontext'] = 'Lista cronológica de eventos por vehículo';
+$lang['loadsperformancetitle'] = 'Informe de seguimiento de cargas';
+$lang['loadsperformancecontext'] = 'Informe del rendimiento de las cargas';
+
+$lang['allnotification'] = 'Todas las notificaciones';
+$lang['loadmorenotification'] = 'Cargar más notificaciones';

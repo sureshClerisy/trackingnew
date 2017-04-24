@@ -771,7 +771,7 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
                 templateUrl: 'assets/templates/billings/billingDashboard.html',
                 controller: 'billingDashboardController',
                 controllerAs: 'billDash',
-                moduleName: 'loads',
+                moduleName: 'billing',
                   resolve: {
                   	billingStats: function(dataFactory, $stateParams) {
 						return dataFactory.httpRequest(URL+'/billings/billingStats');
@@ -964,7 +964,7 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
                         return [];
                     }
                 }              
-            }).state('edit', {
+            }).state('editrole', {
                 url: '/editrole/:id',
                 title: 'Update Roles',
                 moduleName: 'loads',
@@ -981,11 +981,35 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
                 title: 'User List',
                 moduleName: 'loads',
                 templateUrl: 'assets/templates/users/usersList.html',
-                controller: 'usersController',
+                controller: 'manageUsersController',
                 controllerAs: 'users',
                 resolve:{
-                    getUsers: function(dataFactory, $stateParams) {
-                        return dataFactory.httpRequest(URL+'/users/getusers/');
+                    getData: function(dataFactory, $stateParams) {
+                        return dataFactory.httpRequest(URL+'/users/');
+                    }
+                }
+            }).state('addUser', {
+                url: '/addUser',
+                title: 'Add User',
+                moduleName: 'loads',
+                templateUrl: 'assets/templates/users/userAdd.html',
+                controller: 'manageUsersController',
+                controllerAs: 'users',
+                resolve:{
+                    getData: function(dataFactory, $stateParams) {
+                        return dataFactory.httpRequest(URL+'/users/getAddEdit');
+                    }
+                }
+            }).state('editUser', {
+                url: '/editUser/:id',
+                title: 'Update User',
+                moduleName: 'loads',
+                templateUrl: 'assets/templates/users/userAdd.html',
+                controller: 'manageUsersController',
+                controllerAs: 'users',
+                resolve:{
+                    getData: function(dataFactory, $stateParams) {
+                        return dataFactory.httpRequest(URL+'/users/getAddEdit/'+$stateParams.id);
                     }
                 }
             });

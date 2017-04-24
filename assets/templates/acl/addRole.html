@@ -34,10 +34,11 @@
 						<div class="panel-body">
 							<form id="form-project" name="newrole" role="form" autocomplete="off" ng-submit="newrole.$valid && addrole()" novalidate>
 								<!--row-->
+								<input type="hidden" name="id" ng-model="aclData.id">
 								<div class="row clearfix">
 									<div class="col-sm-6">
 										<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':newrole.name.$invalid && !newrole.name.$pristine || newrole.$submitted && newrole.name.$invalid}">
-											<label>{{ languageArray.brokerListingTableThName }} {{aclData.name}}</label>
+											<label>{{ languageArray.brokerListingTableThName }}</label>
 											<input type="text" class="form-control" name="name" ng-model="aclData.name" required />
 										</div>
 										<label class="error" for="name" ng-show="newrole.name.$invalid && !newrole.name.$pristine || newrole.$submitted && newrole.name.$invalid">Please enter role name.</label>
@@ -54,7 +55,8 @@
 								<div class="update-truck-block-btn">
 									<button ng-click="submitted=true" class="btn btn-primary btn-cons m-b-10" type="submit">
 										<i class="fa fa-plus"></i>
-										<span class="bold"> {{ languageArray.brokerListingTableAddbutton|capitalize }}</span>
+										<span ng-hide = "aclData.id" class="bold"> {{ languageArray.brokerListingTableAddbutton|capitalize }}</span>
+										<span ng-show = "aclData.id" class="bold"> {{ languageArray.brokerListingTableEditbutton|capitalize }}</span>
 									</button>
 									<a href="#/roles">
 										<button class="btn btn-danger btn-cons m-b-10" type="button">

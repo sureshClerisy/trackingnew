@@ -63,6 +63,11 @@ $lang['searchFrom'] = 'Buscar desde';
 /******************** Action Titles End **********/
 
 /******************** Common messages for all **********/
+$lang['popupselectbroker'] = 'Seleccione Broker';
+$lang['popupselectshipper'] = 'Seleccionar cargador';
+$lang['popupselectdriver'] = 'Seleccione Driver';
+$lang['popuporginaldetail'] = 'Detalle original';
+
 $lang['popupLoadId'] = 'ID de carga';  
 $lang['commonTableThAction'] = 'ACCIÓN';
 $lang['commonSummaryHeading'] = 'Resumen';
@@ -79,6 +84,9 @@ $lang['clearbutton'] = 'Claro';
 $lang['savebutton'] = 'Salvar';
 $lang['closebutton'] = 'Cerca';
 $lang['okbutton'] = 'DE ACUERDO';
+$lang['resetbutton'] = 'Reiniciar';
+$lang['editbutton'] = 'Editar';
+$lang['exportbutton'] = 'Exportar';
 
 $lang['confirmdelete'] = 'Confirmar eliminación?';
 $lang['confirmdeleteyes'] = 'Sí';
@@ -96,6 +104,12 @@ $lang['destination'] = 'Destino';
 $lang['date'] = 'Fecha';
 $lang['time'] = 'Hora';
 $lang['address'] = 'Dirección';
+
+$lang['streetaddress'] = 'Dirección';
+$lang['city'] = 'Ciudad';
+$lang['state'] = 'Estado';
+$lang['zipcode'] = 'Código postal';
+
 $lang['weight'] = 'PESO';
 $lang['length'] = 'LONGITUD';
 $lang['distance'] = 'Distancia';
@@ -214,6 +228,7 @@ $lang['popuppickup'] = 'recoger';
 $lang['popupdelivery'] = 'Entrega';  
 $lang['popupextrastops'] = 'paradas adicionales';
 $lang['popupaddanotherstop'] = 'Añadir otra parada';
+$lang['popupaddextrastop'] = 'Añadir Parada Extra';
 $lang['popupequipment'] = 'Equipo';
 $lang['popupequipmentoption'] = 'Opciones del equipo';
 $lang['popuploadsize'] = 'Tamaño de la carga';
@@ -316,6 +331,32 @@ $lang['delivered'] = 'Entregado';
 $lang['completed'] = 'Terminado';
 $lang['cancel'] = 'Cancelar';
 $lang['invoiced'] = 'Facturado';
+$lang['watingpaperwork'] = 'Wating papeleo';
 $lang['jobStatusPlaceholder'] = 'Sin Estado';
 $lang['noStatusValue'] = 'Sin Estado';
 /**loads status **/
+
+/*Learder Board*/
+$lang['profit'] = 'LUCRO';
+$lang['charges'] = 'Cargas';
+$lang['goal'] = 'GOL';
+$lang['values'] = 'Valores';
+/*Leader Board end*/
+
+/*Add Load button*/
+$lang['addload'] = 'Añadir Carga';
+/*Notification button*/
+$lang['notification'] = 'NOTIFICACIONES';
+$lang['seeallnotification'] = 'Ver todas las notificaciones';
+$lang['selectdaterange'] = 'Seleccionar periodo';
+$lang['uploaddoc'] = 'Subir documento';
+$lang['routeerror'] =    'Error: Por favor ingrese la dirección de recogida y destino para ver las rutas.';
+$lang['documenterror'] = 'Error!: Por favor, guarde los detalles de la carga para ver los documentos.';
+$lang['exceedmessage'] = 'Error: Por favor, guarde los detalles de la carga y asignar el controlador a la carga para ver la página de detalles de viaje.';
+
+$lang['daterange'] = 'Rango de fechas';
+$lang['generatedby'] = 'Generado por';
+$lang['timezone'] = 'Zona horaria';
+$lang['eastern'] = '
+Oriental';
+

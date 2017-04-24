@@ -189,7 +189,7 @@ app.controller('investorController', function(dataFactory, $scope,  $http , $roo
     }
 
     /**Clicking on load detail changes url withour reload state*/
-    inv.clickMatchLoadDetail = function(truckstopId,loadId, deadmile,calPayment,totalCost,orignPickDate,vehicleID, index) {
+    $scope.clickMatchLoadDetail = function(truckstopId,loadId, deadmile,calPayment,totalCost,orignPickDate,vehicleID, index) {
         if ( loadId == '' && loadId == undefined ) 
             loadId = '';
         $rootScope.globalListingIndex = index;          // set index to update the particular record from list
@@ -197,10 +197,10 @@ app.controller('investorController', function(dataFactory, $scope,  $http , $roo
         $state.go('search.popup', {staticId:2,encodedurl:encodedUrl}, {notify: false,reloadOnSearch: false});
     } 
 
-    inv.hideLoadDetailPopup = function() {
+    $scope.hideLoadDetailPopup = function() {
         $rootScope.firstTimeClick = true;
         if ( $rootScope.statesArr[0] != '' && $rootScope.statesArr[0] != undefined ) {
-            $state.go($rootScope.statesArr[0], {}, {notify: false,reload: false});
+            $state.go('investor', {}, {notify: false,reload: false});
         } else {
             $state.go('investor', {}, {notify: false,reload: false});
         }
@@ -211,7 +211,7 @@ app.controller('investorController', function(dataFactory, $scope,  $http , $roo
         var $trigger1 = $(".popup-container-wid1");
         if($trigger1 !== event.target && !$trigger1.has(event.target).length){
             if ( $rootScope.statesArr[0] != '' && $rootScope.statesArr[0] != undefined ) {
-                $state.go($rootScope.statesArr[0], {}, {notify: false,reload: false});
+                $state.go('investor', {}, {notify: false,reload: false});
             } else {
                 $state.go('investor', {}, {notify: false,reload: false});
             }

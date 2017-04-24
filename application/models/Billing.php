@@ -119,12 +119,20 @@ class Billing extends CI_Model {
 
 			$this->db->where(array('loads.sent_for_payment' => 1, 'loads.delete_status' => 0));
 
-		}else if ( isset($filters["filterType"]) && $filters["filterType"] == 'cash_flow' ) {	
+		}else if ( isset($filters["filterType"]) && $filters["filterType"] == 'cash_flow_expected' ) {	
 
 			$oneDayBefore = date('Y-m-d', strtotime('-1 day', strtotime($filters["dateFrom"])));	
 			$this->db->where("( date( loads.deliveryDate ) BETWEEN '".$filters["dateFrom"]."' AND '".$filters["dateTo"]."' OR ( date( loads.deliveryDate ) BETWEEN  '2017-02-09' AND '".$oneDayBefore."' AND loads.sent_for_payment = 0 AND  loads.id >=10000) )");	
 				$this->db->where(array('loads.delete_status' => 0));	
 				$this->db->where_IN('loads.JobStatus',$this->config->item('loadStatus'));
+
+
+		}else if ( isset($filters["filterType"]) && $filters["filterType"] == 'cash_flow_actual' ) {	
+			if(isset($filters["token"]) && !empty($filters["token"])){
+				$this->db->where("FIND_IN_SET( loads.id, ( SELECT GROUP_CONCAT( sp.loadids ) AS id FROM `save_payment_confirmCode` AS `sp` where sp.id = ".$filters["token"]."))");	
+			}
+			$this->db->where(array('loads.delete_status' => 0));	
+			$this->db->where_IN('loads.JobStatus',$this->config->item('loadStatus'));
 
 
 		}else if ( isset($filters["filterType"]) && $filters["filterType"] == 'last_week_sale' ) {	
@@ -420,11 +428,12 @@ class Billing extends CI_Model {
 
 		$in_aray = $this->invoiceGeneratedIds();
 		
+		
 		$this->db->select('loads.PickupDate,loads.PickupAddress,loads.OriginCity,loads.OriginState,loads.OriginCountry,loads.DestinationAddress,loads.DestinationCity,loads.DestinationState,loads.DestinationCountry,loads.PaymentAmount,loads.truckstopID,loads.id,loads.flag,loads.billType, loads.payment_type, loads.flag_perm, concat(drivers.first_name," ",drivers.last_name,"-",vehicles.label) as driverName,drivers.profile_image,vehicles.id as vehicleID,drivers.first_name,drivers.last_name,drivers.color,loads.created,loads.totalCost,loads.overallTotalProfit,loads.overallTotalProfitPercent,loads.Mileage,loads.deadmiles,loads.pickDate,loads.DeliveryDate,loads.JobStatus, 
 			CASE loads.billType 
 			WHEN "shipper" THEN (shippers.shipperCompanyName) 
 					   ELSE (broker_info.TruckCompanyName)
-					END AS TruckCompanyName');
+					END AS TruckCompanyName,loads.invoiceNo,(loads.PaymentAmount/loads.Mileage) as rpm');
 		
 		$this->db->join('drivers','drivers.id = loads.driver_id','LEFT');
 		$this->db->join('vehicles','vehicles.id = loads.vehicle_id','LEFT');
@@ -505,7 +514,7 @@ class Billing extends CI_Model {
 					WHEN "shipper" THEN (shippers.shipperCompanyName) 
 					ELSE (broker_info.TruckCompanyName)
 				END AS TruckCompanyName, 
-					loads.Mileage,loads.deadmiles,loads.pickDate,loads.DeliveryDate,loads.JobStatus,loads.created,loads.totalCost,loads.overallTotalProfit');
+					loads.Mileage,loads.deadmiles,loads.pickDate,loads.DeliveryDate,loads.JobStatus,loads.created,loads.totalCost,loads.overallTotalProfit,loads.invoiceNo,(loads.PaymentAmount/loads.Mileage) as rpm');
 		} else {
 			$this->db->select("count(loads.id) as totalRows");
 		}
@@ -580,7 +589,7 @@ class Billing extends CI_Model {
 			CASE loads.billType 
 			WHEN "shipper" THEN (shippers.shipperCompanyName)
 					   ELSE (broker_info.TruckCompanyName)
-					END AS TruckCompanyName');
+					END AS TruckCompanyName,(loads.PaymentAmount/loads.Mileage) as rpm,loads.invoiceNo');
 
 		$this->db->join('drivers','drivers.id = loads.driver_id','LEFT');
 		$this->db->join('vehicles','vehicles.id = loads.vehicle_id','LEFT');
@@ -811,7 +820,7 @@ class Billing extends CI_Model {
 	}
 
 	public function getRecentTransactions($date = false, $limit = 5,$args = array()){
-		$this->db->select(array("confirmationCode, DATE( created ) as date, (CHAR_LENGTH(loadIds) - CHAR_LENGTH(REPLACE(loadIds, ',', '')) + 1) as inv, ( SELECT SUM( paymentamount ) FROM loads WHERE FIND_IN_SET( id, ( SELECT GROUP_CONCAT( sp.loadids ) AS id FROM `save_payment_confirmCode` AS `sp` where id = spCode.id))) as amount"),false);
+		$this->db->select(array("id as justToken, confirmationCode, DATE( created ) as date, (CHAR_LENGTH(loadIds) - CHAR_LENGTH(REPLACE(loadIds, ',', '')) + 1) as inv, ( SELECT SUM( paymentamount ) FROM loads WHERE FIND_IN_SET( id, ( SELECT GROUP_CONCAT( sp.loadids ) AS id FROM `save_payment_confirmCode` AS `sp` where id = spCode.id))) as amount"),false);
 
 		if(isset($args["startDate"])){
 			$this->db->where("DATE( spCode.created ) >=", $args["startDate"]);
