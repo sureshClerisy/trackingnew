@@ -204,7 +204,7 @@ app.controller('billingsController', ["dataFactory","$scope","$http","$rootScope
 
     $scope.loadNextPage = function(pageNumber,search,sortColumn,sortType){
     	$scope.autoFetchLoads = true;
-        dataFactory.httpRequest(URL+'/Billings/getRecords/'+$scope.listTypeParameter,'Post',{} ,{ pageNo:pageNumber, itemsPerPage:$scope.itemsPerPage,searchQuery: search, sortColumn:sortColumn, sortType:sortType,startDate: $scope.dateRangeSelector.startDate, endDate:$scope.dateRangeSelector.endDate }).then(function(data){
+        dataFactory.httpRequest(URL+'/Billings/skipAcl_getRecords/'+$scope.listTypeParameter,'Post',{} ,{ pageNo:pageNumber, itemsPerPage:$scope.itemsPerPage,searchQuery: search, sortColumn:sortColumn, sortType:sortType,startDate: $scope.dateRangeSelector.startDate, endDate:$scope.dateRangeSelector.endDate }).then(function(data){
         	$scope.autoFetchLoads = false;
         	$rootScope.billingLoads = data.data;
 			$scope.total            = data.total;

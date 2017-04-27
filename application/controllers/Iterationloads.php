@@ -250,7 +250,7 @@ class Iterationloads extends Admin_Controller{
 	 * Calculate Loads next date 
 	 */
 	
-	public function CalculateNextLoadDate( $result = array() ) {
+	private function CalculateNextLoadDate( $result = array() ) {
 		if ( $result['DeliveryDate'] != '' && $result['DeliveryDate'] != '0000-00-00' && $result['DeliveryDate'] != null ) {
 			$dateSearch = $result['DeliveryDate'];
 		} else {
@@ -270,7 +270,7 @@ class Iterationloads extends Admin_Controller{
 		return $searchDate;
 	}
 
-	public function getUnFinishedChain($driverID){
+	private function getUnFinishedChain($driverID){
 		$allChains = $this->Job->getUnFinishedChain($driverID);
 		$userChain = array();
 		
@@ -794,7 +794,7 @@ class Iterationloads extends Admin_Controller{
 		echo json_encode($newData);
 	}
 	
-	public function estimatedTime ( $time = '' , $deadmilesEstTime = '' , $pickupDate = '0000-00-00', $hoursLimitInTimeFormat = 0 , $vehicleID = null , $hoursRem = 0,$availableHours = array() ) {
+	private function estimatedTime ( $time = '' , $deadmilesEstTime = '' , $pickupDate = '0000-00-00', $hoursLimitInTimeFormat = 0 , $vehicleID = null , $hoursRem = 0,$availableHours = array() ) {
 			
 		$timeDay = $timeDayDead = $timeMin = $hoursRemaining = $deadMileTimeMins = $timeHourDead = $timeHour = 0;
 		//Estimated Time
@@ -1021,7 +1021,7 @@ class Iterationloads extends Admin_Controller{
 		return array("newPickupDate"=>$newPickupDate,"totalHours"=>$totalHours,"totalDrivingHour"=>$totalDrivingHour,"nextDaysHoursLeft"=>$nextDaysHoursLeft,"nextPickupDays"=>$nextPickupDays,"holidayOccured"=>$holidayOccured,"deadMileEstTime"=>$deadMileEstTime,"skippedWeekdays"=>$skippedWeekdays,"tEstimatedTimeInHours"=>$tEstimatedTimeInHours);	
 	}
 	
-	function fromTime($time) {
+	private function fromTime($time) {
 	    if($time > 0){
 	        $time = number_format($time,2);
 	        $timeArray = explode('.', $time);
@@ -1032,7 +1032,7 @@ class Iterationloads extends Admin_Controller{
 	    	return 0;
 	}
 
-	function toTime($number) {
+	private function toTime($number) {
 	    $hours = floor($number / 60);
 	    $minutes = $number % 60;
 	    return $hours.".".($minutes <= 9 ? "0" : "").$minutes;
@@ -1040,16 +1040,16 @@ class Iterationloads extends Admin_Controller{
 
 	public function destroyLoadsChain($driverID){
 		$this->Job->destroyLoadsChain($driverID);
-		$this->getChangeDriverChains($driverID);
+		$this->skipAcl_getChangeDriverChains($driverID);
 	}	
 
-	public function removeFromChain(){
+	protected function removeFromChain(){
 		$objPost = json_decode(file_get_contents('php://input'),true);
 		$this->Job->removeElementFromChain($objPost['deletedRowIndex'],$objPost['ID'],$objPost["driverID"]);
 		echo json_encode(array("success"=>TRUE));
 	}
 	
-	public function getChangeDriverChains($driverID = false) {
+	public function skipAcl_getChangeDriverChains($driverID = false) {
 		
 		$driverType = "driver";
 		if($driverID){
@@ -1231,7 +1231,7 @@ class Iterationloads extends Admin_Controller{
 		echo json_encode(array('loadsData'=> $newdata),JSON_NUMERIC_CHECK);
 	}
 	
-	public function getDriverVehicleInfo( $vehicleID = null ) {
+	private function getDriverVehicleInfo( $vehicleID = null ) {
 		$statesAddress 	= $this->Vehicle->get_vehicle_address($vehicleID);
 		$newDest = array();
 		if($statesAddress['destination_address'] != '')
@@ -1256,20 +1256,6 @@ class Iterationloads extends Admin_Controller{
 		return array( $this->orign_city, $this->orign_state, $this->pickupDateDest, $statesAddress['vehicle_type'], $newlabel , $driverNameShow);
 	}
 	
-	public function findDieselCosts( $truckAverage = 6, $distance = null, $dieselFuelPrice =  null, $driverCal = '',$driverAssignType="driver") {
-		$gallon_needed = ($distance / $truckAverage);
-		$comp_diesel_cost = round($dieselFuelPrice * $gallon_needed,2);
-		if ( $driverCal == 'driverMiles' ){
-			//--------------- Code for Team task ----------------
-			$driverPayMilesCargo = $this->driver_pay_miles_cargo;
-			if($driverAssignType == "team"){
-				$driverPayMilesCargo = $this->driver_pay_miles_cargo_team;
-			}
-			//--------------- Code for Team task end--------------
-			$comp_diesel_cost = $comp_diesel_cost + round( $distance * $driverPayMilesCargo, 2 );
-		} 
-		return $comp_diesel_cost;
-	}
 
 }
 

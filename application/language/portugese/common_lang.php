@@ -295,6 +295,7 @@ $lang['uploadRateSheet'] = 'Folha de taxa de upload';
 $lang['billingAndShipping'] = 'Detalhes de faturamento e envio';
 $lang['shipper'] = 'remetente';
 $lang['name'] = 'Nome';
+$lang['username'] = 'Nome de usuário';
 $lang['telephone'] = 'Telefone';
 $lang['address'] = 'Endereço';
 $lang['cosignee'] = 'Destinatário';

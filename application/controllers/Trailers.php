@@ -2,23 +2,23 @@
 class Trailers extends Admin_Controller {
 
 	public $search;
-	public $userId;
-	public $roleId;
-	public $userName;
-	public $data;
-	
-	function __construct()
-	{ 
-		parent::__construct();	
-		$this->load->model(array('Trailer','Vehicle',"Job"));
+    public $userId;
+    public $roleId;
+    public $userName;
+    public $data;
+    
+    function __construct()
+    { 
+        parent::__construct();    
+        $this->load->model(array('Trailer','Vehicle',"Job"));
 
-		
-		$this->userId = $this->session->loggedUser_id;
-		$this->roleId = $this->session->role;	
-		$this->userName = $this->session->loggedUser_username;
-		$this->load->helper('truckstop_helper');		
-		$this->data = array();
-	}
+        
+        $this->userId = $this->session->loggedUser_id;
+        $this->roleId = $this->session->role;    
+        $this->userName = $this->session->loggedUser_username;
+        $this->load->helper('truckstop_helper');        
+        $this->data = array();
+    }
 	
 	/**
 	* Request URL: http://domain.com/api/trailers/index
@@ -152,7 +152,7 @@ class Trailers extends Admin_Controller {
 	 *  checking truck already assigned to another trailer or not
 	 */ 
 	 
-	public function changeTruck( $truckId = null, $trailerId = null ) {
+	public function skipAcl_changeTruck( $truckId = null, $trailerId = null ) {
 		$trailerUnit = '';
 		$result = $this->Trailer->checkChangeTrailer($truckId,$trailerId);
 		if ( !empty($result) ) {
@@ -198,7 +198,7 @@ class Trailers extends Admin_Controller {
 	 * Check trailer unit id exist or not
 	 */
 	
-	public function checkTrailerUnit( $trailerNo = null, $id = null ) {
+	public function skipAcl_checkTrailerUnit( $trailerNo = null, $id = null ) {
 		if ( $id != '' && $id != null )
 			$result = $this->Trailer->checkTrailerUnitExist($trailerNo, $id);
 		else
@@ -220,7 +220,7 @@ class Trailers extends Admin_Controller {
 	* Comment: Used for uploading trailers documents
 	*/
 	
-	public function uploadContractDocs()
+	public function skipAcl_uploadContractDocs()
 	{
 		$prefix = "trailer"; 
 	    $response  = array();

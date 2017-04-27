@@ -50,7 +50,7 @@ class Investors extends Admin_Controller {
 	* comment: fetch vehicles listing assigned to user
 	**/
 
-	public function fetchVehiclesList(){
+	public function skipAcl_fetchVehiclesList(){
 		$vehicles = $this->vehicles;
 		array_unshift($vehicles, array("id"=>"all","vehicleName"=>"All Vehicles"));
 		$rssFeeds = $this->getRssFeeds();
@@ -65,7 +65,7 @@ class Investors extends Admin_Controller {
 	* @return: list array
 	* comment: fetch data for all portlets on investor dashboard
 	**/
-	public function getPortletsData(){
+	public function skipAcl_getPortletsData(){
 		$vehicleId          = ""; $vehiclesJobs = $filters = array();
 		if(isset($_COOKIE["_gDateRangeInvDash"])){
 			$filters = json_decode($_COOKIE["_gDateRangeInvDash"],true);
@@ -139,7 +139,7 @@ class Investors extends Admin_Controller {
 	* @return: list array
 	* comment: fetch rss feeds from http://investors.ryder.com/rss/pressrelease.aspx
 	**/
-	public function getRssFeeds( ){
+	public function skipAcl_getRssFeeds( ){
 		$xml   = $this->config->item("investor_rss_feed_url");
 		$feeds =  simplexml_load_file($xml);
 		$feeds = json_decode( json_encode($feeds),true );
@@ -174,7 +174,7 @@ class Investors extends Admin_Controller {
 	* @return: list array
 	* comment: fetch vehicles listing with live location
 	**/
-	public function getTrucksLocation($vehicleId){
+	private function getTrucksLocation($vehicleId){
 		$allVehicles = $this->Investor->vehiclesWithFilter($this->userId,$vehicleId);
 		foreach ($allVehicles as $key => $value) {
 			if(empty($value['latitude']) || empty($value['tracker_id']) /* || empty($allVehicles[$key]["loadDetail"])*/){

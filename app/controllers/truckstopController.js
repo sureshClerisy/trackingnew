@@ -178,7 +178,7 @@ app.controller('truckstopController', function( dataFactory,$scope,$sce,$http ,$
 		$scope.newRows = [];
 		searchStatus = 'newSearch'; 
 	
-		dataFactory.httpRequest('truckstop/get_load_data_repeat','POST',{},{loadsArray: $scope.loadsIdArray, vehicleIDRepeat : $scope.vehicleIdRepeat, formPost: $rootScope.form, searchStatus : searchStatus}).then(function(data){
+		dataFactory.httpRequest('truckstop/skipAcl_get_load_data_repeat','POST',{},{loadsArray: $scope.loadsIdArray, vehicleIDRepeat : $scope.vehicleIdRepeat, formPost: $rootScope.form, searchStatus : searchStatus}).then(function(data){
 			$scope.newRows = data.rows;
 			$scope.loadsIdArray = data.loadsIdArray;
 			
@@ -189,7 +189,7 @@ app.controller('truckstopController', function( dataFactory,$scope,$sce,$http ,$
 	}
 	
 	$scope.getNewLoadsData = function(stateID, finalString){
-		dataFactory.httpRequest(URL+'/truckstop/get_load_data','POST',{},{stateID: stateID}).then(function(data) {
+		dataFactory.httpRequest(URL+'/truckstop/slipAcl_get_load_data','POST',{},{stateID: stateID}).then(function(data) {
 			$scope.newData = data.rows;
 			$rootScope.tableTitledata = data.table_title;
 			$rootScope.loadsData.push($scope.newData);

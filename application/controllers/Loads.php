@@ -190,7 +190,7 @@ class Loads extends Admin_Controller{
 	
 	
 	
-	public function getRecords(){
+	public function skipAcl_getRecords(){
 		
 		$params = json_decode(file_get_contents('php://input'),true);
 		$total 	= 0;

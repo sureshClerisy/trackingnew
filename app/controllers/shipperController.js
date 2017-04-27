@@ -104,11 +104,12 @@ app.controller('shipperController', function(dataFactory, $scope, PubNub , $http
 	}
 
 	$scope.confirmDelete = function(confirm){
-		shp.type = '';
+		
+		shp.type 	= '';
 		if(confirm == 'yes'){
-			var shipperId = angular.element("#confirm-delete").data("shipperId");
-			var index  = angular.element("#confirm-delete").data("index");
-			var shipperStatus  = angular.element("#confirm-delete").data("shipperStatus");
+			var shipperId 		= angular.element("#confirm-delete").data("shipperId");
+			var index  			= angular.element("#confirm-delete").data("index");
+			var shipperStatus  	= angular.element("#confirm-delete").data("shipperStatus");
 
 			if ( shipperId != '' && shipperId != undefined ) {
 				if( shipperStatus != undefined ) {
@@ -160,7 +161,7 @@ $scope.toggleRow = function($event,index){
 	$scope.dropzoneConfigShipperAdd = {
 		parallelUploads: 5,
 		maxFileSize: 3,
-		url: URL+ '/shippers/uploadContractDocs',
+		url: URL+ '/shippers/skipAcl_uploadContractDocs',
 		addRemoveLinks: true, 
 		autoProcessQueue: false,
 		acceptedFiles: 'image/*, application/pdf, .xls, .xlsx, .doc, .docx, .txt, .bmp, .svg',
@@ -251,7 +252,7 @@ app.controller('editShipperController', function(dataFactory,getShipperData, $sc
 	$scope.dropzoneConfigBrokerEdit = {
 		parallelUploads: 5,
 		maxFileSize: 3,
-		url: URL+ '/shippers/uploadContractDocs',
+		url: URL+ '/shippers/skipAcl_uploadContractDocs',
 		addRemoveLinks: true, 
 		//~ autoProcessQueue: false,
 		acceptedFiles: 'image/*, application/pdf, .xls, .xlsx, .doc, .docx, .txt, .bmp, .svg',

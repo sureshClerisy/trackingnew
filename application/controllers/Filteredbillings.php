@@ -63,7 +63,11 @@ class Filteredbillings extends Admin_Controller{
 		echo json_encode($data);
 	}
 
-	public function getRecords($parameter = ''){
+	/**
+	* Fetching next page loads and on change of sort and search
+	*/
+	
+	public function skipAcl_getRecords($parameter = ''){
 
 		$params = json_decode(file_get_contents('php://input'),true);
 		$total = 0;

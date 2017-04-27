@@ -148,7 +148,7 @@ app.controller('outboxPaymentController', ["dataFactory","$scope","$rootScope", 
 		   
 	        $scope.showLoad = function(id, index) {
 				$rootScope.selectedIndex = index;
-				dataFactory.httpRequest(URL+'/billings/getLoadDetail/'+id).then(function(data){
+				dataFactory.httpRequest(URL+'/billings/skipAcl_getLoadDetail/'+id).then(function(data){
 					$scope.showLoadDetail = data;
 					$rootScope.noLoadSelected = false;
 					

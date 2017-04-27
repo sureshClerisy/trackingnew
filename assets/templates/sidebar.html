@@ -183,29 +183,11 @@
         </a>
     </li>
 
-    <li ng-class="(state=='trucks' || state=='trailers') ? 'open active' : ''">
-        <a class="test" href="javascript:void(0)">
+    <li ng-if="loggedUserRoleId == 8">
+        <a class="test" ui-sref="organizations">
           <span class="title">Organization</span>
-          <span class=" arrow" ng-class="{'open active':(state=='trucks' || state=='trailers' || state=='maintenance') }"></span>
-
-          <span class="icon-thumbnail"><i class="icon-pg trucks vehicles"></i></span></a>
-          <ul class="sub-menu">
-            <li>
-                <a  href="#/organization">Organization
-                    <span class="icon-thumbnail">tr</span>
-                </a>
-            </li>
-            <li>
-                <a  href="#/manage">Manage
-                    <span class="icon-thumbnail">tl</span>
-                </a>
-            </li>
-            <li>
-                <a href="#/roles">Roles
-                    <span class="icon-thumbnail">tl</span>
-                </a>
-            </li>
-        </ul>
+          <span class="icon-thumbnail"><i class="icon-pg trucks vehicles"></i></span>
+        </a>
     </li>
 
     <li ng-class="(state=='users' || state=='addUser') ? 'open active' : ''">
@@ -219,6 +201,11 @@
                     <span class="icon-thumbnail"> 
                          <i class="fa fa-user-plus"></i>
                     </span>
+                </a>
+            </li>
+             <li>
+                 <a ui-sref="roles">Roles
+                    <span class="icon-thumbnail">tl</span>
                 </a>
             </li>
         </ul>

@@ -7,11 +7,16 @@ app.controller('reportsController', function(dataFactory,$scope,$http ,$rootScop
 	//All Dispatchers with their drivers
 	$scope.vDriversList = initialData.vDriversList;
 
-
 	$scope.formFilter = {};
 	$scope.formFilter.customDate = $filter('date')(new Date(), 'yyyy-MM-dd');
 	$scope.formFilter.reportType = "individual";
-	$scope.selectedScope= {id: "",driverName:"All Groups", profile_image:"",label:"",username:"All Groups", latitude:"",longitude:"",vid:"",vehicle_address:"",state:"", city:""};
+
+	// if ( $scope.vDriversList != undefined && $scope.vDriversList.length > 0 ) {
+	// 	var showValues = ( $scope.vDriversList[0] != undefined) ? $scope.vDriversList[0] : [];
+	// 	$scope.selectedScope = {id: "",driverName: showValues.driverName, profile_image:"", label: showValues.label,username: showValues.username, latitude: showValues.latitude,longitude: showValues.longitude, vid:showValues.vid, vehicle_address: showValues.vehicle_address,state:showValues.state, city:showValues.city};
+	// } else {
+		$scope.selectedScope = {id: "",driverName:"All Groups", profile_image:"",label:"",username:"All Groups", latitude:"",longitude:"",vid:"",vehicle_address:"",state:"", city:""};
+	// }
 
 	$scope.reportListOpen 	= true;
 	$scope.reportOpen 		= false;
@@ -250,7 +255,7 @@ app.controller('reportsController', function(dataFactory,$scope,$http ,$rootScop
 
 	$scope.pageChanged = function(newPage){
 
-		$scope.action = '/reports/getReportRecords/';
+		$scope.action = '/reports/skipAcl_getReportRecords/';
 		$scope.currentPage = newPage;
 		$scope.loadNextPage(($scope.currentPage - 1),$scope.searchFilter,$scope.lastSortedColumn,$scope.lastSortType);
 	};
@@ -309,7 +314,7 @@ app.controller('reportsController', function(dataFactory,$scope,$http ,$rootScop
 			case 'DestinationCity'	 			: $scope.DestinationCitySortType = type; break;
 			case 'DestinationState' 			: $scope.DestinationStateSortType = type; break;
 		}
-		$scope.action = '/reports/getReportRecords/';
+		$scope.action = '/reports/skipAcl_getReportRecords/';
 		$scope.loadNextPage(($scope.currentPage - 1), $scope.searchFilter, sortColumn, type);
 	}
 
@@ -319,7 +324,7 @@ app.controller('reportsController', function(dataFactory,$scope,$http ,$rootScop
 		if ( actionName == 'breadcrumb_detail') 
 			$scope.action = '/reports/irp_breadcrumb_detail/';
 		else
-			$scope.action = '/reports/getReportRecords/';
+			$scope.action = '/reports/skipAcl_getReportRecords/';
 
 		$scope.loadNextPage(($scope.currentPage - 1), query, '','');
 	};

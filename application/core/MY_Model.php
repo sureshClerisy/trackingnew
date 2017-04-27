@@ -5,23 +5,28 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 		function __construct()
 		{
 			parent::__construct();
+			
 		}
 	}
 	   
-    class Parent_Model extends MY_Model {
+    class Parent_Model extends CI_Model {
 
 		public  $superAdmin;
 		public  $role;
 		public  $userID;
+		public $organisationRoleId; 
 
 		function __construct() {
+			
 			parent::__construct();
+			$this->organisationRoleId = 9;
 			$this->userID 	= $this->session->loggedUser_id;
+
 			$this->role 	= $this->session->role;
 			if(in_array($this->userID, $this->config->item('superAdminIds'))){
 				$this->superAdmin = true;
 			}
-
+			// echo $this->superAdmin.'<br/>';
 		}
 		
 		/**
@@ -260,6 +265,17 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 		}
 
-		
+		/**
+		* method 	: Get
+		* @param 	: dispatcherId
+		* @return  	: return drivers list array
+		* Comment 	: used to fetch list of drivers to dispatcher
+		*/
 
+		public function getColumnsList( $table, $coumns = [],$condition = [] ) {
+			if(!empty($condition)){
+				$this->db->where($condition);
+			}
+			return $this->db->select(implode(',',$coumns))->get($table)->result_array();
+		}
 	}

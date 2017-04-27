@@ -262,7 +262,7 @@
 
 <form ng-show="report.name == 'loads_performance'"> 
     <div class="report-filter filter-1">
-      <h2>{{ languageArray.scope }}</h2>
+      <h2>{{ languageArray.scope }}</h2> 
       <div class=" dat-sec-1 form-group form-group-default">
          <label>{{ languageArray.selectscope }}</label>
          <div class="dashbord-select-dropdown">
@@ -279,7 +279,7 @@
 </div>
 
 <div class="report-filter filter-2">
-  <h2>{{languagueArray.filtersandoptions}}</h2>
+  <h2>{{languageArray.filtersandoptions}}</h2>
   <div class=" dat-sec-1 form-group form-group-default">
      <label>{{ languageArray.reporttype }}: </label>
      <div class="date-wrapper">
@@ -439,7 +439,7 @@
           </div>
 
           <div class="tb-cell miles-report stype" ng-click="sortCustom('Mileage', MileageSortType)"> 
-              <span class="lode-arrow {{MileageSortType}}">{{ langaugeArray.planthmiles }}</span>
+              <span class="lode-arrow {{MileageSortType}}">{{ languageArray.planthmiles }}</span>
           </div>
 
           <div class="tb-cell dmiles-report stype" ng-click="sortCustom('deadmiles', deadmilesSortType)"> 
@@ -447,7 +447,7 @@
           </div>
 
           <div class="tb-cell rpm-report stype" ng-click="sortCustom('rpm', RpmSortType)"> 
-              <span class="lode-arrow {{RpmSortType}}">{{ langaugeArray.planthrpm }}</span>
+              <span class="lode-arrow {{RpmSortType}}">{{ languageArray.planthrpm }}</span>
           </div>
 
           <div class="tb-cell pickup-report stype" ng-click="sortCustom('PickupDate', pickupDateSortType)"> 
@@ -608,14 +608,14 @@
 
 <div class="tb-cell pickup-report">
   <span>
-      <div class="heading">{{ langaugeArray.popuppickup }} <b>:</b></div>
+      <div class="heading">{{ languageArray.popuppickup }} <b>:</b></div>
       <div class="value">{{ (value.PickupDate != '0000-00-00' && value.PickupDate != '' ) ? value.PickupDate : ''}}</div>
   </span>
 </div>
 
 <div class="tb-cell origin-report">
   <span>
-      <div class="heading">{{ langauaeArray.planthorigin }} <b>:</b></div>
+      <div class="heading">{{ languageArray.planthorigin }} <b>:</b></div>
       <div class="value">{{ value.OriginCity|capitalize}}</div>
   </span>
 </div>

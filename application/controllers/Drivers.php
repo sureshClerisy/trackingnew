@@ -93,7 +93,7 @@ class Drivers extends Admin_Controller {
 	* Return: success or error
 	* Comment: Used for uploading drivers documents
 	*/
-	public function uploadDocs() {
+	public function skipAcl_uploadDocs() {
 		$prefix = "driver"; 
 	    $response  = array();
 	    if(isset($_POST["driverId"]) && $_POST["driverId"] != ""){
@@ -313,58 +313,29 @@ class Drivers extends Admin_Controller {
 		}
 	}
 	
-	public function delete($driverID=null)
-	{
-		$result = $this->Driver->delete( $driverID );
-		if ( $result ) {
-			$message = "$this->userName deleted a driver";
-			logEvent('delete',$message,$this->Job);
-			echo json_encode(array('success' => true));
-		} else {
-			echo json_encode(array('success' => false));
-		}
-	}
+	// public function delete($driverID=null)
+	// {
+	// 	$result = $this->Driver->delete( $driverID );
+	// 	if ( $result ) {
+	// 		$message = "$this->userName deleted a driver";
+	// 		logEvent('delete',$message,$this->Job);
+	// 		echo json_encode(array('success' => true));
+	// 	} else {
+	// 		echo json_encode(array('success' => false));
+	// 	}
+	// }
 	
-	public function addDrivers() 
+	protected function addDrivers() 
 	{
 		$_POST = json_decode(file_get_contents('php://input'), true);
     	$result = $this->Driver->addDrivers($_POST,$this->userId);
 		echo json_encode(array('success' => true));
 	}
 	
-	public function uploadDocuments()
-	{
-		$prefix = 'driver';
-		$parameter = 'drivers';
-		$docs = $_FILES;
-		$responseArray = array();
-		foreach($docs as $key=>$documents){
-			$response = $this->uploadCommonDocs($docs,$prefix,$parameter,$key);
-			if(empty($response['error'])){
-				$responseArray[$key] = $response;
-				$docNameArray = explode('.',$response['data']['file_name']);
-				$thumbName = $docNameArray[0];
-				$responseArray[$key]['thumb_name'] = 'thumb_'.$thumbName.'.jpg';
-				$path = "./assets/uploads/documents/thumb_drivers/".$responseArray[$key]['thumb_name'];
-				while(true){
-					if(file_exists($path)){
-						break;
-						}	
-					}
-			}
-		}
-		if(!empty($responseArray)){
-			echo json_encode(array("success"=>true,"responseArray"=>$responseArray)); 
-		}else{
-			echo json_encode(array("success"=>true));
-		}
-			
-	}
 
 	 
-	 /********* Dispatcher List - r288 ****************/
-	 public function dispatcherList($driver_id = null)
-	 {
+	public function skipAcl_dispatcherList($driver_id = null)
+	{
 		$data['selected'] = ''; 
 		if ( $this->roleId == 2 )
 			$userId = $this->userId;
@@ -392,8 +363,6 @@ class Drivers extends Admin_Controller {
 		}
 		echo json_encode($data);
 	}
-	/********* Dispatcher List - r288 ****************/
-	
 	
 	/*
 	* Request URL: http://domain/drivers/changeStatus
@@ -434,7 +403,7 @@ class Drivers extends Admin_Controller {
 	* Comment: Used to check duplicate driver licence number exist
 	*/
 
-	public function checkLicenceNumber( $entityId = null ) {
+	public function skipAcl_checkLicenceNumber( $entityId = null ) {
 		$_POST = json_decode(file_get_contents('php://input'), true);
 		if ( $_POST['value'] != '') {
 			$result = $this->Driver->checkLicenceNumberExist($_POST['value'], $_POST['name'], $_POST['tblName'], $entityId);
@@ -520,7 +489,7 @@ class Drivers extends Admin_Controller {
 	* Changing driver assignment after selecting yes or no 
 	*/
 
-	public function changeDriverAssignment( $type = '', $driverId = null , $userId = null , $previousUser = null, $secondDriverId = null) {
+	public function skipAcl_changeDriverAssignment( $type = '', $driverId = null , $userId = null , $previousUser = null, $secondDriverId = null) {
 
 		$type  = ( $type == 'team') ? $type : '';
 		$jobsList = $this->Driver->fetchDriversLoad($driverId,$type);

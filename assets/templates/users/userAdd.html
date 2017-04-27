@@ -31,15 +31,15 @@
 								<div class="row clearfix">
 									<div class="col-sm-6">
 										<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':newuser.first_name.$invalid && !newuser.first_name.$pristine || newuser.$submitted && newuser.first_name.$invalid}">
-											<label>Name</label>
-											<input type="text" class="form-control" name="first_name" ng-model="userData.first_name" required />
+											<label>First Name</label>
+											<input type="text" class="form-control" name="first_name" ng-model="users.userData.first_name" required />
 										</div>
-										<label class="error" for="first_name" ng-show="newuser.first_name.$invalid && !newuser.first_name.$pristine || newuser.$submitted && newuser.first_name.$invalid">Please enter name.</label>
+										<label class="error" for="first_name" ng-show="newuser.first_name.$invalid && !newuser.first_name.$pristine || newuser.$submitted && newuser.first_name.$invalid">Please enter first name.</label>
 									</div>
 									<div class="col-sm-6">
 										<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':newuser.last_name.$invalid && !newuser.last_name.$pristine || newuser.$submitted && newuser.last_name.$invalid}">
 											<label>Last Name</label>
-											<input type="text" class="form-control" name="last_name" ng-model="userData.last_name" required / >
+											<input type="text" class="form-control" name="last_name" ng-model="users.userData.last_name" required / >
 										</div>
 										<label class="error" for="last_name" ng-show="newuser.last_name.$invalid && !newuser.last_name.$pristine || newuser.$submitted && newuser.last_name.$invalid">Please enter last name.</label>
 									</div>
@@ -49,18 +49,18 @@
 								<div class="row clearfix">
 									
 									<div class="col-sm-6">
-										<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':newuser.username.$invalid && !newuser.username.$pristine || newuser.$submitted && newuser.username.$invalid || userData.username.$invalid}">
+										<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':newuser.username.$invalid && !newuser.username.$pristine || newuser.$submitted && newuser.username.$invalid || userData.username.$invalid, 'has-error-new' : users.notSaveUser == false}">
 											<label>Username</label>
-											<input type="text" id='checkUnique' ng-blur = "checkUnique()" class="form-control" name="username" ng-model="userData.username" required / >
+											<input type="text" id='checkUnique' ng-blur = "users.checkUnique()" class="form-control" name="username" ng-model="users.userData.username" required / >
 										</div>
 										<label class="error" for="username" ng-show="newuser.username.$invalid && !newuser.username.$pristine || newuser.$submitted && newuser.username.$invalid">Please enter username</label>
-										<label class="error" for="username" ng-show="username">Username already in used.Please choose diffrent.</label>
+										<label class="error" for="username" ng-show="users.notSaveUser == false">Username already in used.Please choose diffrent.</label>
 									</div>
 
 									<div ng-if="request=='addUser'" class="col-sm-6">
 										<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':newuser.password.$invalid && !newuser.password.$pristine || newuser.$submitted && newuser.password.$invalid}">
 											<label>Password</label>
-											<input type="password" class="form-control" name="password" ng-model="userData.password" required / >
+											<input type="password" class="form-control" name="password" ng-model="users.userData.password" required / >
 										</div>
 										<label class="error" for="password" ng-show="newuser.password.$invalid && !newuser.password.$pristine || newuser.$submitted && newuser.password.$invalid">Please enter password.</label>
 									</div>
@@ -68,7 +68,7 @@
 									<div class="col-sm-6" ng-if="request=='editUser'">
 										<div pg-form-group class="form-group form-group-default">
 											<label>Password</label>
-											<input type="password" class="form-control" name="password" ng-model="userData.newpassword"/>
+											<input type="password" class="form-control" name="password" ng-model="users.userData.newpassword"/>
 										</div>
 									</div>
 
@@ -81,7 +81,7 @@
 									<div class="col-sm-6">
 										<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':newuser.email.$invalid && !newuser.email.$pristine || newuser.$submitted && newuser.email.$invalid}">
 											<label>Email</label>
-											<input type="text" class="form-control" name="email" ng-model="userData.email" required / >
+											<input type="text" class="form-control" name="email" ng-model="users.userData.email" required / >
 										</div>
 										<label class="error" for="email" ng-show="newuser.email.$invalid && !newuser.email.$pristine || newuser.$submitted && newuser.email.$invalid">Please enter email address.</label>
 									</div>
@@ -89,7 +89,7 @@
 									<div class="col-sm-6">
 										<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':newuser.phone.$invalid && !newuser.phone.$pristine || newuser.$submitted && newuser.phone.$invalid}">
 											<label>Phone</label>
-											<input type="text" class="form-control" name="phone" ng-model="userData.phone" required / >
+											<input type="text" class="form-control" name="phone" ui-jq="mask" ui-options="'(999) 999-9999'" ng-model="users.userData.phone" required / >
 										</div>
 										<label class="error" for="phone" ng-show="newuser.phone.$invalid && !newuser.phone.$pristine || newuser.$submitted && newuser.phone.$invalid">Please enter phone.</label>
 									</div>
@@ -101,13 +101,13 @@
 									<div class="col-sm-6">
 										<div pg-form-group class="form-group form-group-default">
 											<label>City</label>
-											<input type="text" class="form-control" name="city" ng-model="userData.city"/>
+											<input type="text" class="form-control" name="city" ng-model="users.userData.city"/>
 										</div>
 									</div>
 									<div class="col-sm-6">
 										<div pg-form-group class="form-group form-group-default">
 											<label>State</label>
-											<input type="text" class="form-control" name="state" ng-model="userData.state"/>
+											<input type="text" class="form-control" name="state" ng-model="users.userData.state"/>
 										</div>
 									</div>
 								</div>								
@@ -118,7 +118,7 @@
 									<div class="col-sm-6">
 										<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':newuser.zipcode.$invalid && !newuser.zipcode.$pristine || newuser.$submitted && newuser.zipcode.$invalid}">
 											<label>Zip Code</label>
-											<input type="text" class="form-control" name="zipcode" ng-model="userData.zipcode" required / >
+											<input type="text" class="form-control" name="zipcode" ng-model="users.userData.zipcode" required / >
 										</div>
 										<label class="error" for="zipcode" ng-show="newuser.zipcode.$invalid && !newuser.zipcode.$pristine || newuser.$submitted && newuser.zipcode.$invalid">Please enter zip code.</label>
 									</div>
@@ -126,7 +126,7 @@
 									<div class="col-sm-6">
 										<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':newuser.address.$invalid && !newuser.address.$pristine || newuser.$submitted && newuser.address.$invalid}">
 											<label>Address</label>
-											<input type="text" class="form-control" name="address" ng-model="userData.address" required / >
+											<input type="text" class="form-control" name="address" ng-model="users.userData.address" required / >
 										</div>
 										<label class="error" for="address" ng-show="newuser.address.$invalid && !newuser.address.$pristine || newuser.$submitted && newuser.address.$invalid">Please enter address.</label>
 									</div>
@@ -137,8 +137,8 @@
 									<div class="col-sm-6">
 										<div pg-form-group class="form-group form-group-default required th-select" ng-class="{'has-error':newuser.role_id.$invalid && !newuser.role_id.$pristine || newuser.$submitted && newuser.role_id.$invalid}">
 											<label>SELECT ROLE</label>
-											<ui-select name="role_id" ng-model="userData.role_id" theme="bootstrap" required on-select="onSelectRoleCallback($item, $model)">
-												<ui-select-match class="ui-select-match" placeholder="Select Role">{{selectedRole}}</ui-select-match>
+											<ui-select name="role_id" ng-model="users.userData.role_id" theme="bootstrap" required on-select="onSelectRoleCallback($item, $model)">
+												<ui-select-match class="ui-select-match" placeholder="Select Role">{{users.selectedRole}}</ui-select-match>
 												<ui-select-choices class="ui-select-choices" repeat="item in roleList | filter: $select.search">
 													<div ng-bind-html="trustAsHtml((item.name | highlight: $select.search))"></div>
 												</ui-select-choices>
@@ -148,19 +148,22 @@
 									</div>
 
 									<div class="col-sm-6">
+										&nbsp;
+									</div>
+									<!--div class="col-sm-6">
 										<div pg-form-group class="form-group form-group-default th-select">
 											<label>Profile Image</label>
 											<input type="file" id="profileImage" class="form-control" name="profile_image" ng-model="userData.profile_image"/>
 										</div>
 										
-									</div>
+									</div-->
 								</div>	
 								<!--row-end-->
 								<div class="update-truck-block-btn">
 									<button ng-click="submitted=true" class="btn btn-primary btn-cons m-b-10" type="submit">
 										<i class="fa fa-plus"></i>
-										<span ng-disable="username" ng-hide="userData.id" class="bold"> {{languageArray.brokerListingTableAddbutton|capitalize }}</span>
-										<span ng-disable="username" ng-show="userData.id" class="bold"> {{languageArray.brokerListingTableEditbutton|capitalize }}</span>
+										<span ng-disable="username" ng-hide="users.userData.id" class="bold"> {{languageArray.brokerListingTableAddbutton|capitalize }}</span>
+										<span ng-disable="username" ng-show="users.userData.id" class="bold"> {{languageArray.brokerListingTableEditbutton|capitalize }}</span>
 									</button>
 									<a href="#/users">
 										<button class="btn btn-danger btn-cons m-b-10" type="button">

@@ -207,22 +207,39 @@ class User extends Parent_Model
 			return array();
 	}
 
-	public function getUsers() {
-		
-		$column = 'users.id,username,CONCAT(first_name, ,last_name) as fullName,email,users.status,role_id';
+	/**
+	* get list of users for organisation
+	*/
 
+	public function getUsers( $userId = null) {
+		$column = 'users.id,username,CONCAT(first_name," ",last_name) as fullName,email,users.status, phone,role_id, roles.name as roleName';
 		$this->db->join("roles", "users.role_id = roles.id","Left");
-		$this->db->select($column)->where('users.status',1);
-		
-		if(!$this->superAdmin){
-			$this->db->where('users.parent_id',$this->userID);
-		}
+		$this->db->select($column);		
+		$this->db->where(array('users.parent_id' => $userId, 'users.deleted' => 0));
 
-		$data = $this->db->get('users')
-			 ->result_array();
-		return $data;
+		$data = $this->db->get('users');
+		if ( $data->num_rows() > 0 )
+			return $data->result_array();
+		else 
+			return array();
 	}
 
+	/**
+	* get user detail organisation
+	*/
+
+	public function getUserDetail( $userId = null) {
+		$column = 'users.id,username,CONCAT(first_name," ",last_name) as fullName,email,users.status, phone,role_id, roles.name as roleName';
+		$this->db->join("roles", "users.role_id = roles.id","Left");
+		$this->db->select($column);
+		$this->db->where(array('users.id' => $userId, 'users.deleted' => 0));
+
+		$data = $this->db->get('users');
+		if ( $data->num_rows() > 0 )
+			return $data->row_array();
+		else 
+			return array();
+	}
 
 	public function getUsersById( $userId = null ) {
 		
@@ -263,12 +280,75 @@ class User extends Parent_Model
 		return $this->db->insert('users',$data);
 	}
 
-	public function changeStatus(){
-
-		$postData 			= json_decode(file_get_contents('php://input'));
-		$status 			= ($postData->data->status==1)?'0':'1';
-		$this->db->where('id',$postData->data->userID)->update('users',['status'=>$status]);
+	public function changeStatus($status,$userId){
+		$status 			= ($status ==1 ) ? '0' : '1';
+		$this->db->where('id',$userId)->update('users',['status'=>$status]);
 	}
+
+	/**
+	* delete user from list
+	*/
+
+	public function deleteUser($userId = null ) {
+		$this->db->where('id',$userId)->update('users',['deleted' => 1]);
+	}
+
+	/**
+	* get list of organisation added
+	*/
+
+	public function getOrganisationsList() {
+		$this->db->select('first_name,id');
+		$this->db->where('role_id',$this->organisationRoleId);
+		$result = $this->db->get('users');
+		if($result->num_rows() > 0) {
+			return $result->result_array();
+		} else {
+			return array();
+		}
+	}
+
+	/**
+	* Get selected organisation id
+	*/
+
+	public function getSelectedOrganisation( $userId = null) {
+		$this->db->select('name,organisation_id');
+		$this->db->where('user_id',$userId);
+		$result = $this->db->get('selected_organisation');
+		if( $result->num_rows() > 0 )
+			return $result->row_array();
+		else
+			return array();
+	}
+
+	/**
+	* remove selected organisation id
+	*/
+
+	public function removeSelectedOrganisation( $userId = null) {
+		$data = array(
+			'name' => '',
+			'organisation_id' => ''
+		);
+
+		$this->db->where('user_id',$userId);
+		$this->db->update('selected_organisation',$data);
+		return true;
+	}
+
+	/**
+	* set selected organisation id in db
+	*/
+
+	public function setSelectedOrganisation( $userId = null, $data = array()) {
+		$this->db->where('user_id',$userId);
+		$this->db->update('selected_organisation',$data);
+		return true;
+	}
+
+	
+	
 }
 
 ?>

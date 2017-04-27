@@ -206,7 +206,7 @@ app.controller('filteredBillingsController', ["dataFactory","$scope","$http","$r
 
     $scope.loadNextPage = function(pageNumber,search,sortColumn,sortType){
     	$scope.autoFetchLoads = true;
-        dataFactory.httpRequest(URL+'/Filteredbillings/getRecords/'+$scope.listTypeParameter,'Post',{} ,{ pageNo:pageNumber, itemsPerPage:$scope.itemsPerPage,searchQuery: search, sortColumn:sortColumn, sortType:sortType,startDate: $scope.dateRangeSelector.startDate, endDate:$scope.dateRangeSelector.endDate,filterArgs:$scope.filterArgs }).then(function(data){
+        dataFactory.httpRequest(URL+'/Filteredbillings/skipAcl_getRecords/'+$scope.listTypeParameter,'Post',{} ,{ pageNo:pageNumber, itemsPerPage:$scope.itemsPerPage,searchQuery: search, sortColumn:sortColumn, sortType:sortType,startDate: $scope.dateRangeSelector.startDate, endDate:$scope.dateRangeSelector.endDate,filterArgs:$scope.filterArgs }).then(function(data){
         	$scope.autoFetchLoads = false;
         	$rootScope.filteredBillingLoads = data.data;
 			$scope.total            = data.total;
@@ -222,7 +222,7 @@ app.controller('filteredBillingsController', ["dataFactory","$scope","$http","$r
     };
 
     $scope.exportBilling = function(search){
-    	dataFactory.httpRequest(URL+'/Filteredbillings/getRecords/'+$scope.listTypeParameter,'Post',{} ,{ pageNo:'', itemsPerPage:$scope.itemsPerPage,searchQuery: search, sortColumn:'', sortType:'',startDate: $scope.dateRangeSelector.startDate, endDate:$scope.dateRangeSelector.endDate,filterArgs:$scope.filterArgs,'export':1 }).then(function(data){
+    	dataFactory.httpRequest(URL+'/Filteredbillings/skipAcl_getRecords/'+$scope.listTypeParameter,'Post',{} ,{ pageNo:'', itemsPerPage:$scope.itemsPerPage,searchQuery: search, sortColumn:'', sortType:'',startDate: $scope.dateRangeSelector.startDate, endDate:$scope.dateRangeSelector.endDate,filterArgs:$scope.filterArgs,'export':1 }).then(function(data){
         	$rootScope.donwloadExcelFile(data.fileName);
 		});
     };

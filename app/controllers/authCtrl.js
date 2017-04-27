@@ -41,27 +41,35 @@ app.controller('authCtrl', function (dataFactory,$scope, PubNub, $rootScope, $lo
 				{	
 					$rootScope.profileImage = data.profile_img.profile_image;
 					$rootScope.loggedInUser = true;
-					$rootScope.loggedInUserID = data.loggedUser_id;
+					$rootScope.activeUser = data.loggedUser_id;
 					$rootScope.loggedUserFirstName 	= data.loggedUser_fname;
 					$rootScope.LastName 	= data.LastName;
 					$rootScope.color 		= data.color;
 					
 					$cookies.put('LastName', $rootScope.LastName);
-					$cookies.put('color', $rootScope.color);
-					
+					$cookies.put('color', $rootScope.color);					
 					$cookies.put('loggedUserFirstNameCookie', data.loggedUser_fname);
 					$cookies.put('loggedUserId', data.loggedUser_id);
 					$cookies.put('loggedUserRoleId', data.loggedUserRole_id);
 					$cookies.put('profileImage', data.profile_img.profile_image);
 					$cookies.put('userIsLoggedIn', 1);
 					$rootScope.activeUser = data.loggedUser_id;
-							
+					
+					if ( data.loggedUserRole_id == 8 ) {
+						$rootScope.organisationsList = data.organisations;
+						$rootScope.organisationSelected = data.selectedOrgName;
+						$rootScope.globalSelectedOrganisationId = data.selectedId;
+						$rootScope.showOrganisationsDropdown = true;
+					} else {
+						$rootScope.organisationSelected = '';
+						$rootScope.globalSelectedOrganisationId = '';
+						$rootScope.showOrganisationsDropdown = false;
+					}		
 
-				}
-				else
-				{
+				} else {
 					$rootScope.loggedInUser = false;
 				}
+
 				$rootScope.showHeader = true;
 				$rootScope.showBackground = false;
 
@@ -91,7 +99,7 @@ app.controller('authLogoutCtrl', function (dataFactory,$scope, $rootScope, $loca
 		$cookies.remove("admin_email");
 		$cookies.remove("admin_uid");
 		$cookies.remove('loggedUserFirstNameCookie');	
-																													$cookies.remove('LastName');	
+		$cookies.remove('LastName');	
 		$cookies.remove('color');	
 		$cookies.remove('loggedUserRoleId');	
 		$cookies.remove('userIsLoggedIn');	

@@ -300,6 +300,7 @@ $lang['uploadRateSheet'] = 'Upload Rate Sheet';
 $lang['billingAndShipping'] = 'Billing and shipping details';
 $lang['shipper'] = 'Shipper';
 $lang['name'] = 'Name';
+$lang['username'] = 'Username';
 $lang['telephone'] = 'Telephone';
 $lang['address'] = 'Address';
 $lang['cosignee'] = 'Consignee';
@@ -378,9 +379,11 @@ $lang['addRole'] 		= 'Add Role';
 $lang['editRole'] 		= 'Update Role';
 $lang['deleteRole'] 	= 'Delete Role';
 $lang['roleHeader'] 	= 'Roles';
+$lang['orgHeaderAdd'] 	= 'Add Organization';
+$lang['orgHeaderEdit'] 	= 'Update Organization';
 
 //Roles section
-$lang['usersHeading'] 		= 'Users';
+$lang['usersHeading'] 	= 'Users';
 $lang['editUser'] 		= 'Update User';
 $lang['addUser'] 		= 'Add User';
 $lang['deleteUser'] 	= 'Delete User';

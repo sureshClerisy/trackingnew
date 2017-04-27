@@ -144,7 +144,7 @@ class Shippers extends Admin_Controller {
 	}
 
 
-    public function uploadContractDocs(){
+    public function skipAcl_uploadContractDocs(){
 
         $prefix = "shipper"; 
         $response  = array();
@@ -225,7 +225,7 @@ class Shippers extends Admin_Controller {
 	* fetch list of us states
 	*/
 
-	public function fetchUsStates() {
+	public function skipAcl_fetchUsStates() {
 		$states_data = $this->Job->getAllStates();
 		echo json_encode($states_data);
 	}
@@ -250,7 +250,7 @@ class Shippers extends Admin_Controller {
 	* fetch shipper info based on id
 	*/
 
-	public function getshipperListById($shipperId = null ) {
+	public function skipAcl_getshipperListById($shipperId = null ) {
 		$result['shipperData'] = $this->Shipper->getshippersById($shipperId);
 		$resultNew = $this->Shipper->fetchContractDocuments($shipperId, 'shipper');
 		if ( !empty($resultNew) ) {

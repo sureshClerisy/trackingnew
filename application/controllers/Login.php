@@ -21,6 +21,16 @@ class Login extends CI_Controller {
 		$data = array();
 		if( $this->User->check_admin_credentials($username, $password) == true ) {
 			$profile_img = $this->User->user_Profile($this->session->userdata('loggedUser_id'));
+			if ( $this->session->userdata('role') == 8 ) {
+				$result = $this->User->getOrganisationsList();
+				$selectedOrg = $this->User->getSelectedOrganisation($this->session->userdata('loggedUser_id'));
+				$selectedId = (!empty($selectedOrg) && !empty($selectedOrg['organisation_id'])) ? $selectedOrg['organisation_id'] : ( !empty($result) ? $result[0]['id'] : '');
+				$selectedOrgName = (!empty($selectedOrg) && !empty($selectedOrg['name'])) ? $selectedOrg['name'] : ( !empty($result) ? $result[0]['first_name'] : '');
+			} else {
+				$result = array();
+				$selectedOrgName = $selectedId = '';
+			}
+
 			echo json_encode(
 				array(
 					'success'=>true,
@@ -31,7 +41,9 @@ class Login extends CI_Controller {
 					'loggedUser_fname' 	=> $this->session->userdata('loggedUser_fname'),
 					'loggedUser_id' 	=> $this->session->userdata('loggedUser_id'),
 					'loggedUserRole_id' => $this->session->userdata('role'),
-					'profile_img' 		=> $profile_img)
+					'profile_img' 		=> $profile_img,
+					'organisations' => $result,'selectedOrgName' => $selectedOrgName, 'selectedId' => $selectedId
+					)
 				);
 
 			$message = '<span class="blue-color uname">'.ucfirst($this->session->userdata('loggedUser_username'))."</span> logged in from ip : <b>".$_SERVER['REMOTE_ADDR']."</b>";
@@ -43,6 +55,7 @@ class Login extends CI_Controller {
 
 	public function logout()
 	{
+		$this->User->removeSelectedOrganisation($this->session->userdata('loggedUser_id'));
 		if($this->session->userdata('loggedUser_id')){
 			$message = '<span class="blue-color uname">'.ucfirst($this->session->userdata('loggedUser_username'))."</span> logged out from ip : <b>".$_SERVER['REMOTE_ADDR']."</b>";
 			logActivityEvent($this->session->userdata('loggedUser_id'), $this->entity["user"], $this->event["logout"], $message, $this->Job);	
@@ -292,6 +305,9 @@ class Login extends CI_Controller {
 		//~ $load = json_encode($this->lang->language);
 		//~ echo "var loadsArr=".$load.';';
 	}
+	
+
+
 	
 
 }

@@ -22,7 +22,7 @@ angular.module('app')
          **/
         function fetchVehiclesList() {
              return $http({
-                    url   : EnvironmentConfig.api + 'investors/fetchVehiclesList',
+                    url   : EnvironmentConfig.api + 'investors/skipAcl_fetchVehiclesList',
                     method: 'POST',
                     //data: $httpParamSerializerJQLike(shipperData)
                 })
@@ -36,7 +36,7 @@ angular.module('app')
          **************************/
         function getPortletsData(filters) {
              return $http({
-                    url   : EnvironmentConfig.api + 'investors/getPortletsData',
+                    url   : EnvironmentConfig.api + 'investors/skipAcl_getPortletsData',
                     method: 'POST',
                     data  : $httpParamSerializerJQLike(filters)
                 })
@@ -64,7 +64,7 @@ angular.module('app')
          ****************************/
         function getRssFeeds() {
              return $http({
-                    url   : EnvironmentConfig.api + 'investors/getRssFeeds/',
+                    url   : EnvironmentConfig.api + 'investors/skipAcl_getRssFeeds/',
                     method: 'POST',
                     //data  : $httpParamSerializerJQLike(params)
                 })

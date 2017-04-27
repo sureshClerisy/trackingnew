@@ -6,13 +6,13 @@
           <div class="container-fluid padding-25 sm-padding-10">
 			<div class="row">
 				<div class="col-md-12 col-xlg-12">
-					<div ng-show="alertmsg == true" class="alert alert-success" role="alert">
-						<button class="close" data-dismiss="alert"></button>
-						{{Message}}
-						</div>
-						<div ng-show="alertdeletemsg == true" class="alert alert-error" role="alert">
-						<button data-dismiss="alert" class="close"></button>
-						{{errMessage}}
+					<div ng-show="users.type == 'success'" class="alert alert-success" role="alert">
+						<button class="close"  ng-click="users.hidemessages()"  data-dismiss="alert"></button>
+						{{users.message}}
+					</div>
+					<div ng-show="users.type == 'failure'" class="alert alert-error" role="alert">
+						<button data-dismiss="alert" ng-click="users.hidemessages()" class="close"></button>
+						{{users.message}}
 						</div>
 					<div class="commen-heading">
 						<h2 class="oprate-dashbord"><i class="fa fa-users"></i>{{languageArray.usersHeading}}</h2>
@@ -38,16 +38,20 @@
 											<th>Full Name</th>
 											<th>Username</th>
 											<th>Email</th>
+											<th>Phone</th>
+											<th>RoleName</th>
 											<th class="text-center">{{ languageCommonVariables.commonTableThAction }}</th>
 										</tr>
 									</thead>
 									<tbody>
-										<tr ng-repeat="value in usersData" >
+										<tr ng-repeat="value in users.usersData" >
 											
 											<td>{{ value.id }} </td>
 											<td>{{ value.fullName }}</td>
 											<td>{{ value.username }}</td>
 											<td>{{ value.email }}</td>
+											<td>{{ value.phone }}</td>
+											<td>{{ value.roleName }}</td>
 											<td class="text-center action-btn-ryt"> 
 												<div class="export-options-container">
 													<div class="exportOptions">
@@ -55,10 +59,13 @@
 															<a href="#/editUser/{{value.id}}" class="btn btn-default DTTT_button_pdf" title="{{languageCommonVariables.editTrailer}}" ui-jq="tooltip" >
 																<span><i class="fa fa-edit" aria-hidden="true"></i></span>
 															</a>
-															<a class="btn btn-default DTTT_button_csv" title = "Deactivate User" ui-jq="tooltip" ng-click="changeUserStatus(value.id,value.status,$index)">
+															<a class="btn btn-default DTTT_button_csv" title = "Deactivate User" ui-jq="tooltip" ng-if="value.status == 1" ng-click="users.changeUserStatus(value.id,value.status,$index)">
 																<span><i class="fa fa-check-square"></i></span>
 															</a>
-															<a class="btn btn-default DTTT_button_csv" title = "Delete User" ui-jq="tooltip" ng-click="delete(value.id)">
+															<a class="btn btn-default DTTT_button_csv" title = "Deactivate User" ui-jq="tooltip" ng-if="value.status == 0 || value.status == ''" ng-click="users.changeUserStatus(value.id,value.status,$index)">
+																<span><i class="fa fa-square-o"></i></span>
+															</a>
+															<a class="btn btn-default DTTT_button_csv" title = "Delete User" ui-jq="tooltip" ng-click="users.deleteUser(value.id,$index)">
 																<span><i class="fa fa-check-square"></i></span>
 															</a>
 														</div>

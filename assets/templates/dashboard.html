@@ -405,16 +405,9 @@
 																	<td ng-show="typeOfData == '_idriver'" class="text-center v-align-middle semi-bold"></td>
 																	<td ng-show="typeOfData == '_idriver'" class="text-center v-align-middle semi-bold"></td>
 
-																	<td ng-if="typeOfData != '_idriver' && typeOfData != '_iteam'" class="text-center v-align-middle semi-bold">	
-																		{{totalAllArray.overallTotalFinancialGoal | currency:"$":2}} 
-																		<span class="goals-font" ng-class="totalAllArray.overallPlusMinusFinancialGoal >= 0 ? 'positiveGoal' : 'negativeGoal'" > 	
-																			{{totalAllArray.overallPlusMinusFinancialGoal | currency:"$":2}}
-																		</span>
+																	<td ng-if="typeOfData != '_idriver' && typeOfData != '_iteam'" class="text-center v-align-middle semi-bold">	{{totalAllArray.overallTotalFinancialGoal | currency:"$":2}} <span class="goals-font" ng-class="totalAllArray.overallPlusMinusFinancialGoal >= 0 ? 'positiveGoal' : 'negativeGoal'" > 	{{totalAllArray.overallPlusMinusFinancialGoal | currency:"$":2}}</span>
 																	</td>
-																	<td ng-if="typeOfData != '_idriver' && typeOfData != '_iteam'" class="text-center v-align-middle semi-bold">{{totalAllArray.overallTotalMilesGoal | number:0}} 
-																		<span class="goals-font" ng-class="totalAllArray.overallPlusMinusMilesGoal >= 0 ? 'positiveGoal' : 'negativeGoal'"> 
-																			{{totalAllArray.overallPlusMinusMilesGoal | number:0}} 
-																		</span>
+																	<td ng-if="typeOfData != '_idriver' && typeOfData != '_iteam'" class="text-center v-align-middle semi-bold">{{totalAllArray.overallTotalMilesGoal | number:0}} <span class="goals-font" ng-class="totalAllArray.overallPlusMinusMilesGoal >= 0 ? 'positiveGoal' : 'negativeGoal'"> {{totalAllArray.overallPlusMinusMilesGoal | number:0}} </span>
 																	 </td>
 																	<td  class="text-center v-align-middle semi-bold">{{totalAllArray.totMiles | number:0}}</td>
 																	<td  class="text-center v-align-middle">{{totalAllArray.totDeadMiles | number:0}}</td>
@@ -935,7 +928,7 @@
 							                                </div>
 							                            </div>
 							                            <div class="panel-body">
-								                            <div class="metro live-tile" data-mode="carousel" data-start-now="true" data-delay="3000" ui-jq="liveTile">
+								                            <!-- <div class="metro live-tile" data-mode="carousel" data-start-now="true" data-delay="3000" ui-jq="liveTile"> -->
 								                                <div class="slide-front tiles slide active">
 									                                <div class="  top-left bottom-right padding-25 p-t-50">
 									                                    <span class="number " ng-click="showRecordsWithFilter('withoutTruck','driversInsights', 'driver', '', '', '',dashboard.activeDriversDate)">{{ dashboard.activeDriversWTruck }}</span>
@@ -945,29 +938,7 @@
 									                                    
 									                                </div>
 									                            </div>
-									                            <div class="slide-back tiles " ng-repeat="record in predictedJobs.data">
-									                            	<div class="">
-									                            		<h1>Top loads for {{record.driverName}}</h1>
-									                            		<ul class="slide-blockdrive">
-									                            			<li>
-									                            				<div class="tile-origin">Pickup</div>
-									                            				<div class="tile-origin">Origin</div>
-									                            				<div class="tile-origin">Destination</div>
-									                            				<div class="tile-origin">Profit</div>
-									                            				<div class="tile-origin">Profit %</div> 
-									                            			</li>
-									                            			<li class="cursor" ng-click="clickMatchLoadDetail(jobs.ID,'',jobs.deadmiles,jobs.Payment,jobs.TotalCost,jobs.pickDate)"  ng-repeat="jobs in record.jobs">
-									                            				<div class="tile-origin">{{jobs.PickUpDate}}</div>
-									                            				<div class="tile-origin">{{jobs.OriginCity + ", " + jobs.OriginState}}</div>
-									                            				<div class="tile-origin" >{{jobs.DestinationCity + ", " + jobs.DestinationState}}</div>	
-									                            				<div class="tile-origin" >{{jobs.profitAmount}}</div>
-									                            				<div class="tile-origin" >{{jobs.percent}}%</div>
-									                            			</li>
-									                            		</ul>
-									                            	</div>
-
-									                            </div>
-									                        </div>
+									                        <!-- </div> -->
 							                            </div>
 							                        </div>
 							                        <!-- END WIDGET -->
@@ -1010,6 +981,7 @@
 									                                    <h3 class="text-white ltext">{{ languageArray.incompleteLoads }}</h3>
 									                                </div>
 							                                    </div>
+
 							                                </div>
 
 
@@ -1018,6 +990,54 @@
 							                                    <br>
 							                                    <h3 class="text-white ltext">Trucks are not reporting current location</h3>
 							                                </div> -->
+							                            </div>
+							                        </div>
+							                        <!-- END WIDGET -->
+							                    </div>
+							                </div>
+							            </div>
+		                       		</div>
+		                       		
+		                       		<div class="panel panel-default no-border predict-jobs bg-transparent wpanel" id="12" ng-show ="visibility[12] ==1" pg-portlet>
+				                    	<div class="row ">
+							                <div class="col-md-12 col-lg-12 col-sm-12 p-l-0">
+							                    <div class="ar-1-1">
+							                        <!-- START WIDGET -->
+							                        <div class="widget-2 dawt panel no-border predict-next-jobs bg-primary widget widget-loader-circle-lg no-margin" pg-portlet progress="circle-lg" overlay-color='0,0,0' overlay-opacity="0.6" on-refresh="refreshNotification('.predict-next-jobs','predict_next_jobs')">
+							                            <div class="panel-heading dwithout-t">
+							                                <div class="panel-controls">
+							                                    <ul>
+							                                        <li><a class="portlet-refresh" data-toggle="refresh"><i class="portlet-icon portlet-icon-refresh text-white"></i></a>
+							                                        </li>
+							                                    </ul>
+							                                </div>
+							                            </div>
+							                            <div class="panel-body">
+								                            <div id="ttt" class="metro live-tile" data-mode="carousel" data-start-now="true" data-delay="7000" ui-jq="liveTile">
+								                            
+									                            <div class="tiles slide" ng-class=" ($index == 0) ? 'slide-front' : 'slide-back'" ng-repeat="record in predictedJobs track by $index">
+									                            	<div class="">
+									                            		<h1>Top loads for {{record.driverName}}</h1>
+									                            		<ul class="slide-blockdrive">
+									                            			<li>
+									                            				<div class="tile-origin">Pickup</div>
+									                            				<div class="tile-origin">Origin</div>
+									                            				<div class="tile-origin">Destination</div>
+									                            				<div class="tile-origin">Profit</div>
+									                            				<div class="tile-origin">Profit %</div> 
+									                            			</li>
+									                            			<li class="cursor" ng-click="clickMatchLoadDetail(jobs.ID,'',jobs.deadmiles,jobs.Payment,jobs.TotalCost,jobs.pickDate)"  ng-repeat="jobs in record.jobs">
+									                            				<div class="tile-origin">{{jobs.PickUpDate}}</div>
+									                            				<div class="tile-origin">{{jobs.OriginCity + ", " + jobs.OriginState}}</div>
+									                            				<div class="tile-origin" >{{jobs.DestinationCity + ", " + jobs.DestinationState}}</div>	
+									                            				<div class="tile-origin" >{{jobs.profitAmount}}</div>
+									                            				<div class="tile-origin" >{{jobs.percent}}%</div>
+									                            			</li>
+									                            		</ul>
+									                            	</div>
+
+									                            </div>
+									                        </div>
 							                            </div>
 							                        </div>
 							                        <!-- END WIDGET -->

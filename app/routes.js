@@ -122,7 +122,7 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
 				title: 'Reports',
 				templateUrl: 'assets/templates/reports.html',
                 controller: 'reportsController',
-                moduleName: 'reports',
+                moduleName: 'loads',
                 showHeader : true,
                 resolve:{            
 					initialData: function(dataFactory, $stateParams) {
@@ -169,7 +169,7 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
 						return dataFactory.httpRequest(URL+'/drivers/edit/' + $stateParams.id);
 					},
 					getDispatcherList: function(dataFactory,$stateParams) {
-						return dataFactory.httpRequest(URL+'/drivers/dispatcherList/'+$stateParams.id);
+						return dataFactory.httpRequest(URL+'/drivers/skipAcl_dispatcherList/'+$stateParams.id);
 					},
 					 deps: ['$ocLazyLoad', function($ocLazyLoad) {
                         return $ocLazyLoad.load([
@@ -520,7 +520,7 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
                 moduleName: 'trucks',
                 resolve:{
 					getTruckData: function(dataFactory) {
-						return dataFactory.httpRequest(URL+'/vehicles/states/');
+						return dataFactory.httpRequest(URL+'/vehicles/skipAcl_states/');
 					}
 				}
             })
@@ -532,7 +532,7 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
                 moduleName: 'drivers',
                 resolve:{            
 					getDispatcherList: function(dataFactory) {
-						return dataFactory.httpRequest(URL+'/drivers/dispatcherList');
+						return dataFactory.httpRequest(URL+'/drivers/skipAcl_dispatcherList');
 					}
 				}
             })
@@ -821,7 +821,7 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
                         return dataFactory.httpRequest(URL+'/shippers/update/' + $stateParams.id);
                     },
                     fetchStatesList : function(dataFactory) {
-                        return dataFactory.httpRequest(URL+'/shippers/fetchUsStates');
+                        return dataFactory.httpRequest(URL+'/shippers/skipAcl_fetchUsStates');
                     },
                     deps: ['$ocLazyLoad', function($ocLazyLoad) {
                         return $ocLazyLoad.load([
@@ -913,17 +913,59 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
                         return investorService.fetchVehiclesList();
                     },                    
                 }
-            }).state('organization', {
-                url: '/organization',
+            }).state('organizations', {
+                url: '/organizations',
                 title: 'Management Section',
                 moduleName: 'loads',
-                templateUrl: 'assets/templates/acl/organisations.html',
-                controller: 'aclController',
-                controllerAs: 'acl',
+                templateUrl : 'assets/templates/acl/organisations.html',
+                controller : 'organisationController',
+                controllerAs: 'org',
+                params: {
+                    type: '',
+                    message: ''
+                },
                 resolve:{
                     getOrganisations: function(dataFactory, $stateParams) {
                         return dataFactory.httpRequest(URL+'/acl/organisations');
                     }
+                }              
+            }).state('addOrganization', {
+                url: '/addOrganization',
+                title: 'Add New Organization',
+                moduleName: 'loads',
+                templateUrl: 'assets/templates/acl/add_organisations.html',
+                controller: 'organisationController',
+                controllerAs: 'org',
+                resolve:{
+                    getOrganisations: function(dataFactory, $stateParams) {
+                        return [];
+                    },
+                    deps: ['$ocLazyLoad', function($ocLazyLoad) {
+                        return $ocLazyLoad.load([
+                                'inputMask',
+                                ], {
+                                insertBefore: '#lazyload_placeholder'
+                            })
+                    }]
+                }              
+            }).state('editOrganization', {
+                url: '/editOrganization/:id',
+                title: 'Update Organization',
+                moduleName: 'loads',
+                templateUrl: 'assets/templates/acl/add_organisations.html',
+                controller: 'organisationController',
+                controllerAs: 'org',
+                resolve:{
+                    getOrganisations: function(dataFactory, $stateParams) {
+                        return dataFactory.httpRequest(URL+'/acl/editOrganisation/'+$stateParams.id);
+                    },
+                    deps: ['$ocLazyLoad', function($ocLazyLoad) {
+                        return $ocLazyLoad.load([
+                                'inputMask',
+                                ], {
+                                insertBefore: '#lazyload_placeholder'
+                            })
+                    }]
                 }              
             }).state('manage', {
                 url: '/manage/:id',
@@ -934,7 +976,7 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
                 controllerAs: 'acl',
                 resolve:{
                     getAction: function(dataFactory, $stateParams) {
-                        return dataFactory.httpRequest(URL+'/acl/getController');
+                        return dataFactory.httpRequest(URL+'/acl/get_module/'+$stateParams.id);
                     }
                 }              
             }).state('roles', {
@@ -943,10 +985,14 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
                 moduleName: 'loads',
                 templateUrl: 'assets/templates/acl/role.html',
                 controller: 'roleManage',
-                controllerAs: 'acl',
+                controllerAs: 'roles',
+                params:{
+                    type : '',
+                    message :  ''
+                },
                 resolve:{
-                    getRoles: function(dataFactory, $stateParams) {
-                        return dataFactory.httpRequest(URL+'/acl/getRoles');
+                    getRoles: function(dataFactory,$rootScope) {
+                        return dataFactory.httpRequest(URL+'/acl/getRoles/'+$rootScope.activeUser);
                     }
                 }              
             }).state('addrole', {
@@ -955,14 +1001,11 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
                 moduleName: 'loads',
                 templateUrl: 'assets/templates/acl/addRole.html',
                 controller: 'roleManage',
-                controllerAs: 'acl',
+                controllerAs: 'roles',
                 resolve:{
-                    getAction: function(dataFactory, $stateParams) {
+                    getRoles: function() {
                         return [];
                     },
-                    getRoles: function(dataFactory, $stateParams) {
-                        return [];
-                    }
                 }              
             }).state('editrole', {
                 url: '/editrole/:id',
@@ -970,10 +1013,10 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
                 moduleName: 'loads',
                 templateUrl: 'assets/templates/acl/addRole.html',
                 controller: 'roleManage',
-                controllerAs: 'acl',
+                controllerAs: 'roles',
                 resolve:{
                     getRoles: function(dataFactory, $stateParams) {
-                        return dataFactory.httpRequest(URL+'/acl/getRoles/'+$stateParams.id);
+                        return dataFactory.httpRequest(URL+'/acl/editRole/'+$stateParams.id);
                     }
                 }
             }).state('users', {
@@ -981,11 +1024,15 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
                 title: 'User List',
                 moduleName: 'loads',
                 templateUrl: 'assets/templates/users/usersList.html',
-                controller: 'manageUsersController',
+                controller: 'usersController',
                 controllerAs: 'users',
+                params: {
+                    type : '',
+                    message : ''
+                },
                 resolve:{
-                    getData: function(dataFactory, $stateParams) {
-                        return dataFactory.httpRequest(URL+'/users/');
+                    getData: function(dataFactory, $rootScope) {
+                        return dataFactory.httpRequest(URL+'/users/index/'+$rootScope.activeUser);
                     }
                 }
             }).state('addUser', {
@@ -993,7 +1040,7 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
                 title: 'Add User',
                 moduleName: 'loads',
                 templateUrl: 'assets/templates/users/userAdd.html',
-                controller: 'manageUsersController',
+                controller: 'usersController',
                 controllerAs: 'users',
                 resolve:{
                     getData: function(dataFactory, $stateParams) {
@@ -1005,12 +1052,19 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
                 title: 'Update User',
                 moduleName: 'loads',
                 templateUrl: 'assets/templates/users/userAdd.html',
-                controller: 'manageUsersController',
+                controller: 'usersController',
                 controllerAs: 'users',
                 resolve:{
                     getData: function(dataFactory, $stateParams) {
                         return dataFactory.httpRequest(URL+'/users/getAddEdit/'+$stateParams.id);
-                    }
+                    },
+                     deps: ['$ocLazyLoad', function($ocLazyLoad) {
+                        return $ocLazyLoad.load([
+                                'inputMask',
+                                ], {
+                                insertBefore: '#lazyload_placeholder'
+                            })
+                    }]
                 }
             });
 }]);

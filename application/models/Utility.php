@@ -85,22 +85,34 @@ class Utility extends Parent_Model
 
 
 	/**
-	* @param  : null
-	* @return : array
+	* @param  : $args, $jobs
+	* @return : int
 	* comment : fetch vehicles listing assigned to user
 	**/
 	public function savePredictedJobs( $args, $jobs )
 	{
-		$args["jobs"] = serialize( $jobs );
+		$args["jobs"] = serialize( (array) $jobs );
 		$res = $this->db->insert( 'perdict_next_jobs', $args );
+		return $this->db->insert_id();
 	}
 
 	/**
-	* @param  : null
+	* @param  : id
+	* @return : null
+	* comment : delete predicted jobs before the requested id
+	**/
+	public function deletePredictedJobs( $id )
+	{
+		$this->db->where("id < ", $id);
+		$this->db->delete('perdict_next_jobs');
+	}
+
+	/**
+	* @param  : dispId
 	* @return : array
 	* comment : fetch vehicles listing assigned to user
 	**/
-	public function getNextPredictedJobs( $dispId ){
+	public function getNextPredictedJobs( $args = array(), $dispId = false ){
 		$this->db->select(" CASE pj.driver_type 
     						WHEN 'team' THEN CONCAT(d.first_name,' + ',team.first_name) 
     									ELSE concat(d.first_name,' ',d.last_name) 
@@ -108,13 +120,32 @@ class Utility extends Parent_Model
 		
 		$this->db->join("drivers as d", "pj.driver_id = d.id","Left");
 		$this->db->join('drivers as team','pj.team_driver_id = team.id','left');	
-		$this->db->where( "dispatcher_id", $dispId );
+		
+		if($dispId){
+			$this->db->where( "dispatcher_id", $dispId );	
+		}
+		
+		$type = isset( $args["label"] ) ? $args["label"] : "";
+		if($type == "_idispatcher"){
+			$this->db->where('pj.dispatcher_id', $args['dispId']);
+		}else if($type == "_idriver" || $type == "driver" ) {
+			$this->db->where('pj.dispatcher_id', $args['dispId']);
+			$this->db->where('pj.driver_id',     $args['id']);
+		} else if( $type == "_iteam" || $type == "team" || $type == "_team"){
+			$this->db->where(array("pj.driver_id" => $args["id"], 'pj.team_driver_id' => $args['team_driver_id'],'pj.dispatcher_id' => $args["dispId"], 'pj.driver_type' => 'team'));
+		}else if( !empty( $type ) && isset($args["id"]) && isset($args["dispId"]) ){
+			$this->db->where('pj.dispatcher_id', $args['dispId']);
+			$this->db->where('pj.driver_id',     $args['id']);
+		}
+
+
 		$result = $this->db->get('perdict_next_jobs as pj');
+		//pr($args);die;
 		//echo $this->db->last_query();die;
 		if ($result->num_rows() > 0) {
 			return $result->result_array();
 		} else {
-			return false;
+			return array();
 		}
 	}
 

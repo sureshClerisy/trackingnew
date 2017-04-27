@@ -6628,6 +6628,35 @@ font-size: 13px;padding-right:10px;word-break: break-all;
 .tile-origin:nth-child(3){width:30%;}
 .tile-origin:nth-child(4){width:15%;text-align:center;}
 .tile-origin:nth-child(5){width:10%;text-align:center;padding-right:0px;}
+
+/*ACL related CSS Start*/
+.controller-listing h3{
+  cursor: pointer;
+}
+
+.action-list > ul {
+  float: left;
+  list-style: outside none none;
+  width: 100%;
+}
+.action-list{
+  display: none;
+}
+.action-list ul li {
+  float: left;
+  width: 33%;
+}
+.action-list .actino-label {
+  color: #626262;
+}
+/*ACL related CSS End*/
+.pull-right-dropdown {
+    float: left;
+    width: 150px;
+    margin-top: 12px;
+    margin-right: 10px;
+}
+
 @media (min-width:2000px){
     .map-load-section .dataTables_wrapper.no-footer table thead tr th.billing-origin{
        width:200px;
@@ -6644,11 +6673,11 @@ font-size: 13px;padding-right:10px;word-break: break-all;
 }
 }
 @media (max-width:2100px){
-  .tile-origin:nth-child(1){width:20%;}
+/*  .tile-origin:nth-child(1){width:20%;}
 .tile-origin:nth-child(2){width:40%;}
   .tile-origin:nth-child(3){width:40%;padding-right:0px;}
 .tile-origin:nth-child(4){display: none;}
-.tile-origin:nth-child(5){display: none;}
+.tile-origin:nth-child(5){display: none;}*/
 }
 @media (max-width:1400px){
     .itinery-distance-detail {
@@ -6658,9 +6687,9 @@ font-size: 13px;padding-right:10px;word-break: break-all;
       display: inline-block;
       padding-top: 11px;
   }
-    .tile-origin:nth-child(1){width:40%;}
+    /*.tile-origin:nth-child(1){width:40%;}
 .tile-origin:nth-child(2){width:60%;}
-  .tile-origin:nth-child(3){display:none;}
+  .tile-origin:nth-child(3){display:none;}*/
   .slide-back h1 {
   color: #fff;
   font-size: 18px;

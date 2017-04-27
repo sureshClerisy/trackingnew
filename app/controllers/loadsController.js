@@ -208,14 +208,14 @@ app.controller('loadsController', ["dataFactory","$scope","$http","$rootScope", 
 	$scope.exportLoadData = function(){
 		search = angular.element('.srpSearch1 input').val();
 		data = { pageNo:'', itemsPerPage:$scope.itemsPerPage,searchQuery: search, sortColumn:'', sortType:'',startDate: $scope.dateRangeSelector.startDate, endDate:$scope.dateRangeSelector.endDate,filterArgs:$scope.filterArgs,'export':'1'}
-        dataFactory.httpRequest(URL+'/Loads/getRecords/','Post',{} ,data).then(function(data){
+        dataFactory.httpRequest(URL+'/Loads/skipAcl_getRecords/','Post',{} ,data).then(function(data){
            $rootScope.donwloadExcelFile(data.fileName);
 		});		
 	}    
 
     $scope.loadNextPage = function(pageNumber,search,sortColumn,sortType){
     	$scope.autoFetchLoads = true;
-        dataFactory.httpRequest(URL+'/Loads/getRecords/','Post',{} ,{ pageNo:pageNumber, itemsPerPage:$scope.itemsPerPage,searchQuery: search, sortColumn:sortColumn, sortType:sortType,startDate: $scope.dateRangeSelector.startDate, endDate:$scope.dateRangeSelector.endDate,filterArgs:$scope.filterArgs }).then(function(data){
+        dataFactory.httpRequest(URL+'/Loads/skipAcl_getRecords/','Post',{} ,{ pageNo:pageNumber, itemsPerPage:$scope.itemsPerPage,searchQuery: search, sortColumn:sortColumn, sortType:sortType,startDate: $scope.dateRangeSelector.startDate, endDate:$scope.dateRangeSelector.endDate,filterArgs:$scope.filterArgs }).then(function(data){
         	$scope.autoFetchLoads = false;
         	$rootScope.assignedLoads = data.data;
 

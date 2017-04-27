@@ -62,7 +62,7 @@ angular.module('app')
 
         function fetchStatesList() {
             return $http({
-                url: EnvironmentConfig.api + 'shippers/fetchUsStates',
+                url: EnvironmentConfig.api + 'shippers/skipAcl_fetchUsStates',
                 method: 'POST',
             })
             .then(getDataComplete)

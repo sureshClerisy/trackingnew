@@ -29,8 +29,37 @@ $rootScope.logoutmessage=false;
 		}
 	});
 	
+	/**
+	* fetch list of organisations if logged user is superadmin
+	*/
+	
+	$rootScope.fetchOrganisationsList = function() {
+		dataFactory.httpRequest(URL + '/users/skipAcl_getOrganisationsList').then(function(data) {
+			$rootScope.organisationsList = data.organisations;
+			$rootScope.organisationSelected = data.selectedOrgName;
+			$rootScope.globalSelectedOrganisationId = data.selectedId;
+			$rootScope.showOrganisationsDropdown = true;
+		});	
+	};
 
+	main.organisationsList = [];
+	$rootScope.showOrganisationsDropdown = false;
+	if ( $cookies.get('loggedUserRoleId') != undefined && $cookies.get('loggedUserRoleId') == 8 ) {				// get list of organisations when superadmin logins
+		$rootScope.fetchOrganisationsList();
+	}
 
+	/**
+	* changing Organisation List for superadmin users
+	*/
+
+	main.onSelectOrganisationCallback = function(item) {
+		dataFactory.httpRequest(URL + '/users/skipAcl_setSelectedOrganisation','POST',{},{	organisation_id:item.id, name:item.first_name}).then(function(data) {
+			$rootScope.organisationSelected = item.first_name;
+			$rootScope.globalSelectedOrganisationId = item.id;
+			$state.reload();
+		});	
+	}
+		
 	//~~~~~~~~~~~~~~~~~~~~~~~ Pubnub Code ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     /**Fetching language values*/
 	$scope.ticketActivity   = []; 	//For activities in timeline tab of job ticket
@@ -106,6 +135,7 @@ $rootScope.logoutmessage=false;
     	}
     }
 		
+	$rootScope.activeUser = ($cookies.get('loggedUserId') != undefined ) ? $cookies.get('loggedUserId') : '';
 	$scope.hideMe = function(){
 		setTimeout(function() {
             $('#modalSlideLeft').modal('hide');
@@ -132,12 +162,10 @@ $rootScope.logoutmessage=false;
 					$rootScope.$on(PubNub.ngMsgEv($rootScope.predictJobChannel), function(event, payload) { 
 						var msgFor = payload.env[0][0].message.sender_uuid;
 						if( msgFor  != undefined && msgFor == $rootScope.activeUser ){
-							//alert("gotcha");
 							$rootScope.getNextPredictedJobs();
 						}
 					});
 				}
-
 				$rootScope.getNextPredictedJobs();
 				$rootScope.getNotifications();
 				$rootScope.loggedInUser = true;
@@ -186,9 +214,11 @@ $rootScope.logoutmessage=false;
 
 	$rootScope.getNextPredictedJobs = function(){
 		$http.post(URL + '/Utilities/getNextPredictedJobs/'+$rootScope.activeUser).then(function(data){
-    		$scope.predictedJobs = data;
+    		$rootScope.predictedJobs = data;
     	});
 	}
+
+
 
 	$rootScope.donwloadExcelFile = function(fileName){
 
@@ -606,7 +636,7 @@ $rootScope.logoutmessage=false;
 		$rootScope.fetchUSCities = function(enteredCity,country) {
 		
 			if ( enteredCity != undefined && enteredCity.length > 1 ) {
-				dataFactory.httpRequest(URL+'/truckstop/searchCity','POST',{},{city: enteredCity,country:country}).then(function(data){
+				dataFactory.httpRequest(URL+'/truckstop/skipAcl_searchCity','POST',{},{city: enteredCity,country:country}).then(function(data){
 					
 					$scope.mainOriginUL = true;
 					if ( data.result.length > 0 ) {
@@ -678,7 +708,7 @@ $rootScope.logoutmessage=false;
 		
 		$rootScope.fetchUSDestCities = function(enteredCity,country) {
 			if ( enteredCity != undefined && enteredCity.length > 1 ) {
-				dataFactory.httpRequest(URL+'/truckstop/searchCity','POST',{},{city: enteredCity,country:country}).then(function(data){
+				dataFactory.httpRequest(URL+'/truckstop/skipAcl_searchCity','POST',{},{city: enteredCity,country:country}).then(function(data){
 					if ( data.result.length > 0 ) {
 						$('.list-unstyled-dest').show();
 						$rootScope.destCities = data.result;
@@ -1361,7 +1391,7 @@ $rootScope.logoutmessage=false;
 			
 			if ( item.id != '' ) {
 				$scope.autoFetchLoads = true;
-				dataFactory.httpRequest(URL+'/truckstop/FetchVehicleInfo/'+item.id).then(function(data) {
+				dataFactory.httpRequest(URL+'/truckstop/skipAcl_fetchVehicleInfo/'+item.id).then(function(data) {
 					if ( data.vehicleInfo != undefined && data.vehicleInfo.length != 0 ) {
 						$rootScope.vehicleInfo = {};
 						$rootScope.vehicleInfo = data.vehicleInfo;
@@ -1442,7 +1472,7 @@ $rootScope.logoutmessage=false;
 		} else {
 			$cookies.put('printTicket',JSON.stringify($rootScope.editSavedLoad));
 		}
-		newWindowUrl +='/truckstop/printLoadDetails/'+TS_id+'/'+id;		
+		newWindowUrl +='/truckstop/skipAcl_printLoadDetails/'+TS_id+'/'+id;		
 		var winPrint = $window.open(newWindowUrl,"Map");
 		// winPrint.focus();
 		setTimeout(function () {winPrint.print();},1000);
@@ -1476,7 +1506,7 @@ $rootScope.logoutmessage=false;
 				$rootScope.changeAddMilesDistanceNew('origin','notSearchZip');
 			} else {
 				$scope.autoFetchLoads = true;
-				dataFactory.httpRequest(URL+'/truckstop/UnassignTruckToDriver/','POST',{},{allData : $rootScope.editSavedLoad,driverAssignType:$rootScope.driverAssignType}).then(function(dataRes) {
+				dataFactory.httpRequest(URL+'/truckstop/skipAcl_UnassignTruckToDriver/','POST',{},{allData : $rootScope.editSavedLoad,driverAssignType:$rootScope.driverAssignType}).then(function(dataRes) {
 					$rootScope.editSavedLoad.Mileage = dataRes.distance;
 					$rootScope.editSavedLoad.timer_distance = dataRes.distance;
 					$rootScope.editSavedLoad.deadmiles = dataRes.new_deadmiles_Cal;
@@ -1503,7 +1533,7 @@ $rootScope.logoutmessage=false;
 
 			$rootScope.driverAssignType = item.label == "_team" ? "team" : "driver";
 			
-			dataFactory.httpRequest(URL+'/truckstop/assignTruckToDriver/'+item.id,'POST',{},{allData : $rootScope.editSavedLoad,driverAssignType:$rootScope.driverAssignType}).then(function(dataRes) {
+			dataFactory.httpRequest(URL+'/truckstop/skipAcl_assignTruckToDriver/'+item.id,'POST',{},{allData : $rootScope.editSavedLoad,driverAssignType:$rootScope.driverAssignType}).then(function(dataRes) {
 				if ( dataRes ) {
 					
 					$rootScope.vehicleInfo = dataRes.vehicleDetail;
@@ -1592,7 +1622,7 @@ $rootScope.logoutmessage=false;
 		if (address != undefined ) {
 			$scope.autoFetchLoads = true;
 		
-				dataFactory.httpRequest(URL+'/truckstop/calculateNewDistance/'+$rootScope.primaryLoadId+'/'+$scope.primaryTripDetailId,'POST',{},{ allData : $rootScope.editSavedLoad,vehicleId : $rootScope.editSavedLoad.vehicle_id, searchType : addType, extraStopsAdded : $rootScope.extraStops, deadMileCalculate : $rootScope.iterationPopData, setDeadMilePage : $rootScope.setDeadMilePage , leftSideColumnPlanPage : $scope.setChainArrayValue, driverAssignType:$rootScope.driverAssignType}).then(function(dataRes) {
+				dataFactory.httpRequest(URL+'/truckstop/skipAcl_calculateNewDistance/'+$rootScope.primaryLoadId+'/'+$scope.primaryTripDetailId,'POST',{},{ allData : $rootScope.editSavedLoad,vehicleId : $rootScope.editSavedLoad.vehicle_id, searchType : addType, extraStopsAdded : $rootScope.extraStops, deadMileCalculate : $rootScope.iterationPopData, setDeadMilePage : $rootScope.setDeadMilePage , leftSideColumnPlanPage : $scope.setChainArrayValue, driverAssignType:$rootScope.driverAssignType}).then(function(dataRes) {
 					if ( dataRes.distance != '' && dataRes.distance != undefined && dataRes.distance != null ) {
 						$rootScope.editSavedLoad.Mileage = dataRes.distance;
 						$rootScope.editSavedLoad.timer_distance = dataRes.distance;
@@ -1753,7 +1783,6 @@ $rootScope.logoutmessage=false;
 				}
 			}
 			$rootScope.editSavedLoad.PickupAddress 	= street_number + " " + street ;			
-			$rootScope.editSavedLoad.OriginStreet 	= street_number + " " + street ;	
 			$rootScope.editSavedLoad.OriginCity 	= city ;
 			$rootScope.editSavedLoad.OriginState 	= state;
 			$rootScope.editSavedLoad.OriginCountry 	= country;
@@ -1848,7 +1877,6 @@ $rootScope.logoutmessage=false;
 		}
 		
 		$rootScope.editSavedLoad.DestinationAddress = street + " " + street_number;
-		$rootScope.editSavedLoad.DestinationStreet 	= street + " " + street_number;
 		$rootScope.editSavedLoad.DestinationCity 	= city ;
 		$rootScope.editSavedLoad.DestinationState 	= state;
 		$rootScope.editSavedLoad.DestinationCountry = country;
@@ -2026,7 +2054,7 @@ $rootScope.logoutmessage=false;
 					$rootScope.mapChange = !$rootScope.mapChange;
 					if($rootScope.mapChange===true){
 						$rootScope.stops = 'Fuelstops';
-						dataFactory.httpRequest(URL+'/truckstop/get_nearby_tstops','POST',{},{coords: coords,"radius":5.0}).then(function(data) {
+						dataFactory.httpRequest(URL+'/truckstop/skipAcl_get_nearby_tstops','POST',{},{coords: coords,"radius":5.0}).then(function(data) {
 							$rootScope.truckStops = data;
 							angular.forEach($rootScope.truckStops, function(tstop){
 							   $rootScope.createMarker(tstop); 
@@ -2035,7 +2063,7 @@ $rootScope.logoutmessage=false;
 					}       
 					else{
 						$rootScope.stops = 'Truckstops';
-						dataFactory.httpRequest(URL+'/truckstop/get_nearby_fstops','POST',{},{coords: coords,"radius":5.0}).then(function(data) {
+						dataFactory.httpRequest(URL+'/truckstop/skipAcl_get_nearby_fstops','POST',{},{coords: coords,"radius":5.0}).then(function(data) {
 							$rootScope.truckStops = data;
 							angular.forEach($rootScope.truckStops, function(fstop){
 								$rootScope.createsecondMarker(fstop); 
@@ -2592,7 +2620,6 @@ $rootScope.logoutmessage=false;
 				}
 				
 				$rootScope.editSavedLoad.PickupAddress  = street_number +' '+ street;
-				$rootScope.editSavedLoad.OriginStreet 	= street_number + " " + street ;
 				$rootScope.editSavedLoad.OriginCity 	= city ;
 				$rootScope.editSavedLoad.OriginState 	= state;
 				$rootScope.editSavedLoad.OriginCountry 	= country;
@@ -2679,7 +2706,6 @@ $rootScope.logoutmessage=false;
 			}
 			
 			$rootScope.editSavedLoad.DestinationAddress = street_number + " " + street;
-			$rootScope.editSavedLoad.DestinationStreet 	= street_number + " " + street ;
 			$rootScope.editSavedLoad.DestinationCity 	= city ;
 			$rootScope.editSavedLoad.DestinationState 	= state;
 			$rootScope.editSavedLoad.DestinationCountry = country;
@@ -3067,13 +3093,9 @@ $rootScope.logoutmessage=false;
 			if ($rootScope.editSavedLoad.PickupAddress != undefined && $rootScope.editSavedLoad.DestinationAddress  != undefined ) {
 				$scope.autoFetchLoads = true;
 
-					dataFactory.httpRequest(URL+'/truckstop/calculateNewDistance','POST',{},{allData : $rootScope.editSavedLoad,vehicleId : $rootScope.setAddVehicleId, searchType : addType, requestType : 'addRequest',extraStopsAdded : $rootScope.extraStops,driverAssignType:$rootScope.driverAssignType}).then(function(dataRes) {
+					dataFactory.httpRequest(URL+'/truckstop/skipAcl_calculateNewDistance','POST',{},{allData : $rootScope.editSavedLoad,vehicleId : $rootScope.setAddVehicleId, searchType : addType, requestType : 'addRequest',extraStopsAdded : $rootScope.extraStops,driverAssignType:$rootScope.driverAssignType}).then(function(dataRes) {
 			
 						if ( dataRes.distance != '' && dataRes.distance != undefined && dataRes.distance != null ) {
-							
-							if ( $rootScope.extraStop.length == 0 ) {
-								$rootScope.editSavedLoad.originalDistance = dataRes.distance;
-							}
 							
 							$rootScope.editSavedLoad.Mileage = dataRes.distance;
 							$rootScope.editSavedLoad.timer_distance = dataRes.distance;
@@ -3392,7 +3414,7 @@ $rootScope.logoutmessage=false;
 			$("#new-row-id").removeClass('class-disable-all-input');
 			$("#new-row-id").find("input,select").attr("disabled", false);
 			
-			dataFactory.httpRequest(URL+'/truckstop/fetch_matched_trucks_live/'+truckstopId+'/'+ldID+'/1'+'/'+$rootScope.vehicleIdRepeat,'POST',{},{jobRecords: $rootScope.editSavedLoad, jobPrimary: $rootScope.primaryLoadId, jobDistance: $rootScope.editSavedDist, saveDeadMile : $rootScope.deadmileSave, savedCalPayment: $rootScope.calPaymentSaved,driverAssignType: $rootScope.driverAssignType  }).then(function(data) {
+			dataFactory.httpRequest(URL+'/truckstop/skipAcl_fetch_matched_trucks_live/'+truckstopId+'/'+ldID+'/1'+'/'+$rootScope.vehicleIdRepeat,'POST',{},{jobRecords: $rootScope.editSavedLoad, jobPrimary: $rootScope.primaryLoadId, jobDistance: $rootScope.editSavedDist, saveDeadMile : $rootScope.deadmileSave, savedCalPayment: $rootScope.calPaymentSaved,driverAssignType: $rootScope.driverAssignType  }).then(function(data) {
 				$rootScope.showMatchingTrucks = false;
 				$rootScope.showMatchingTrucksEdit = false;
 				
@@ -3733,7 +3755,7 @@ $rootScope.logoutmessage=false;
 			$scope.autoFetchLoads = true;
 			
 			var addType = 'extraStop';
-			dataFactory.httpRequest(URL+'/truckstop/calculateNewDistance/'+$rootScope.primaryLoadId+'/'+$scope.primaryTripDetailId,'POST',{},{ allData : $rootScope.editSavedLoad, vehicleId : $rootScope.editSavedLoad.vehicle_id, searchType : addType, index:index, extraStopsAdded : $rootScope.extraStops, driverAssignType:$rootScope.driverAssignType}).then(function(dataRes) {
+			dataFactory.httpRequest(URL+'/truckstop/skipAcl_calculateNewDistance/'+$rootScope.primaryLoadId+'/'+$scope.primaryTripDetailId,'POST',{},{ allData : $rootScope.editSavedLoad, vehicleId : $rootScope.editSavedLoad.vehicle_id, searchType : addType, index:index, extraStopsAdded : $rootScope.extraStops, driverAssignType:$rootScope.driverAssignType}).then(function(dataRes) {
 				if ( dataRes.distance != '' && dataRes.distance != undefined && dataRes.distance != null ) {
 					$rootScope.editSavedLoad.Mileage = dataRes.distance;
 					$rootScope.editSavedLoad.timer_distance = dataRes.distance;
@@ -4050,7 +4072,7 @@ $rootScope.logoutmessage=false;
 		
 		angular.element(".progress-div").show();
 		if ( docType == 'broker' || docType == 'shipper' ) {
-			dataFactory.httpRequest(URL+'/truckstop/fetchBrokerShipperDocuments/'+loadId+'/'+docType).then(function(data){
+			dataFactory.httpRequest(URL+'/truckstop/skipAcl_fetchBrokerShipperDocuments/'+loadId+'/'+docType).then(function(data){
 				data = angular.fromJson(data);
 				$scope.brokerDocuments = data.result.brokerDocuments;
 				angular.element(".progress-div").hide();
@@ -4420,7 +4442,7 @@ $rootScope.logoutmessage=false;
 	$rootScope.uniqueFieldsValue = true;
 	$rootScope.checkUniqueFields = function( fieldValue, fieldName, table, fieldId ) {
 		if( fieldName != '' ) {
-			dataFactory.httpRequest(URL + '/drivers/checkLicenceNumber/'+fieldId,'POST',{}, { value : fieldValue, name : fieldName, tblName : table}).then(function(data) {
+			dataFactory.httpRequest(URL + '/drivers/skipAcl_checkLicenceNumber/'+fieldId,'POST',{}, { value : fieldValue, name : fieldName, tblName : table}).then(function(data) {
 				if ( data.response == false ){
 					$rootScope.uniqueFieldsValue = false;
 				} else {

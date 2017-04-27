@@ -106,7 +106,7 @@ app.controller('editBrokersController', function(dataFactory,getBrokersData, $sc
 	$scope.dropzoneConfigBrokerEdit = {
 		parallelUploads: 5,
 		maxFileSize: 3,
-		url: URL+ '/brokers/uploadContractDocs',
+		url: URL+ '/brokers/skipAcl_uploadContractDocs',
 		addRemoveLinks: true, 
 		//~ autoProcessQueue: false,
 		acceptedFiles: 'image/*, application/pdf, .xls, .xlsx, .doc, .docx, .txt, .bmp, .svg',
@@ -194,7 +194,7 @@ app.controller('addBrokersController', function(dataFactory,$scope, PubNub , $ht
 	$scope.dropzoneConfigBrokerAdd = {
 		parallelUploads: 5,
 		maxFileSize: 3,
-		url: URL+ '/brokers/uploadContractDocs',
+		url: URL+ '/brokers/skipAcl_uploadContractDocs',
 		addRemoveLinks: true, 
 		autoProcessQueue: false,
 		acceptedFiles: 'image/*, application/pdf, .xls, .xlsx, .doc, .docx, .txt, .bmp, .svg',

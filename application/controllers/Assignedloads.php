@@ -81,10 +81,10 @@ class Assignedloads extends Admin_Controller{
 				array_unshift($vDriversList, $value);
 			}
 			
-			if($this->userRoleId != _DISPATCHER && $this->userRoleId != 4){
+			// if($this->userRoleId != _DISPATCHER && $this->userRoleId != 4){
 				$new = array("id"=>"","driverName"=>"All Groups","username"=>"","dispId"=>"","vid"=>"","dispId" => "");
 				array_unshift($vDriversList, $new);
-			}
+			// }
 		}
 
 		$newDestlabel = array();
@@ -162,7 +162,7 @@ class Assignedloads extends Admin_Controller{
 		echo json_encode($this->data);
 	}
 	
-	public function getChangeDriverLoads( $vehicleId = null, $driverId = null, $secondDriverId = null ) {
+	public function skipAcl_getChangeDriverLoads( $vehicleId = null, $driverId = null, $secondDriverId = null ) {
 		$objPost = json_decode(file_get_contents('php://input'),true);
 
 		$loadSource = '';
@@ -211,7 +211,7 @@ class Assignedloads extends Admin_Controller{
 		echo json_encode($this->data);
 	}
 	
-	public function fetchVehicleAddress( $vehicleId = null ) {
+	public function skipAcl_fetchVehicleAddress( $vehicleId = null ) {
 		$result = $this->Job->fetchVehicleAddress( $vehicleId);
 		if ( !empty($result) ) {
 			$this->data = $result;
@@ -451,7 +451,7 @@ class Assignedloads extends Admin_Controller{
 	 * Merging PDF files
 	 */
 
-	public function mergingPdf( $loadId = null, $srcPage = "" ) {
+	private function mergingPdf( $loadId = null, $srcPage = "" ) {
 		$pdf = $this->load->library('m_pdf');
 		$pdf = new mPDF();
 		$pdf->SetImportUse();
@@ -527,57 +527,11 @@ class Assignedloads extends Admin_Controller{
 		return true;
 	} 
 	
-	public function mergingPdf1( $loadId = null ) {
-		$loadId = 33;
-		$pdf = $this->load->library('m_pdf');
-		$pdf = new mPDF();
-		$pdf->SetImportUse();
-		$pathGen = str_replace('application/', '', APPPATH);
-		
-		$documents = $this->Billing->fetchDocToBundle($loadId);
-		$invoiceResult = $this->Billing->fetchUploadedDocs( $loadId, 'bundle');
-		$files = array();
-		if ( !empty($documents) ) {
-			foreach( $documents as $docs ) {
-				$files[] = "assets/uploads/documents/{$docs['doc_type']}/{$docs['doc_name']}";
-			}			
-		}
-		
-		for ($i = 0; $i < count($files); $i++ ) {
-			$ext = explode('.',$files[$i]);
-			if ( strtolower($ext[1]) == 'png' || strtolower($ext[1]) == 'jpg' || strtolower($ext[1]) == 'jpeg' ) {
-				$pdf->AddPage('L','A4');
-				$pdf->WriteHTML('<img src="'.$files[$i].'" />');
-			} else if ( strtolower($ext[1]) == 'xlsx' ) {
-
-			} else if ( $ext[1] == 'txt' ) {
-				$result = file_get_contents($files[$i]);
-				$pdf->AddPage('L','A4');
-				$pdf->WriteHTML($result);
-			} else {
-				$pagecount = $pdf->setSourceFile($pathGen.$files[$i]);	
-				for($j = 1; $j <= $pagecount ; $j++)
-				{
-						$tplidx = $pdf->importPage(($j), '/MediaBox'); // template index.
-						$pdf->addPage('L','A4');// orientation can be P|L
-						$pdf->useTemplate($tplidx, 0, 0, 0, 0, TRUE);                   
-					}
-				}
-			}
-			
-			$fileName = "bundle_".time().".pdf";
-			$pdfFilePath = $pathGen."assets/uploads/documents/bundle/".$fileName;
-
-			$pdf->Output('tes.pdf', "D"); 
-
-
-		} 
-
 	/**
 	 * Fetching Broker list on add load
 	 */
 
-	public function getBrokersList( $loadId = null, $type = '' ) {
+	public function skipAcl_getBrokersList( $loadId = null, $type = '' ) {
 		$this->load->model('Shipper');
 
 		$brokersData = $this->BrokersModel->getBrokersList();
@@ -594,200 +548,8 @@ class Assignedloads extends Admin_Controller{
 		$this->data['brokerLoadDetail'] = $getBrokerLoad;
 		echo json_encode($this->data);
 	} 
-	
-	
-	public function demo() {
 
-		require_once("application/third_party/fpdf/fpdf.php");//http://www.fpdf.org/
-		require_once("application/third_party/fpdi/FPDI.php");
-		require_once("application/third_party/fpdi/FPDI_Protection.php");
-
-		$pathGen = str_replace('application/', '', APPPATH.'assets/');
-
-		$files1 = $pathGen.'/compresspdf_demo/Compressed.pdf';
-		$files2 = $pathGen.'/compresspdf_demo/PDFReference15_v5.pdf';
-		$files 	= array($files1,$files2);
-		$pdf 	= new FPDI();
-
-		for ($i = 0; $i < count($files); $i++ ) {
-			$pagecount = $pdf->setSourceFile($files[$i]);
-			
-			for($j = 0; $j < $pagecount ; $j++) {
-
-				$tplidx = $pdf->importPage(($j +1), '/MediaBox'); // template index.
-				$pdf->addPage('P','A4');// orientation can be P|L
-				$pdf->useTemplate($tplidx, 0, 0, 0, 0, TRUE);                   
-			}
-		}
-
-		// set the metadata.
-		//~ $pdf->SetAuthor($data->user->user_name);
-		$pdf->SetCreator('website name!');
-		$pdf->SetSubject('PDF subject !');
-		//~ $pdf->SetKeywords('website name!'.", keywords! ".$data->user->user_name);
-		$output = $pdf->Output('', 'S');
-		$name = 'test.pdf';
-		$this->output->set_header("Content-Disposition: filename=$name;")->set_content_type('Application/pdf')->set_output($output);
-	}
-
-
-	public function gestScript(){
-		
-		$pathGen 	= str_replace('application/', '', APPPATH.'assets/');
-		$gostscript = $pathGen.'ghostscript/gs-920-linux_x86_64';
-		$files1 	= $pathGen.'/compresspdf_demo/Compressed.pdf';
-		$files2 	= $pathGen.'/compresspdf_demo/Compressed2222.pdf';	
-
-		try{
-			shell_exec("{$gostscript} -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dNOPAUSE -dQUIET -dBATCH -sOutputFile={$files2} {$files1}"); 
-		}catch(Exception $e){
-			$e->getMessage();
-		}
-	}
-
-	public function demoNew( $loadId = null ) {
-		$pdf = $this->load->library('m_pdf');
-		$pdf = new mPDF();
-		$pdf->SetImportUse();
-		
-
-		$files = array('/home/csolution/Downloads/semail_(2) (1).pdf','/home/csolution/Downloads/podNew(1).pdf');
-		// include('class.pdf2text.php');
-		$this->load->library('PDF2text.php');
-		$a = new PDF2Text();
-$a->setFilename('/home/csolution/Downloads/semail_(2) (1).pdf'); //grab the test file at http://www.newyorklivearts.org/Videographer_RFP.pdf
-$out = $a->decodePDF();
-pr($out);
-echo $a->output();
-
-die;
-		/*$resu = $this->pdf2string($files[0]);
-		$pdf->SetProtection($resu);
-
-		$new = $pdf->WriteHTML('allo World');
-		// $pdf->Output('filename.pdf');
-		$files[0] = $new;*/
-		for ($i = 0; $i < count($files); $i++ ) {
-			$pagecount = $pdf->setSourceFile($files[$i]);	
-			
-			for($j = 1; $j <= $pagecount ; $j++)
-			{
-				$tplidx = $pdf->importPage(($j), '/MediaBox'); // template index.
-				$pdf->addPage('P','A4');// orientation can be P|L
-				$pdf->useTemplate($tplidx, 0, 0, 0, 0, TRUE);                   
-			}
-		}		
-
-		
-		$pdf->Output(); 
-	} 
-
-	function pdf2string($sourcefile) { 
-
-		$fp = fopen($sourcefile, 'rb'); 
-		$content = fread($fp, filesize($sourcefile)); 
-		fclose($fp); 
-
-		$searchstart = 'stream'; 
-		$searchend = 'endstream'; 
-		$pdfText = ''; 
-		$pos = 0; 
-		$pos2 = 0; 
-		$startpos = 0; 
-
-		while ($pos !== false && $pos2 !== false) { 
-
-			$pos = strpos($content, $searchstart, $startpos); 
-			$pos2 = strpos($content, $searchend, $startpos + 1); 
-
-			if ($pos !== false && $pos2 !== false){ 
-
-				if ($content[$pos] == 0x0d && $content[$pos + 1] == 0x0a) { 
-					$pos += 2; 
-				} else if ($content[$pos] == 0x0a) { 
-					$pos++; 
-				} 
-
-				if ($content[$pos2 - 2] == 0x0d && $content[$pos2 - 1] == 0x0a) { 
-					$pos2 -= 2; 
-				} else if ($content[$pos2 - 1] == 0x0a) { 
-					$pos2--; 
-				} 
-
-				$textsection = substr( 
-					$content, 
-					$pos + strlen($searchstart) + 2, 
-					$pos2 - $pos - strlen($searchstart) - 1 
-					); 
-				$data = @gzuncompress($textsection); 
-				$pdfText .= $this->pdfExtractText($data); 
-				$startpos = $pos2 + strlen($searchend) - 1; 
-
-			} 
-		} 
-
-		return preg_replace('/(\s)+/', ' ', $pdfText); 
-
-	} 
-
-	function pdfExtractText($psData){ 
-
-		if (!is_string($psData)) { 
-			return ''; 
-		} 
-
-		$text = ''; 
-
-    // Handle brackets in the text stream that could be mistaken for 
-    // the end of a text field. I'm sure you can do this as part of the 
-    // regular expression, but my skills aren't good enough yet. 
-		$psData = str_replace('\)', '##ENDBRACKET##', $psData); 
-		$psData = str_replace('\]', '##ENDSBRACKET##', $psData); 
-
-		preg_match_all( 
-			'/(T[wdcm*])[\s]*(\[([^\]]*)\]|\(([^\)]*)\))[\s]*Tj/si', 
-			$psData, 
-			$matches 
-			); 
-
-		for ($i = 0; $i < sizeof($matches[0]); $i++) { 
-			if ($matches[3][$i] != '') { 
-            // Run another match over the contents. 
-				preg_match_all('/\(([^)]*)\)/si', $matches[3][$i], $subMatches); 
-				foreach ($subMatches[1] as $subMatch) { 
-					$text .= $subMatch; 
-				} 
-			} else if ($matches[4][$i] != '') { 
-				$text .= ($matches[1][$i] == 'Tc' ? ' ' : '') . $matches[4][$i]; 
-			} 
-		} 
-
-    	// Translate special characters and put back brackets. 
-		$trans = array( 
-			'...'                => '…', 
-			'\205'                => '…', 
-			'\221'                => chr(145), 
-			'\222'                => chr(146), 
-			'\223'                => chr(147), 
-			'\224'                => chr(148), 
-			'\226'                => '-', 
-			'\267'                => '•', 
-			'\('                => '(', 
-			'\['                => '[', 
-			'##ENDBRACKET##'    => ')', 
-			'##ENDSBRACKET##'    => ']', 
-			chr(133)            => '-', 
-			chr(141)            => chr(147), 
-			chr(142)            => chr(148), 
-			chr(143)            => chr(145), 
-			chr(144)            => chr(146), 
-			); 
-
-		$text = strtr($psData, $trans);
-		return $text;
-	}
-
-	public function getRecords(){
+	public function skipAcl_getRecords(){
 
 		$params = json_decode(file_get_contents('php://input'),true);
 		$total 	= 0;

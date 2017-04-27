@@ -3,14 +3,14 @@
 		<div class="container-fluid padding-25 sm-padding-10">
 			<div class="row">
 				<div class="col-md-12 col-xlg-12">
-					<div ng-show="alertmsg == true" class="alert alert-success" role="alert">
-						<button class="close" data-dismiss="alert"></button>						
-						{{message}}
-					</div>
-					<div ng-show="alertdeletemsg == true" class="alert alert-success" role="alert">
-						<button ng-click = "hidedeletemessage()" class="close"></button>
-						{{deleteMessage}}
-					</div>
+  					<div ng-if="roles.type == 'success'" class="alert alert-success" role="alert">
+  						<button class="close" data-dismiss="alert"></button>						
+  						{{roles.message}}
+  					</div>
+  					<div ng-if="roles.type == 'failure'" class="alert alert-success" role="alert">
+  						<button ng-click = "hidedeletemessage()" class="close"></button>
+  						{{roles.message}}
+  					</div>
 					<div class="commen-heading brokers-page">
 						<h2 class="oprate-dashbord"> {{ languageCommonVariables.roleHeader }}</h2>
 					</div>
@@ -28,50 +28,88 @@
 									</button>
 								</a>
 
-  								<table datatable="ng" dt-options="dtOptions" class="table tr-hover table-hover table-striped driver-table" id="tableWithExportOptions">
-  									<thead>
-  										<tr>
-  											<th>Role</th>
-                                            <th>RoleAlias</th>
-  											<th>Created BY</th>
-  											<th class="text-center">{{ languageCommonVariables.commonTableThAction }}</th>
-  										</tr>
-  									</thead>
-  									<tbody>
-  										<tr ng-repeat="value in aclData">
-  											<td>{{value.name}}</td>
-                                            <td>{{value.alias}}</td>
-  											<td>{{value.username}}{{supeadmin}}</td>
-  											<td class="text-center action-btn-ryt"> 
-  												<div class="export-options-container">
-  													<div class="exportOptions">
-  														<div class="DTTT btn-group" >
-  															<a href="#/editrole/{{value.id}}" ng-disabled="currentuserid != value.user_id && superadmin != 1" class="btn btn-default DTTT_button_pdf" data-original-title="{{languageCommonVariables.editRole}}" ui-jq="tooltip" >
-  																<span>
-                                                                    <i class="fa fa-edit" aria-hidden="true"></i>
-                                                                </span>
-  															</a>
-  															<a class="btn btn-default" ng-disabled="currentuserid != value.user_id && superadmin != 1" title="{{languageCommonVariables.deleteRole}}" ui-jq="tooltip" ng-click='removeRole(value.id,$index)' >
-  																<span>
-                                                                    <i class="fa fa-trash" aria-hidden="true"></i>
-                                                                </span>
-  															</a>
-  															<a href="#/manage/{{value.id}}" ng-disabled="currentuserid != value.user_id && superadmin != 1" class="btn btn-default DTTT_button_csv" title="Manage Permissions" ui-jq="tooltip">
-  																<span><i class="fa fa-cog"></i></span>
-  															</a>
-  														</div>
-  													</div>
-  												</div>
-  											</td>
-  										</tr>
-  									</tbody>
-  								</table>
-  							</div>
-  						</div>
-  					</div>
-  				</div>
-  			</div>
-  		</div>
-  	</div>
+                              <table datatable="ng" dt-options="dtOptions" class="table tr-hover table-hover table-striped driver-table" id="tableWithExportOptions">
+                                 <thead>
+                                    <tr>
+                                       <th>Role</th>
+                                       <th>RoleAlias</th>
+                                       <th>Created BY</th>
+                                       <th class="text-center">{{ languageCommonVariables.commonTableThAction }}</th>
+                                   </tr>
+                               </thead>
+                               <tbody>
+                                <tr ng-repeat="value in roles.aclData">
+                                   <td>{{value.name}}</td>
+                                   <td>{{value.alias}}</td>
+                                   <td>{{value.username}}{{supeadmin}}</td>
+                                   <td class="text-center action-btn-ryt"> 
+                                      <div class="export-options-container">
+                                         <div class="exportOptions">
+                                            <div class="DTTT btn-group" >
+                                               <a href="#/editrole/{{value.id}}" ng-disabled="currentuserid != value.user_id && superadmin != 1" class="btn btn-default DTTT_button_pdf" data-original-title="{{languageCommonVariables.editRole}}" ui-jq="tooltip" >
+                                                  <span>
+                                                    <i class="fa fa-edit" aria-hidden="true"></i>
+                                                </span>
+                                            </a>
+                                            <!-- a class="btn btn-default" ng-disabled="currentuserid != value.user_id && superadmin != 1" title="{{languageCommonVariables.deleteRole}}" ui-jq="tooltip" ng-click='removeRole(value.id,$index)' >
+                                              <span>
+                                                <i class="fa fa-trash" aria-hidden="true"></i>
+                                            </span>
+                                          </a -->
+                                        <a href="#/manage/{{value.id}}" ng-disabled="currentuserid != value.user_id && superadmin != 1" class="btn btn-default DTTT_button_csv" title="Manage Permissions" ui-jq="tooltip">
+                                          <span><i class="fa fa-cog"></i></span>
+                                      </a>
+                                  </div>
+                              </div>
+                          </div>
+                      </td>
+                  </tr>
+              </tbody>
+          </table>
+      </div>
   </div>
-  <ng-include src="'./assets/templates/common_modals.html'"></ng-include>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<div class="modal fade slide-up confirm-delete" id="confirm-delete-role" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" style="padding-right: 17px;" aria-hidden="false">
+    <div class="popup-overlay">
+        <div class="popup-main">
+            <div class="popup-main-table">
+                <div class="popup-table-cell">
+                    <div class="confirm-main-content-">
+                        <div class="popconfirm-img">
+                            <img src="pages/img/confirm-icon.png">
+                        </div>
+                        <h2 class="confirm-heading ng-binding">Confirm Delete?</h2>
+                        <div class="line-image">
+                            <img src="pages/img/confirm-line.png">
+                        </div>
+                        <div class="confirm-btn-section">
+                            <a href="" class="common-item confirm-yes yes-btn" ng-click="confirmDeleteRole('yes')">
+                                <button class="btn btn-primary btn-cons m-b-10" type="button">
+                                    <i class="fa fa-check"></i> 
+                                    <span class="bold ng-binding"> Yes </span>
+                                </button>
+                            </a>
+                            <a href="" class="common-item no-btn" ng-click="confirmDeleteRole('no')">
+                                <button class="btn btn-danger btn-cons m-b-10" type="button">
+                                    <i class="fa fa-close"></i>
+                                    <span class="bold ng-binding"> No </span>
+                                </button>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--    table-full-width  -->
+</div>
+
+
+<ng-include src="'./assets/templates/common_modals.html'"></ng-include>

@@ -334,52 +334,35 @@ class Cron extends CI_Controller{
 	*/
 
 	public function findJobs(){
+		$executionStartTime = microtime(true);
 		$this->load->library("Realtime");
-		$allJobs = array();
 		$pubnub  = new Realtime();	
 		$this->load->model(array("Utility"));
-		//$driversList         = $this->Utility->getIdleDrivers();
-		$driversList         = $this->Utility->getAllDrivers();
-		$vehiclesWithParams  = array();
-		$channel = "";
-		/*$driversList = array(  array(
-								"driver_id" => 27,
-								"vehicle_id" => 22,
-								"team_driver_id" => 0,
-								"dispatcher_id" => 35,
-								"driver_type" => "single",
-							),
-						array(
-								"driver_id" => 152,
-								"vehicle_id" => 53,
-								"team_driver_id" => 0,
-								"dispatcher_id" => 35,
-								"driver_type" => "single",
-						),
-
-			);
-        */
+		$driversList = $this->Utility->getAllDrivers();
+		$jobs = array();
+		$limitSearchDate  = date("Y-m-d");
+		$limitSearchDate  = date ("Y-m-d", strtotime("+3 day", strtotime($limitSearchDate)));
+		$firstInsertedRow = 0;
+		$isFirstJob       = true;
 		foreach ($driversList as $key => $driver) {
-			if($driver["dispatcher_id"] == 12){
-				continue;
-			}
-			$isProcessed = $this->Utility->isAlreadyPredict($driver);
-			if( $isProcessed ){
-				continue;
-			}
-
-			if( is_null( $driver["driver_type"]) || empty($driver["driver_type"])){
-				$driver["driver_type"] = "single";
-			}
 
 			$results = $this->Vehicle->getLastLoadRecord( $driver["vehicle_id"], $driver["driver_id"] );
+
 			if ( !empty($results) ){
 				$driversList[$key]["state"]        = $results['DestinationState'];
 				$driversList[$key]["city"]         = $results['DestinationCity'];
 				$driversList[$key]["country"]      = $results['DestinationCountry'];
 				$driversList[$key]["vehicle_type"] = $results['vehicle_type'];
-				$driversList[$key]["searchDate"]   =  $this->CalculateNextLoadDate($results);
-				$this->todayDate = date('m/d/y',strtotime($driversList[$key]["searchDate"]));
+				$driversList[$key]["searchDate"]   = $this->CalculateNextLoadDate($results);
+				 
+
+				if(!empty($driversList[$key]["searchDate"]) && $driversList[$key]["searchDate"][0] >= $limitSearchDate){
+					continue;
+				}
+
+				if(!empty($driversList[$key]["searchDate"]) && isset($driversList[$key]["searchDate"][0])){
+					$this->todayDate = date('m/d/y',strtotime($driversList[$key]["searchDate"][0]));
+				}
 			} else {
 				$vehicleAddress = $this->Vehicle->get_vehicles_address( null, $driver["vehicle_id"] );
 				$driversList[$key]["state"]        = $vehicleAddress['0']['state'];
@@ -389,30 +372,40 @@ class Cron extends CI_Controller{
 				$driversList[$key]["searchDate"]   = "";
 			}
 
+
+			if( is_null( $driver["driver_type"]) || empty($driver["driver_type"])){
+				$driver["driver_type"] = "single";
+			}
+			
 			$jobs = $this->findJobsFromTruckStop($driversList[$key]);
-			if(!empty($jobs)){
-				if ( !empty($jobs) ) {
+			if(!empty($jobs) && !is_null($jobs)){
+				if ( is_array($jobs) && count($jobs) > 0 ) {
 					$bestJobs = $this->giveBestLoads( $jobs, $this->todayDate, $driver["vehicle_id"] ,  $driversList[$key]["vehicle_type"], $driver["driver_type"]);
-					$this->Utility->savePredictedJobs($driver, $bestJobs);
-					$channel = "predict_next_job_".$driver["dispatcher_id"];
+					
+					if($isFirstJob){
+						$firstInsertedRow = $this->Utility->savePredictedJobs($driver, $bestJobs);	
+						$isFirstJob = false;
+					}else{
+						$this->Utility->savePredictedJobs($driver, $bestJobs);	
+					}
+
 					$publish = $pubnub->publish("predict_next_job_".$driver["dispatcher_id"], array( "message" => array("content"=>"activity", "sender_uuid"=>$driver["dispatcher_id"])));
 				}
-				
-				break;
 			}
 		}
-		//echo $channel;
-	}
+		$executionEndTime = microtime(true);
+		$seconds = $executionEndTime - $executionStartTime;
+		$this->Utility->deletePredictedJobs($firstInsertedRow);	
 
-	/*$unFinishedChain = $this->getUnFinishedChain((int)$driver["vehicle_id"]);
-	if(count($unFinishedChain) > 0){
-		$savedChain = end($unFinishedChain[0]);
-		$driversList[$key]["city"]         =  $savedChain['encodedJobRecord']['DestinationCity'];
-		$driversList[$key]["state"]        = $savedChain['encodedJobRecord']['DestinationState'];
-		$driversList[$key]["country"]      = $savedChain['encodedJobRecord']['DestinationCountry'];
-		$driversList[$key]["vehicle_type"] = $savedChain['encodedJobRecord']['EquipmentTypes']['Code'];
-		$driversList[$key]["searchDate"]   = $savedChain['valuesArray']['nextPickupDate1'];
-	}*/
+		//Print it out
+		echo "\n\nThis script took $seconds to execute.\n\n";
+
+		//Free memory
+		unset($limitSearchDate, $seconds, $executionStartTime, $executionEndTime, $firstInsertedRow, $isFirstJob, $driversList, $jobs);
+	}
+	
+
+	
 
 	private function giveBestLoads( $loads = array(),$todayDate = '', $vehicleId = null ,  $abbreviation = '', $driverType="driver") {	// abbreviation to filer records with particular search type
 
@@ -569,14 +562,19 @@ class Cron extends CI_Controller{
 
 	private function CalculateNextLoadDate( $result = array() ) {
 		if ( $result['DeliveryDate'] != '' && $result['DeliveryDate'] != '0000-00-00' && $result['DeliveryDate'] != null ) {
-			$dateSearch = $result['DeliveryDate'];
+			$lastDeliveryDate = $result['DeliveryDate'];
 		} else {
-			$dateSearch = date('Y-m-d', strtotime($result['pickday'] . ' +1 day'));
+			$lastDeliveryDate = date('Y-m-d', strtotime($result['pickday'] . ' +1 day'));
 		} 
 
-		if ( $dateSearch < date('Y-m-d') ){
-			$dateSearch = "";
-		}
+		$dateSearch = array();
+		if ( $lastDeliveryDate >= date('Y-m-d') ){
+			$dateSearch[] = $lastDeliveryDate;
+			for ( $i = 1; $i < 3; $i++ ) {					// searching jobs upto 3 days
+				$dateSearch[] = date('Y-m-d', strtotime($lastDeliveryDate . ' +'.$i.' day'));
+			}
+		} 
+
 		return $dateSearch;
 	}
 
@@ -620,11 +618,11 @@ class Cron extends CI_Controller{
 					);
 
 		$return = $client->GetLoadSearchResults($params);
-		if(empty($return->GetLoadSearchResultsResult->SearchResults)  || empty($return->GetLoadSearchResultsResult->SearchResults->LoadSearchItem)){
+		if( is_soap_fault($return) || empty($return->GetLoadSearchResultsResult->SearchResults)  || empty($return->GetLoadSearchResultsResult->SearchResults->LoadSearchItem)){
 			$this->rows   = array();
 		} else if(empty($return->GetLoadSearchResultsResult->Errors->Error)){
 			$this->rows   = $return->GetLoadSearchResultsResult->SearchResults->LoadSearchItem;
-		} else{			
+		}else{
 			$data['no_result'] 	= $return->GetLoadSearchResultsResult->Errors->Error->ErrorMessage;
 		}
 

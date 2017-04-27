@@ -118,9 +118,7 @@ class Dashboard extends Admin_Controller {
 		$gDropdown 	= array();$rparam = array();
 		$lPerformance = '';
 		$args = json_decode(file_get_contents('php://input'),true);
-		
-		// ex($args);
-
+	
 		if(isset($_COOKIE["_globalDropdown"])){
 			$gDropdown = json_decode($_COOKIE["_globalDropdown"],true);
 		}
@@ -149,7 +147,7 @@ class Dashboard extends Admin_Controller {
 				$vList = array($gDropdown["vid"]);	
 			}
 
-		}else{
+		} else {
 			
 			$vList = array();
 			if(isset($args["did"]) && !empty($args["did"]) && isset($args["vtype"]) && $args["vtype"] == "_idispatcher"){
@@ -158,7 +156,7 @@ class Dashboard extends Admin_Controller {
 				foreach ($drivers as $key => $value) {
 					$vehicleID = $value["vid"];break;
 				}
-			}else{
+			} else {
 				$vehicleID = isset($args['vid']) && !empty(trim($args['vid'])) ? $args['vid'] : end($vList);	
 			}
 
@@ -168,7 +166,7 @@ class Dashboard extends Admin_Controller {
 	
 			if(isset($args['vtype']) && !empty(trim($args['vtype']))){
 				$lPerformance = 	$args['vtype'];
-			}else if(isset($gDropdown["label"])){
+			} else if (isset($gDropdown["label"])){
 				
 				if($gDropdown["label"] != "_iall" && $gDropdown["label"] != "_idispatcher" && $gDropdown["label"] != "_idriver" && $gDropdown["label"] != "_iteam" && $gDropdown["label"] != "_team" && $gDropdown["label"] != ""){
 					$lPerformance = "_idriver";
@@ -331,16 +329,16 @@ class Dashboard extends Admin_Controller {
 				array_unshift($vehicleList, $value);
 			}
 
-			if($this->userRoleId != _DISPATCHER && $this->userRoleId != 4){
+			// if($this->userRoleId != _DISPATCHER && $this->userRoleId != 4){
 				$new = array("id"=>"","profile_image"=>"","driverName"=>"All Groups","label"=>"","username"=>"","latitude"=>"","longitude"=>"","vid"=>"","city"=>"","vehicle_address"=>"","state"=>"");
 				array_unshift($vehicleList, $new);
-			}
+			// }
 		}
 
 		$weatherNotFound['status'] = false;
 		$latitude = $lat;
 		$longitude = $lng;
-		$curAddress = $vehicleInfo['vehicle_address'];
+		$curAddress = ( !empty($vehicleInfo) ) ? $vehicleInfo['vehicle_address'] : '';
 
 
 		/**
@@ -350,12 +348,13 @@ class Dashboard extends Admin_Controller {
 		
 		$driverId = (!empty($rparam['driverId'])) ? $rparam['driverId'] : (isset($gDropdown['id']) ? $gDropdown["id"] : ""); 
 
-		if(!empty($driverId)){
-			
+		if(!empty($driverId)){			
 			$avatraInfo = $this->createAvatarText($driverId);
 			$gDropdown['avtarText'] = $avatraInfo['text'];
 			$gDropdown['color'] 	= $avatraInfo['color'];
 		}
+		
+		$vehicleLabel = (isset($vehicleLabel) && $vehicleLabel != '' ) ? $vehicleLabel : '';
 
 		echo json_encode(array('longitude'=>$longitude, 'latitude' =>$latitude , 'address' => $curAddress,  "vehicleList"=>$vehicleList,'vehicleID'=>$vehicleID,'vehicleLabel'=>$vehicleLabel, 'weatherNotFound'=>$weatherNotFound,"loadsChart"=>$loadsChart,"vehicleLocation"=>$vehicleLocation,'selectedDriver'=>$gDropdown, "chartStack"=>$chartStack, "todayReport"=>$todayReport, "totals"=>$totals, "driversIdleVsActive"=>$driversIdleVsActive, 'success'=>true));    
 
@@ -377,7 +376,7 @@ class Dashboard extends Admin_Controller {
 		return $avatraInfo;
 	}
 
-	public function fetchWidgetsOrder(){
+	public function skipAcl_fetchWidgetsOrder(){
 
 		$widgetOrd 		= array();
 		$widgetsOrder 	= $this->Job->getWidgetsOrder($this->userId);
@@ -416,7 +415,7 @@ class Dashboard extends Admin_Controller {
 	* @return NULL
 	* 
 	*/
-	public function widgetVisibility(){
+	public function skipAcl_widgetVisibility(){
 		
 		$args = json_decode(file_get_contents('php://input'),true);
 		$this->Job->widgetsVisibility($args);
@@ -430,13 +429,13 @@ class Dashboard extends Admin_Controller {
 	* @return NULL
 	* 
 	*/
-	public function getPortletVisibility(){
+	public function skipAcl_getPortletVisibility(){
 		$visibility = $this->Job->getPortletVisibility();
 		echo json_encode(array("visibility"=>$visibility,'success'=>true));
 	}
 
 	
-	public function updateDashboardOnLoadEdit(){
+	public function skipAcl_updateDashboardOnLoadEdit(){
 		
 		$gDropdown 	= array();
 		$rparam 	= array();
@@ -526,7 +525,7 @@ class Dashboard extends Admin_Controller {
 
 
 
-	public function getTrucksLocation($args,$type){
+	private function getTrucksLocation($args,$type){
 		$this->load->helper('truckstop');
 		$vehicleID = array();
 		if($type == "_idispatcher"){
@@ -577,7 +576,7 @@ class Dashboard extends Admin_Controller {
 
 
 
-	public function checkWeatherType($weather_type ,$weather_description, $time = 'day'){
+	private function checkWeatherType($weather_type ,$weather_description, $time = 'day'){
 		$weather = "partly-cloudy-day";
 		if(strtolower($weather_type) == 'rain' && ($weather_description == 'light rain' || $weather_description == 'moderate rain') ){
 			$weather = 'sleet';
@@ -607,7 +606,7 @@ class Dashboard extends Admin_Controller {
 	}
 	
 
-	public function getRssFeeds(){
+	public function skipAcl_getRssFeeds(){
 		$feeds = array(
 			array(
 				array(
@@ -682,7 +681,7 @@ class Dashboard extends Admin_Controller {
 
 	}
 
-	public function updateWidgets(){
+	public function skipAcl_updateWidgets(){
 		$args = json_decode(file_get_contents('php://input'),true);
 		$args = json_encode($args);
 		$oldOrder = $this->Job->getWidgetsOrder($this->userId);
@@ -694,14 +693,14 @@ class Dashboard extends Admin_Controller {
 		echo json_encode(array("success"=>true));
 	}
 
-	function validateDate($date)
+	private function validateDate($date)
 	{
 		$d = DateTime::createFromFormat('Y-m-d', $date);
 		return $d && $d->format('Y-m-d') === $date;
 	}
 
 
-	function weather_updates($vehicleID = false){
+	function skipAcl_weather_updates($vehicleID = false){
 
 		$userId = $this->userId;
 		$args = json_decode(file_get_contents('php://input'),true);
@@ -722,7 +721,7 @@ class Dashboard extends Admin_Controller {
 		$currentWeather = array();
 		$dailyForecast = array();
 		$weatherNotFound['status'] = false;
-		if(!empty($lat) && !empty($lng) ){
+		if(empty($lat) && !empty($lng) ){
 
 			try{
 				$currentWeather = @json_decode(file_get_contents('http://api.openweathermap.org/data/2.5/weather?lat='.$lat.'&lon='.$lng.'&mode=json&units=imperial&appid=51b18a47eee105fcac60c7c2e832f587'),true);
@@ -793,7 +792,7 @@ class Dashboard extends Admin_Controller {
 	* get number of days in month
 	*/
 
-	public function getMonthDays($startDate = '', $endDate = '' ) {
+	private function getMonthDays($startDate = '', $endDate = '' ) {
 		$data 	= array();
 		$time  	  = strtotime($startDate);
 		$endTime  = strtotime($endDate);
@@ -816,7 +815,7 @@ class Dashboard extends Admin_Controller {
 		return $data;
 	}
 
-	public function fetchDashboardData( $rparam = array(), $lPerformance = '' ) {
+	private function fetchDashboardData( $rparam = array(), $lPerformance = '' ) {
 
 		$this->load->model("Report");
 		$lPResult = array();
@@ -1260,7 +1259,7 @@ class Dashboard extends Admin_Controller {
 	* Get number of days for drivers
 	*/
 	
-	public function getNumberOfDays($rparam, $driversList, $driverId, $type) {
+	private function getNumberOfDays($rparam, $driversList, $driverId, $type) {
 		$daysdiff = 1;
 		$newEndDate = $rparam['startDate'];
 
@@ -1308,7 +1307,7 @@ class Dashboard extends Admin_Controller {
 	* returning data for dashboard in case of all groups selected
 	*/
 
-	public function getPerformanceLoadsForAllDispatchers($dispatchersList = array(),$rparam, $goalValues) {
+	private function getPerformanceLoadsForAllDispatchers($dispatchersList = array(),$rparam, $goalValues) {
 		$mainArray = array();
 		$lPResult = array();
 		$chartStack = array();
@@ -1529,7 +1528,7 @@ class Dashboard extends Admin_Controller {
 	* get latest date from many date time of same day
 	*/
 
-	public function getUniqueDriverDate($driversList = array()) {
+	private function getUniqueDriverDate($driversList = array()) {
 		$driverListlength  = count($driversList);
 		for( $j = 0; $j < $driverListlength; $j++ ) {
 			if ( isset($driversList[$j]['createdDate']) && isset($driversList[$j+1]['createdDate'])  && ($driversList[$j]['createdDate'] == $driversList[$j+1]['createdDate']) ) {
@@ -1550,9 +1549,9 @@ class Dashboard extends Admin_Controller {
 	* Fetch list of top 5 customers
 	*/
 
-	public function topFiveCustomer(){
+	public function skipAcl_topFiveCustomer(){
 		$data = array();
-		$this->load->model('BrokersModel');
+		$this->load->model(array('BrokersModel', 'Utility'));
 		$args = json_decode(file_get_contents('php://input'),true);
 
 		$cmpName = $this->BrokersModel->getTopFiveCustomer($args);
@@ -1572,6 +1571,17 @@ class Dashboard extends Admin_Controller {
 		$trucksNotReporting    = $this->Driver->trucksReporting($filters,true);
 		$vehiclesWithoutDriver = $this->Driver->fetchTrucksWithoutDriver($filters,true);
 		$pastLoadsIncomplete   = count($this->Job->fetchPastLoadsIncomplete($filters,true));
+		$predictedJobs  = array();
+		/*$predictedJobs         = $this->Utility->getNextPredictedJobs();
+		if( count($predictedJobs) > 0 && is_array($predictedJobs) ){
+			foreach ($predictedJobs as $key => $value) {
+				$predictedJobs[$key]["jobs"] = unserialize($value["jobs"]);
+			}	
+		}else{
+			$predictedJobs = array();
+		}*/
+		//$predictedJobs = json_decode(json_encode($predictedJobs), true);
+
 	
 		$dispatcherId = isset($args['dispatcherId']) ? $args['dispatcherId'] : '';
 		$driverId = isset($args['driverId']) ? $args['driverId'] : '';
@@ -1596,12 +1606,13 @@ class Dashboard extends Admin_Controller {
 		$data['vehiclesWithoutDriver'] 		= $vehiclesWithoutDriver;
 		$data['pastLoadsIncomplete'] 		= $pastLoadsIncomplete;
 		$data['todayDate'] 	  				= date('Y-m-d');
+		$data['predictedJobs'] 		        = $predictedJobs;
 		
 		if(!empty($args['export'])){$this->createTop5Excell($data);}
 		echo json_encode($data);
 	}
 
-	public function exportLoadStatus(){
+	public function skipAcl_exportLoadStatus(){
 		
 		$args = json_decode(file_get_contents('php://input'),true);
 		$ExportData[] =['Assigned Loads','Booked Loads','Delivered Loads','Inprogress Loads','No-Loads','INVOICES','PAYMENT ON COLLECTION','Waiting Paperwork'];
@@ -1625,7 +1636,7 @@ class Dashboard extends Admin_Controller {
 	* @description Create excel file for top five customers
 	*/
 
-	public function createTop5Excell($rawData=null){
+	private function createTop5Excell($rawData=null){
 
 		$paymentAmounts 	= array_column($rawData['paymentAmount'], 'y');
 		$companyName 		= $rawData['cName']['cmpName'];

@@ -136,7 +136,7 @@ app.controller('editDriversController', function(dataFactory,getDriversData, $sc
 	$scope.dropzoneConfigDriverEdit = {
 		parallelUploads: 5,
 		maxFileSize: 3,
-		url: URL+ '/drivers/uploadDocs',
+		url: URL+ '/drivers/skipAcl_uploadDocs',
 		addRemoveLinks: true, 
 		/*autoProcessQueue: false,*/
 		acceptedFiles: 'image/*, application/pdf, .xls, .xlsx, .doc, .docx, .txt, .bmp, .svg',
@@ -250,7 +250,7 @@ app.controller('editDriversController', function(dataFactory,getDriversData, $sc
 	// var previousUser = editDriv.NotifyData.previous_userId; 
 	// var secondDriverId = editDriv.NotifyData.second_driver_id;
 
-		dataFactory.httpRequest(URL + '/drivers/changeDriverAssignment/'+type+"/"+driverId+"/"+userId+"/"+previousUser+"/"+secondDriverId).then(function(data) {
+		dataFactory.httpRequest(URL + '/drivers/skipAcl_changeDriverAssignment/'+type+"/"+driverId+"/"+userId+"/"+previousUser+"/"+secondDriverId).then(function(data) {
 			if(data.success == true) {
 				$rootScope.driverEditMessage = $rootScope.languageArray.driverUpdatedSuccMsg;
 				$location.path('drivers');
@@ -275,7 +275,7 @@ app.controller('addDriversController', function(dataFactory,$scope, PubNub, $htt
 	$scope.dropzoneConfigDriverAdd = {
 		parallelUploads: 5,
 		maxFileSize: 3,
-		url: URL+ '/drivers/uploadDocs',
+		url: URL+ '/drivers/skipAcl_uploadDocs',
 		addRemoveLinks: true, 
 		autoProcessQueue: false,
 		acceptedFiles: 'image/*, application/pdf, .xls, .xlsx, .doc, .docx, .txt, .bmp, .svg',

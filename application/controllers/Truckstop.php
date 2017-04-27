@@ -536,7 +536,6 @@ class Truckstop extends Admin_Controller{
 			$jobRecord['PaymentAmount'] = str_replace(',','',$jobRecord['PaymentAmount']);
 			$jobRecord['PaymentAmount1'] = $jobRecord['PaymentAmount'];
 			$data['primaryLoadId'] 		= '';
-			$jobRecord['originalDistance'] = $jobRecord['Mileage'];
 			$truckAverage = $this->defaultTruckAvg;
 			$jobRecord['totalCost'] = $_POST['totalCost'];			
 			$jobRecord['deadmiles'] = $_POST['deadmiles'];
@@ -688,7 +687,7 @@ class Truckstop extends Admin_Controller{
 	 * comment :Assignment of truck to driver
 	 */
 	
-	public function assignTruckToDriver( $driverId = null ) {
+	public function skipAcl_assignTruckToDriver( $driverId = null ) {
 		
 		$_POST = json_decode(file_get_contents('php://input'), true);
 		$driverAssignType = isset($_POST["driverAssignType"]) && $_POST["driverAssignType"] == "team" ? $_POST["driverAssignType"] : "driver";
@@ -723,7 +722,7 @@ class Truckstop extends Admin_Controller{
 	 * Unassign truck for job ticket
 	 */
 	  
-	public function UnassignTruckToDriver() {
+	public function skipAcl_UnassignTruckToDriver() {
 		$_POST = json_decode(file_get_contents('php://input'), true);
 		$jobRecord = $_POST['allData'];
 		$driverAssignType = isset($_POST["driverAssignType"]) && $_POST["driverAssignType"] == "team" ? $_POST["driverAssignType"] : "driver";
@@ -758,12 +757,16 @@ class Truckstop extends Admin_Controller{
 	 * Fetch vehicle detail on change from ticket dropdowm
 	 */
 	 
-	public function FetchVehicleInfo( $vehicle_id = null ) {
+	public function skipAcl_fetchVehicleInfo( $vehicle_id = null ) {
 		$data['vehicleInfo'] = $this->Vehicle->getVehicleInfo($vehicle_id);
 		echo json_encode($data);
 	} 
 	
-	public function fetch_matched_trucks_live( $truckStopId = null , $jobId = null , $itera = '' , $vehicle_id = null )  {
+	/**
+	* Fetching truck info for trip detail page on ticket
+	*/
+
+	public function skipAcl_fetch_matched_trucks_live( $truckStopId = null , $jobId = null , $itera = '' , $vehicle_id = null )  {
 
 		$fetchAssigedTruck = null;
 		$tripDetailPrId = '';
@@ -885,7 +888,7 @@ class Truckstop extends Admin_Controller{
 	* @return NULL
 	*/
 
-	public function printLoadDetails($truckstopId = null,$loadid = null){
+	public function skipAcl_printLoadDetails($truckstopId = null,$loadid = null){
 	
 		if ( $loadid != null && $loadid != 0 && $loadid != '' ) {
 			$data 				= $this->matchLoadDetailNew($truckstopId,$loadid);
@@ -911,8 +914,11 @@ class Truckstop extends Admin_Controller{
 		$html = $this->load->view('printTemplates/loaddetail',$data); 	
 	}
 
+	/**
+	* ticket loads detail for printing
+	*/
 
-	public function matchLoadDetailNew( $truckStopId = null,$loadId = null ) 
+	private function matchLoadDetailNew( $truckStopId = null,$loadId = null ) 
 	{
 		$data['vehicleInfo'] = array();
 		$data['brokerData']  = array();
@@ -1295,8 +1301,12 @@ class Truckstop extends Admin_Controller{
 		}
 		return $userChain;
 	}
-		
-	public function calculateNewDistance( $loadId = null, $tripDetailId = null ) {
+	
+	/**
+	* calculating distance b/w two points when address is changed in ticket
+	*/
+
+	public function skipAcl_calculateNewDistance( $loadId = null, $tripDetailId = null ) {
 		
 		$obj = json_decode(file_get_contents('php://input'),true);
 
@@ -1714,7 +1724,7 @@ class Truckstop extends Admin_Controller{
 		}	
 	}
 	
-	public function get_load_data( $pickUpDate = ''){
+	public function skipAcl_get_load_data( $pickUpDate = ''){
 	
 		$obj = json_decode(file_get_contents('php://input'));
 	
@@ -1778,36 +1788,6 @@ class Truckstop extends Admin_Controller{
 		echo json_encode(array('loadsData'=> $newdata),JSON_NUMERIC_CHECK);
 	}
 
-	public function fetchAjaxStates( $country = '' ) {
-		$results = $this->Job->getAllStates( $country );
-
-		$html = '';
-		$html .= '<option value="">Select State</option>';
-
-		if ( !empty($results) ) {
-			foreach ( $results as $result ) {
-				$html .= "<option value='{$result['code']}'>{$result['label']}</option>";
-			}
-		} else {
-			$html .= "No Record Found";
-		}
-		echo $html;
-	}
-
-	public function get_distance_ajax(){
-		
-		$data = json_decode(file_get_contents('php://input'));
-		
-		$origin = $data->origin;
-
-		$destin = explode('-',$data->destin);
-	
-		$finalDestin = @$destin[4].','.@$destin[3];
-
-		$jsondata = $this->getDistance($origin,$finalDestin);
-		echo json_encode(array('deadmiles' => $jsondata));
-	}
-	
 	public function fetch_truckstop_special_note( $truckStopId = null, $loadId = null ) {
 		
 		if ( $loadId != '' && $loadId != null && is_numeric($loadId) ) {
@@ -1836,7 +1816,7 @@ class Truckstop extends Admin_Controller{
 	 * Fetching loads after every 30 seconds
 	 */
 	  
-	public function get_load_data_repeat($loadsIdArray = array(), $vehicleIDRepeat = null ){
+	public function skipAcl_get_load_data_repeat($loadsIdArray = array(), $vehicleIDRepeat = null ){
 		$objPost = json_decode(file_get_contents('php://input'),true);
 	
 		$loadsIdArray = $objPost['loadsArray'];
@@ -1905,7 +1885,11 @@ class Truckstop extends Admin_Controller{
 		echo json_encode($newData);
 	}
 
-	public function get_nearby_tstops(){
+	/**
+	* fetching truckstop to show on route map
+	*/
+
+	public function skipAcl_get_nearby_tstops(){
 		$requset = json_decode(file_get_contents('php://input'),true);
 
 		$coords = $requset["coords"];
@@ -1930,7 +1914,11 @@ class Truckstop extends Admin_Controller{
 		echo json_encode($finalCoords);
 	}
 
-	public function get_nearby_fstops(){
+	/**
+	* fetching fuel stops to show on route map
+	*/
+
+	public function skipAcl_get_nearby_fstops(){
 		$requset = json_decode(file_get_contents('php://input'),true);
 
 		$coords = $requset["coords"];
@@ -1978,7 +1966,7 @@ class Truckstop extends Admin_Controller{
 		return $total_cost;	
 	}
 
-	public function searchCity() {
+	public function skipAcl_searchCity() {
 		$cityObj = json_decode(file_get_contents('php://input'));
 		$city = $cityObj->city;
 		$country = isset($cityObj->country) ? $cityObj->country : false;
@@ -2034,7 +2022,7 @@ class Truckstop extends Admin_Controller{
 					}
 
 					$this->BrokersModel->uploadBrokerDocument($response['data']['file_name'], $_REQUEST['brokerId'], $parameter);
-					$this->fetchBrokerShipperDocuments($_REQUEST['brokerId'],$parameter);
+					$this->skipAcl_fetchBrokerShipperDocuments($_REQUEST['brokerId'],$parameter);
 
 					$companyName = ( $parameter == 'broker') ? $brokerInfo['TruckCompanyName'] : $brokerInfo['shipperCompanyName'];
 					$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> uploaded a new document ('.$response['data']['file_name'].') for '.$parameter.' <a class="notify-link" href="'.$this->serverAddr.'#/edit'.$parameter.'/'.$brokerInfo["id"].'">'.ucfirst($companyName).'</a> from ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$_REQUEST['loadId'].',\'\',\'\',\'\',\'\',0,\'\')">#'.$_REQUEST['loadId'].'</a>';
@@ -2047,9 +2035,9 @@ class Truckstop extends Admin_Controller{
 			}
 		} else {
 			if ( $parameter == 'broker' || $parameter == 'shipper' ) {
-				$this->fetchBrokerShipperDocuments($_REQUEST['brokerId'], $parameter, $response );
+				$this->skipAcl_fetchBrokerShipperDocuments($_REQUEST['brokerId'], $parameter, $response );
 			} else {
-				$this->fetchDocuments($_REQUEST['loadId'],$response );
+				$this->skipAcl_fetchDocuments($_REQUEST['loadId'],$response );
 			}
 		}
 	}
@@ -2074,7 +2062,7 @@ class Truckstop extends Admin_Controller{
 			
 			$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> uploaded a new '.$metaKey.' ('.$fileName.') for ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$loadId.',\'\',\'\',\'\',\'\',0,\'\')">#'.$loadId.'</a>';
 			logActivityEvent($loadId, $this->entity["ticket"], $this->event["upload_doc"], $message, $this->Job, $srcPage);
-			$this->fetchDocuments($loadId);
+			$this->skipAcl_fetchDocuments($loadId);
 		}catch(Exception $e){
 			log_message('error',$metaKey.'-UPLOAD_DOCS_TICKET'.$e->getMessage());
 		}
@@ -2084,7 +2072,7 @@ class Truckstop extends Admin_Controller{
 	 * Fetching Broker Documents for job ticket
 	 */
 	 
-	public function fetchBrokerShipperDocuments( $brokerId = null, $type = '', $errorResponse = array() ){
+	public function skipAcl_fetchBrokerShipperDocuments( $brokerId = null, $type = '', $errorResponse = array() ){
 		$result = $this->BrokersModel->fetchContractDocuments($brokerId, $type);
 		$docs_list = array();
 		if ( !empty($result) ) {
@@ -2113,7 +2101,7 @@ class Truckstop extends Admin_Controller{
 		echo json_encode(array('result' => $docs_list, 'error_exceed' => $exceedMsg));
 	}
 	 
-	public function fetchDocuments($loadId = FALSE, $errorResponse = array(), $from = "" ){
+	public function skipAcl_fetchDocuments($loadId = FALSE, $errorResponse = array(), $from = "" ){
 		if(!$loadId){
 			$_POST = json_decode(file_get_contents('php://input'), true);
 			$loadId = $_POST['loadId'];
@@ -2218,7 +2206,7 @@ class Truckstop extends Admin_Controller{
 	* Degrading PDF(1.5+) to 1.4 version
 	*/
 
-	public function degradePdfVersion( $data = NULL , $config = array(), $parameter = '', $result = array()){
+	private function degradePdfVersion( $data = NULL , $config = array(), $parameter = '', $result = array()){
 		$fileName 	= $config['file_name'];
 		$outputfile = $config['upload_path'].'/'.$fileName;
 		$sourcefile = $data['file']['tmp_name'];
@@ -2257,34 +2245,6 @@ class Truckstop extends Admin_Controller{
 	}
 
 
-	/**
-	 *  Check if uploaded pdf file is not compressed
-	 */ 
-	 
-	private function CheckPdfNotCompressed( $fileName = '', $parameter = '') {
-		$pdf = $this->load->library('m_pdf');
-		$pdf = new mPDF();
-		$pdf->SetImportUse();
-		$pathGen = str_replace('application/', '', APPPATH);
-		
-		$files = array();
-		if ( !empty($fileName) ) {
-			$files = array($pathGen."assets/uploads/documents/{$parameter}/{$fileName}",$pathGen."assets/uploads/documents/Normal.pdf");
-			if ( !empty($files) && (count($files) == 2) ) {
-				for ($i = 0; $i < count($files); $i++ ) {
-					$ext = explode('.',$files[$i]);
-					$pagecount = $pdf->setSourceFile($files[$i]);
-					//~ echo $pagecount;
-					//~ if ( strpos($pagecount,"Unable to find xref table file compression") === true ) {
-					if ( $pagecount == 'file compression issue' ) {
-						return 'pdfCompression';
-					}
-				}
-			}
-		}
-		
-		return 'correctFile';	
-	}
 //------------------ Upload Docs Functions --------------------------
 
 	public function deleteDocument(){
@@ -2348,7 +2308,7 @@ class Truckstop extends Admin_Controller{
 				$brokerInfo = $this->BrokersModel->getEntityInfoByDocId($_POST['docId'], $this->entity[$_POST['doc_type']]);
 
 				$this->BrokersModel->removeContractDocs($_POST['docId']);
-				$this->fetchBrokerShipperDocuments($brokerId, $_POST['doc_type']);
+				$this->skipAcl_fetchBrokerShipperDocuments($brokerId, $_POST['doc_type']);
 
 				$companyName = ( $_POST['doc_type'] == 'broker') ? $brokerInfo['TruckCompanyName'] : $brokerInfo['shipperCompanyName'];
 				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> deleted a document ('.$brokerInfo["document_name"].') of '.$_POST['doc_type'].' <a class="notify-link" href="'.$this->serverAddr.'#/edit'.$_POST['doc_type'].'/'.$brokerInfo["id"].'"> '.$companyName.'</a>  from ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$_POST['loadId'].',\'\',\'\',\'\',\'\',0,\'\')">#'.$_POST['loadId'].'</a>';
@@ -2371,7 +2331,7 @@ class Truckstop extends Admin_Controller{
 				
 				$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> deleted the '.$metaKey.' ('.$docInfo["doc_name"].') from ticket <a href="javascript:void(0);" class="notify-link" ng-click="clickMatchLoadDetail(0,'.$_POST['loadId'].',\'\',\'\',\'\',\'\',0,\'\')">#'.$_POST['loadId'].'</a>';
 				logActivityEvent($_POST['loadId'], $this->entity["ticket"], $this->event["remove_doc"], $message, $this->Job,$_POST["srcPage"]);
-				$this->fetchDocuments(false, array(), $_POST['doc_type']);
+				$this->skipAcl_fetchDocuments(false, array(), $_POST['doc_type']);
 			}catch(Exception $e){
 				log_message('error',$metaKey.'-DELETE_DOCS_TICKET'.$e->getMessage());
 			}
@@ -2381,9 +2341,7 @@ class Truckstop extends Admin_Controller{
 	private function joinAddress($args){
 		$pickupAddress = array();
 		$response = array();
-		if ( isset($args['OriginStreet'])) 
-			$pickupAddress[] = trim($args['OriginStreet']);
-	
+		
 		if ( isset($args['OriginCity'])) 
 			$pickupAddress[] = trim($args['OriginCity']);
 
@@ -2398,9 +2356,7 @@ class Truckstop extends Admin_Controller{
 
 		
 		$dropAddress = array();
-		if ( isset($args['DestinationStreet'])) 
-			$dropAddress[] = trim($args['DestinationStreet']);
-	
+		
 		if ( isset($args['DestinationCity'])) 
 			$dropAddress[] = trim($args['DestinationCity']);
 
@@ -2420,7 +2376,7 @@ class Truckstop extends Admin_Controller{
 	 * Saving load to database
 	 */ 
 	 
-	public function edit_live( $id = null , $loadFrom = ''){			
+	public function SaveLoadRecord( $id = null , $loadFrom = ''){			
 		$_POST = json_decode(file_get_contents('php://input'), true);
 		$driverAssignType = isset($_POST["driverAssignType"]) && $_POST["driverAssignType"] == "team" ? $_POST["driverAssignType"] : "driver";
 		$id = $_POST['jobPrimary'];
@@ -2527,9 +2483,7 @@ class Truckstop extends Admin_Controller{
 		}
 		
 		$saveData = $_POST['jobRecords']; 
-		$saveData['OriginStreet'] = $saveData['PickupAddress'];
-		$saveData['DestinationStreet'] = $saveData['DestinationAddress'];
-		
+			
 		if ( $vehicle_id != '' & $vehicle_id != null && $vehicle_id != 'undefined' ) {
 			$dataN['vehicles_Available'] = $VehiclesArray = $this->Job->FindJobVehicles($vehicle_id, $this->userId, 'saveJob');
 		} else {
@@ -2692,7 +2646,7 @@ class Truckstop extends Admin_Controller{
 												  break;
 						}
 
-						if(in_array($key, array("second_driver_id","trailer_id","driver_type","PickupAddress","updated","updated_record","created","PickDate","ready_for_invoice"))){continue;}
+						if(in_array($key, array("second_driver_id","trailer_id","driver_type","PickupAddress","updated","created","PickDate","ready_for_invoice"))){continue;}
 
 						if($key == "Stops"){
 							$key = "extra stop(s)";
@@ -2883,7 +2837,7 @@ class Truckstop extends Admin_Controller{
 	 * saving broker and shipping info for custom added load
 	 */ 
 
-	public function saveBrokerShipperInfo( $loadId = null , $type = '' ) {
+	public function skipAcl_saveBrokerShipperInfo( $loadId = null , $type = '' ) {
 		$_POST = json_decode(file_get_contents('php://input'), true);
 		
 		$records = $_POST['loadRecords'];
@@ -2912,7 +2866,7 @@ class Truckstop extends Admin_Controller{
 	}
 	
 	/** showing trailer type on main search page */
-	public function fetchTrailerType(  $pickUpDate ='' ){
+	public function skipAcl_fetchTrailerType(  $pickUpDate ='' ){
 		$newData['trailerTypes'] = $this->getTrailerTypes();
 		$newData['driversList'] = $this->Driver->getSearchDriversList();
 		$new = array("id"=>"","driverName"=>"Unassign","username"=>"","vehicleId" => "");
@@ -2962,7 +2916,7 @@ class Truckstop extends Admin_Controller{
 	 * Changing Profit calculation on payment change
 	 */
 	
-	public function changingProfitCalulations() {
+	public function skipAcl_changingProfitCalulations() {
 		$_POST = json_decode(file_get_contents('php://input'), true);
 		$jobRecord = $_POST['allData'];
 		
@@ -2982,7 +2936,7 @@ class Truckstop extends Admin_Controller{
 		echo json_encode($data);
 	}
 
-	public function getCommodities(){
+	public function skipAcl_getCommodities(){
 		$postObj = json_decode(file_get_contents('php://input'), true);
 		if(isset($postObj["commodity"]) && !empty(trim($postObj["commodity"]))){
 			$response = $this->Job->getMatchedCommodities($postObj["commodity"]);
@@ -2990,19 +2944,11 @@ class Truckstop extends Admin_Controller{
 		echo json_encode(array("suggestions"=>$response));
 	}
 
-	public function getSuggestions(){
-		$postObj = json_decode(file_get_contents('php://input'), true);
-		if(isset($postObj["type"]) && !empty(trim($postObj["type"]))){
-			$response = $this->Job->getMatchedSuggestions($postObj["type"], $postObj["q"]);
-		}
-		echo json_encode(array("suggestions"=>$response));
-	} 
-
 	/**
 	 * Re calculating all things on miles or deadmiles change
 	 */
 	
-	public function reCaluclationsOfmiles() {
+	public function skipAcl_reCaluclationsOfmiles() {
 		$_POST = json_decode(file_get_contents('php://input'), true);
 		$jobRecord = $_POST['allData'];
 		$driverAssignType = isset($_POST["driverAssignType"]) && $_POST["driverAssignType"] == "team" ? $_POST["driverAssignType"] : "driver";
@@ -3116,7 +3062,7 @@ class Truckstop extends Admin_Controller{
 	 * Check if same pick date exist for another load
 	 */
 	
-	public function checkDateLoadExist( $parameter = '' ) {
+	public function skipAcl_checkDateLoadExist( $parameter = '' ) {
 		$_POST = json_decode(file_get_contents('php://input'), true);
 		$jobRecord = $_POST['allData'];
 		$setDeadMilePage = @$_POST['setDeadMilePage'];
@@ -3174,7 +3120,7 @@ class Truckstop extends Admin_Controller{
 	 * Compare extra Stops date if they are greater than pickup date
 	 */
 	 
-	public function compareExtraStopDates() {
+	public function skipAcl_compareExtraStopDates() {
 		$_POST = json_decode(file_get_contents('php://input'), true);
 		
 		$extraStops = array();
@@ -3260,7 +3206,7 @@ class Truckstop extends Admin_Controller{
 	 * Fetch zip code from address using api
 	 */
 	
-	public function getZipCode() {
+	public function skipAcl_getZipCode() {
 		$_POST = json_decode(file_get_contents('php://input'), true);
 		$zipCod = '';
 		
@@ -3293,7 +3239,7 @@ class Truckstop extends Admin_Controller{
 	 * Fetching zip code from api by passing address
 	 */
 	
-	public function getZipCodeFromApi( $address = '' ) {
+	private function getZipCodeFromApi( $address = '' ) {
 		$data = array();
 		 if(!empty($address)) {
 			 
@@ -3371,272 +3317,5 @@ class Truckstop extends Admin_Controller{
 		}
 	}
 	 
-	 
-	public function fetchCalampEvents(){
-
-		$this->load->helper('truckstop');
-		$response = calAmp($this->Vehicle);
-		$calmpEvents = array();
-		date_default_timezone_set('GMT');
-		//Calamp Master Table Data
-		$calmpEvents['AlertEvents'] = $response['AlertEvents'];
-		$calmpEvents['AlertEventList'] = json_encode($response['AlertEventList']);
-		$calmpEvents['AVLEvents'] = $response['AVLEvents'];
-		$calmpEvents['JBUSEvents'] = $response['JBUSEvents'];
-		$calmpEvents['errorMessage'] = $response['errorMessage'];
-		$calmpEvents['JBUSDTCEvents'] = $response['JBUSDTCEvents'];
-		$calmpEvents['JBUSDTCEventList'] = json_encode($response['JBUSDTCEventList']);
-		$calmpEvents['DTCEvents'] = json_encode($response['DTCEvents']);
-		$calmpEvents['DTCEventList'] = json_encode($response['DTCEventList']);
-		$this->Job->addData('calamp_events',$calmpEvents);
-
-		//Add Data for AVL Events
-		if (isset($response['AVLEvents']) && !empty($response['AVLEvents']) ) {
-			$AVLEventsList = array();
-			if($response['AVLEvents'] > 1){
-				$AVLEventsList = $response['AVLEventList']['AVLEvent'];	
-			}else{
-				$AVLEventsList[0] = $response['AVLEventList']['AVLEvent'];	
-			}
-			$calampData = $avlEventsData = array();
-			$i = 0;
-			foreach ($AVLEventsList as $key => $events) {
-
-				//For vechile location update
-				$deviceID = $events['deviceID'];
-				$allTrucks["ID_".$deviceID] = $events;
-				
-				if(!$this->in_array_r($events['deviceID'], $calampData)){
-					$calampData[$i]['deviceID']	 	= $events['deviceID'];
-					$calampData[$i]['vehicleID'] 	= $events['vehicleID'];
-					$calampData[$i]['vehicleVIN']	= $events['vehicleVIN'];
-					$calampData[$i]['driverID']		= $events['driverID'];
-				}
-
-				$avlEventsData[$i]['deviceID']	= $events['deviceID'];
-				$avlEventsData[$i]['GMTTime']	= date('Y-m-d H:i:s', strtotime($events['event']['GMTTime']));
-				$avlEventsData[$i]['timeOffset']= $events['event']['timeOffset'];
-				$avlEventsData[$i]['eventType']	= $events['event']['eventType'];
-
-				if(is_array($events['event']['GPS'])){
-					$avlEventsData[$i] = array_merge($avlEventsData[$i],$events['event']['GPS']);
-				}else{
-					$avlEventsData[$i]['GPSVAlidity'] = $avlEventsData[$i]['latitude'] = $avlEventsData[$i]['longitude'] = $events['event']['longitude'] = '';
-				}
-
-
-				if(is_array($events['event']['address'])){
-					$avlEventsData[$i] = array_merge($avlEventsData[$i],$events['event']['address']);	
-				}else{
-					$avlEventsData[$i]['street'] = $avlEventsData[$i]['crossStreet'] = $avlEventsData[$i]['city'] = $avlEventsData[$i]['state'] = '';
-					$avlEventsData[$i]['zip'] = $avlEventsData[$i]['country']	= $avlEventsData[$i]['POIName']	= $avlEventsData[$i]['POIType'] = '';
-				}
-				
-				
-				if(is_array($events['event']['telemetry'])){
-					$avlEventsData[$i] = array_merge($avlEventsData[$i],$events['event']['telemetry']);
-				}else{
-					$avlEventsData[$i]['vehicleSpeed'] = $avlEventsData[$i]['heading'] = $avlEventsData[$i]['odometer']	= $avlEventsData[$i]['engineHours']	= '';
-					$avlEventsData[$i]['fuelUsage'] = $avlEventsData[$i]['trueOdometer'] = $avlEventsData[$i]['gpsOdometer'] = '';
-				}
-				
-				if(is_array($events['event']['digitalIO'])){
-					$avlEventsData[$i] = array_merge($avlEventsData[$i],$events['event']['digitalIO']);	
-				}else{
-					$avlEventsData[$i]['pin'] = $avlEventsData[$i]['value'] = '';
-				}
-				if(is_array($events['event']['speeding'])){
-					$avlEventsData[$i] = array_merge($avlEventsData[$i],$events['event']['speeding']);	
-				}else{
-					$avlEventsData[$i]['speedingEventType'] = $avlEventsData[$i]['speedingDuration'] = $avlEventsData[$i]['maximumSpeed'] = '';	
-				}
-				$avlEventsData[$i]['messageSeqID'] =  $events['messageSeqID'];
-				$avlEventsData[$i++]['messageDataID']= $events['messageDataID'];
-			}
-
-			//For vehicle location update
-			foreach ($allTrucks as $key => $truck) {
-				$this->Vehicle->updateTruckInfo($truck);
-			}
-
-			if(count($calampData) > 0){
-				foreach ($calampData as $key => $value) {
-					if(!$this->Job->checkIfExists($value['deviceID'])){
-						$this->Job->addData('calamp',$value);
-					}
-				}
-			}
-
-			if(count($avlEventsData) > 0){
-				$this->Job->addData('avl_events',$avlEventsData,true);
-			}
-		}
-
-
-
-
-		//Code for JBUS Events
-		if (isset($response['JBUSEvents']) && !empty($response['JBUSEvents']) ) {
-			$JBUSEventsList = array();
-			if($response['JBUSEvents'] > 1){
-				$JBUSEventsList = $response['JBUSEventList']['JBUSEvent'];	
-			}else{
-				$JBUSEventsList[0] = $response['JBUSEventList']['JBUSEvent'];	
-			}
-			$calampData = $jbusEventsData = array();
-			$i = 0;
-			foreach ($JBUSEventsList as $key => $events) {
-				date_default_timezone_set('GMT');
-				if(!$this->in_array_r($events['deviceID'], $calampData)){
-					$calampData[$i]['deviceID']	 	= $events['deviceID'];
-					$calampData[$i]['vehicleID'] 	= $events['vehicleID'];
-					$calampData[$i]['vehicleVIN']	= $events['vehicleVIN'];
-					$calampData[$i]['driverID']		= $events['driverID'];
-				}
-
-				$jbusXtra['deviceID']	= $events['deviceID'];
-				$jbusXtra['GMTTime']	= date('Y-m-d H:i:s', strtotime($events['GMTTime']));
-				
-				if(count($events['JBUSMessageList']['JBUSMessage']) > 1){
-					$JBUSMessageList = $events['JBUSMessageList']['JBUSMessage'];	
-				}else{
-					$JBUSMessageList[0] = $events['JBUSMessageList']['JBUSMessage'];
-				}
-				
-				foreach ($JBUSMessageList as $key => $JBUSMessage) {
-					 $JBUSMessage = array_merge($JBUSMessage,$jbusXtra);
-					 array_push($jbusEventsData,$JBUSMessage);
-				}
-			}
-
-			if(count($calampData) > 0){
-				foreach ($calampData as $key => $value) {
-					if(!$this->Job->checkIfExists($value['deviceID'])){
-						$this->Job->addData('calamp',$value);
-					}
-				}
-			}
-
-			if(count($jbusEventsData) > 0){
-				$this->Job->addData('jbus_events',$jbusEventsData,true);
-			}
-		}
-
-
-
-		//Code for JBUSDTCEvents
-
-		if (isset($response['JBUSDTCEvents']) && !empty($response['JBUSDTCEvents']) ) {
-			$JBUSDTCEventList = array();
-			
-			if($response['JBUSDTCEvents'] > 1){
-				$JBUSDTCEventList = $response['JBUSDTCEventList']['JBUSDTCEvent'];	
-			}else{
-				$JBUSDTCEventList[0] = $response['JBUSDTCEventList']['JBUSDTCEvent'];	
-			}
-			$calampData = $jbusdtcEventsData = array();
-			$i = 0;
-			foreach ($JBUSDTCEventList as $key => $events) {
-				
-				if(!$this->in_array_r($events['deviceID'], $calampData)){
-					$calampData[$i]['deviceID']	 	= $events['deviceID'];
-					$calampData[$i]['vehicleID'] 	= $events['vehicleID'];
-					$calampData[$i]['vehicleVIN']	= $events['vehicleVIN'];
-					$calampData[$i]['driverID']		= $events['driverID'];
-				}
-
-
-				$jbusdtcEVentsList['deviceID']	= $events['deviceID'];
-				$jbusdtcEVentsList['GMTTime']	= date('Y-m-d H:i:s', strtotime($events['GMTTime']));
-				if(isset($events['JBUSDTCMessage']) && !is_array($events['JBUSDTCMessage'])){
-					$events['JBUSDTCMessage']['SPN'] = $events['JBUSDTCMessage']['FMI'] = $events['JBUSDTCMessage']['OC'] = '';
-				}
-				$jbusdtcEVentsList = array_merge($jbusdtcEVentsList,$events['JBUSDTCMessage']);
-				array_push($jbusdtcEventsData,$jbusdtcEVentsList);
-			}
-				
-			if(count($calampData) > 0){
-				foreach ($calampData as $key => $value) {
-					if(!$this->Job->checkIfExists($value['deviceID'])){
-						$this->Job->addData('calamp',$value);
-					}
-				}
-			}
-			if(count($jbusdtcEventsData) > 0){
-				$this->Job->addData('jbusdtc_events',$jbusdtcEventsData,true);
-			}
-		}
-	}
-
-
-	/*
-	* Request URI : http://siteurl/Truckstop/updateGoogleKeyByHitAPI
-	* Method : CronJob
-	* Params : null
-	* Return : null
-	* Comment: Not in use now.
-	*/
-
-	public function updateGoogleKeyByHitAPI(){
-		$gKeys = array("AIzaSyC4BwSAdx7ejol56LQjoZ_ZMTwLXrjYZJ0","AIzaSyBWEM0dXBzFS63qB82dP_jCIf-s6-pGfbg","AIzaSyCEFH2LkKezwk5XJsgBekN2vhfCtdUiyMk","AIzaSyActdBf8AhNG6846b971AmWpUCb4oFlW_M","AIzaSyBzKjQv_GApxMshR6h_Qjj-7ig0jR7le20","AIzaSyBTOC3xsGe8ft7_KZS2YofUlsDOCGLl5zg","AIzaSyAZrLPhQEVo2F3sz-FjmRacWIo1jv8UB4Y","AIzaSyDe5FFx4H0DIrc-PGZmI6U_RbeH7uIV7zQ","AIzaSyC6Msx3qCWtk9UToMJr9ztobJkEkuiq7Ak","AIzaSyCDCxatmrRX80Ft4muozMlhILoa9vsmrog","AIzaSyBGrDwpuVKlXmJA-B0QioXuipZfAr9ZNEg","AIzaSyCAFV1gpJZpE6RDOIjbYhLiAIehZSx8di0","AIzaSyBQB9KIKUv_ivCH21vs8eAw80rm8Cn_kjs","AIzaSyCHjGZD49WvOapXhek-MGeW1kPQ2cAcKz4","AIzaSyAkrSGI9cEXYBJ9EIciM98lLE2uink6weg","AIzaSyBlNHdgx_wxqXcFKX2E9fJV2vXa85A0QV4","AIzaSyDPdWG13xv8O-OcT2SVSdJWBDGG6HuWldg","AIzaSyC-ynfpBawou_Z_bY4LDawXWOcDfTUrb68","AIzaSyBTc3RpmZ8BbUZoRfHgM7utQq8VfnabZb0","AIzaSyCWz4BokVJCI-Yw9Chaa6UZoyQfUilqEgs","AIzaSyCp97kpoW5y0LFekMa-qgHubVQhiFFUWT8","AIzaSyDKPdW5FsxofNPYMp4-pcuzEfBib4eJsfg","AIzaSyC9td9T3s1XOsOy9_AclkIaEvUx3LoM81Y","AIzaSyCZ59YUBNXm3szAYKPIMCYtWVb24avqy1Y","AIzaSyBzYnza3J0g2iMwNsRCi2t82emvFmsoGRA","AIzaSyCraYMxGRdLPDiUDfl_LJzzo2VrglegZUc","AIzaSyBuxdIKh5B_e_t3py4NMIcgQ_Etv-8hgiw","AIzaSyDYzbiGY_K_x2hbrwFGKvQxSKLEzNJGAb8","AIzaSyATf_sXFLiDO8_gZgmA4EAP2X5FY0rJrsI","AIzaSyCv39MHSFSHgb9wkVJf6A5Ni0m695DuLTQ","AIzaSyBg12QRJBuOq-GjF-Iz3SQQw3AnHhQ8n_o","AIzaSyDfm5qM3Hx6hEjEl2a5KAG0IsvVeSrz91Y","AIzaSyCJwXGKQpVqwu7-H_fQAp_iNEaUMpSv53I","AIzaSyDtUGtcMdZDAJqIPx4PEZFFMICAd2OIzwk","AIzaSyCnQO6mPhlhTpZyngV_dBvZdJRH3Id7BFE","AIzaSyBmf1DOY9DXk2UZ7I6t0iVLr-gTiYLmGtg","AIzaSyC2X7Bq_54OiopHUzChgK3tcodLwS_viQE","AIzaSyDeUMQxXJn4do1TRV-vtNohsOLeqfK9xQo","AIzaSyDzNFpaW8mOUS9nA6GnUtngiJVgTqWBtVs","AIzaSyCwI-FmFuz_Ke2ooH_DjZaaSSCjWpgoYNk","AIzaSyBlGhrkkXU1S9Cp07k9-gdch5SfZ8xU4XI","AIzaSyCBNUIWSaHCYIadyPbYLah656-G4o6T0Fw","AIzaSyAs1krawH6JZ5SF0lyTyIWrE0gewZ5SPzI","AIzaSyCJxKWkyvOhA6pAl0mXuGe0phOPWbkCebM","AIzaSyDw20vcbVsxjfg5VYpNeh3DAoEluBAk8AI","AIzaSyAwF0iqNCvpZgXwOs6MFiklA6YkhVMOnV8","AIzaSyBSPVGmxdOqe2yrxzla4iezs00zWe_p6j4", "AIzaSyBUriaO-aK0cbf64cHSe1LPNIoLswUWng8","AIzaSyAhHieDgOmfBZZeaK_YiMQlhnANyUKQt2k","AIzaSyBO4h9EABf5zt1SUeyCqV4qyFmfF8SxDqM","AIzaSyCw9XpjOXlZwsFYVimc5o2lNAVSE8wO5Tc" );
-        $keyIndex = 0;
-        $i=1;
-        try
-        {
-	        while(true){
-	            $response =  file_get_contents("https://maps.googleapis.com/maps/api/place/search/json?location=-33.8670522,151.1957362&radius=500&sensor=false&key=".$gKeys[$keyIndex]);
-	            $response =  file_get_contents("https://maps.googleapis.com/maps/api/place/search/json?location=-33.8670522,151.1957362&radius=500&sensor=false&key=".$gKeys[$keyIndex]);
-	            $response =  file_get_contents("https://maps.googleapis.com/maps/api/place/search/json?location=-33.8670522,151.1957362&radius=500&sensor=false&key=".$gKeys[$keyIndex]);
-	            
-	            $response = json_decode($response,true);
-	            if(in_array($response["status"], array("OVER_QUERY_LIMIT","REQUEST_DENIED"))){
-	                $keyIndex++;
-	            }else if($response["status"] == "OK"){
-	                
-	                $validKey = $gKeys[$keyIndex];
-	               
-	                break;
-	            }else{
-	                $keyIndex++;
-	            }
-	            if($keyIndex >= count($gKeys)){
-	                $validKey = end($gKeys);
-	                break;
-	            }
-	        }
-	        $this->User->updateGoogleKey($validKey);
-	    }catch(Exception $e){
-	    	log_message('error', $e->getMessage());
-	    }
-        
-	}
-
-
-	/*
-	* Request URI : http://siteurl/Truckstop/updateGoogleKey
-	* Method : CronJob
-	* Params : null
-	* Return : null
-	* Comment: Auto Change Google Map key in database (runs after every hour).
-	*/
-
-	public function updateGoogleKey(){
-		$keyInUse = $this->User->getMapKey();
-		$gKeys =  array("AIzaSyC4BwSAdx7ejol56LQjoZ_ZMTwLXrjYZJ0","AIzaSyBWEM0dXBzFS63qB82dP_jCIf-s6-pGfbg","AIzaSyCEFH2LkKezwk5XJsgBekN2vhfCtdUiyMk","AIzaSyActdBf8AhNG6846b971AmWpUCb4oFlW_M","AIzaSyBzKjQv_GApxMshR6h_Qjj-7ig0jR7le20","AIzaSyBTOC3xsGe8ft7_KZS2YofUlsDOCGLl5zg","AIzaSyAZrLPhQEVo2F3sz-FjmRacWIo1jv8UB4Y","AIzaSyDe5FFx4H0DIrc-PGZmI6U_RbeH7uIV7zQ","AIzaSyC6Msx3qCWtk9UToMJr9ztobJkEkuiq7Ak","AIzaSyCDCxatmrRX80Ft4muozMlhILoa9vsmrog","AIzaSyBGrDwpuVKlXmJA-B0QioXuipZfAr9ZNEg","AIzaSyCAFV1gpJZpE6RDOIjbYhLiAIehZSx8di0","AIzaSyBQB9KIKUv_ivCH21vs8eAw80rm8Cn_kjs","AIzaSyCHjGZD49WvOapXhek-MGeW1kPQ2cAcKz4","AIzaSyAkrSGI9cEXYBJ9EIciM98lLE2uink6weg","AIzaSyBlNHdgx_wxqXcFKX2E9fJV2vXa85A0QV4","AIzaSyDPdWG13xv8O-OcT2SVSdJWBDGG6HuWldg","AIzaSyC-ynfpBawou_Z_bY4LDawXWOcDfTUrb68","AIzaSyBTc3RpmZ8BbUZoRfHgM7utQq8VfnabZb0","AIzaSyCWz4BokVJCI-Yw9Chaa6UZoyQfUilqEgs","AIzaSyCp97kpoW5y0LFekMa-qgHubVQhiFFUWT8","AIzaSyDKPdW5FsxofNPYMp4-pcuzEfBib4eJsfg","AIzaSyC9td9T3s1XOsOy9_AclkIaEvUx3LoM81Y","AIzaSyCZ59YUBNXm3szAYKPIMCYtWVb24avqy1Y","AIzaSyBzYnza3J0g2iMwNsRCi2t82emvFmsoGRA","AIzaSyCraYMxGRdLPDiUDfl_LJzzo2VrglegZUc","AIzaSyBuxdIKh5B_e_t3py4NMIcgQ_Etv-8hgiw","AIzaSyDYzbiGY_K_x2hbrwFGKvQxSKLEzNJGAb8","AIzaSyATf_sXFLiDO8_gZgmA4EAP2X5FY0rJrsI","AIzaSyCv39MHSFSHgb9wkVJf6A5Ni0m695DuLTQ","AIzaSyBg12QRJBuOq-GjF-Iz3SQQw3AnHhQ8n_o","AIzaSyDfm5qM3Hx6hEjEl2a5KAG0IsvVeSrz91Y","AIzaSyCJwXGKQpVqwu7-H_fQAp_iNEaUMpSv53I","AIzaSyDtUGtcMdZDAJqIPx4PEZFFMICAd2OIzwk","AIzaSyCnQO6mPhlhTpZyngV_dBvZdJRH3Id7BFE","AIzaSyBmf1DOY9DXk2UZ7I6t0iVLr-gTiYLmGtg","AIzaSyC2X7Bq_54OiopHUzChgK3tcodLwS_viQE","AIzaSyDeUMQxXJn4do1TRV-vtNohsOLeqfK9xQo","AIzaSyDzNFpaW8mOUS9nA6GnUtngiJVgTqWBtVs","AIzaSyCwI-FmFuz_Ke2ooH_DjZaaSSCjWpgoYNk","AIzaSyBlGhrkkXU1S9Cp07k9-gdch5SfZ8xU4XI","AIzaSyCBNUIWSaHCYIadyPbYLah656-G4o6T0Fw","AIzaSyAs1krawH6JZ5SF0lyTyIWrE0gewZ5SPzI","AIzaSyCJxKWkyvOhA6pAl0mXuGe0phOPWbkCebM","AIzaSyDw20vcbVsxjfg5VYpNeh3DAoEluBAk8AI","AIzaSyAwF0iqNCvpZgXwOs6MFiklA6YkhVMOnV8","AIzaSyBSPVGmxdOqe2yrxzla4iezs00zWe_p6j4", "AIzaSyBUriaO-aK0cbf64cHSe1LPNIoLswUWng8","AIzaSyAhHieDgOmfBZZeaK_YiMQlhnANyUKQt2k","AIzaSyBO4h9EABf5zt1SUeyCqV4qyFmfF8SxDqM","AIzaSyCw9XpjOXlZwsFYVimc5o2lNAVSE8wO5Tc" );
-		$keyInUseIndex = array_search($keyInUse, $gKeys);
-
-		try
-        {
-			if(isset($gKeys[$keyInUseIndex + 1])){
-				$this->User->updateGoogleKey($gKeys[$keyInUseIndex + 1]);
-			}else{
-				$this->User->updateGoogleKey($gKeys[0]);
-			}
-       	}catch(Exception $e){
-	    	log_message('error', $e->getMessage());
-	    }
-        
-	}
-	
 	
 }

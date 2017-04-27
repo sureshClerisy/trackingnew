@@ -101,7 +101,7 @@ class Script extends CI_Model {
 	 */
 	
 	public function fetchAllLoads() {
-		$this->db->select('id,PickupAddress,OriginStreet,OriginCity,OriginState,OriginCountry,DestinationAddress,DestinationStreet,DestinationCity,DestinationState,DestinationCountry');
+		$this->db->select('id,PickupAddress,OriginCity,OriginState,OriginCountry,DestinationAddress,DestinationCity,DestinationState,DestinationCountry');
 		return $this->db->get('loads')->result_array();
 	} 
 	

@@ -15,10 +15,10 @@ app.controller('AdminController', function($scope,$interval, $document,$timeout,
     $scope.today_insight = "";
     $scope.otherIcon = true;
     $rootScope.todayInsightActive ='booked';
-
+    $rootScope.havePredictions = false;
     $scope.todayProgress = false;
     $scope.tSortableWidgets = 11;
-    
+
     Highcharts.setOptions({
         lang: {
             thousandsSep:","
@@ -34,7 +34,6 @@ app.controller('AdminController', function($scope,$interval, $document,$timeout,
     }
    
     var globalDash = this;
-
     
     $scope.opts = {
         autoUpdateInput: false,
@@ -226,10 +225,18 @@ app.controller('AdminController', function($scope,$interval, $document,$timeout,
         },
     }
 
+    $scope.refreshNotification = function(portlet,src){
+        $rootScope.getNextPredictedJobs();
+        $timeout(function() {
+            $(portlet).portlet({ refresh: false });
+        }, 1000);
+    }
+
     /**
     * Top five customers records
     */
     function topFiveCustomer(){
+        $rootScope.getNextPredictedJobs();
         var tempBuffer = $cookies.getObject('_globalDropdown');
         if ( tempBuffer != undefined ) {
             if ( tempBuffer.label == '' || tempBuffer.label == 'all' || tempBuffer.label == '_iall' )  
@@ -242,12 +249,20 @@ app.controller('AdminController', function($scope,$interval, $document,$timeout,
             data = {'startDate':$scope.dateRangeSelector.startDate, 'endDate':$scope.dateRangeSelector.endDate};
         }
 
-        dataFactory.httpRequest(URL+'/dashboard/topFiveCustomer','POST',{},data).then(function(data){
+        dataFactory.httpRequest(URL+'/dashboard/skipAcl_topFiveCustomer','POST',{},data).then(function(data){
             globalDash.showTopCustomers = true;
             if( data.paymentAmount != undefined && data.paymentAmount.length > 0 )
                 globalDash.showTopCustomers = true;
             else
                 globalDash.showTopCustomers = false;
+
+            /*if( data.predictedJobs.length > 0){
+                $rootScope.havePredictions = true;
+                $rootScope.predictedJobs = [];
+                $rootScope.predictedJobs = data.predictedJobs;
+            }else{
+                $rootScope.havePredictions = false;
+            }            */
 
             $scope.comp_name = [];
             $scope.barColors = data.colors;
@@ -325,7 +340,7 @@ app.controller('AdminController', function($scope,$interval, $document,$timeout,
             var left = angular.element("#placeholder_left").sortable('toArray');
             var right = angular.element("#placeholder_right").sortable('toArray');
             var data ={'left':left,'right':right} ;
-            dataFactory.httpRequest('dashboard/updateWidgets/','POST',{},data).then(function(data) {
+            dataFactory.httpRequest('dashboard/skipAcl_updateWidgets/','POST',{},data).then(function(data) {
             });
         },
     create: function (event, ui) {
@@ -462,7 +477,6 @@ app.controller('AdminController', function($scope,$interval, $document,$timeout,
                 return el.vid !== driver.vid;
             });
             $scope.driversOnDashboard = newBorn;
-
         }
 
         if($scope.driversOnDashboard.length <= 0 && $scope.user_role != 2){
@@ -472,7 +486,7 @@ app.controller('AdminController', function($scope,$interval, $document,$timeout,
             $scope.skipClick = true;
             $cookies.remove("_globalDropdown");
             $cookies.putObject('_globalDropdown', $scope.search_vehicle1.selected);
-         }else if($scope.driversOnDashboard.length <= 0 && $scope.user_role == 2){
+        } else if ($scope.driversOnDashboard.length <= 0 && $scope.user_role == 2){
             $scope.showDrivers = false;
             $scope.vtype="_idispatcher";
             $scope.did= driver.dispId;
@@ -497,13 +511,13 @@ app.controller('AdminController', function($scope,$interval, $document,$timeout,
     $scope.driversOnDashboard = []; //Dashboard drivers multiview && aggregated
     $scope.selDrivers = []; //Dashboard drivers multiview && aggregated
     $scope.driverName = false;
-    dataFactory.httpRequest(URL+'/dashboard/fetchWidgetsOrder').then(function(data){
+    dataFactory.httpRequest(URL+'/dashboard/skipAcl_fetchWidgetsOrder').then(function(data){
     
     
 
     if(data.widgetsOrder.length == 0 ) {
 
-        $scope.tSortableWidgetsLeft  = '1,2,3,4,5';
+        $scope.tSortableWidgetsLeft  = '1,2,3,4,5,12';
         $scope.tSortableWidgetsRight = '6,7,8,9,10,11';
     } else {
         $scope.tSortableWidgetsLeft  = data.widgetsOrder.left;
@@ -597,10 +611,14 @@ app.controller('AdminController', function($scope,$interval, $document,$timeout,
 });
     $rootScope.ofFilter = {};
     $scope.changeLang = function(){
-        if($scope.user_role != 2 && $scope.user_role != 4){
-            $scope.vehicleList[0].driverName = $rootScope.languageArray.allGroups;  //r288
-        }
+        // if($scope.user_role != 2 && $scope.user_role != 4){
+            $scope.vehicleList[0].driverName = $rootScope.languageArray.allGroups;  
+        // }
     }
+    // Manually Destroy LiveTile objects
+        $scope.$on('$destroy', function() {
+            $('.live-tile').liveTile("destroy");
+        });
 
     $scope.dashboardData = function(ofDriver){
 
@@ -1085,7 +1103,7 @@ $scope.load_status = function(){
 }
 
 $scope.exportLoadStatus = function(){
-    dataFactory.httpRequest(URL+'/dashboard/exportLoadStatus','POST',{},$scope.printloadchart).then(function(data){
+    dataFactory.httpRequest(URL+'/dashboard/skipAcl_exportLoadStatus','POST',{},$scope.printloadchart).then(function(data){
         $rootScope.donwloadExcelFile(data.fileName);
     });
 }
@@ -1184,7 +1202,7 @@ $scope.update_weather = function($lat , $lon , $add){
     var data = {'latitude':$lat , 'longitude':$lon , 'address':$add,'did':$scope.did, 'vid':sterm,"vtype":$scope.vtype};
     angular.element('.myweather1_portlet-progress').css('display', 'block');
     var data = {'latitude':$lat , 'longitude':$lon , 'address':$add};
-    dataFactory.httpRequest(URL+'/dashboard/weather_updates','POST',{},data).then(function(dataa){
+    dataFactory.httpRequest(URL+'/dashboard/skipAcl_weather_updates','POST',{},data).then(function(dataa){
         angular.element('.myweather1_portlet-progress').css('display', 'none');
         $scope.autoFetchLoads = false;
         $scope.currentWeather = dataa.currentWeather;
@@ -1310,7 +1328,7 @@ $rootScope.exportTop5 = function(){
         data = {'startDate':$scope.dateRangeSelector.startDate, 'endDate':$scope.dateRangeSelector.endDate,'export':1};
     }
 
-    dataFactory.httpRequest(URL+'/dashboard/topFiveCustomer','POST',{},data).then(function(data){
+    dataFactory.httpRequest(URL+'/dashboard/skipAcl_topFiveCustomer','POST',{},data).then(function(data){
        $rootScope.donwloadExcelFile(data.fileName);
     });
 }
@@ -1370,7 +1388,7 @@ $scope.getWeatherInfo = function(){
             $scope.todayReport.totals = data.totals;    
 
             if($scope.driverName){
-                $scope.vehicleList[0].driverName = "All Drivers";  
+                $scope.vehicleList[0].driverName = "All Driversss";  
                 $scope.driverName = false;
             }
             $scope.liveTrucks = data.vehicleLocation.allVehicles;
@@ -1437,7 +1455,7 @@ $scope.getWeatherInfo = function(){
         });
     }
 
-    dataFactory.httpRequest(URL+'/dashboard/getRssFeeds').then(function(data){
+    dataFactory.httpRequest(URL+'/dashboard/skipAcl_getRssFeeds').then(function(data){
         $scope.rssfeeds = data.feeds;
     });
 
@@ -1453,7 +1471,7 @@ $rootScope.updateDashboard = function(){
     if( $scope.selDrivers.length > 0){ sterm = $scope.selDrivers.join(); } else{ sterm = ''; }
     $rootScope.getTodayReport($rootScope.todayInsightActive);
     data = {'did':$scope.did, 'vid':sterm,"vtype":$scope.vtype,"startDate":$scope.dateRangeSelector.startDate, "endDate" : $scope.dateRangeSelector.endDate};
-    dataFactory.httpRequest(URL+'/dashboard/updateDashboardOnLoadEdit','POST',{},data).then(function(data){
+    dataFactory.httpRequest(URL+'/dashboard/skipAcl_updateDashboardOnLoadEdit','POST',{},data).then(function(data){
         $scope.autoFetchLoads = false;
         $scope.printloadchart = loadsChart;
         $scope.summary = data.loadsChart.summary;

@@ -130,7 +130,7 @@ app.controller('assignedLoadsController', ["dataFactory","$scope", "PubNub", "$h
     	
     	search = angular.element('.srpSearch1 input').val();
 		// $scope.autoFetchLoads = true;
-        dataFactory.httpRequest(URL+'/Assignedloads/getRecords/','Post',{} ,{searchQuery: search,startDate: $scope.dateRangeSelector.startDate, endDate:$scope.dateRangeSelector.endDate,'export':'1' }).then(function(data){
+        dataFactory.httpRequest(URL+'/Assignedloads/skipAcl_getRecords/','Post',{} ,{searchQuery: search,startDate: $scope.dateRangeSelector.startDate, endDate:$scope.dateRangeSelector.endDate,'export':'1' }).then(function(data){
         	
             var url = URL+'/assets/ExportExcel/'+data.fileName;
 			var timestamp = Math.floor(Date.now() / 1000);
@@ -177,7 +177,7 @@ app.controller('assignedLoadsController', ["dataFactory","$scope", "PubNub", "$h
         //~ isSending = true;
         //~ canceller = $q.defer();
 		$scope.autoFetchLoads = true;
-        dataFactory.httpRequest(URL+'/Assignedloads/getRecords/','Post',{} ,{ pageNo:pageNumber, itemsPerPage:$scope.itemsPerPage,searchQuery: search, sortColumn:sortColumn, sortType:sortType,startDate: $scope.dateRangeSelector.startDate, endDate:$scope.dateRangeSelector.endDate }).then(function(data){
+        dataFactory.httpRequest(URL+'/Assignedloads/skipAcl_getRecords/','Post',{} ,{ pageNo:pageNumber, itemsPerPage:$scope.itemsPerPage,searchQuery: search, sortColumn:sortColumn, sortType:sortType,startDate: $scope.dateRangeSelector.startDate, endDate:$scope.dateRangeSelector.endDate }).then(function(data){
         	$scope.autoFetchLoads = false;
         	$rootScope.assignedLoads = data.data;
         	if(Object.keys($rootScope.assignedLoads).length <= 0){
@@ -329,7 +329,7 @@ app.controller('assignedLoadsController', ["dataFactory","$scope", "PubNub", "$h
 			labelValue = '';
 	
 			if ( valueArray.JobStatus == 'inprogress' ) {			
-					dataFactory.httpRequest(URL+'/assignedloads/fetchVehicleAddress/'+valueArray.vehicle_id).then(function(result){
+					dataFactory.httpRequest(URL+'/assignedloads/skipAcl_fetchVehicleAddress/'+valueArray.vehicle_id).then(function(result){
 						if ( result.latitude  != '' && result.latitude != undefined ) {
 							latValue = result.latitude;
 							lngValue = result.longitude;
@@ -585,7 +585,7 @@ app.controller('assignedLoadsController', ["dataFactory","$scope", "PubNub", "$h
 		if ( $rootScope.scope != undefined && $rootScope.selScope != undefined ) {
 			$scope.autoFetchLoads = true;
 		
-			dataFactory.httpRequest(URL+'/assignedloads/getChangeDriverLoads/'+$rootScope.selectedVehicle+'/'+$rootScope.setVehicleDriverId+'/'+$rootScope.setVehicleSecondDriverId,'POST',{},{scopeType:$rootScope.scope, scope: $rootScope.selScope, loadSource : $scope.loadSource, startingDate: $scope.dateRangeSelector.startDate, endingDate : $scope.dateRangeSelector.endDate}).then(function(data) {
+			dataFactory.httpRequest(URL+'/assignedloads/skipAcl_getChangeDriverLoads/'+$rootScope.selectedVehicle+'/'+$rootScope.setVehicleDriverId+'/'+$rootScope.setVehicleSecondDriverId,'POST',{},{scopeType:$rootScope.scope, scope: $rootScope.selScope, loadSource : $scope.loadSource, startingDate: $scope.dateRangeSelector.startDate, endingDate : $scope.dateRangeSelector.endDate}).then(function(data) {
 				$rootScope.assignedLoads = [];
 				$rootScope.assignedLoads = data.assigned_loads;
 				if(Object.keys($rootScope.assignedLoads).length <= 0){

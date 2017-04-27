@@ -69,16 +69,6 @@ class Billings extends Admin_Controller{
 		echo json_encode($this->data);
 	}
 	
-	public function fetchVehicleAddress( $vehicleId = null ) {
-		
-		$result = $this->Job->fetchVehicleAddress( $vehicleId);
-		if ( !empty($result) ) {
-			$this->data = $result;
-		}
-		
-		echo json_encode($this->data);
-	}
-
 	/**
 	 * Fetching loads with generated invoice only for send payment page
 	*/ 
@@ -171,7 +161,7 @@ class Billings extends Admin_Controller{
 	* move flag loads for payment
 	*/
 
-	public function setFinalFlagLoads() {
+	public function skipAcl_setFinalFlagLoads() {
 		$data =  array();
 
 		$this->data['loadFlaggedTemp'] = $this->Billing->fetchLoadsFlaggedTemp();
@@ -208,7 +198,7 @@ class Billings extends Admin_Controller{
 	 * creating schedule and send for payment
 	 */ 
 	
-	public function creatingSchedule() 
+	public function sendPayment() 
 	{
 		try{	
 			$objPost = json_decode(file_get_contents('php://input'),true);
@@ -329,7 +319,7 @@ class Billings extends Admin_Controller{
 	 * Getting api method values
 	 */
 	
-	public function getApiMethodValue( $url = '', $type = '', $token = '' ) {
+	private function getApiMethodValue( $url = '', $type = '', $token = '' ) {
 		$postData = '';
 		$result = $this->commonTriumphCurlRequest( $url, $postData, $token);
 		
@@ -357,7 +347,7 @@ class Billings extends Admin_Controller{
 	 * Converting file to byte array
 	 */
 	
-	public function convertByte( $fileName = '') {
+	private function convertByte( $fileName = '') {
 		ini_set('max_execution_time', -1);
 		$pathGen = str_replace('application/', '', APPPATH);
 		$_PATH = $pathGen.'assets/uploads/documents/bundle/'.$fileName;
@@ -369,7 +359,7 @@ class Billings extends Admin_Controller{
 	 * Creating Document Triumph Api method 
 	 */
 	
-	public function createDocument( $loadDetail = array(), $token = '' ) {
+	private function createDocument( $loadDetail = array(), $token = '' ) {
 		$url = 'v1Submit/CreateDocument';
 		$postData = "inputId={$loadDetail['inputId']}&filename={$loadDetail['filename']}&fileData={$loadDetail['fileData']}&{$loadDetail['docType']}"; 
 		
@@ -390,7 +380,7 @@ class Billings extends Admin_Controller{
 	 * finalize input array
 	 */
 	
-	public function createFinalizeInputArray($fianlInput = array(), $fundingOptions = '', $token) {
+	private function createFinalizeInputArray($fianlInput = array(), $fundingOptions = '', $token) {
 		$postData = '';
 		$i = 0;
 		foreach( $fianlInput as $input ) {
@@ -416,7 +406,7 @@ class Billings extends Admin_Controller{
 	 * Create  Multiple Inputs method
 	 */
 	
-	public function createMultipleInputs( $loadIds = array() ) {
+	private function createMultipleInputs( $loadIds = array() ) {
 		$i = 0;
 		$postData = '';
 		
@@ -457,7 +447,7 @@ class Billings extends Admin_Controller{
 	 * Creating common triumph curl method
 	 */
 	
-	public function commonTriumphCurlRequest( $url = '', $post = '', $triumphToken = '') {
+	private function commonTriumphCurlRequest( $url = '', $post = '', $triumphToken = '') {
 		
 		$c = curl_init($this->triumphUrlRequest.$url);
 		curl_setopt($c, CURLOPT_POST, 1);
@@ -475,7 +465,7 @@ class Billings extends Admin_Controller{
 	 * Getting load detail for single record on send for payment
 	 */
 	
-	public function getLoadDetail( $loadId = null ) {
+	public function skipAcl_getLoadDetail( $loadId = null ) {
 		$result = $this->Billing->getSingleLoadDetail( $loadId );
 		if ( $result['doc_name'] != '' && $result['doc_type'] == 'bundle' ) {
 			$docNameArr = explode('.',$result['doc_name']);
@@ -520,7 +510,7 @@ class Billings extends Admin_Controller{
 	 * Generating session token for triumph
 	 */
 	
-	public function get_sessionToken(){
+	private function get_sessionToken(){
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL,$this->triumphUrl);
 		curl_setopt($ch, CURLOPT_POST, 1);
@@ -533,11 +523,7 @@ class Billings extends Admin_Controller{
 		return $data;
 	}
 	
-	public function updateReadyForInvoice() {
-		$this->Job->readyInvoice();
-	}
-
-	public function getRecords($parameter = ''){
+	public function skipAcl_getRecords($parameter = ''){
 		$params = json_decode(file_get_contents('php://input'),true);
 		$total = 0;
 		$jobs = array();
@@ -650,22 +636,7 @@ class Billings extends Admin_Controller{
 	* Description Export Recent Stat data
 	*/
 
-	/*public function exportStat($recentStats=NULL){
-		
-		$keys = [['DATE','CONFIRMATION NO','INV','EXPECTED','ACTUAL']];
-		$filterData=[];
-		foreach ($recentStats as $key => $recentStat) {
-			$filterData[$key]['date'] 		= $recentStat['date'];
-			$filterData[$key]['confirmationCode'] = $recentStat['confirmationCode'];
-			$filterData[$key]['inv'] 		= $recentStat['inv'];
-			$filterData[$key]['expected'] 	= '$'.number_format($recentStat['expected'], 2, '.', '');
-			$filterData[$key]['amount'] 	= '$'.$recentStat['amount'];
-		}
-		$data 	= array_merge($keys,$filterData);
-		echo json_encode(array('fileName'=>$this->createExcell('brokers',$data)));
-	}*/
-
-	public function exportStat($recentStats=NULL){
+	private function exportStat($recentStats=NULL){
 		
 		$keys = [['DATE','CONFIRMATION NO','INV','EXPECTED','ACTUAL']];
 		$filterData=[];
@@ -689,7 +660,7 @@ class Billings extends Admin_Controller{
 	* Return : null
 	* Comment: get specific stats for billing dashboard on refresh.
 	*/
-	public function getSpecificStat(){
+	public function skipAcl_getSpecificStat(){
 		$postObj  = json_decode(file_get_contents("php://input"),true);
 		$lastWeekStartDay = date("Y-m-d", strtotime('monday last week'));
 		$lastWeekEndDay   = date("Y-m-d", strtotime('sunday last week'));
@@ -769,7 +740,7 @@ class Billings extends Admin_Controller{
 	* Comment: update all stats for billing dashboard.
 	*/
 
-	public function updateBillingStats(){
+	public function skipAcl_updateBillingStats(){
 		$postObj  = json_decode(file_get_contents("php://input"),true);
 		$dateFrom = date("Y-m-d", strtotime($postObj["startDate"]));
 		$dateto   = date("Y-m-d", strtotime($postObj["endDate"]));
@@ -806,7 +777,7 @@ class Billings extends Admin_Controller{
 	}
 
 
-	public function getRecentTransactions($args = array()){
+	private function getRecentTransactions($args = array()){
 		$recentTransactions = $this->Billing->getRecentTransactions(false, 5 , $args);
 		//pr($recentTransactions);die;
 		$recentTransactions = array_reverse($recentTransactions);
@@ -922,7 +893,7 @@ class Billings extends Admin_Controller{
 	* get number of days in month
 	*/
 
-	public function getMonthDays($startDate = '', $endDate = '' ) {
+	private function getMonthDays($startDate = '', $endDate = '' ) {
 		$data 	= array();
 		$time  	  = strtotime($startDate);
 		$endTime  = strtotime($endDate);
@@ -945,7 +916,7 @@ class Billings extends Admin_Controller{
 		return $data;
 	}
 
-	public function getPerformanceLoadsForAllDispatchers($dispatchersList = array(),$rparam, $goalValues) {
+	private function getPerformanceLoadsForAllDispatchers($dispatchersList = array(),$rparam, $goalValues) {
 		$mainArray = array();
 		$lPResult = array();
 
@@ -1074,7 +1045,7 @@ class Billings extends Admin_Controller{
 	* get latest date from many date time of same day
 	*/
 
-	public function getUniqueDriverDate($driversList = array()) {
+	private function getUniqueDriverDate($driversList = array()) {
 		$driverListlength  = count($driversList);
 		for( $j = 0; $j < $driverListlength; $j++ ) {
 			if ( isset($driversList[$j]['createdDate']) && isset($driversList[$j+1]['createdDate'])  && ($driversList[$j]['createdDate'] == $driversList[$j+1]['createdDate']) ) {

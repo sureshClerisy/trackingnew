@@ -288,6 +288,7 @@ $lang['uploadRateSheet'] = 'Hoja de tarifa de subida';
 $lang['billingAndShipping'] = 'Detalles de facturación y envío';
 $lang['shipper'] = 'Expedidor';
 $lang['name'] = 'Nombre';
+$lang['username'] = 'Nombre de usuario';
 $lang['telephone'] = 'Teléfono';
 $lang['address'] = 'Dirección';
 $lang['cosignee'] = 'Consignatario';

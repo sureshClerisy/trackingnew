@@ -226,7 +226,7 @@ class Brokers extends Admin_Controller {
 	 * Fetching broker uploaded document on job ticket
 	 */ 
 	
-	public function getBrokerShipperDocumentUploaded( $brokerId = null, $type = '' ) {
+	public function skipAcl_getBrokerShipperDocumentUploaded( $brokerId = null, $type = '' ) {
 		$result = $this->BrokersModel->fetchContractDocuments($brokerId, $type);
 		if ( !empty($result) ) {
 			for( $i = 0; $i < count($result); $i++ ) {
@@ -255,7 +255,7 @@ class Brokers extends Admin_Controller {
 	* Comment: Used for uploading brokers documents
 	*/
 	
-	public function uploadContractDocs()
+	public function skipAcl_uploadContractDocs()
 	{
 		$prefix = "broker"; 
 	    $response  = array();

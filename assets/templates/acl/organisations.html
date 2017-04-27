@@ -3,13 +3,13 @@
 		<div class="container-fluid padding-25 sm-padding-10">
 			<div class="row">
 				<div class="col-md-12 col-xlg-12">
-					<div ng-show="alertmsg == true" class="alert alert-success" role="alert">
+					<div ng-if="org.type == 'success'" class="alert alert-success" role="alert">
 						<button class="close" data-dismiss="alert"></button>						
-						{{message}}
+						{{org.message}}
 					</div>
-					<div ng-show="alertdeletemsg == true" class="alert alert-success" role="alert">
+					<div ng-if="org.type == 'failure'" class="alert alert-success" role="alert">
 						<button ng-click = "hidedeletemessage()" class="close"></button>
-						{{deleteMessage}}
+						{{org.message}}
 					</div>
 					<div class="commen-heading brokers-page">
 						<h2 class="oprate-dashbord"> Organisations</h2>
@@ -21,63 +21,61 @@
 					<div class="load-new-block-table">
 						<div class="panel-body add-new-data fix-page">
 							<div class="load-tabe-auto map-load-section">
-								<a href="#/addbroker" class="add-new-data-button">
+								<a href="#/addOrganization" class="add-new-data-button">
 									<button class="btn btn-primary">
 										<i class="fa fa-plus" style="margin-right:3px"></i>
-										<span class="bold">Add Organisation</span>
+										<span class="bold">Add Organization</span>
 									</button>
 								</a>
-								<!-- <a href="" class="add-new-data-button" style="right: 150px;" ng-click="exportCsvData('brokers')">
-  									<button title="Export" class="btn btn-primary btn-cons m-b-10" type="button">
-  										<i class="fa fa-file-excel-o"></i> 
-  										<span class="bold">Export</span>
-  									</button>
-  								</a> -->
 
-  								<table datatable="ng" dt-options="dtOptions" class="table tr-hover table-hover table-striped driver-table" id="tableWithExportOptions">
-  									<thead>
-  										<tr>
-  											<th>UserName</th>
-  											<th>Name</th>
-  											<th class="text-center">{{ languageCommonVariables.commonTableThAction }}</th>
-  										</tr>
-  									</thead>
-  									<tbody>
-  										<tr ng-repeat="value in organisations">
-  											<td>{{value.username}}</td>
-  											<td>{{value.name}}</td>
-  											<td class="text-center action-btn-ryt"> 
-  												<div class="export-options-container">
-  													<div class="exportOptions">
-  														<div class="DTTT btn-group">
-  															<a href="#/editbroker/{{value.id}}" class="btn btn-default DTTT_button_pdf" data-original-title="{{languageCommonVariables.editBroker}}" ui-jq="tooltip" >
-  																<span><i class="fa fa-edit" aria-hidden="true"></i></span>
-  															</a>
-  															<a class="btn btn-default DTTT_button_copy" title="{{languageCommonVariables.deleteBroker}}" ui-jq="tooltip" ng-click='removeBroker(value.id,$index)' >
-  																<span><i class="fa fa-trash" aria-hidden="true"></i></span>
-  															</a>
-  															<a class="btn btn-default DTTT_button_csv" title="{{languageCommonVariables.blackListBroker}}" ui-jq="tooltip" ng-click="blackListBroker(value.id,value.black_list,$index)" ng-if="value.black_list == 0 || value.black_list == ''">
-  																<span><i class="fa fa-thumbs-o-up"></i></span>
-  															</a>
-  															<a class="btn btn-default DTTT_button_csv" title="{{languageCommonVariables.acceptBroker}}" ui-jq="tooltip" ng-click="blackListBroker(value.id,value.black_list,$index)" ng-if="value.black_list == 1">
-  																<span><i class="fa fa-thumbs-down"></i></span>
-  															</a>
-  															<a href="#/manage/{{value.id}}" class="btn btn-default DTTT_button_csv" title="Manage" ui-jq="tooltip">
-  																<span><i class="fa fa-cog"></i></span>
-  															</a>
-  														</div>
-  													</div>
-  												</div>
-  											</td>
-  										</tr>
-  									</tbody>
-  								</table>
-  							</div>
-  						</div>
-  					</div>
-  				</div>
-  			</div>
-  		</div>
-  	</div>
-  </div>
-  <ng-include src="'./assets/templates/common_modals.html'"></ng-include>
+                              <table datatable="ng" dt-options="dtOptions" class="table tr-hover table-hover table-striped driver-table" id="tableWithExportOptions">
+                                 <thead>
+                                    <tr>
+                                       <th>{{languageCommonVariables.username}}</th>
+                                       <th>{{languageCommonVariables.name}}</th>
+                                       <th>{{languageCommonVariables.address}}</th>
+                                       <th>{{languageCommonVariables.zipcode}}</th>
+                                       <th class="text-center">{{ languageCommonVariables.commonTableThAction }}</th>
+                                   </tr>
+                               </thead>
+                               <tbody>
+                                <tr ng-repeat="value in org.organisations">
+                                   <td>{{value.username}}</td>
+                                   <td>{{value.name}}</td>
+                                   <td>{{value.address}}, {{value.city}}, {{value.state}}</td>
+                                   <td>{{value.zipcode}}</td>
+                                   <td class="text-center action-btn-ryt"> 
+                                      <div class="export-options-container">
+                                         <div class="exportOptions">
+                                            <div class="DTTT btn-group">
+                                               <a href="#/editOrganization/{{value.id}}" class="btn btn-default DTTT_button_pdf" data-original-title="Edit Organization" ui-jq="tooltip" >
+                                                  <span>
+                                                      <i class="fa fa-edit" aria-hidden="true"></i>
+                                                  </span>
+                                              </a>
+                                              <!-- <a class="btn btn-default DTTT_button_copy" title="Remove Organisat" ui-jq="tooltip" ng-click='removeOrganization(value.id,$index)' >
+                                                  <span>
+                                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                                </span>
+                                            </a -->
+                                            <a href="#/manage/{{value.id}}" class="btn btn-default DTTT_button_csv" title="Manage" ui-jq="tooltip">
+                                              <span>
+                                                <i class="fa fa-cog"></i>
+                                            </span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<ng-include src="'./assets/templates/common_modals.html'"></ng-include>

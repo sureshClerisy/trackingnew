@@ -203,7 +203,7 @@ app.controller('editTruckController', function(dataFactory,getTruckData,$sce,$sc
 		$scope.truckData.fuel_type = item.key;
 	};
 	
-	dataFactory.httpRequest(URL + '/truckstop/fetchTrailerType').then(function(data) {
+	dataFactory.httpRequest(URL + '/truckstop/skipAcl_fetchTrailerType').then(function(data) {
 		$scope.trailerTypes = data.trailerTypes;
 	});
 	
@@ -229,7 +229,7 @@ app.controller('editTruckController', function(dataFactory,getTruckData,$sce,$sc
 			}
 			$scope.truckData.driverName = item.driverName;
 			if(driverId !== '0'){
-				dataFactory.httpRequest(URL+'/vehicles/changeDriver/'+driverId+'/'+$scope.truckData.id).then(function(data) {
+				dataFactory.httpRequest(URL+'/vehicles/skipAcl_changeDriver/'+driverId+'/'+$scope.truckData.id).then(function(data) {
 					if ( data.result == false ) {
 						$scope.truckName = data.truckName;
 						$('#changeDriverOnTruck').modal('show');
@@ -260,7 +260,7 @@ app.controller('editTruckController', function(dataFactory,getTruckData,$sce,$sc
 			$scope.truckData.driverName = item.driverName;
 
 			if(driverId !== '0'){
-				dataFactory.httpRequest(URL+'/vehicles/changeDriver/'+driverId+'/'+$scope.truckData.id).then(function(data) {
+				dataFactory.httpRequest(URL+'/vehicles/skipAcl_changeDriver/'+driverId+'/'+$scope.truckData.id).then(function(data) {
 					if ( data.result == false ) {
 						$scope.truckName = data.truckName;
 						$('#changeDriverOnTruck').modal('show');
@@ -313,7 +313,7 @@ app.controller('editTruckController', function(dataFactory,getTruckData,$sce,$sc
 	
 	$rootScope.confirmCommonDocumentStatus = function(confirm){
 		if(confirm=='yes'){
-		dataFactory.httpRequest(URL + '/vehicles/deleteContractDocs/'+$scope.docId+"/"+$scope.documentName).then(function(data) {
+		dataFactory.httpRequest(URL + '/vehicles/skipAcl_deleteContractDocs/'+$scope.docId+"/"+$scope.documentName).then(function(data) {
 			PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
 			if(data.success == true) {
 				$scope.truckDocuments.splice($scope.documentIndex,1);
@@ -326,7 +326,7 @@ app.controller('editTruckController', function(dataFactory,getTruckData,$sce,$sc
 	$scope.dropzoneConfigTruckEdit = {
 		parallelUploads: 5,
 		maxFileSize: 10,
-		url: URL+ '/vehicles/uploadContractDocuments',
+		url: URL+ '/vehicles/skipAcl_uploadContractDocuments',
 		addRemoveLinks: true, 
 		//~ autoProcessQueue: false,
 		acceptedFiles: 'image/*, application/pdf, .xls, .xlsx, .doc, .docx, .txt, .bmp, .svg',
@@ -364,7 +364,7 @@ app.controller('editTruckController', function(dataFactory,getTruckData,$sce,$sc
         var fd = new FormData();
             fd.append('vehicle_image', file);
 			fd.append('data1',$scope.name);
-              $http.post(URL+'/vehicles/image/',fd,{
+              $http.post(URL+'/vehicles/skipAcl_image/',fd,{
                   transformRequest: angular.identity,
                   headers: {'Content-Type': undefined}
                }).then(function successCallback(response) {
@@ -394,7 +394,7 @@ app.controller('editTruckController', function(dataFactory,getTruckData,$sce,$sc
 	 
 	$scope.checkVehicleLabelExist = function( truckNo, truckId ) {
 		if ( truckNo != '' && truckNo != undefined ) {
-			dataFactory.httpRequest(URL+'/vehicles/checkTruckNumber/'+truckNo+'/'+truckId).then(function(data) {
+			dataFactory.httpRequest(URL+'/vehicles/skipAcl_checkTruckNumber/'+truckNo+'/'+truckId).then(function(data) {
 				if ( data.success == false ) {
 					$rootScope.showErrorMessage = true;
 					$scope.errorMessage = 'Error! : This truck number already exist, please try another number.';
@@ -445,7 +445,7 @@ app.controller('editTruckController', function(dataFactory,getTruckData,$sce,$sc
     $scope.addTruckData.permitted_speed = 75;					// set value of permitted speed to 75
     $scope.addTruckData.vehicle_type = [{ 'abbrevation' : 'F','name' : 'Flatbed'}];
     
-    dataFactory.httpRequest(URL + '/truckstop/fetchTrailerType').then(function(data) {
+    dataFactory.httpRequest(URL + '/truckstop/skipAcl_fetchTrailerType').then(function(data) {
 		$scope.trailerTypes = data.trailerTypes;
 	});
 			
@@ -484,7 +484,7 @@ app.controller('editTruckController', function(dataFactory,getTruckData,$sce,$sc
 			$scope.addTruckData.driverName = item.driverName;
 			$scope.truckData.driverName = item.driverName;
 			if(driverId !== '0'){
-				dataFactory.httpRequest(URL+'/vehicles/changeDriver/'+driverId+'/'+$scope.addTruckData.id).then(function(data) {
+				dataFactory.httpRequest(URL+'/vehicles/skipAcl_changeDriver/'+driverId+'/'+$scope.addTruckData.id).then(function(data) {
 					if ( data.result == false ) {
 						$scope.truckName = data.truckName;
 						$('#changeDriverOnTruck').modal('show');
@@ -513,7 +513,7 @@ app.controller('editTruckController', function(dataFactory,getTruckData,$sce,$sc
 			$scope.truckData.driverName = item.driverName;
 
 			if(driverId !== '0'){
-				dataFactory.httpRequest(URL+'/vehicles/changeDriver/'+driverId+'/'+$scope.addTruckData.id).then(function(data) {
+				dataFactory.httpRequest(URL+'/vehicles/skipAcl_changeDriver/'+driverId+'/'+$scope.addTruckData.id).then(function(data) {
 					if ( data.result == false ) {
 						$scope.truckName = data.truckName;
 						$('#changeDriverOnTruck').modal('show');
@@ -542,7 +542,7 @@ app.controller('editTruckController', function(dataFactory,getTruckData,$sce,$sc
 	$scope.dropzoneConfigTruckAdd = {
 		parallelUploads: 5,
 		maxFileSize: 3,
-		url: URL+ '/vehicles/uploadContractDocuments',
+		url: URL+ '/vehicles/skipAcl_uploadContractDocuments',
 		addRemoveLinks: true, 
 		autoProcessQueue: false,
 		acceptedFiles: 'image/*, application/pdf, .xls, .xlsx, .doc, .docx, .txt, .bmp, .svg',
@@ -579,7 +579,7 @@ app.controller('editTruckController', function(dataFactory,getTruckData,$sce,$sc
 		var fd = new FormData();
             fd.append('vehicle_image', file);
 			
-              $http.post(URL+'/vehicles/image/',fd,{
+              $http.post(URL+'/vehicles/skipAcl_image/',fd,{
                   transformRequest: angular.identity,
                   headers: {'Content-Type': undefined}
                }).then(function successCallback(response) {
@@ -607,7 +607,7 @@ app.controller('editTruckController', function(dataFactory,getTruckData,$sce,$sc
 	 
 	$scope.checkVehicleLabelExist = function( truckNo ) {
 		if ( truckNo != '' && truckNo != undefined ) {
-			dataFactory.httpRequest(URL+'/vehicles/checkTruckNumber/'+truckNo).then(function(data) {
+			dataFactory.httpRequest(URL+'/vehicles/skipAcl_checkTruckNumber/'+truckNo).then(function(data) {
 				if ( data.success == false ) {
 					$rootScope.showErrorMessage = true;
 					$scope.errorMessage = 'Caution! : This truck number already exist, please try another number.';

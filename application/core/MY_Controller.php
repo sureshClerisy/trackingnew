@@ -22,6 +22,7 @@ class Admin_Controller extends MY_Controller
 	public $protocol;
 	protected $userID;
 	protected $superAdmin = 0;
+	protected $selectedOrgId;
 
 
 	function __construct() {
@@ -35,6 +36,7 @@ class Admin_Controller extends MY_Controller
 		$this->entity     = $this->config->item('entity');
 		$this->event      = $this->config->item('event');
 		
+		$this->load->model('User');
 		$this->load->library('excel');
 
 		$this->protocol   = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
@@ -54,9 +56,11 @@ class Admin_Controller extends MY_Controller
 		$this->wsdl_url		= 'http://webservices.truckstop.com/V13/Searching/LoadSearch.svc?wsdl'; //Live Mode Api 
 		$this->finalArray	= array();
 		
-		
+		$this->selectedOrgId = 0;
 		if(in_array($this->userID, $this->config->item('superAdminIds'))){
 			$this->superAdmin = 1;
+			$res = $this->User->getSelectedOrganisation($this->userID);
+			$this->selectedOrgId = ( !empty($res)) ? $res['organisation_id'] : 0;
 		}
 	}
 		

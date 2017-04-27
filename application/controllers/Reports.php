@@ -8,24 +8,55 @@
 class Reports extends Admin_Controller{
 
 	public $userId;
+	public $userRoleId;
 	private $paginationLimit = 20;
 	
 	function __construct(){
 		parent::__construct();
 		$this->userId 		= $this->session->loggedUser_id;
-		$this->load->model('Report');
-		$this->load->model('Driver');
+		$this->userRoleId  = $this->session->role;
+		$this->load->model(array('Report','Driver','User'));
 	}
 	
 	public function index(){
 		$vehicles = $this->Report->getAllVehicles();
 
-		//List of all dispatchers with their drivers
-		$allVehicles 	= $this->Driver->getDriversList(false,false,true);
-		$teamList 		= $this->Driver->getDriversListAsTeam(false,false,true);
-		$dispatcherList = $this->Driver->getDispatcherList();
-		$vDriversList 	= array();
+		$userId = false;
+		$parentId = false;
+		$tempUserId = $this->userId;
+		$childIds  = array();				// dispatchers child list
+		if($this->userRoleId == _DISPATCHER ){
+			$userId = $this->userId;
+			$parentId =  $this->userId;
+			$childIds = $this->User->fetchDispatchersChilds($userId);
+		} else if ( $this->userRoleId == 4 ) {
+			$parentIdCheck = $this->session->userdata('loggedUser_parentId');
+			if( isset($parentIdCheck) && $parentIdCheck != 0 ) {
+				$userId = $parentIdCheck;
+				$parentId = $parentIdCheck;
+				$tempUserId = $parentIdCheck;
+			}
+		}
+		
+		$allVehicles = $this->Driver->getDriversListNew($userId);
+		$dispatcherList = $this->Driver->getDispatcherList($parentId); 	//for add all drivers under every dispatcher
+		$teamList = $this->Driver->getDriversListAsTeamNew($userId);
 
+		if ( !empty($childIds)) {
+			$childVehicles = array();
+			foreach($childIds as $child ) {
+				$childVehicles = $this->Driver->getDriversListNew($child['id']);
+				$allVehicles = array_merge($allVehicles,$childVehicles);	
+				
+				$childVehicles = $this->Driver->getDriversListAsTeamNew($child['id']);
+				$teamList = array_merge($teamList,$childVehicles);
+
+				$childs = $this->Driver->getDispatcherList($child['id']);
+				$dispatcherList = array_merge($dispatcherList,$childs);
+			}
+		}
+
+		$vDriversList 	= array();
 		if(!empty($allVehicles) && is_array($allVehicles)){	
 			$vDriversList = $allVehicles;
 			if(is_array($teamList) && count($teamList) > 0){
@@ -34,16 +65,16 @@ class Reports extends Admin_Controller{
 					array_unshift($vDriversList, $value);
 				}
 			}
-			$new = array("id"=>"","profile_image"=>"","driverName"=>"All Groups","label"=>"","username"=>"","latitude"=>"","longitude"=>"","vid"=>"","city"=>"","vehicle_address"=>"","state"=>"");
+			
 			foreach ($dispatcherList as $key => $value) {
 				array_unshift($vDriversList, $value);
 			}
-			array_unshift($vDriversList, $new);
-		}
+
+				$new = array("id"=>"","profile_image"=>"","driverName"=>"All Groups","label"=>"","username"=>"","latitude"=>"","longitude"=>"","vid"=>"","city"=>"","vehicle_address"=>"","state"=>"");
+				array_unshift($vDriversList, $new);
+		}	
 
 		$response = array("vehicles"=>$vehicles,"vDriversList"=>$vDriversList);
-		// pr($response);
-
 
 		echo json_encode($response);
 	}
@@ -444,7 +475,7 @@ class Reports extends Admin_Controller{
 	* Comment : For implementing pagination on load perfromance rresults
 	*/
 
-	public function sortPaginationListing($filterArgs = array(), $iscope = '' , $pageNumber = 0, $search = '', $sortColumn = '', $lastSortType = '' ) {
+	private function sortPaginationListing($filterArgs = array(), $iscope = '' , $pageNumber = 0, $search = '', $sortColumn = '', $lastSortType = '' ) {
 		$data = array();
 		
 		$filterArgs['itemsPerPage'] = $this->paginationLimit;
@@ -460,7 +491,7 @@ class Reports extends Admin_Controller{
 		exit();
 	}
 
-	public function getReportRecords() {
+	public function skipAcl_getReportRecords() {
 		$params = json_decode(file_get_contents('php://input'),true);
 		$data 	= array();
 		if($params["pageNo"] < 1){

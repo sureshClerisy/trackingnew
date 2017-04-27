@@ -97,6 +97,16 @@
 			<div class="icon bell" data-target="#modalSlideLeft" data-toggle="modal" ng-click="modalSlideLeft()"> <img src="assets/img/bell.png">
 			<div ng-show="haveUnread > 0" class="num-block">{{ureadCount}}</div></div>
 		 </div>
+
+		  <div class="pull-right pull-right-dropdown form-group form-group-default th-select" ng-if="showOrganisationsDropdown == true">
+			<ui-select class="mdrivers" name="dispatchersList" ng-model="globalSelectedOrganisationId" theme="bootstrap" on-select="mctrl.onSelectOrganisationCallback($item);" >
+				<ui-select-match class="ui-select-match" placeholder="Select Organisation">{{organisationSelected}}</ui-select-match>
+				<ui-select-choices class="ui-select-choices" repeat="item in organisationsList | filter: $select.search">
+					<span ng-bind-html="trustAsHtml((item.first_name | highlight: $select.search))"></span>
+				</ui-select-choices>
+			</ui-select>		
+		 </div>
+
         <!--mail-icon block-->
       </div>
       <!-- END HEADER -->
@@ -752,8 +762,7 @@
 							</div>
 								
 								<input ng-model="primaryLoadId" type="hidden" name="id" class="form-control" />
-								<input type ="hidden" name = "bond" ng-model="editSavedLoad.Bond" />
-									
+														
 							<div class="load-det-main">	
 								<div class="table-input-head">
 									<h1 class="ng-binding">{{ languageCommonVariables.popuploaddetails }}</h1>

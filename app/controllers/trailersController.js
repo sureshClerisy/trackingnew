@@ -122,7 +122,7 @@ app.controller('addEditTrailerController', function(dataFactory, getAddTrailerDa
 		var truckId =item.id;
 		if ( truckId != '' && truckId != undefined )  {
 			$scope.trailerData.truck_id = item.id;
-			dataFactory.httpRequest(URL+'/trailers/changeTruck/'+truckId+'/'+$scope.trailerData.id).then(function(data) {
+			dataFactory.httpRequest(URL+'/trailers/skipAcl_changeTruck/'+truckId+'/'+$scope.trailerData.id).then(function(data) {
 				if ( data.result == false ) {
 					$scope.trailerUnit = data.trailerUnit;
 					$('#changeTruckOnTrailer').modal('show');
@@ -141,7 +141,7 @@ app.controller('addEditTrailerController', function(dataFactory, getAddTrailerDa
 	$scope.dropzoneConfigTrailerAdd = {
 		parallelUploads: 5,
 		maxFileSize: 3,
-		url: URL+ '/trailers/uploadContractDocs',
+		url: URL+ '/trailers/skipAcl_uploadContractDocs',
 		addRemoveLinks: true, 
 		autoProcessQueue: false,
 		acceptedFiles: 'image/*, application/pdf, .xls, .xlsx, .doc, .docx, .txt, .bmp, .svg',
@@ -169,7 +169,7 @@ app.controller('addEditTrailerController', function(dataFactory, getAddTrailerDa
 		$scope.dropzoneConfigTrailerEdit = {
 			parallelUploads: 5,
 			maxFileSize: 3,
-			url: URL+ '/trailers/uploadContractDocs',
+			url: URL+ '/trailers/skipAcl_uploadContractDocs',
 			addRemoveLinks: true, 
 			autoProcessQueue: true,
 			acceptedFiles: 'image/*, application/pdf, .xls, .xlsx, .doc, .docx, .txt, .bmp, .svg',
@@ -235,7 +235,7 @@ app.controller('addEditTrailerController', function(dataFactory, getAddTrailerDa
 	 
 	$scope.checkTrailerUnitExist = function( trailerNo, trailerId ) {
 		if ( trailerNo != '' && trailerNo != undefined) {
-			dataFactory.httpRequest(URL+'/trailers/checkTrailerUnit/'+trailerNo+'/'+trailerId).then(function(data) {
+			dataFactory.httpRequest(URL+'/trailers/skipAcl_checkTrailerUnit/'+trailerNo+'/'+trailerId).then(function(data) {
 				if ( data.success == false ) {
 					$rootScope.dataNotFound = true;
 					$scope.errorMessage = 'Error! : This trailer unit id already exist, please try another number.';

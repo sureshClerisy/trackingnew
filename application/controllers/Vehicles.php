@@ -75,7 +75,7 @@ class Vehicles extends Admin_Controller {
 		echo json_encode($data);
 	}
 	 
-	public function states(){
+	public function skipAcl_states(){
 		$data['states_data'] = $this->Job->getAllStates();
 		$data['driversList'] = $this->vehicle->getRelatedDrivers($this->userId);
 		echo json_encode($data);
@@ -238,15 +238,15 @@ class Vehicles extends Admin_Controller {
 		}
 	}
 	
-	public function delete($truckID=null){
-		$result = $this->vehicle->deleteVehicle($truckID);
-		if ( $result ) {
-			echo json_encode(array('success' => true));
-		} else {
-			echo json_encode(array('success' => false));
-		}
+	// public function delete($truckID=null){
+	// 	$result = $this->vehicle->deleteVehicle($truckID);
+	// 	if ( $result ) {
+	// 		echo json_encode(array('success' => true));
+	// 	} else {
+	// 		echo json_encode(array('success' => false));
+	// 	}
 		
-	}
+	// }
 	
 
 	/*
@@ -256,7 +256,7 @@ class Vehicles extends Admin_Controller {
 	* Return: string
 	* Comment: Used for uploading vehicle image on server
 	*/
-	public function image()
+	public function skipAcl_image()
 	{
 		try{
 
@@ -313,7 +313,7 @@ class Vehicles extends Admin_Controller {
 	 *  checking driver already assigned to another truck or not
 	 */ 
 	 
-	public function changeDriver( $driverId = null, $vehicleId = null ) {
+	public function skipAcl_changeDriver( $driverId = null, $vehicleId = null ) {
 		$truckName = '';
 		$result = $this->vehicle->checkChangeDriver($driverId,$vehicleId, $this->userId);
 		if ( !empty($result) ) {
@@ -371,7 +371,7 @@ class Vehicles extends Admin_Controller {
 	 * Check truck number exist or not
 	 */
 	
-	public function checkTruckNumber( $truckNo = null, $id = null ) {
+	public function skipAcl_checkTruckNumber( $truckNo = null, $id = null ) {
 		if ( $id != '' && $id != null )
 			$result = $this->vehicle->checkTruckNumberExist($truckNo, $id);
 		else
@@ -393,7 +393,7 @@ class Vehicles extends Admin_Controller {
 	* Comment: Used for uploading trucks documents
 	*/
 	
-	public function uploadContractDocuments()
+	public function skipAcl_uploadContractDocuments()
 	{
 		$prefix = "truck"; 
 	    $response  = array();
@@ -428,7 +428,7 @@ class Vehicles extends Admin_Controller {
 	* Comment: Used for deleting vehicles documents
 	*/
 	
-	public function deleteContractDocs($docId = null, $docName = '')
+	public function skipAcl_deleteContractDocs($docId = null, $docName = '')
 	{
 		try{
 			

@@ -638,7 +638,7 @@ app.controller('iterationLoadsController', ["dataFactory","$scope","$http","$roo
    	$scope.changeDriverLoads = function(driverValue) {
 		if ( driverValue != '' && driverValue != 0 && driverValue != undefined && driverValue != 'all' ) {
 			$scope.autoFetchLoads = true;
-			dataFactory.httpRequest(URL+'/iterationloads/getChangeDriverChains','POST',{},{driverInfo: driverValue,driverType: $scope.driverType}).then(function(data) {
+			dataFactory.httpRequest(URL+'/iterationloads/skipAcl_getChangeDriverChains','POST',{},{driverInfo: driverValue,driverType: $scope.driverType}).then(function(data) {
 				$scope.loadsData = [];
 				$scope.tableTitle = [];
 				$scope.loadsData = data.loadsData.rows;
@@ -1203,7 +1203,7 @@ app.controller('iterationLoadsController', ["dataFactory","$scope","$http","$roo
 	
 	$scope.askCustomCitiesSuggestions = function(q,from) {
 		if ( q != undefined && q.length > 1 ) {
-			dataFactory.httpRequest(URL+'/truckstop/searchCity','POST',{},{city: q}).then(function(data){
+			dataFactory.httpRequest(URL+'/truckstop/skipAcl_searchCity','POST',{},{city: q}).then(function(data){
 				if ( data.result.length > 0 ) {
 					$scope.haveAskCities = true;
 					$rootScope.askSuggestedCities = data.result;
@@ -1340,7 +1340,7 @@ app.controller('iterationLoadsController', ["dataFactory","$scope","$http","$roo
 		$scope.formSearch.pickup_date = $scope.originDateSearch;
 		
 		var searchStatus = 'planSearch';
-		dataFactory.httpRequest('truckstop/get_load_data_repeat','POST',{},{loadsArray: $scope.loadsIdArray, vehicleIDRepeat : $rootScope.iterationVehicleId, formPost: $scope.formSearch, searchStatus : searchStatus}).then(function(data){
+		dataFactory.httpRequest('truckstop/skipAcl_get_load_data_repeat','POST',{},{loadsArray: $scope.loadsIdArray, vehicleIDRepeat : $rootScope.iterationVehicleId, formPost: $scope.formSearch, searchStatus : searchStatus}).then(function(data){
 			$scope.loadsIdArray = data.loadsIdArray;
 			$scope.newRows = data.rows;
 			

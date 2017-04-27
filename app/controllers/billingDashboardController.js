@@ -129,7 +129,7 @@ app.controller('billingDashboardController', ["dataFactory","$scope",  "$rootSco
 
 	vm.refreshTest = function(portlet,src) {
         // Timeout to simulate AJAX response delay
-        dataFactory.httpRequest(URL+'/billings/getSpecificStat/','POST',{},{type:src,dates:vm.dateRangeSelector}).then(function(data){
+        dataFactory.httpRequest(URL+'/billings/skipAcl_getSpecificStat/','POST',{},{type:src,dates:vm.dateRangeSelector}).then(function(data){
             $timeout(function() {
                 switch(src){
                     case "sent_today"             : vm.sentTodayCount        = data.sentToTriumphToday    ; 
@@ -154,7 +154,7 @@ app.controller('billingDashboardController', ["dataFactory","$scope",  "$rootSco
 
 
     vm.updateBillingStats = function(key) {
-        var method = "updateBillingStats";
+        var method = "skipAcl_updateBillingStats";
         if(key == "clear"){
             method = "billingStats";
         }

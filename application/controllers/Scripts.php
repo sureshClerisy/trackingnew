@@ -336,7 +336,6 @@ class Scripts extends CI_Controller {
 						$streetAddress .= $addressArr[$i].', ';
 					}	
 						
-					$data['OriginStreet'] = rtrim($streetAddress,', ');			
 					$data['PickupAddress'] = rtrim($streetAddress,', ');			
 				}
 			}
@@ -353,7 +352,6 @@ class Scripts extends CI_Controller {
 						$streetAddress .= $addressArr[$i].', ';
 					}	
 						
-					$data['DestinationStreet'] = rtrim($streetAddress,', ');	
 					$data['DestinationAddress'] = rtrim($streetAddress,', ');	
 				}
 			}

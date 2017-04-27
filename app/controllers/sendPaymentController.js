@@ -148,7 +148,7 @@ app.controller('sendPaymentController', ["dataFactory","$scope","$http","$rootSc
 			if ( $scope.idSelection.length > 0 ) {
 				$rootScope.showErrorMessage = false;
 				$scope.autoFetchLoads = true;
-				dataFactory.httpRequest(URL+'/billings/creatingSchedule','POST',{},{selectedIds : $scope.idSelection }).then(function(data){
+				dataFactory.httpRequest(URL+'/billings/sendPayment','POST',{},{selectedIds : $scope.idSelection }).then(function(data){
 					$scope.autoFetchLoads = false;
 					if ( data.success == true ) {
 						$rootScope.SendLoads 				 = data.loadsInfo.factoredLoads;
@@ -212,7 +212,7 @@ app.controller('sendPaymentController', ["dataFactory","$scope","$http","$rootSc
 
 		sendPym.processPaymentQueue = function() {
 			$scope.autoFetchLoads = true;
-			dataFactory.httpRequest(URL+'/billings/setFinalFlagLoads').then(function(data){
+			dataFactory.httpRequest(URL+'/billings/skipAcl_setFinalFlagLoads').then(function(data){
 				$scope.autoFetchLoads = false;
 				$rootScope.SendLoads 		= data.loads;
 				$rootScope.sentPaymentCount = data.sentPaymentCount;
@@ -273,7 +273,7 @@ app.controller('sendPaymentController', ["dataFactory","$scope","$http","$rootSc
 		   
 	        $scope.showLoad = function(id, index) {
 				$rootScope.selectedIndex = index;
-				dataFactory.httpRequest(URL+'/billings/getLoadDetail/'+id).then(function(data){
+				dataFactory.httpRequest(URL+'/billings/skipAcl_getLoadDetail/'+id).then(function(data){
 					$scope.showLoadDetail = data;
 					$rootScope.noLoadSelected = false;
 					
