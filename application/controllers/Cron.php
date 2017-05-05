@@ -420,7 +420,7 @@ class Cron extends CI_Controller{
 			$defaultLength 	= 45;
 
 			if ( $vehicleId != '' && $vehicleId != null ) {
-				$vehicle_details = $this->Vehicle->get_vehicles_fuel_consumption(null, $vehicleId);
+				$vehicle_details = $this->Vehicle->get_vehicles_fuel_consumption($vehicleId);
 				if ( !empty($vehicle_details) ) {
 					$truckAverage =round( 100/$vehicle_details[0]['fuel_consumption'],2);
 					$defaultWeight = ( $vehicle_details[0]['cargo_capacity'] != '' ) ? $vehicle_details[0]['cargo_capacity'] : $defaultWeight;

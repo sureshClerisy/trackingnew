@@ -57,16 +57,12 @@
 <!-- END SIDEBAR MENU TOP TRAY CONTENT-->
 <!-- BEGIN SIDEBAR MENU HEADER-->
 <div class="sidebar-header">
-    <!--img src="assets/img/logo_white.png" alt="logo" class="brand" data-src="assets/img/logo_white.png" data-src-retina="assets/img/logo_white_2x.png" class="logo-main-block"-->
     <img src="assets/img/vikalogo2.png" alt="logo" class="brand" data-src="assets/img/vikalogo2.png" data-src-retina="assets/img/logo_white_2x.png" class="logo-main-block">
     <div class="sidebar-header-controls">
-      <!-- <button type="button" class="btn btn-xs sidebar-slide-toggle btn-link m-l-20" data-pages-toggle="#appMenu"> -->
       <button type="button" class="btn btn-xs sidebar-slide-toggle btn-link m-l-20" data-pages-toggle="#appMenu" ng-click = "showHidePortlet()" title="Portlet">
         <i class="fa fa-angle-down fs-16"></i>
     </button>
-          <!-- <button type="button" class="btn btn-link visible-lg-inline" data-toggle-pin="sidebar">
-            <i class="fa fs-12"></i>
-        </button> -->
+          
     </div>
 </div>
 <!-- END SIDEBAR MENU HEADER-->
@@ -74,138 +70,106 @@
 <div class="sidebar-menu">
     <!-- BEGIN SIDEBAR MENU ITEMS-->
     <ul class="menu-items">
-      <li class="m-t-30 ">
+      <li class="m-t-30 " ng-if="mctrl.allowedModules.indexOf('dashboard') > -1 || mctrl.allowedModules.indexOf('dashboard/index') > -1 ">
         <a class="test" href="#/dashboard" class="detailed">
           <span class="title">{{ languageCommonVariables.dashboard }}</span>
-          <!--span class="details">12 New Updates</span-->
-
           <span class="bg-success icon-thumbnail"><i class="pg-home"></i></span></a>
       </li>
-      <li ng-class="{'open active':(state=='plan' || state=='myLoad' || state=='search' || state=='AutoLoad') }"> 
-
-        <a class="test" href="javascript:;"><span class="title">{{ languageCommonVariables.loads }}</span>
-          <span class=" arrow" ng-class="{'open active':(state=='plan' || state=='myLoad' || state=='search' || state=='AutoLoad') }"></span>
-
+      <li ng-class="{'open active':(state=='plan' || state=='myLoad') }" ng-if="(mctrl.allowedModules.indexOf('assignedloads') > -1 || mctrl.allowedModules.indexOf('assignedloads/index') > -1 ) || ( mctrl.allowedModules.indexOf('iterationloads') > -1 || mctrl.allowedModules.indexOf('iterationloads/index') > -1 )"> 
+          <a class="test" href="javascript:;"><span class="title">{{ languageCommonVariables.loads }}</span>
+          <span class=" arrow" ng-class="{'open active':(state=='plan' || state=='myLoad') }"></span>
           <span class="icon-thumbnail"><i class="icon-pg loads"></i></span></a>
-
           <ul class="sub-menu">
-           <li class="">
-              <a href="#/plan">{{ languageCommonVariables.plan }}
+              <li class="" ng-if="mctrl.allowedModules.indexOf('iterationloads') > -1 || mctrl.allowedModules.indexOf('iterationloads/index') > -1 ">
+                  <a href="#/plan">{{ languageCommonVariables.plan }}
                   <span class="icon-thumbnail">{{ languageCommonVariables.planPl }}</span></a>
+              </li>    				
+    					<li class="" ng-if="mctrl.allowedModules.indexOf('assignedloads') > -1 || mctrl.allowedModules.indexOf('assignedloads/index') > -1 ">
+    						  <a href="#/myLoad">{{ languageCommonVariables.assignedLoads }}
+                        <span class="icon-thumbnail">{{ languageCommonVariables.assignedLoadsAl }}</span></a>
               </li>
-    					<!--li class="">
-    						<a href="#/autoGenerate">AutoLoad</a>
-    						<span class="icon-thumbnail">AL</span>
-    					</li-->
-    					<li class="">
-    						<a href="#/myLoad">{{ languageCommonVariables.assignedLoads }}
-                              <span class="icon-thumbnail">{{ languageCommonVariables.assignedLoadsAl }}</span></a>
-                          </li>
-                      </ul>
-                  </li>
-                  <li>
-                    <a class="test" href="#/drivers"><span class="title">{{ languageCommonVariables.driver }}</span>
-                        <span class="icon-thumbnail"><i class="icon-pg drivers"></i></span>
-                    </a>
+          </ul>
+      </li>
 
-                </li>
-                <li ng-class="(state=='trucks' || state=='trailers') ? 'open active' : ''">
-                    <a class="test" href="javascript:void(0)">
-                      <span class="title">{{ languageCommonVariables.vehicles }}</span>
-                      <span class=" arrow" ng-class="{'open active':(state=='trucks' || state=='trailers' || state=='maintenance') }"></span>
-
-                      <span class="icon-thumbnail"><i class="icon-pg trucks vehicles"></i></span></a>
-                      <ul class="sub-menu">
-                          <li>
-                            <a  href="#/trucks">{{ languageCommonVariables.truck }}
-                                <span class="icon-thumbnail">tr</span></a>
-                            </li>
-                            <li>
-                                <a  href="#/trailers">{{ languageCommonVariables.trailer }}
-                                    <span class="icon-thumbnail">tl</span></a>
-                                </li>
-              <!-- <li>
-                <a  href="#/maintenance">{{ languageCommonVariables.maintenance }}</a>
-                <span class="icon-thumbnail">MN</span>
+      <li ng-class="(state=='trucks' || state=='trailers') ? 'open active' : ''" ng-if="mctrl.allowedModules.indexOf('vehicles') > -1 || mctrl.allowedModules.indexOf('trailers') > -1 || mctrl.allowedModules.indexOf('vehicles/index') > -1  || mctrl.allowedModules.indexOf('trailers/index') > -1 || mctrl.allowedModules.indexOf('drivers') > -1  || mctrl.allowedModules.indexOf('drivers/index') > -1 ">
+          <a class="test" href="javascript:void(0)">
+            <span class="title">Assets</span>
+            <span class=" arrow" ng-class="{'open active':(state=='trucks' || state=='trailers' || state=='maintenance') }"></span>
+            <span class="icon-thumbnail"><i class="icon-pg trucks vehicles"></i></span>
+          </a>
+          <ul class="sub-menu">
+             <li ng-if="mctrl.allowedModules.indexOf('trailers') > -1 || mctrl.allowedModules.indexOf('trailers/index') > -1 ">
+                <a ui-sref="drivers">{{ languageCommonVariables.driver }}
+                  <span class="icon-thumbnail">tl</span>
+                </a>
               </li> 
-    			<li>
-    				<a class="test" href="#"><span class="title">{{ languageCommonVariables.safety }}</span></a>
-    				<span class="icon-thumbnail"><i class="icon-pg safety"></i></span>
-    			</li>  -->
-            </ul>
-        </li>
-        <li>
-            <a class="test" href="#/broker"><span class="title">{{ languageCommonVariables.broker }}</span>
-                <span class="icon-thumbnail"><i class="fa fa-stack-exchange" aria-hidden="true"></i></span>
-            </a>
+              <li ng-if="mctrl.allowedModules.indexOf('vehicles') > -1 || mctrl.allowedModules.indexOf('vehicles/index') > -1 ">
+                  <a ui-sref="trucks">{{ languageCommonVariables.truck }}
+                      <span class="icon-thumbnail"><i class="icon-pg trucks vehicles" aria-hidden="true"></i></span>
+                  </a>
+              </li>
+              <li ng-if="mctrl.allowedModules.indexOf('trailers') > -1 || mctrl.allowedModules.indexOf('trailers/index') > -1 ">
+                <a ui-sref="trailers">{{ languageCommonVariables.trailer }}
+                  <span class="icon-thumbnail">tl</span>
+                </a>
+              </li> 
+          </ul>
+      </li>
 
-        </li>
-        <li>
-            <a class="test" href="#/shipper"><span class="title">{{ languageCommonVariables.shipper }}</span>
-                <span class="icon-thumbnail"><i class="fa fa-stack-exchange" aria-hidden="true"></i></span>
-            </a>
 
-        </li>
+      <li ng-if="mctrl.allowedModules.indexOf('brokers') > -1 || mctrl.allowedModules.indexOf('shippers') > -1 || mctrl.allowedModules.indexOf('shippers/index') > -1  || mctrl.allowedModules.indexOf('brokers/index') > -1">
+          <a class="test" href="javascript:void(0)">
+              <span class="title">Customers</span>
+              <span class=" arrow"></span>
+              <span class="icon-thumbnail"><i class="fa fa-stack-exchange"></i></span>
+          </a>
+          <ul class="sub-menu">
+              <li ng-if="mctrl.allowedModules.indexOf('brokers') > -1 || mctrl.allowedModules.indexOf('brokers/index') > -1 ">
+                   <a ui-sref="broker">{{ languageCommonVariables.broker }}
+                      <span class="icon-thumbnail">br</span>
+                  </a>
+              </li>
+              <li ng-if="mctrl.allowedModules.indexOf('shippers') > -1 || mctrl.allowedModules.indexOf('shippers/index') > -1 ">
+                  <a ui-sref="shipper">{{ languageCommonVariables.shipper }}
+                      <span class="icon-thumbnail">sh</span>
+                  </a>
+              </li>
+          </ul>
+      </li>
 
-        <li ng-if="loggedUserRoleId == 3 || loggedUserRoleId == 1 || loggedUserRoleId == 5"> 
-            <a class="test" href="#/billingDashboard"><span class="title">Billing</span>
-                <span class="icon-thumbnail"><i class="icon-pg fa fa-usd" aria-hidden="true"></i></span>
-            </a>
-
-           <!--a class="test" href="javascript:void(0);"><span class="title">{{ languageCommonVariables.billing }}</span>
-            <span class=" arrow" ng-class="{'open active':(state=='billing' || state=='sendForPayment') }"></span>
-            <span class="icon-thumbnail"><i class="icon-pg fa fa-usd"></i></span> 
-        </a-->
-
-        <!--ul class="sub-menu">
-            <li class="">
-              <a href="#/billingDashboard">Billing Dashboard
-                  <span class="icon-thumbnail">bd</span></a>
-            </li>
-            <li class="">
-              <a href="#/billing">{{ languageCommonVariables.billingHeading }}
-                  <span class="icon-thumbnail">bl</span></a>
-            </li>
-            <li class="">
-                  <a href="#/sendForPayment">{{ languageCommonVariables.sendForPayment}}
-                      <span class="icon-thumbnail">sp</span></a>
-            </li>
-            <li class="">
-                  <a href="#/sendDirectPayment">Send Direct Payment
-                      <span class="icon-thumbnail">dp</span></a>
-            </li>
-        </ul-->
-    </li>
-    <li ng-if="loggedUserRoleId != 6 && loggedUserRoleId != 4">
+      <li ng-if="mctrl.allowedModules.indexOf('billings') > -1 || mctrl.allowedModules.indexOf('billings/billingstats') > -1 "> 
+        <a class="test" href="#/billingDashboard">
+            <span class="title">Billing</span>
+            <span class="icon-thumbnail"><i class="icon-pg fa fa-usd" aria-hidden="true"></i></span>
+        </a>
+      </li>
+    <li  ng-if="mctrl.allowedModules.indexOf('reports') > -1 || mctrl.allowedModules.indexOf('reports/index') > -1 ">
         <a class="test" href="#/reports">
             <span class="title">{{ languageCommonVariables.reports }}</span>
             <span class="icon-thumbnail"><i class="fa fa-bar-chart-o" aria-hidden="true"></i></span>
         </a>
     </li>
 
-    <li ng-if="loggedUserRoleId == 8">
-        <a class="test" ui-sref="organizations">
-          <span class="title">Organization</span>
-          <span class="icon-thumbnail"><i class="icon-pg trucks vehicles"></i></span>
-        </a>
-    </li>
-
-    <li ng-class="(state=='users' || state=='addUser') ? 'open active' : ''">
+    <li ng-if="mctrl.allowedModules.indexOf('users') > -1 || mctrl.allowedModules.indexOf('roles') > -1 || mctrl.allowedModules.indexOf('users/index') > -1  || mctrl.allowedModules.indexOf('roles/index') > -1">
         <a class="test" href="javascript:void(0)">
-          <span class="title">Users</span>
-          <span class=" arrow" ng-class="{'open active':(state=='users' || state=='addUser' || state=='editUser') }"></span>
-          <span class="icon-thumbnail"><i class="fa fa-users"></i></span></a>
-          <ul class="sub-menu">
-            <li>
-                <a  href="#/users">Users List
-                    <span class="icon-thumbnail"> 
-                         <i class="fa fa-user-plus"></i>
-                    </span>
+            <span class="title">Manage</span>
+            <span class=" arrow" ng-class="{'open active':(state=='users' || state=='addUser' || state=='editUser') }"></span>
+            <span class="icon-thumbnail"><i class="fa fa-cog"></i></span>
+        </a>
+        <ul class="sub-menu">
+            <li ng-if="loggedUserRoleId == 8">
+                <a ui-sref="organizations">Organization
+                    <span class="icon-thumbnail"><i class="fa fa-sitemap"></i></span>
                 </a>
             </li>
-             <li>
+            <li ng-if="mctrl.allowedModules.indexOf('roles') > -1 || mctrl.allowedModules.indexOf('roles/index') > -1 ">
                  <a ui-sref="roles">Roles
-                    <span class="icon-thumbnail">tl</span>
+                    <span class="icon-thumbnail"><i class="fa fa-users"></i></span>
+                </a>
+            </li>
+            <li ng-if="mctrl.allowedModules.indexOf('users') > -1 || mctrl.allowedModules.indexOf('users/index') > -1 ">
+                <a ui-sref="users">Users
+                    <span class="icon-thumbnail"><i class="fa fa-user-plus"></i></span>
                 </a>
             </li>
         </ul>

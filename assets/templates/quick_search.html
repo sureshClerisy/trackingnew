@@ -14,24 +14,65 @@
           <!-- END Overlay Close !-->
         </div>
         <!-- END Overlay Header !-->
-        <div class="container-fluid">
+        <div class="container-fluid iso-class">
 			<!-- BEGIN Overlay Controls !-->
-			<input data-search="searchField" id="overlay-search" class="no-border overlay-search bg-transparent" placeholder="Search..." autocomplete="off" spellcheck="false" ng-model="search.query" ng-change="liveSearch()" ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }">
-			<br>
-			<div class="inline-block">
-				<div class="right">
-					<!-- <input id="checkboxn" type="checkbox" value="1" checked="checked"> -->
-					<label ><i class="fa fa-search"></i>{{ languageCommonVariables.qsearchWithinWebsite}}</label>
+			<input data-search="searchField" id="overlay-search" class="no-border overlay-search bg-transparent" placeholder="Search..." autocomplete="off" spellcheck="false" ng-model="search.query" ng-change="eSearch(search.query)" ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }">
+			<div class="iso-blkserch">
+				<div class="inline-block blk-s-1 m-r-20 m-t-5 m-b-5">
+					<div class="right">
+						<!-- <input id="checkboxn" type="checkbox" value="1" checked="checked"> -->
+						<label class="m-b-0" ><i class="fa fa-search m-r-10"></i>{{ languageCommonVariables.qsearchWithinWebsite}}</label>
+					</div>
 				</div>
-			</div>
-			<!--div class="inline-block m-l-10">
-				<p class="fs-13"><i class="fa fa-level-down"></i>{{ languageCommonVariables.qsearchpressenter }}</p>
-			</div-->
-			<div class="inline-block m-l-10">
-				<p class="fs-13"><i class="fa fa-cog"></i> <a ng-click="openNewSearchPopUp()" >{{toggleSearchTitle}}</a></p>
+				<!--div class="inline-block m-l-10">
+					<p class="fs-13"><i class="fa fa-level-down"></i>{{ languageCommonVariables.qsearchpressenter }}</p>
+				</div-->
+				<div class="inline-block m-l-0 blk-s-2 m-t-5 m-b-5">
+					<p class="fs-13 no-margin"><i class="fa fa-cog m-r-10"></i> <a ng-click="openNewSearchPopUp()" >{{toggleSearchTitle}}</a></p>
+				</div>
 			</div>
 			<!-- END Overlay Controls !-->
         </div>
+        <!-- testing -->
+        	<div class="container-fluid">
+
+			    <div class="row" ng-show="!shownewSearch">
+			      	<div class="col-md-12 no-padding m-t-0 m-b-20">
+			            <div class="btn-group btns-main-block-ser" opt-kind ok-key="filter" >
+			              <button type='button' class='btn btn-default no-border active' ok-sel="*">Show All</button>
+			              <button type='button' class='btn btn-default no-border' ok-sel=".jobs, .job_extra_stops">Jobs</button>
+			              <button type='button' class='btn btn-default no-border' ok-sel=".drivers">Drivers</button>
+			              <button type='button' class='btn btn-default no-border' ok-sel=".vehicles">Vehicles</button>
+			              <button type='button' class='btn btn-default no-border' ok-sel=".brokers">Broker</button>
+			              <button type='button' class='btn btn-default no-border' ok-sel=".shippers">Shipper</button>
+			              <button type='button' class='btn btn-default no-border' ok-sel=".payments_triumph">Sent To Triumph</button>
+			            </div>
+				    </div>
+				</div>
+  
+		        <!-- ISOTOPECONTAINER -->
+		        <div class="row iso-cont outerisotop" ng-show="!shownewSearch" >
+		        	<ul id="isotopeContainer"  isotope-container ng-cloak class="ng-cloak" >
+				        <li class="found-item kindling {{row._index}}" isotope-item  ng-repeat="row in output"   > 
+				        	<div class="thumbnail-wrapper d48 circular bg-{{row._index}} text-white inline m-t-10">
+			                    <div>{{row._index.charAt(0) | uppercase}}</div>
+			                </div>
+		                	<a ng-show="row._index == 'jobs' || row._index == 'job_extra_stops'" ng-click="clickMatchLoadDetail(0, row._source.load_id, '', '', '', '', 0, '')">   #{{row._source.load_id}}  </a>
+							<a ng-show="row._index == 'drivers'" ui-sref="editDrivers({id:row._source.driver_id })"> {{row._source.first_name}} {{row._source.last_name}} </a>
+							<a ng-show="row._index == 'vehicles'" ui-sref="editTruck({id:row._source.vehicle_id })"> {{row._source.vehicle_name}}     </a>
+							<a ng-show="row._index == 'trailers'" ui-sref="editTrailer({id:row._source.trailer_id })">{{row._source.unit_id}}     </a>
+							<a ng-show="row._index == 'brokers' " ui-sref="editbroker({id:row._source.broker_id })"> {{row._source.truckcompanyname}}  </a>
+							<a ng-show="row._index == 'shippers'" ui-sref="editshipper({id:row._source.shipper_id})"> {{row._source.shippercompanyname}}  </a>
+							<a ng-show="row._index == 'payments_triumph'" ui-sref="billings({key:'all',q:'filterType=cash_flow_actual&requestFrom=billings&token='+row._source.sent_payment_id})"> {{row._source.confirmationcode}}  </a>
+							<p class="hint-text" ng-repeat="(key, t) in row.highlight" dynamic="t" ng-if="$index < 1" ></p>
+							<p class="hint-text" ng-show="!row.highlight">&nbsp;</p>
+
+		                </li>
+		            </ul>
+		        </div>
+      		</div>
+        <!-- testing -->
+     
         
         <!-- BEGIN Overlay Search Results, This part is for demo purpose, you can add anything you like !-->
         <div class="container-fluid">
@@ -47,7 +88,7 @@
 						<!-- BEGIN Search Result Item !-->
 						<div class="">
 							<!-- BEGIN Search Result Item Thumbnail !-->
-							<div class="thumbnail-wrapper d48 circular bg-success text-white inline m-t-10">
+							<div class="thumbnail-wrapper d48 circular bg-success text-white inline">
 								<div class="search-custom-thumb">
 									<span class="icon-thumbnail">{{ result.thumbnail }}</span>
 								</div>
@@ -60,9 +101,7 @@
 						</div>
 						<!-- END Search Result Item !-->
 					</div>
-					
-					
-					<!------------------------____New Search Tab--------------------->
+					<!-- ____New Search Tab  -->
 
 					<!--div class="modal form-cls fade slide-up" ng-show="shownewSearch == true" id="globalSearchId" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"-->
 					<div ng-show="shownewSearch == true">
@@ -71,11 +110,6 @@
 							<div class="modal-content-wrapper">
 								<div class="modal-content-load">
 								 <form method="POST" name="newSearch" role="form" ng-submit="fetchSearchResults()">
-									<!-- <div class="modal-header model-heading-main">
-										<div class="model-heading-inner">
-											<h4 class="modal-title" id="myModalLabel">ADD A SEARCH</h4>
-										</div>
-									</div> -->
 									<div class="modal-body main-pop-body ">
 										<div class="popup-body-bg inner-high">
 											<div class="form-group-attached">

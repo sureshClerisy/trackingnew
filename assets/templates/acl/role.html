@@ -11,8 +11,8 @@
   						<button ng-click = "hidedeletemessage()" class="close"></button>
   						{{roles.message}}
   					</div>
-					<div class="commen-heading brokers-page">
-						<h2 class="oprate-dashbord"> {{ languageCommonVariables.roleHeader }}</h2>
+					<div class="commen-heading no-padding">          
+						  <h2 class="oprate-dashbord"><i class="fa fa-users"></i> {{ languageCommonVariables.roleHeader }}</h2>
 					</div>
 				</div>
 			</div>
@@ -24,39 +24,39 @@
 								<a href="#/addrole" class="add-new-data-button">
 									<button class="btn btn-primary">
 										<i class="fa fa-plus" style="margin-right:3px"></i>
-										<span class="bold">Add Role</span>
+										<span class="bold">{{ languageArray.addrole }}</span>
 									</button>
 								</a>
 
                               <table datatable="ng" dt-options="dtOptions" class="table tr-hover table-hover table-striped driver-table" id="tableWithExportOptions">
                                  <thead>
                                     <tr>
-                                       <th>Role</th>
-                                       <th>RoleAlias</th>
-                                       <th>Created BY</th>
+                                       <th>{{ languageArray.role }}</th>
+                                       <th>{{ languageArray.rolealias }}</th>
+                                       <th>{{ languageArray.createdby }}</th>
                                        <th class="text-center">{{ languageCommonVariables.commonTableThAction }}</th>
                                    </tr>
                                </thead>
                                <tbody>
-                                <tr ng-repeat="value in roles.aclData">
+                                <tr ng-repeat="value in roles.aclData" ng-click="mctrl.moveEntitiesToEditState(value.id,'editrole')" class="tr-pointer">
                                    <td>{{value.name}}</td>
                                    <td>{{value.alias}}</td>
                                    <td>{{value.username}}{{supeadmin}}</td>
-                                   <td class="text-center action-btn-ryt"> 
+                                   <td class="text-center action-btn-ryt" ng-click="$event.stopPropagation()"> 
                                       <div class="export-options-container">
                                          <div class="exportOptions">
                                             <div class="DTTT btn-group" >
-                                               <a href="#/editrole/{{value.id}}" ng-disabled="currentuserid != value.user_id && superadmin != 1" class="btn btn-default DTTT_button_pdf" data-original-title="{{languageCommonVariables.editRole}}" ui-jq="tooltip" >
+                                               <!--a href="#/editrole/{{value.id}}" ng-disabled="currentuserid != value.user_id && superadmin != 1" class="btn btn-default DTTT_button_pdf" data-original-title="{{languageCommonVariables.editRole}}" ui-jq="tooltip" >
                                                   <span>
                                                     <i class="fa fa-edit" aria-hidden="true"></i>
                                                 </span>
-                                            </a>
+                                            </a-->
                                             <!-- a class="btn btn-default" ng-disabled="currentuserid != value.user_id && superadmin != 1" title="{{languageCommonVariables.deleteRole}}" ui-jq="tooltip" ng-click='removeRole(value.id,$index)' >
                                               <span>
                                                 <i class="fa fa-trash" aria-hidden="true"></i>
                                             </span>
                                           </a -->
-                                        <a href="#/manage/{{value.id}}" ng-disabled="currentuserid != value.user_id && superadmin != 1" class="btn btn-default DTTT_button_csv" title="Manage Permissions" ui-jq="tooltip">
+                                        <a href="#/manageRoles/{{value.id}}" ng-disabled="currentuserid != value.user_id && superadmin != 1" class="btn btn-default DTTT_button_csv" title="{{ languageArray.managepermission }}" ui-jq="tooltip">
                                           <span><i class="fa fa-cog"></i></span>
                                       </a>
                                   </div>
@@ -111,5 +111,3 @@
     <!--    table-full-width  -->
 </div>
 
-
-<ng-include src="'./assets/templates/common_modals.html'"></ng-include>

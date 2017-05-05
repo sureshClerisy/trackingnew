@@ -76,13 +76,13 @@ class Loads extends Admin_Controller{
 				case 'all': 
 							$gVehicleId = false;
 							$this->data['table_title'] = "All Groups";
-							$jobs = $this->getSingleVehicleLoads($this->userId,array(),"all",false,false,false,$startDate,$endDate,$filterArgs); 
-							$this->data["total"] = $this->Job->fetchSavedJobsTotal($this->userId,array(),"all",false,false,false,$startDate,$endDate,$filterArgs); 
+							$jobs = $this->getSingleVehicleLoads(array(),"all",false,false,false,$startDate,$endDate,$filterArgs); 
+							$this->data["total"] = $this->Job->fetchSavedJobsTotal(array(),"all",false,false,false,$startDate,$endDate,$filterArgs); 
 							$this->data['vehicleIdRepeat'] = '';
 				break;
 				case 'dispatcher': 
-							$jobs = $this->getSingleVehicleLoads($this->userId,array(),"dispatcher", $_REQUEST["userToken"],false,false,$startDate,$endDate,$filterArgs); //Fetch Loads by vehicle id(s)
-							$this->data["total"] = $this->Job->fetchSavedJobsTotal($this->userId,array(),"dispatcher",$_REQUEST["userToken"],false,false,$startDate,$endDate,$filterArgs); 
+							$jobs = $this->getSingleVehicleLoads(array(),"dispatcher", $_REQUEST["userToken"],false,false,$startDate,$endDate,$filterArgs); //Fetch Loads by vehicle id(s)
+							$this->data["total"] = $this->Job->fetchSavedJobsTotal(array(),"dispatcher",$_REQUEST["userToken"],false,false,$startDate,$endDate,$filterArgs); 
 							$this->data['table_title'] =  "Dispatcher : ".$urlArgs;
 							$this->data['vehicleIdRepeat'] = '';
 
@@ -109,12 +109,12 @@ class Loads extends Admin_Controller{
 							$this->data['vehicleIdRepeat'] = $vehicleIdRepeat;
 
 							if($_REQUEST["userType"] == "team") {
-								$jobs = $this->getSingleVehicleLoads($tempUserId, $vehicleIdRepeat,"team", $dispatcherId, $_REQUEST["userToken"], $secondDriverId, $startDate,$endDate, $filterArgs);	
-								$this->data["total"] = $this->Job->fetchSavedJobsTotal($tempUserId,$vehicleIdRepeat,"team",$dispatcherId,$_REQUEST["userToken"], $secondDriverId,$startDate,$endDate, $filterArgs); 
+								$jobs = $this->getSingleVehicleLoads($vehicleIdRepeat,"team", $dispatcherId, $_REQUEST["userToken"], $secondDriverId, $startDate,$endDate, $filterArgs);	
+								$this->data["total"] = $this->Job->fetchSavedJobsTotal($vehicleIdRepeat,"team",$dispatcherId,$_REQUEST["userToken"], $secondDriverId,$startDate,$endDate, $filterArgs); 
 
 							} else{
-								$jobs = $this->getSingleVehicleLoads($tempUserId, $vehicleIdRepeat, "driver", $dispatcherId, $_REQUEST["userToken"], $secondDriverId,$startDate,$endDate,$filterArgs);	
-								$this->data["total"] = $this->Job->fetchSavedJobsTotal($this->userId,$vehicleIdRepeat,"driver",$dispatcherId,$_REQUEST["userToken"],$secondDriverId, $startDate,$endDate, $filterArgs); 
+								$jobs = $this->getSingleVehicleLoads($vehicleIdRepeat, "driver", $dispatcherId, $_REQUEST["userToken"], $secondDriverId,$startDate,$endDate,$filterArgs);	
+								$this->data["total"] = $this->Job->fetchSavedJobsTotal($vehicleIdRepeat,"driver",$dispatcherId,$_REQUEST["userToken"],$secondDriverId, $startDate,$endDate, $filterArgs); 
 							}
 				break;
 				case 'broker':
@@ -233,14 +233,14 @@ class Loads extends Admin_Controller{
 			switch ($params['filterArgs']['userType']) {
 				case ''	  : 
 				case 'all': 
-							$jobs = $this->getSingleVehicleLoads($this->userId,array(),"all",false,false,false,$params["startDate"],$params["endDate"],$params); 
-							$total = $this->Job->fetchSavedJobsTotal($this->userId,array(),"all",false,false,false,$params["startDate"],$params["endDate"],$params); 
+							$jobs = $this->getSingleVehicleLoads(array(),"all",false,false,false,$params["startDate"],$params["endDate"],$params); 
+							$total = $this->Job->fetchSavedJobsTotal(array(),"all",false,false,false,$params["startDate"],$params["endDate"],$params); 
 				break;
 
 				case 'dispatcher':
 							$dispId = isset($params["filterArgs"]['userToken']) ? $params["filterArgs"]['userToken'] : false;
-							$jobs = $this->getSingleVehicleLoads($this->userId,array(),"dispatcher", $dispId,false,false,$params["startDate"],$params["endDate"],$params);
-							$total = $this->Job->fetchSavedJobsTotal($this->userId,array(),"dispatcher",$dispId,false,false,$params["startDate"],$params["endDate"],$params); 
+							$jobs = $this->getSingleVehicleLoads(array(),"dispatcher", $dispId,false,false,$params["startDate"],$params["endDate"],$params);
+							$total = $this->Job->fetchSavedJobsTotal(array(),"dispatcher",$dispId,false,false,$params["startDate"],$params["endDate"],$params); 
 				break;
 
 				case 'team': 
@@ -258,11 +258,11 @@ class Loads extends Admin_Controller{
 						$results 			= $this->Vehicle->getLastLoadRecord($statesAddress[0]['id'], $statesAddress[0]['driver_id']);
 
 						if($params["filterArgs"]["userType"] == "team") {
-							$jobs = $this->getSingleVehicleLoads($this->userId, $vehicleIdRepeat,"team", $dispatcherId, $driverId, $secondDriverId, $params["startDate"],$params["endDate"],$params);	
-							$total = $this->Job->fetchSavedJobsTotal($this->userId, $vehicleIdRepeat,"team", $dispatcherId, $driverId, $secondDriverId, $params["startDate"],$params["endDate"],$params);	
+							$jobs = $this->getSingleVehicleLoads($vehicleIdRepeat,"team", $dispatcherId, $driverId, $secondDriverId, $params["startDate"],$params["endDate"],$params);	
+							$total = $this->Job->fetchSavedJobsTotal($vehicleIdRepeat,"team", $dispatcherId, $driverId, $secondDriverId, $params["startDate"],$params["endDate"],$params);	
 						} else {
-							$jobs = $this->getSingleVehicleLoads($this->userId, $vehicleIdRepeat, "driver", $dispatcherId, $driverId, $secondDriverId, $params["startDate"],$params["endDate"],$params);	
-							$total = $this->Job->fetchSavedJobsTotal($this->userId, $vehicleIdRepeat,"driver", $dispatcherId, $driverId, $secondDriverId, $params["startDate"],$params["endDate"],$params);	
+							$jobs = $this->getSingleVehicleLoads($vehicleIdRepeat, "driver", $dispatcherId, $driverId, $secondDriverId, $params["startDate"],$params["endDate"],$params);	
+							$total = $this->Job->fetchSavedJobsTotal($vehicleIdRepeat,"driver", $dispatcherId, $driverId, $secondDriverId, $params["startDate"],$params["endDate"],$params);	
 						}
 				break;
 
@@ -318,28 +318,30 @@ class Loads extends Admin_Controller{
 	* @return JSON
 	* Getting list of drivers with requested params
 	*/
-	public function driversInsights($urlArgs = '') 
-	{
+	public function driversInsights($urlArgs = '') {
+
 		$filters = $_REQUEST;
-		$filters["itemsPerPage"] =20; 
-		$filters["limitStart"] =1; 
-		$filters["sortColumn"] ="DeliveryDate"; 
-		$filters["sortType"] ="DESC"; 
-		$filters["status"] =""; 
-		$filters["requestFrom"] = 'capacity_analysis';
+		$filters["itemsPerPage"] 	= 20; 
+		$filters["limitStart"] 		= 1; 
+		$filters["sortColumn"] 		= "DeliveryDate"; 
+		$filters["sortType"] 		= "DESC"; 
+		$filters["status"] 			= ""; 
+		$filters["requestFrom"] 	= 'capacity_analysis';
 
 		if(isset($filters["filterType"]) && $filters["filterType"] == "trucksWithoutDriver"){
-			$response["driversList"] = $this->Driver->fetchTrucksWithoutDriver($filters);
-			$response["total"] = $this->Driver->fetchTrucksWithoutDriver($filters,true);
+			$response["driversList"] 	= $this->Driver->fetchTrucksWithoutDriver($filters);
+			$response["total"] 			= $this->Driver->fetchTrucksWithoutDriver($filters,true);
+
 		}else if(isset($filters["filterType"]) && $filters["filterType"] == "withoutTruck"){
-			$response["driversList"] = $this->Driver->fetchDriversWithoutTruck($filters);
-			$response["total"] = $this->Driver->fetchDriversWithoutTruck($filters,true);
+			$response["driversList"] 	= $this->Driver->fetchDriversWithoutTruck($filters);
+			$response["total"] 			= $this->Driver->fetchDriversWithoutTruck($filters,true);
 
 		}else if(isset($filters["filterType"]) && $filters["filterType"] == "trucksReporting"){
-			$response["driversList"] = $this->Driver->trucksReporting($filters);
-			$response["total"] = $this->Driver->trucksReporting($filters,true);
+			$response["driversList"] 	= $this->Driver->trucksReporting($filters);
+			$response["total"] 			= $this->Driver->trucksReporting($filters,true);
+			
 		}else{
-			$response["driversList"] = $this->Job->getIdleDrivers($filters,$filters["userType"],'',$filters["fromDate"]);	
+			$response["driversList"] 	= $this->Job->getIdleDrivers($filters,$filters["userType"],'',$filters["fromDate"]);	
 		}
 		
 		$response['filterArgs'] = $filters;
@@ -347,7 +349,7 @@ class Loads extends Admin_Controller{
 		echo json_encode($response);
 	}
 
-	public function getDriversInsightsRecords(){
+	public function skipAcl_getDriversInsightsRecords(){
 		$params = json_decode(file_get_contents('php://input'),true);
 
 		$total = 0;
@@ -464,12 +466,12 @@ class Loads extends Admin_Controller{
 	* @return JSON
 	* Getting list of trucks with requested params
 	*/
-	public function getTruckInsightsRecords()
+	public function skipAcl_getTruckInsightsRecords()
 	{
 		$params = json_decode(file_get_contents('php://input'),true);
 		
-		$total = 0;
-		$jobs = array();
+		$total 	= 0;
+		$jobs 	= array();
 
 		if($params["pageNo"] < 1){
 			$params["limitStart"] = ($params["pageNo"] * $params["itemsPerPage"] + 1);	

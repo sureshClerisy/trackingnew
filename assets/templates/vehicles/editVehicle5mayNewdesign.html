@@ -1,0 +1,395 @@
+	<div class="popup-container-wid1" data-jquery-scrollbar="jqueryScrollbarOptions">
+		<div class="container-fluid padding-25 sm-padding-10"> 
+			<div ng-show="showErrorMessage == true" class="alert alert-danger" role="alert">
+				<button ng-click = "hideloadmessage()" class="close"></button>
+				{{errorMessage}}
+			</div>
+			<div class="row">
+				<div class="col-md-12 col-xlg-12">
+					<div class="commen-heading truck-page">
+						<h2 class="oprate-dashbord">Truck {{ truckData.label }}</h2>
+					</div>
+				</div>
+			</div>
+
+			<div class="row new-block-padding">
+				<div class="col-lg-12 col-md-12">
+					<div class="panel panel-transparent">
+						<div class="panel-body">
+							<form id="form-project" name="editTruck" role="form" autocomplete="off" ng-submit="editTruck.$valid && saveTruck()" enctype="multipart/formdata" novalidate>
+								<div class="pop-gry-blk">
+									<div class="summer-blk-heading">
+										{{ languageCommonVariables.commonSummaryHeading }}
+										<i class="fa fa-minus plus-pop-main" ></i>
+									</div>
+
+									<!--row-->
+									<div class="row clearfix">
+										<div class="col-sm-6">
+											<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':editTruck.label.$invalid && !editTruck.label.$pristine || editTruck.$submitted && editTruck.label.$invalid,'has-success' : editTruck.label.$valid }">
+												<label>{{ languageArray.truckNumbetTableTh }}</label>
+												<input type="number" name="label" class="form-control" ng-model="truckData.label" ng-change="checkVehicleLabelExist(truckData.label, truckData.id)" ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }" required>
+											</div>
+											<label class="error" ng-show="editTruck.label.$invalid && !editTruck.label.$pristine || editTruck.$submitted && editTruck.label.$invalid">Please enter truck number.</label>
+										</div>
+										<div class="col-sm-6">
+											<div pg-form-group class="form-group form-group-default" >
+												<label>{{ languageArray.truckNumbetTableThtracker }}</label>
+												<input type="text" class="form-control" name="tracker" ng-model="truckData.tracker_id"  >
+											</div>
+										</div>
+									</div>
+									<!--row-end-->
+									<!--row-->
+									<div class="radio radio-success">
+										<input type="radio"  checked="checked" ng-change="changeDriverType('single')" ng-model="truckData.driverType" value="single" name="driverType" id="single">
+										<label for="single">Single</label>
+										<input type="radio" value="team" ng-change="changeDriverType('team')" ng-model="truckData.driverType" name="driverType" id="team" >
+										<label for="team">Team</label>
+									</div>
+									<div class="row clearfix">
+										<div class="col-sm-6">
+											<div class="form-group form-group-default th-select" ng-if="truckData.driverType == 'single'" >
+												<label>{{ languageArray.truckNumbetTableThdname }}</label>
+												<ui-select ng-model="truckData.driver_id" theme="bootstrap" on-select="onSelectDriverNameCallback($item, $model)">
+													<ui-select-match class="ui-select-match" placeholder="{{ languageArray.selectDriverName }}">{{truckData.driverName}}</ui-select-match>
+													<ui-select-choices class="ui-select-choices" group-by="groupFind" repeat="item in driversList | filter: $select.search | orderBy: groupFind">
+														<div ng-bind-html="trustAsHtml((item.driverName | highlight: $select.search))"></div>
+													</ui-select-choices>
+												</ui-select>
+											</div>
+											<div class="form-group form-group-default th-select required" ng-if="truckData.driverType == 'team'">
+												<div class="row required" ng-class="{'has-error':editTruck.team_driver_one.$invalid && !editTruck.team_driver_one.$pristine || editTruck.$submitted && editTruck.team_driver_one.$invalid,'has-success' : editTruck.team_driver_one.$valid }">
+													<label>{{ languageArray.truckNumbetTableThdname }}</label>
+													<div class="col-sm-6">
+														<ui-select name="team_driver_one" ng-model="truckData.team_driver_one" theme="bootstrap" on-select="onSelectTeamDriverCallback($item, $model,'team_driver1')" required>
+															<ui-select-match class="ui-select-match" placeholder="{{ languageArray.selectDriverName }}">{{truckData.teamDriverOne}}</ui-select-match>
+															<ui-select-choices class="ui-select-choices" group-by="groupFind" repeat="item in driversListTeam | filter: $select.search | orderBy: groupFind" ui-disable-choice="item.driverName == truckData.teamDriverTwo">
+																<div ng-bind-html="trustAsHtml((item.driverName | highlight: $select.search))"></div>
+															</ui-select-choices>
+														</ui-select>
+													</div>
+													<div class="col-sm-6">
+														<ui-select name="team_driver_two" ng-model="truckData.team_driver_two" theme="bootstrap" on-select="onSelectTeamDriverCallback($item, $model,'team_driver2')" required>
+															<ui-select-match class="ui-select-match" placeholder="{{ languageArray.selectDriverName }}">{{truckData.teamDriverTwo}}</ui-select-match>
+															<ui-select-choices class="ui-select-choices" group-by="groupFind" repeat="item in driversListTeam | filter: $select.search | orderBy: groupFind" ui-disable-choice="item.driverName == truckData.teamDriverOne || ( item.username != teamDispatcher  )">
+																<div ng-bind-html="trustAsHtml((item.driverName | highlight: $select.search))"></div>
+															</ui-select-choices>
+														</ui-select>
+													</div>
+												</div>
+											</div>
+											<label class="error" ng-show="((editTruck.team_driver_one.$invalid && !editTruck.team_driver_one.$pristine || editTruck.$submitted && editTruck.team_driver_one.$invalid) || (editTruck.team_driver_two.$invalid && !editTruck.team_driver_two.$pristine || editTruck.$submitted && editTruck.team_driver_two.$invalid)) && editTruck.driverType == 'team'">Please select driver Team.</label>
+										</div>
+										<div class="col-sm-6">
+											<div class="form-group form-group-default th-select posted-select align-trailer required" ng-class="{'has-error':editTruck.vehicle_type.$invalid && !editTruck.vehicle_type.$pristine || editTruck.$submitted && editTruck.vehicle_type.$invalid,'has-success' : editTruck.vehicle_type.$valid }">
+												<label>{{ languageArray.truckNumbetTableThvhtype }}</label>
+												<ui-select multiple ng-model="truckData.vehicle_type" name="vehicle_type" class="multiSelect" theme="select2" required>
+													<ui-select-match class="ui-select-match" placeholder="{{languageArray.selectVehicleType}}">{{$item.abbrevation}}</ui-select-match>
+													<ui-select-choices class="ui-select-choices" repeat="trailers in trailerTypes | filter: $select.search">
+														{{trailers.name}}
+													</ui-select-choices>
+												</ui-select>
+											</div>
+											<label class="error" ng-show="editTruck.vehicle_type.$invalid && !editTruck.vehicle_type.$pristine || editTruck.$submitted && editTruck.vehicle_type.$invalid">Please select vehicle type.</label>
+										</div>
+									</div>
+									<!--row-end-->
+
+									<!--row-->
+									<div class="row clearfix">
+										<div class="col-sm-6">
+											<div pg-form-group class="form-group form-group-default">
+												<label>{{ languageArray.truckNumbetTableThmodel }}</label>
+												<input type="text" class="form-control" name="model" ng-model="truckData.model">
+											</div>
+										</div>
+										<div class="col-sm-6">
+											<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':editTruck.vin.$invalid && !editTruck.vin.$pristine || editTruck.$submitted && editTruck.vin.$invalid, 'has-error-new': uniqueFieldsValue == false}">
+												<label>{{ languageArray.truckNumbetTableThvin }}</label>
+												<input type="text" class="form-control" name="vin" ng-model="truckData.vin" required ng-blur="checkUniqueFields(truckData.vin,'vin','vehicles',truckData.id)">
+											</div>
+											<label class="error" ng-show="editTruck.vin.$invalid && !editTruck.vin.$pristine || editTruck.$submitted && editTruck.vin.$invalid">Please enter vehicle vin number.</label>
+											<label class="error" ng-if="uniqueFieldsValue == false">This vin number is already alloted to another truck.</label>
+										</div>
+									</div>
+									<!--row-end-->
+									<!--row-->
+									<div class="row clearfix">
+										<div class="col-sm-6">
+											<div pg-form-group class="form-group form-group-default">
+												<label>{{ languageArray.truckNumbetTableThchnum }}</label>
+												<input type="text" class="form-control" name="chassis_number" ng-model="truckData.chassis_number">
+											</div>
+										</div>
+										<div class="col-sm-6">
+											<div pg-form-group class="form-group form-group-default">
+												<label>{{ languageArray.truckNumbetTableThpspeed }}</label>
+												<input type="text" class="form-control" name="permittedspeed" ng-model="truckData.permitted_speed">
+											</div>
+										</div>
+									</div>
+									<!--row-end-->
+									<!--row-->
+									<div class="row clearfix">
+										<div class="col-sm-6">
+											<div pg-form-group class="form-group form-group-default">
+												<label>{{ languageArray.truckNumbetTableThvehregplate }}</label>
+												<input type="text" class="form-control" name="vehicleregistrationplate" ng-model="truckData.registration_plate">
+											</div>
+										</div>
+										<div class="col-sm-6">
+											<div pg-form-group class="form-group form-group-default">
+												<label>{{ languageArray.truckNumbetTableThvehadd }}</label>
+												<input type="text" class="form-control" name="vehicleaddress" ng-model="truckData.vehicle_address" >
+											</div>
+										</div>
+									</div>
+									<!--row-end-->
+									<!--row-->
+									<div class="row clearfix">
+										<div class="col-sm-6">
+											<div class="form-group form-group-default th-select">
+												<label>{{ languageArray.truckNumbetTableThclocstate }}</label>
+												<ui-select name="vehiclestate" ng-model="truckData.state" theme="bootstrap" on-select="onSelectStateCallback($item, $model)" >
+													<ui-select-match class="ui-select-match" placeholder="{{ languageArray.selectCurrentLocation }}">{{truckData.state}}</ui-select-match>
+													<ui-select-choices class="ui-select-choices" repeat="item in states_data | filter: $select.search">
+														<div ng-bind-html="trustAsHtml((item.label | highlight: $select.search))"></div>
+													</ui-select-choices>
+												</ui-select>
+											</div>
+										</div>
+										<div class="col-sm-6">
+											<div pg-form-group class="form-group form-group-default">
+												<label>{{ languageArray.truckNumbetTableThcloccity }}</label>
+												<input type="text" class="form-control" name="city" ng-model="truckData.city" >
+											</div>
+										</div>
+									</div>
+									<!--row-end-->
+									<!--row-->
+									<div class="row clearfix">
+										<div class="col-sm-6">
+											<div pg-form-group class="form-group form-group-default">
+												<div class="col-sm-8">
+													<label>{{ languageArray.truckNumbetTableThuploadvehimg }}</label>
+													<div class="input-file-browse">
+														<input type = "file" file-model = "myFile"/>
+													</div>
+												</div>
+												<div class="col-sm-4 img-cont image-size" >
+													<img class="center-me" fallback-src="pages/img/truck-dummy.jpeg" ng-src="./assets/uploads/vehicles/thumbnail/{{truckData.vehicle_image}}" ng-show = "showimage == true" height="40px">
+												</div>
+											</div>
+										</div>
+										<div class="col-sm-6"></div>
+									</div>
+									<!--row-end-->
+									<!--TRUCK-BLOCK-->
+								</div>
+
+								<div class="pop-gry-blk">
+									<div class="summer-blk-heading">
+										{{ languageCommonVariables.commonSummaryHeading }} - Dimensions
+										<i class="fa fa-minus plus-pop-main" ></i>
+									</div>
+
+									<div class="update-truck-block">
+										<div class="panel panel-transparent">
+											<div class="row clearfix">
+												<div class="col-sm-6">
+													<p class="Summary-heading">{{ languageArray.truckNumbetTableThdimension }} </p>
+													<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':editTruck.cargocapacity.$invalid && !editTruck.cargocapacity.$pristine || editTruck.$submitted && editTruck.cargocapacity.$invalid,'has-success' : editTruck.cargocapacity.$valid }">
+														<label>{{ languageArray.truckNumbetTableThcclbs }}</label>
+														<input type="text" class="form-control" name="cargocapacity" ng-model="truckData.cargo_capacity" required>
+													</div>
+													<label class="error" ng-show="editTruck.cargocapacity.$invalid && !editTruck.cargocapacity.$pristine || editTruck.$submitted && editTruck.cargocapacity.$invalid">Please enter cargo capacity.</label>
+												</div>
+												<div class="col-sm-6">
+													<p class="Summary-heading">{{ languageArray.truckNumbetTableThwheelbase }} </p>
+													<div class="form-group form-group-default">
+														<label>{{ languageArray.truckNumbetTableThwheelarrang }}</label>
+														<div class="row clearfix">
+															<div pg-form-group class="col-sm-6 border-right-sm">
+																<input type="text" class="form-control" name="wheelx" ng-model="truckData.wheel_arrangement1">	 
+															</div>
+															<div pg-form-group class="col-sm-6">
+																<input type="text" class="form-control" name="wheely"  ng-model="truckData.wheel_arrangement2">
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+
+											<div class="row clearfix">
+												<div class="col-sm-6">
+													<div class="form-group form-group-default required">
+														<label>{{ languageArray.truckNumbetTableThcblwh }}</label>
+														<div class="row clearfix">
+															<div pg-form-group class="col-sm-4 border-right-sm" ng-class="{ true:'has-error'} [(submitted && editTruck.l.$invalid) || (editTruck.l.$invalid && editTruck.l.$touched)]">
+																<input type="text" class="form-control" name="l" placeholder="Cargo Bay L" ng-model="truckData.cargo_bay_l" required>
+															</div>
+															<div pg-form-group class="col-sm-4 border-right-sm" ng-class="{ true:'has-error'} [(submitted && editTruck.w.$invalid) || (editTruck.w.$invalid && editTruck.w.$touched)]">
+																<input type="text" class="form-control" name="w" placeholder="Cargo Bay W" ng-model="truckData.cargo_bay_w" required>
+															</div>
+															<div pg-form-group class="col-sm-4">
+																<input type="text" class="form-control" name="h" placeholder="Cargo Bay H" ng-model="truckData.cargo_bay_h" >
+															</div>
+														</div>
+													</div>
+													<label class="error" for="l" ng-show="((editTruck.l.$invalid && editTruck.l.$touched)||(submitted && editTruck.l.$invalid)) || ((editTruck.w.$invalid && editTruck.w.$touched)||(submitted && editTruck.w.$invalid))">Please enter cargo bay length and width.</label>
+												</div>
+												<div class="col-sm-6">
+													<div pg-form-group class="form-group form-group-default">
+														<label>{{ languageArray.truckNumbetTableThtirenum }}</label>
+														<input type="text" class="form-control" name="tyresnumber" ng-model="truckData.tyres_number" >
+													</div>
+												</div>
+											</div>
+
+											<div class="row clearfix">
+												<div class="col-sm-6">
+													<div pg-form-group class="form-group form-group-default">
+														<label>{{ languageArray.truckNumbetTableThpessnum }}</label>
+														<input type="text" class="form-control" name="numberofpassengers" ng-model="truckData.number_of_passengers">
+													</div>
+												</div>
+												<div class="col-sm-6">
+													<div pg-form-group class="form-group form-group-default">
+														<label>{{ languageArray.truckNumbetTableThtiresize }}</label>
+														<input type="text" class="form-control" name="tyreize" ng-model="truckData.tyres_size">
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<!--TRUCK-BLOCK-END-->
+								<!--TRUCK-BLOCK-->
+								<div class="pop-gry-blk">
+									<div class="summer-blk-heading">
+										{{ languageCommonVariables.commonSummaryHeading }} FUEL COST
+										<i class="fa fa-minus plus-pop-main" ></i>
+									</div>
+									<div class="update-truck-block">
+										<div class="panel panel-transparent">
+											<div class="row clearfix">
+												<div class="col-sm-6">
+													<p class="Summary-heading">{{ languageArray.truckNumbetTableThfuel }} </p>
+													<div class="form-group form-group-default th-select required" ng-class="{'has-error':editTruck.fuel_type.$invalid && !editTruck.fuel_type.$pristine || editTruck.$submitted && editTruck.fuel_type.$invalid,'has-success' : editTruck.fuel_type.$valid }">
+														<label>{{ languageArray.truckNumbetTableThfueltype }}</label>
+														<ui-select name="fuel_type" ng-model="truckData.fuel_type" theme="bootstrap" on-select="onSelectFuelTypeCallback($item, $model)" required>
+															<ui-select-match class="ui-select-match" placeholder="{{ languageArray.selectFuelType }}">{{truckData.fuel_type}}</ui-select-match>
+															<ui-select-choices class="ui-select-choices" repeat="item in fuelType | filter: $select.search">
+																<div ng-bind-html="trustAsHtml((item.val | highlight: $select.search))"></div>
+															</ui-select-choices>
+														</ui-select>
+													</div>
+													<label class="error" ng-show="editTruck.fuel_type.$invalid && !editTruck.fuel_type.$pristine || editTruck.$submitted && editTruck.fuel_type.$invalid">Please select fuel type.</label>
+												</div>
+												<div class="col-sm-6">
+													<p class="Summary-heading">{{ languageArray.truckInsurance }}  </p>
+													<div pg-form-group class="form-group form-group-default">
+														<label>{{ languageArray.truckNumbetTableThinspolnum }}</label>
+														<input type="text" class="form-control" name="insurancepolicynumber" ng-model="truckData.free_insurance_policy_number">
+													</div>
+												</div>
+											</div>
+
+											<div class="row clearfix">
+												<div class="col-sm-6">
+													<div pg-form-group class="form-group form-group-default">
+														<label>{{ languageArray.truckNumbetTableThfuelgrade }}</label>
+														<input type="text" class="form-control" name="fuelgrade" ng-model="truckData.fuel_grade" >
+													</div>
+												</div>
+												<div class="col-sm-6">
+													<div pg-form-group class="form-group form-group-default">
+														<label>{{ languageArray.truckNumbetTableThinspolvalid }}</label>
+														<input type="text" class="form-control" name="insurancevalidtill" ng-model="truckData.liability_insurance_valid_till" >
+													</div>
+												</div>
+											</div>
+
+											<div class="row clearfix">
+												<div class="col-sm-6">
+													<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':editTruck.fuelconsumption.$invalid && !editTruck.fuelconsumption.$pristine || editTruck.$submitted && editTruck.fuelconsumption.$invalid,'has-success' : editTruck.fuelconsumption.$valid }">
+														<label>{{ languageArray.truckNumbetTableThfuelcons }}</label>
+														<input type="text" class="form-control" name="fuelconsumption" ng-model="truckData.fuel_consumption" required>
+													</div>
+													<label class="error" ng-show="editTruck.fuelconsumption.$invalid && !editTruck.fuelconsumption.$pristine || editTruck.$submitted && editTruck.fuelconsumption.$invalid">Please enter fuel consumption per 100 miles.</label>
+												</div>
+												<div class="col-sm-6">	
+													<div pg-form-group class="form-group form-group-default">
+														<label>{{ languageArray.truckNumbetTableThinspolnum2 }}</label>
+														<input type="text" class="form-control" name="insurance2policynumber" ng-model="truckData.insurance_policy_number2">
+													</div>											
+												</div>
+											</div>
+
+											<div class="row clearfix">
+												<div class="col-sm-6">	
+													<div pg-form-group class="form-group form-group-default">
+														<label>{{ languageArray.truckNumbetTableThtankcap }}</label>
+														<input type="text" class="form-control" name="tankcapacity" ng-model="truckData.tank_capactiy">
+													</div>
+												</div>
+												<div class="col-sm-6">	
+													<div pg-form-group class="form-group form-group-default">
+														<label>{{ languageArray.truckNumbetTableThinspolvalid }}</label>
+														<input type="text" class="form-control" name="insurancevalidtill" ng-model="truckData.insurance_valid_date2">
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="pop-gry-blk">
+									<div class="summer-blk-heading">
+										{{ languageCommonVariables.commonSummaryHeading }} DOCUMENTS
+										<i class="fa fa-minus plus-pop-main" ></i>
+									</div>
+									<div class="row clearfix">
+										<div class="col-sm-12">	
+											<div class="dropzone" ng-dropzone dropzone="dropzone" dropzone-config="dropzoneConfigTruckEdit" ></div>
+										</div>
+										<div class="col-sm-12">	
+											<section class="truck-load-pdf">
+												<div class="truck-load-pdf-left" ng-repeat="docs in truckDocuments">
+													<div class="row1">
+														<button class="btn btn-danger" type="button" ng-click="deleteDocument(docs.id,docs.document_name, $index);">X</button>
+														<div class="pdf-cover" data-url="assets/uploads/documents/truck/{{docs.document_name}}" ng-click="perviewDoc($event)">
+															<img ng-src="assets/uploads/documents/thumb_truck/thumb_{{docs.document_name | filetoimg}} " fallback-src="pages/img/pdf.png" />
+														</div>
+													</div>
+												</div>
+											</section>
+										</div>
+									</div>
+								</div>
+							</div>
+
+
+
+							<div class="update-truck-block-btn">
+								<button ng-click="submitted=true" class="btn btn-primary btn-cons m-b-10" type="submit">
+									<i class="fa fa-pencil-square-o"></i>
+									<span class="bold"> {{ languageCommonVariables.updatebutton|capitalize }} </span>
+								</button>
+								<a href="#/trucks" ng-click="close()">
+									<button class="btn btn-danger btn-cons m-b-10" type="button">
+										<i class="fa fa-ban"></i>
+										<span class="bold"> {{ languageCommonVariables.cancelbutton|capitalize }} </span>
+									</button>
+								</a>
+							</div>
+						</form>
+					</div>
+					<!---->
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<ng-include src="'./assets/templates/vehicles/common-modal.html'"></ng-include>

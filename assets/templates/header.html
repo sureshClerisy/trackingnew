@@ -5,7 +5,7 @@
           <div class="pull-left full-height visible-sm visible-xs">
             <!-- START ACTION BAR -->
             <div class="header-inner">
-              <a href="#" class="btn-link toggle-sidebar visible-sm-inline-block visible-xs-inline-block padding-5" data-toggle="sidebar">
+              <a href="javascript:void(0)" class="btn-link toggle-sidebar visible-sm-inline-block visible-xs-inline-block padding-5" data-toggle="sidebar">
                 <span class="icon-set menu-hambuger"></span>
               </a>
             </div>
@@ -66,7 +66,46 @@
 
 					</span>
 				</button>
-				<ul class="dropdown-menu profile-dropdown" role="menu">
+				<ul class="dropdown-menu profile-dropdown my-menu-ds-block" role="menu" ng-if="showOrganisationsDropdown == true">
+					<li class="account-bk" ng-repeat="value in organisationsList" ng-class="{'active': value.first_name == organisationSelected }" ng-click="mctrl.onSelectOrganisationCallback(value,$index)">
+						<div class="row-bk">
+							<div class="cir-acc">{{value.first_name.charAt(0)}}</div>
+							<h2>{{value.first_name}}</h2>
+							<div class="setting-blk" ng-if="value.first_name == organisationSelected">
+								<a href="javascript:void(0);">Setting</a><b>|</b>
+								<a href="javascript:void(0);">Feedback</a><b>|</b>
+								<a href="javascript:void(0);">Help</a>
+							</div>
+						</div>
+					</li>
+					<!--li class="active account-bk" >
+						<div class="row-bk">
+							<div class="cir-acc">R</div>
+							<h2>Ryder</h2>
+							<div class="setting-blk">
+								<a href="javascript:void(0);">Setting</a><b>|</b>
+								<a href="javascript:void(0);">Feedback</a><b>|</b>
+								<a href="javascript:void(0);">Help</a>
+							</div>
+						</div>
+					</li-->
+					<li class=" lang-bk">
+						<div class="left-blk">
+							<em class="fa fa-globe"></em> {{ languageCommonVariables.headermenulanguages }}</a>
+							<ul ng-show="toggleMenu == true" class="language-multi-drop">
+								<li ng-click="setLanguageGlobal('english')">{{ languageCommonVariables.headermenulanguagesenglish }}<span>{{ languageCommonVariables.headermenulanguagesen }}</span></li>
+								<li ng-click="setLanguageGlobal('spanish')">Español<span>{{ languageCommonVariables.headermenuhelpes }}</span></li>
+								<li ng-click="setLanguageGlobal('portugese')">português<span> {{ languageCommonVariables.headermenuhelpport }}</span></li>
+							</ul>
+						</div>
+						<div class="left-blk">
+							<a href="#/logout" ng-click="clearBuffer()"  class="clearfix">
+								<em class="pg-power"></em> {{ languageCommonVariables.headermenulogout }}
+							</a>
+						</div>
+					</li>
+				</ul>
+				<ul class="dropdown-menu profile-dropdown" role="menu" ng-if="showOrganisationsDropdown == false">
 					<li><a><i class="pg-settings_small"></i>{{ languageCommonVariables.headermenusetting }}</a></li>
 					<li><a><i class="pg-outdent"></i>{{ languageCommonVariables.headermenufeedback }} </a></li>
 					<li><a><i class="pg-signals"></i>{{ languageCommonVariables.headermenuhelp }} </a></li>
@@ -98,18 +137,20 @@
 			<div ng-show="haveUnread > 0" class="num-block">{{ureadCount}}</div></div>
 		 </div>
 
-		  <div class="pull-right pull-right-dropdown form-group form-group-default th-select" ng-if="showOrganisationsDropdown == true">
+		  <!--div class="pull-right pull-right-dropdown form-group form-group-default th-select" ng-if="showOrganisationsDropdown == true">
 			<ui-select class="mdrivers" name="dispatchersList" ng-model="globalSelectedOrganisationId" theme="bootstrap" on-select="mctrl.onSelectOrganisationCallback($item);" >
 				<ui-select-match class="ui-select-match" placeholder="Select Organisation">{{organisationSelected}}</ui-select-match>
 				<ui-select-choices class="ui-select-choices" repeat="item in organisationsList | filter: $select.search">
 					<span ng-bind-html="trustAsHtml((item.first_name | highlight: $select.search))"></span>
 				</ui-select-choices>
 			</ui-select>		
-		 </div>
+		 </div-->
 
         <!--mail-icon block-->
+
       </div>
       <!-- END HEADER -->
+
 
 		<div class="col-middle loader-outer" ng-show="autoFetchLoads == true">
 			<!-- START PANEL -->
@@ -1125,7 +1166,7 @@
 						</section>
 				</div> <!--popup-inner-content-main -->
 
-				<!-------Matching Trucks------------------>
+				<!--Matching Trucks-->
 				
 						<div class="popup-inner-content-main" ng-show="showAddhighlighted == 'matchTruck'">
 							
@@ -1136,7 +1177,7 @@
 									<div class="col-xs-12">
 										<div class="trip-detail-cover trip-detail-two-input manage-padding for-dropzone">
 											
-											<button ng-click="uploadPOD(primaryLoadId)" ng-if="saveAddPrimaryId != '' && saveAddPrimaryId != 'undefined' && showUploadPODButton == true" class="ratesheet-tripDetail btn btn-success btn-cons m-b-10" type="button"><i class="fa fa-cloud-upload"></i> <span class="bold">{{languageCommonVariables.proofDelivery}}</span>
+											<button ng-click="uploadPOD(primaryLoadId)" ng-if="saveAddPrimaryId != '' && saveAddPrimaryId != 'undefined' && showUploadPODButton == true && (mctrl.allowedModules.indexOf('truckstop') > -1 || mctrl.allowedModules.indexOf('truckstop/saveloadrecord') > -1)" class="ratesheet-tripDetail btn btn-success btn-cons m-b-10" type="button"><i class="fa fa-cloud-upload"></i> <span class="bold">{{languageCommonVariables.proofDelivery}}</span>
 											</button>
 											
 											<div class="row">
@@ -1145,7 +1186,7 @@
 														<div class="trip-detail-header">
 															<h3><img src="./pages/img/fuel-blue.png">{{ languageCommonVariables.diselcalculation }} </h3>
 																									
-															<div class="save-cancel" ng-show="showTruckDetailEdit == false">
+															<div class="save-cancel" ng-show="showTruckDetailEdit == false && (mctrl.allowedModules.indexOf('truckstop') > -1 || mctrl.allowedModules.indexOf('truckstop/saveloadrecord') > -1)">
 																
 																<button ng-click="changeAddTruckDetailFields(saveAddPrimaryId,primaryTripDetailId,$index)" class="btn btn-primary btn-cons m-b-10" type="button"><i class="pg-form"></i> <span class="bold">Save</span>
 																</button>
@@ -1154,7 +1195,7 @@
 																</button>
 																
 															</div>
-															<button href="javascript:void(0)" ng-click="changeTruckDetailStatus()" ng-show ="showTruckEdit == true" class="btn btn-info btn-cons m-b-10 trip-btn-right" type="button"><i class="fa fa-paste"></i> <span class="bold">Edit</span>
+															<button href="javascript:void(0)" ng-click="changeTruckDetailStatus()" ng-show ="showTruckEdit == true && (mctrl.allowedModules.indexOf('truckstop') > -1 || mctrl.allowedModules.indexOf('truckstop/saveloadrecord') > -1)" class="btn btn-info btn-cons m-b-10 trip-btn-right" type="button"><i class="fa fa-paste"></i> <span class="bold">Edit</span>
 															</button>
 														</div>
 														<div class="estimate-section actuals-class">
@@ -1385,58 +1426,58 @@
 										</div>
 									</div>
 								</div>
-							</div> <!--new-row-id  -->
-						</div>
-					<!-------Matching Trucks End----------------->
-						
-					<!-------Map start------------------>
-						<div class="popup-inner-content-main" ng-show="showMaps == true">
-							<div class="hide-routes" ng-show="showNoRoutesSelected == true">
-							
 							</div>
+						</div>
+					<!--Matching Trucks End-->
+						
+					<!--Map start-->
+					<div class="popup-inner-content-main" ng-show="showMaps == true">
+						<div class="hide-routes" ng-show="showNoRoutesSelected == true">
+						
+						</div>
+						
+						<div class="show-routes" ng-show="showNoRoutesSelected == false">
+							<h4 class="main-common-heading">
+								<span class = "map-icon" ng-show = "mapChange == true">{{ languageCommonVariables.flyingjnpilot }}</span>
+								<span class = "map-icon" ng-show = "mapChange == false">{{ languageCommonVariables.fuelstops }}</span>
+							</h4>
 							
-							<div class="show-routes" ng-show="showNoRoutesSelected == false">
-								<h4 class="main-common-heading">
-									<span class = "map-icon" ng-show = "mapChange == true">{{ languageCommonVariables.flyingjnpilot }}</span>
-									<span class = "map-icon" ng-show = "mapChange == false">{{ languageCommonVariables.fuelstops }}</span>
-								</h4>
-								
-								<div id="floating-panel-add" class="floating-panel" ng-class = "{'trukstop-markers': mapChange == false }">
-									<button ng-click="CheckStop()" class="btn btn-danger btn-cons m-b-10" title = "View Truck Stops" ng-show = "mapChange == false" type="button">
-										<i class="fa fa-truck"></i> <span class="bold">Truck Stops</span>
-									</button>									
-									<button ng-click="CheckStop()" ng-show = "mapChange == true" title = " View Fuel Stops" class="btn btn-success btn-cons m-b-10" type="button">
-										<img src="./pages/img/gas-pump.png" height = "14" width = "14" ><span class="bold"> Fuel Stops </span>
-									</button>
-								</div>
-								<div class="truck-detail-block" >
-									<div class="directions-map-div">
-										<div class="row main-lg-map">
-											<div class="col-lg-12">
-												<div class="col-lg-12 no-padding">
-													<div class="map-inner">
-														<div id="mapAdd" class="map-iw"></div>
-														<a href="javascript:void(0);" title="Route Directions" ng-click="showHidePanel('addRequest')" class="minus-plus-icon show-hide-panel"></a>
-													</div>
+							<div id="floating-panel-add" class="floating-panel" ng-class = "{'trukstop-markers': mapChange == false }">
+								<button ng-click="CheckStop()" class="btn btn-danger btn-cons m-b-10" title = "View Truck Stops" ng-show = "mapChange == false" type="button">
+									<i class="fa fa-truck"></i> <span class="bold">Truck Stops</span>
+								</button>									
+								<button ng-click="CheckStop()" ng-show = "mapChange == true" title = " View Fuel Stops" class="btn btn-success btn-cons m-b-10" type="button">
+									<img src="./pages/img/gas-pump.png" height = "14" width = "14" ><span class="bold"> Fuel Stops </span>
+								</button>
+							</div>
+							<div class="truck-detail-block" >
+								<div class="directions-map-div">
+									<div class="row main-lg-map">
+										<div class="col-lg-12">
+											<div class="col-lg-12 no-padding">
+												<div class="map-inner">
+													<div id="mapAdd" class="map-iw"></div>
+													<a href="javascript:void(0);" title="Route Directions" ng-click="showHidePanel('addRequest')" class="minus-plus-icon show-hide-panel"></a>
 												</div>
-												<div class="col-lg-12 main-directions-div no-padding" >
-													<div id="paneldivAdd" class="map-inner" style="display:none">
-														<div class="main-directions1">
-															<div id="panelAdd"></div>
-														</div>
+											</div>
+											<div class="col-lg-12 main-directions-div no-padding" >
+												<div id="paneldivAdd" class="map-inner" style="display:none">
+													<div class="main-directions1">
+														<div id="panelAdd"></div>
 													</div>
 												</div>
 											</div>
 										</div>
 									</div>
 								</div>
-							</div>  <!--show routes-->
-						</div>	
-					<!----- Map ends-->
+							</div>
+						</div>  <!--show routes-->
+					</div>	
+					<!--Map ends-->
 					
 					<div class="popup-inner-content-main " ng-show="showAddhighlighted == 'documents'" >
 						<div class="document-genrate-invoice">
-							<button ng-click="generateInvoiceForLoad(primaryLoadId)" ng-if="loggedUserRoleId == 3 || loggedUserRoleId == 1 || loggedUserRoleId == 5" href="javascript:void(0)" class="btn btn-info btn-cons m-b-10" type="button"><i class="fa fa-file-text"></i> <span class="bold">{{ languageCommonVariables.generateinvoice }}</span>
+							<button ng-click="generateInvoiceForLoad(primaryLoadId)" ng-if="mctrl.allowedModules.indexOf('assignedloads') > -1 || mctrl.allowedModules.indexOf('assignedloads/generateinvoice') > -1" href="javascript:void(0)" class="btn btn-info btn-cons m-b-10" type="button"><i class="fa fa-file-text"></i> <span class="bold">{{ languageCommonVariables.generateinvoice }}</span>
 							</button>
 						</div>
 						<div class="documents" >
@@ -1479,7 +1520,7 @@
                                 	<img class="fetch-docs" src="pages/img/progress/progress-circle-master.svg" />
 							</div>
 				            </div>
-						</div>  <!---Documents end--->
+						</div>  <!---Documents end-->
 								
 						
 						</div>
@@ -1592,9 +1633,9 @@
 								<img src="pages/img/confirm-line.png">
 							</div>
 							<div class="confirm-btn-section">
-								<a href="" class="common-item confirm-yes yes-btn" ng-click="confirmDelete('yes')"><button class="btn btn-primary btn-cons m-b-10" type="button"><i class="fa fa-check"></i> <span class="bold"> {{ languageCommonVariables.confirmdeleteyes|capitalize }} </span>
+								<a class="common-item confirm-yes yes-btn" ng-click="confirmDelete('yes')"><button class="btn btn-primary btn-cons m-b-10" type="button"><i class="fa fa-check"></i> <span class="bold"> {{ languageCommonVariables.confirmdeleteyes|capitalize }} </span>
 								</button></a>
-								<a href="" class="chain-item yes-btn" style="display: none" ng-click="confirmDeleteChainItem('yes')" ><button class="btn btn-primary btn-cons m-b-10" type="button"><i class="fa fa-check"></i> <span class="bold"> {{ languageCommonVariables.confirmdeleteyes|capitalize }} </span>
+								<a class="chain-item yes-btn" style="display: none" ng-click="confirmDeleteChainItem('yes')" ><button class="btn btn-primary btn-cons m-b-10" type="button"><i class="fa fa-check"></i> <span class="bold"> {{ languageCommonVariables.confirmdeleteyes|capitalize }} </span>
 								</button></a>
 								<a href="" class="doc-item yes-btn" style="display: none" ng-click="confirmDocDelete('yes')" ><button class="btn btn-primary btn-cons m-b-10" type="button"><i class="fa fa-check"></i> <span class="bold"> {{ languageCommonVariables.confirmdeleteyes|capitalize }} </span>
 								</button></a>

@@ -4,7 +4,7 @@ class Shipper extends Parent_Model {
 	function __construct(){
 		parent::__construct();
         $this->load->library('email');
-        $this->limit_per_page = $this->config->item('limit_per_page');  
+        $this->limit_per_page = $this->config->item('limit_per_page'); 
     }
 
     /**
@@ -19,7 +19,7 @@ class Shipper extends Parent_Model {
             $this->db->select("count(id) as totalRows");
         }
 
-        $this->db->where('deleted',0);
+        $this->db->where(['organisation_id'=>$this->selectedOrgId,'deleted'=>0]);
         
         if(isset($args["searchQuery"]) && !empty($args["searchQuery"])){
             $this->db->group_start();
@@ -40,10 +40,13 @@ class Shipper extends Parent_Model {
         }
 
         $result = $this->db->get('shippers');
+        
+        // echo $this->db->last_query();
+
         if($result->num_rows()>0){
             return $result->result_array();
         } else {
-            return false;
+            return [];
         }
     } 
 
@@ -66,6 +69,8 @@ class Shipper extends Parent_Model {
         }
     } else {
         $shipperInfo['status'] = 1;
+        $shipperInfo['organisation_id'] = $this->selectedOrgId;
+
         $this->db->insert('shippers',$shipperInfo);
         $shippersLastId   = $this->db->insert_id();
         $updated        = 'no';
@@ -123,8 +128,7 @@ class Shipper extends Parent_Model {
 
     public function exportShippers($args= array(), $total = false ){
 
-       $this->db->select('*');
-       $this->db->where('deleted',0);
+       $this->db->select('*')->where(['deleted'=>0,'organisation_id'=>$this->selectedOrgId]);
         
        if(isset($args["searchText"]) && !empty($args["searchText"])){
            $this->db->group_start();
@@ -141,7 +145,7 @@ class Shipper extends Parent_Model {
        if($result->num_rows()>0){
            return $result->result_array();
        } else {
-           return false;
+           return [];
        }
     }
 
@@ -150,8 +154,8 @@ class Shipper extends Parent_Model {
     */
     public function fetchShipperList() {
         $this->db->select('id,shipperCompanyName');
-        $this->db->where('status',1);
-        $this->db->where('deleted',0);
+        $this->db->where(['status'=>1,'deleted'=>0]);
+        
         $result = $this->db->get('shippers');
         if( $result->num_rows() > 0 ) {
             return $result->result_array();

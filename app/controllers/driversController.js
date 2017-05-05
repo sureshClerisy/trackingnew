@@ -59,12 +59,6 @@ app.controller('driversController', function(dataFactory,$scope, PubNub, $http ,
 		$scope.alertdeletemsg = false;
 	}
 	
-  	$scope.removeDriver = function(driverid,index){
-		angular.element("#confirm-delete").modal('show');
-		angular.element("#confirm-delete").data("driverid",driverid);
-		angular.element("#confirm-delete").data("index",index);
-	}
-  
   /** Change Driver Status **/
   
 	$scope.changeDriverStatus = function( driverId, status, index) {
@@ -90,31 +84,6 @@ app.controller('driversController', function(dataFactory,$scope, PubNub, $http ,
 		} 
 		angular.element("#driver-list-status").modal('hide');
 	}
-
-
-  $scope.confirmDelete = function(confirm){
-		if(confirm == 'yes'){
-			var driverid = angular.element("#confirm-delete").data("driverid");
-			var index  = angular.element("#confirm-delete").data("index");
-			if ( driverid != '' && driverid != undefined ) {
-				dataFactory.httpRequest(URL + '/drivers/delete/'+driverid).then(function(data) {
-					PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
-					if ( data.success == true ) {
-						$scope.driverdeleteMessage = $rootScope.languageArray.driverDeleteSuccMsg;
-						$scope.alertdeletemsg = true;
-						$scope.data.splice(index,1);
-					} else {
-						$scope.driverdeleteMessage = $rootScope.languageArray.driverDeleteErrMsg;
-						$scope.alertdeletemsg = true;
-					}
-			    });
-			}
-		} else {
-			angular.element("#confirm-delete").removeData("driverid");
-			angular.element("#confirm-delete").removeData("index");
-		}
-		angular.element("#confirm-delete").modal('hide');
-	} 
 		
 });
 
@@ -205,7 +174,7 @@ app.controller('editDriversController', function(dataFactory,getDriversData, $sc
             fd.append('profile_image', file);
 			fd.append('posted_data',data);
 			fd.append('id',$scope.driversData.id);
-			$http.post(URL+'/drivers/update/',fd,{
+			$http.post(URL+'/drivers/skipAcl_update/',fd,{
 			transformRequest: angular.identity,
 			headers: {'Content-Type': undefined },
 			headers: {'typeCheck': 'type' }

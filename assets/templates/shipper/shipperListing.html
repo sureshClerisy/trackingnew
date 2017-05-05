@@ -19,7 +19,10 @@
 
 
 					<div class="commen-heading">
-						<h2 class="oprate-dashbord"> {{ languageArray.shipperListingHeading }}</h2>
+						<h2 class="oprate-dashbord"> 
+							<i class="fa fa-stack-exchange" aria-hidden="true"></i>
+							{{ languageArray.shipperListingHeading }}
+						</h2>
 					</div>
 				</div>
 			</div>
@@ -84,7 +87,7 @@
 											</div>
 										</div>
 
-										<div class="table-row-main1 tb-body" dir-paginate="value in shipper.shipperData | itemsPerPage: mctrl.itemsPerPage track by value.id" total-items="shipper.totalRecords" current-page="currentPage" pagination-id="shipperPage">
+										<div class="table-row-main1 tb-body" dir-paginate="value in shipper.shipperData | itemsPerPage: mctrl.itemsPerPage track by value.id" total-items="shipper.totalRecords" current-page="currentPage" pagination-id="shipperPage" ng-click="mctrl.moveEntitiesToEditState(value.id,'editshipper')">
 
 											<div class="tb-cell shipper-new-col"> 
 												<span>
@@ -120,9 +123,9 @@
 
 											<div class="tb-cell action" ng-click="$event.stopPropagation()">
 												<span class="wid">
-													<a href="#/editshipper/{{value.id}}" class="btn btn-default DTTT_button_copy" data-original-title="{{languageCommonVariables.editShipper}}" ui-jq="tooltip" >
+													<!--a href="#/editshipper/{{value.id}}" class="btn btn-default DTTT_button_copy" data-original-title="{{languageCommonVariables.editShipper}}" ui-jq="tooltip" >
 														<span><i class="fa fa-edit" aria-hidden="true"></i></span>
-													</a>
+													</a-->
 													<a class="btn btn-default DTTT_button_csv" title="Deactivate Shipper" ui-jq="tooltip" ng-click="shipper.changeShipperStatus(value.id,value.status,$index)" ng-if="value.status == 1">
 														<span><i class="fa fa-check-square"></i></span>
 													</a>
@@ -196,9 +199,9 @@
 
 												<div class="tb-cell action">
 													<span >
-														<a href="#/editshipper/{{value.id}}" class="btn btn-default DTTT_button_copy" data-original-title="{{languageCommonVariables.editShipper}}" ui-jq="tooltip" >
+														<!--a href="#/editshipper/{{value.id}}" class="btn btn-default DTTT_button_copy" data-original-title="{{languageCommonVariables.editShipper}}" ui-jq="tooltip" >
 															<span><i class="fa fa-edit" aria-hidden="true"></i></span>
-														</a>
+														</a-->
 														<a class="btn btn-default DTTT_button_csv" title="Deactivate Shipper" ui-jq="tooltip" ng-click="shipper.changeShipperStatus(value.id,value.status,$index)" ng-if="value.status == 1">
 															<span><i class="fa fa-check-square"></i></span>
 														</a>

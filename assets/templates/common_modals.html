@@ -1,41 +1,6 @@
 
 <!-- Confirm Delete Modal -->
 
-<div class="modal fade slide-up confirm-delete " id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-	<div class="popup-overlay">
-		<div class="popup-main">
-			<div class="popup-main-table">
-				<div class="popup-table-cell">
-					<div class="confirm-main-content-">
-						<div class="popconfirm-img">
-							<img src="pages/img/confirm-icon.png">
-						</div>
-						<h2 class="confirm-heading">{{ languageCommonVariables.confirmMessage }} {{ languageCommonVariables.commonDelete }}?</h2>
-						<div class="line-image">
-							<img src="pages/img/confirm-line.png">
-						</div>
-						<div class="confirm-btn-section">
-							<a href="" class="common-item confirm-yes yes-btn" ng-click="confirmDelete('yes')"><button class="btn btn-primary btn-cons m-b-10" type="button"><i class="fa fa-check"></i> <span class="bold"> {{ languageCommonVariables.confirmdeleteyes|capitalize }} </span>
-								</button></a>
-							<a href="" class="chain-item yes-btn" style="display: none" ng-click="confirmDeleteChainItem('yes')" ><button class="btn btn-primary btn-cons m-b-10" type="button"><i class="fa fa-check"></i> <span class="bold"> {{ languageCommonVariables.confirmdeleteyes|capitalize }} </span>
-								</button></a>
-							<a href="" class="common-item no-btn" ng-click="confirmDelete('no')"><button class="btn btn-danger btn-cons m-b-10" type="button"><i class="fa fa-close"></i><span class="bold"> {{ languageCommonVariables.confirmdeleteno|capitalize }} </span></button></a>
-							<a href="" class="chain-item no-btn" style="display: none;" ng-click="confirmDeleteChainItem('no')" ><button class="btn btn-danger btn-cons m-b-10" type="button"><i class="fa fa-close"></i><span class="bold"> {{ languageCommonVariables.confirmdeleteno|capitalize }} </span></button></a>
-							
-						</div>
-						
-					</div>
-				</div>
-			</div>
-		</div>
-<!-- 	table-full-width  -->
-	</div>
-</div>
-<!-- Confirm Delete Modal -->
-
-
-<!-- Confirm Delete Modal -->
-
 <div class="modal fade stick-up confirm-delete " id="black-list" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
 	<div class="popup-overlay">
 		<div class="popup-main">

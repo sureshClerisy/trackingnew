@@ -405,10 +405,9 @@
 												<i class="fa fa-print"></i> <span class="bold"> Print</span>
 											</button>
 
-											<div class="save-cancel" ng-show="save_cancel_div == true" >
+											<div class="save-cancel" ng-show="save_cancel_div == true && (mctrl.allowedModules.indexOf('truckstop') > -1 || mctrl.allowedModules.indexOf('truckstop/saveloadrecord') > -1)" >
 												 <button ng-click="saveEditLoad(editSavedLoad)"  class="save btn btn-primary btn-cons m-b-10" type="button">
-												 <!--button ng-click="submitted=true"  class="save btn btn-primary btn-cons m-b-10" type="submit"-->
-												 	<i class="pg-form"></i> <span class="bold">Save</span>
+													<i class="pg-form"></i> <span class="bold">Save</span>
 												</button>
 												<button href="javascript:void(0)" ng-click="changeSaveStatus()" class="cancelTheLoad1 btn btn-danger btn-cons m-b-10" type="button">
 													<i class="fa fa-close"></i><span class="bold">Close</span>
@@ -416,11 +415,11 @@
 											</div>
 
 
-											<button href="javascript:void(0);" ng-if = "save_edit_div == true && showEditButton == true" ng-click="changeEditStatus()" class="edit-loadDetail edit1Load1 btn btn-info btn-cons m-b-10" type="button">
+											<button href="javascript:void(0);" ng-if = "save_edit_div == true && showEditButton == true && (mctrl.allowedModules.indexOf('truckstop') > -1 || mctrl.allowedModules.indexOf('truckstop/saveloadrecord') > -1)" ng-click="changeEditStatus()" class="edit-loadDetail edit1Load1 btn btn-info btn-cons m-b-10" type="button">
 												<i class="fa fa-paste"></i> <span class="bold">Edit</span>
 											</button>
 
-											<button ng-click="uploadRateSheet(primaryLoadId)" ng-if="showUploadRateSheetButton == true && showEditButton == true" class="ratesheet-loadDetail btn btn-success btn-cons m-b-10" type="button">
+											<button ng-click="uploadRateSheet(primaryLoadId)" ng-if="showUploadRateSheetButton == true && showEditButton == true && (mctrl.allowedModules.indexOf('truckstop') > -1 || mctrl.allowedModules.indexOf('truckstop/saveloadrecord') > -1)" class="ratesheet-loadDetail btn btn-success btn-cons m-b-10" type="button">
 												<i class="fa fa-cloud-upload"></i> 
 												<span class="bold">{{languageCommonVariables.uploadRateSheet}}</span>
 											</button>
@@ -981,14 +980,14 @@
 									<h4>{{ editSavedLoad.TruckCompanyName }}
 										<span ng-if="showBrokerStatus != 'undefined' && showBrokerStatus != '' && editSavedLoad.billType != 'shipper'" ng-class="editSavedLoad.brokerStatus == 'Approved' ? 'green-color' : 'red-color'">({{ showBrokerStatus }})</span>
 									</h4>
-									<button  style="float: right" ng-click="mctrl.uploadBrokerDocument(primaryLoadId,editSavedLoad.broker_id)" ng-if="mctrl.showUploadBrokerButton == true" class="ratesheet-tripDetail btn btn-success btn-cons m-b-10" type="button"><i class="fa fa-cloud-upload"></i> <span class="bold">Upload Document</span>
+									<button  style="float: right" ng-click="mctrl.uploadBrokerDocument(primaryLoadId,editSavedLoad.broker_id)" ng-if="mctrl.showUploadBrokerButton == true && (mctrl.allowedModules.indexOf('truckstop') > -1 || mctrl.allowedModules.indexOf('truckstop/saveloadrecord') > -1)" class="ratesheet-tripDetail btn btn-success btn-cons m-b-10" type="button"><i class="fa fa-cloud-upload"></i> <span class="bold">Upload Document</span>
 									</button>
-										<div class="save-cancel" ng-show="save_cancel_div == true">
+										<div class="save-cancel" ng-show="save_cancel_div == true && (mctrl.allowedModules.indexOf('truckstop') > -1 || mctrl.allowedModules.indexOf('truckstop/saveloadrecord') > -1)">
 											<button ng-click ="saveEditLoad(editSavedLoad)" ng-disabled="editLoad.$invalid" class="save btn btn-primary btn-cons m-b-10" type="button"><i class="pg-form"></i> <span class="bold">Save</span>
 											</button>
 											<button href="javascript:void(0)" ng-click="changeSaveStatus()" class="cancelTheLoad btn btn-danger btn-cons m-b-10" type="button"><i class="fa fa-close"></i><span class="bold"> Close </span></button>
 										</div>
-										<button href="javascript:void(0);" ng-click="changeEditStatus()" ng-if = "save_edit_div == true && showEditButton == true" class="edit-loadDetail edit1Load btn btn-info btn-cons m-b-10" type="button"><i class="fa fa-paste"></i> <span class="bold">Edit</span>
+										<button href="javascript:void(0);" ng-click="changeEditStatus()" ng-if = "save_edit_div == true && showEditButton == true && (mctrl.allowedModules.indexOf('truckstop') > -1 || mctrl.allowedModules.indexOf('truckstop/saveloadrecord') > -1)" class="edit-loadDetail edit1Load btn btn-info btn-cons m-b-10" type="button"><i class="fa fa-paste"></i> <span class="bold">Edit</span>
 										</button>
 
 									</div>
@@ -1198,7 +1197,7 @@
 														<h3>
 															<img src="./pages/img/fuel-blue.png">{{ languageCommonVariables.diselcalculation }} 
 														</h3>															
-														<div class="save-cancel" ng-show="showTruckDetailEdit == false && showEditButton == true" >
+														<div class="save-cancel" ng-show="showTruckDetailEdit == false && showEditButton == true && (mctrl.allowedModules.indexOf('truckstop') > -1 || mctrl.allowedModules.indexOf('truckstop/saveloadrecord') > -1)" >
 															
 															 <button ng-click="changeTruckDetailFields(editSavedLoad.ID,primaryLoadId,primaryTripDetailId,$index)" class="btn btn-primary btn-cons m-b-10" type="button">
 															 	<i class="pg-form"></i> 
@@ -1210,7 +1209,7 @@
 																</button>
 															</div>
 																														
-															<button href="javascript:void(0)" ng-click="changeTruckDetailStatus()" ng-show ="showTruckEdit == true" class="btn btn-info btn-cons m-b-10 trip-btn-right" type="button">	<i class="fa fa-paste"></i>
+															<button href="javascript:void(0)" ng-click="changeTruckDetailStatus()" ng-show ="showTruckEdit == true && (mctrl.allowedModules.indexOf('truckstop') > -1 || mctrl.allowedModules.indexOf('truckstop/saveloadrecord') > -1)" class="btn btn-info btn-cons m-b-10 trip-btn-right" type="button">	<i class="fa fa-paste"></i>
 																<span class="bold">Edit</span>
 															</button>
 
@@ -1432,7 +1431,7 @@
 												<div>
 												
 												<div class="ratesheet-tripDetail-cover">
-													<button ng-click="uploadPOD(primaryLoadId)" ng-if="selectedVehicleId != '' && selectedVehicleId != 'undefined' && showUploadPODButton == true && showEditButton == true" class="ratesheet-tripDetail btn btn-success btn-cons m-b-10" type="button" scrollOnClick ><i class="fa fa-cloud-upload"></i> 
+													<button ng-click="uploadPOD(primaryLoadId)" ng-if=" showUploadPODButton == true && showEditButton == true && (mctrl.allowedModules.indexOf('truckstop') > -1 || mctrl.allowedModules.indexOf('truckstop/saveloadrecord') > -1)" class="ratesheet-tripDetail btn btn-success btn-cons m-b-10" type="button" scrollOnClick ><i class="fa fa-cloud-upload"></i> 
 														<span class="bold">{{languageCommonVariables.proofDelivery}}</span>
 													</button>
 												</div>
@@ -1558,7 +1557,7 @@
 						<div class="popup-inner-content-main " ng-show="showhighlighted == 'documents'" >
 							<div class="document-genrate-pad">
 								<div class="document-genrate-invoice">
-									<button ng-click="generateInvoiceForLoad(primaryLoadId)" ng-if="loggedUserRoleId == 3 || loggedUserRoleId == 1 || loggedUserRoleId == 5" href="javascript:void(0)" class="btn btn-info btn-cons m-b-10" type="button"><i class="fa fa-file-text"></i> <span class="bold">{{ languageCommonVariables.generateinvoice }}</span>
+									<button ng-click="generateInvoiceForLoad(primaryLoadId)" ng-if="mctrl.allowedModules.indexOf('assignedloads') > -1 || mctrl.allowedModules.indexOf('assignedloads/generateinvoice') > -1" href="javascript:void(0)" class="btn btn-info btn-cons m-b-10" type="button"><i class="fa fa-file-text"></i> <span class="bold">{{ languageCommonVariables.generateinvoice }}</span>
 									</button>
 								</div>
 								<div class="documents" >

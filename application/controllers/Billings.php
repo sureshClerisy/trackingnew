@@ -74,10 +74,6 @@ class Billings extends Admin_Controller{
 	*/ 
 	
 	public function sendForPayment() {
-		if ( !in_array($this->userRoleId, $this->config->item('with_admin_role')) ) {
-			echo json_encode($this->data);
-			exit();
-		}
 		$this->data = $this->fetchingSentPaymentsInfo();
 		$this->data['sendPaymentContType'] = 'sendForPayment';
 		$this->data['loadsForPaymentCount'] = count($this->data['loads']);
@@ -88,7 +84,7 @@ class Billings extends Admin_Controller{
 	 * Fetching load info common function
 	 */
 	
-	public function fetchingSentPaymentsInfo($parameter = '' ) {
+	protected function fetchingSentPaymentsInfo($parameter = '' ) {
 		if( $parameter == 'otherPage')
 			$this->data['loadsForPaymentCount'] = $this->Billing->fetchLoadsForPaymentCount();
 		else
@@ -105,10 +101,6 @@ class Billings extends Admin_Controller{
 	 */
 	
 	public function fetchSentPaymentRecords() {
-		if ( !in_array($this->userRoleId, $this->config->item('with_admin_role')) ) {
-			echo json_encode($this->data);
-			exit();
-		}
 		$_POST = json_decode(file_get_contents('php://input'),true);
 		if ( isset($_POST) && count($_POST) > 0 ) {
 			$filters = $_POST;
@@ -582,7 +574,6 @@ class Billings extends Admin_Controller{
 		$thisWeek["goal"]   = $this->getPerformanceLoadsForAllDispatchers($dispatchersList, $goalFilterThisWeek, $goalValuesThisWeek);
 		$lastWeek["goal"]   = $this->getPerformanceLoadsForAllDispatchers($dispatchersList, $goalFilterLastWeek, $goalValuesLastWeek);
 
-
 		$considerDate = $yesterday;
 		$recentTransactions = $this->Billing->getRecentTransactions(date("Y-m-d"), 1);
 		if(isset($recentTransactions[0]["date"])){ 
@@ -593,12 +584,12 @@ class Billings extends Admin_Controller{
 
 		$lastWeek["sentToTriumph"]  = $this->Billing->sentForPaymentWithFilter( $lastWeekStartDay, $lastWeekEndDay );
 		$lastWeek["sentToTriumph"]  = is_null($lastWeek["sentToTriumph"]) ? 0 : $lastWeek["sentToTriumph"];
-		$lastWeek["goalCompleted"]  = ( $lastWeek["sentToTriumph"] / $lastWeek["goal"] ) * 100;
+		$lastWeek["goalCompleted"]  = ( isset($lastWeek['goal']) && $lastWeek['goal'] != 0 ) ? ( $lastWeek["sentToTriumph"] / $lastWeek["goal"] ) * 100 : 0;
 
 
 		$thisWeek["sentToTriumph"]  = $this->Billing->sentForPaymentWithFilter( $thisWeekStartDay, $thisWeekToday  );
 		$thisWeek["sentToTriumph"]  = is_null($thisWeek["sentToTriumph"]) ? 0 : $thisWeek["sentToTriumph"];
-		$thisWeek["goalCompleted"]  = ( $thisWeek["sentToTriumph"] / $thisWeek["goal"] ) * 100;
+		$thisWeek["goalCompleted"]  = ( isset($lastWeek['goal']) && $lastWeek['goal'] != 0 ) ? ( $thisWeek["sentToTriumph"] / $thisWeek["goal"] ) * 100 : 0;
 		$thisWeek["targetType"]     = $thisWeek["goalCompleted"] > 100 ? "ahead" : "behind";
 		$thisWeek["target"]         = abs($thisWeek["goalCompleted"] - 100) ;
 
@@ -1123,7 +1114,4 @@ class Billings extends Admin_Controller{
 		$exportData = $this->buildExportLoadData($loads,'billing');
 	}
 
-	public function testAction(){
-		
-	}
 }

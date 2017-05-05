@@ -1,0 +1,51 @@
+<div class="page-content-wrapper">
+	<div class="content sm-gutter">
+		<div class="container-fluid padding-25 sm-padding-10">
+			<div class="row">
+				<div class="col-md-12 col-xlg-12">
+					<div ng-show="alertmsg == true" class="alert alert-success" role="alert">
+						<button class="close" data-dismiss="alert"></button>						
+						{{message}}
+					</div>
+					<div ng-show="alertdeletemsg == true" class="alert alert-success" role="alert">
+						<button ng-click = "hidedeletemessage()" class="close"></button>
+						{{deleteMessage}}
+					</div>
+					<div class="commen-heading brokers-page">
+						<h2 class="oprate-dashbord"> Assign Permissions</h2>
+					</div>
+				</div>
+			</div>
+			<div class="row invocie-block-row ">
+				<div class="col-md-12 col-xlg-12">
+					<div class="load-new-block-table">
+						<div class="panel-body add-new-data fix-page">
+							<div class="load-tabe-auto map-load-section">
+                                <div class="truck-detail-block" ng-repeat="(key,value) in getAction">
+                                  <div class="truck-detail-heading controller-listing">
+                                    
+                                    <h3>
+                                        <input ng-click="checkUncheckAll($event)" type="checkbox" ng-model="" name = "">
+                                        <span ng-click="showActions($event,key.split('-')[0])">{{ key.split('-')[1] }}
+                                            <i class="fa fa-plus" aria-hidden="true"></i>
+                                        </span>
+                                    </h3>
+                                    <div class="action-list" style="display: none">
+                                        <ul>
+                                            <li ng-repeat = "action in value">
+                                                <input type='checkbox' name=''>
+                                                <span class="actino-label">{{ action.action | capitalize }}</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<ng-include src="'./assets/templates/common_modals.html'"></ng-include>

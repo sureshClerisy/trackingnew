@@ -5,7 +5,7 @@ class User extends Parent_Model
 	function __construct()
 	{
 		parent::__construct();
-		$this->load->library('email');
+		// $this->load->library('email');
 	}
 	
 	public function check_admin_credentials( $username = null, $pass = null) {
@@ -28,6 +28,7 @@ class User extends Parent_Model
 
 			$this->session->set_userdata('role', $role);
 			$this->session->set_userdata('loggedUser_parentId', $data['parent_id']);
+			$this->session->set_userdata('dispCord_parent', $data['dispatcher_parent']);
 			$this->session->set_userdata('loggedUser_username', $user_username);
 			$this->session->set_userdata('loggedUser_fname', $user_fname);
 			$this->session->set_userdata('loggedUser_id', $user_id);
@@ -245,14 +246,12 @@ class User extends Parent_Model
 		
 		$column = 'users.id,username,CONCAT(first_name, ,last_name) as fullName,email,users.status,role_id';
 		if(!empty($userId)){
-
-			$column .= ',phone,first_name,last_name,city,address,zipcode,roles.name as rname';
+			$column .= ',phone,first_name,last_name,city,address,zipcode,roles.name as rname,profile_image';
 			$this->db->where(['users.id'=>$userId]);
 			$this->db->join("roles", "users.role_id = roles.id","Left");
 		}
 
-		$this->db->select($column)
-			 ->where('users.status',1);
+		$this->db->select($column);
 		$data =  $this->db->get('users')
 			 ->result_array();
 			 
@@ -299,27 +298,13 @@ class User extends Parent_Model
 
 	public function getOrganisationsList() {
 		$this->db->select('first_name,id');
-		$this->db->where('role_id',$this->organisationRoleId);
+		$this->db->where('role_id',$this->setOrganisationRoleId);
 		$result = $this->db->get('users');
 		if($result->num_rows() > 0) {
 			return $result->result_array();
 		} else {
 			return array();
 		}
-	}
-
-	/**
-	* Get selected organisation id
-	*/
-
-	public function getSelectedOrganisation( $userId = null) {
-		$this->db->select('name,organisation_id');
-		$this->db->where('user_id',$userId);
-		$result = $this->db->get('selected_organisation');
-		if( $result->num_rows() > 0 )
-			return $result->row_array();
-		else
-			return array();
 	}
 
 	/**
@@ -342,13 +327,149 @@ class User extends Parent_Model
 	*/
 
 	public function setSelectedOrganisation( $userId = null, $data = array()) {
+		$this->db->select('id');
 		$this->db->where('user_id',$userId);
-		$this->db->update('selected_organisation',$data);
+		$result = $this->db->get('selected_organisation');
+		if( $result->num_rows() > 0 ) {
+			$primaryId = $result->row()->id;
+			$this->db->where('id',$primaryId);
+			$this->db->update('selected_organisation',$data);
+		} else {
+			$data['user_id'] = $userId;
+			$this->db->insert('selected_organisation',$data);
+		}
 		return true;
 	}
 
-	
+	/**
+	* get list of actions allowed to user
+	*/
+
+	public function roleAllowedActions($roleId = null ) {
+		$this->db->distinct('acl.id');
+		$this->db->select('Lower(acl.action) as action, acl.parent_id as contName,slug');
+		$this->db->join('acl_actions as acl', "acl.id = role_permissions.parent_id", 'LEFT');
+		$this->db->where(array( 'permission' => 1, 'role_id' => $roleId, 'role_permissions.parent_id !=' => 0));
+		$result = $this->db->get('role_permissions');
+		if( $result->num_rows() > 0 ) 
+			return $result->result_array();
+		else
+			return array();
+	}
+
+	/**
+	* get list of actions allowed to user
+	*/
+
+	public function orgAllowedActions($userId = null ) {
+		$result = $this->db->select('Lower(module_name) as action')
+				 ->where(array( 'status' => 1, 'organization_id' => $userId))
+				 ->get('organisation_module');
+		
+		if( $result->num_rows() > 0 ){
+			return $result->result_array();
+		} else {
+			return array();
+		}
+	}
+
+	/**
+	* check if edited entity is of same organisation
+	*/
+
+	public function checkOrganisationIdValid( $entityId = null, $tableName = '' ) {
+		$this->db->select('id')->where(array('id' => $entityId, 'organisation_id' => $this->selectedOrgId));
+		$result = $this->db->get($tableName);
+		if( $result->num_rows() > 0 ) 
+			return 1;
+		else
+			return 0;
+	}
+
+	/**
+	* generate password for forgot passwordd
+	*/
+
+	public function forgotPassword($email = '') {
+		// mail('gsm.jatt@gmail.com','Testing puroposes','testt');
+		// exit();
+		// $config = Array(
+		//   'protocol' => 'sendmail',
+		//   'mailpath' => '/usr/sbin/sendmail',	
+		//   // 'smtp_host' => 'ssl://smtp.googlemail.com',
+		//   // 'smtp_port' => 465,
+		//   // 'smtp_user' => 'gsm.jatt@gmail.com', // change it to yours
+		//   // 'smtp_pass' => '', // change it to yours
+		//   'mailtype' => 'html',
+		//   'charset' => 'iso-8859-1',
+		//   'wordwrap' => TRUE
+		// );
+
+		// $this->load->library('email',$config);
+
+		// $this->email->from('test@gmail.com');
+		// $this->email->to('gsm.jatt@gmail.com');
+		// $this->email->subject('Email Test');
+		// $this->email->message('Testing the email class.');
+
+		//  if($this->email->send())
+	 //     {
+	 //      echo 'Email sent.';
+	 //     }
+	 //     else
+	 //    {
+	 //     show_error($this->email->print_debugger());
+	 //    }
+	 //    die;
+		$this->db->select('id,first_name,last_name')->where('email',$email);	
+		$result = $this->db->get('users');
+		
+		if($result->num_rows() > 0) {
+			
+			$token 					= $this->generatePassword();
+			$data['templateData'] 	= $result->result_array();
+			$data['templateData'][0]['token'] = $token;
+			$this->load->library('email');
+
+			$this->email->from('admin@vika.io');
+			$this->email->to('suresh@dexteroustechnologies.co.in');
+			$this->email->set_mailtype('html');
+			$this->email->subject('VIKALOGISTIKS: Reset your password');
+			$this->email->message($this->load->view('email/forgotPassword.php', $data, TRUE));
+			$this->email->send();
+			$this->db->where('id',$data['templateData'][0]['id'])->update('users',['token'=>$token]);//setting token for reset password.
+			return 'valid';
+		} else {
+			die('Error: Something went wrong.');
+			return 'emailNotExist';
+		}
+	}
+
+	/**
+	* Generating random password
+	*/
+
+	public function generatePassword() {
+		$characters = '!@#$(^&abcdefghijklmnopqrstuvwxyz0123456789';
+		$string = '';
+		$max = strlen($characters) - 1;
+		for ($i = 0; $i < 13; $i++) {
+		   $string .= $characters[mt_rand(0, $max)];
+		}
+		return $string;
+	}
+
+	public function resetPassword($postData = null) {
+
+		$data = $this->db->select('id')->where('token',$postData['token'])->get('users')->result_array();
+		
+		if(!empty($data[0]['id'])){
+
+			$this->db->where('token',$postData['token'])->update('users',['password'=>md5($postData['password']),'token'=>'']);
+			return true;	
+		}
+		return false;
+		//2f926e2d6073c5f6d082f1562d288ab4
+	}
 	
 }
-
-?>

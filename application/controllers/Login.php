@@ -3,46 +3,112 @@ class Login extends CI_Controller {
 
 	private $entity;
 	private $event;
+	protected $superAdmin = 0;
+	protected $userID;
+
 	function __construct()
 	{ 
 		parent::__construct();	
-		$this->load->model('User');
-		$this->load->model("Job");
-		$this->entity = $this->config->item('entity');
-		$this->event = $this->config->item('event');
+		$this->load->model(array('User','Job','AclModel'));
+		$this->entity 	= $this->config->item('entity');
+		$this->event 	= $this->config->item('event');
 		$this->load->helper("truckstop");
+		$this->userID   = $loggedUser_id = $this->session->userdata('loggedUser_id');
+
+		if(in_array($this->userID, $this->config->item('superAdminIds'))){
+			$this->superAdmin = 1;
+		}
+
 	}
 	
+
 	function index()
 	{
 		$_POST = json_decode(file_get_contents('php://input'), true);
 		$username = $_POST['username'];
 		$password = $_POST['password'];
+		
 		$data = array();
 		if( $this->User->check_admin_credentials($username, $password) == true ) {
-			$profile_img = $this->User->user_Profile($this->session->userdata('loggedUser_id'));
-			if ( $this->session->userdata('role') == 8 ) {
-				$result = $this->User->getOrganisationsList();
-				$selectedOrg = $this->User->getSelectedOrganisation($this->session->userdata('loggedUser_id'));
-				$selectedId = (!empty($selectedOrg) && !empty($selectedOrg['organisation_id'])) ? $selectedOrg['organisation_id'] : ( !empty($result) ? $result[0]['id'] : '');
+			
+			$profile_img 	= $this->User->user_Profile($this->session->userdata('loggedUser_id'));
+			$roleId 		= $this->session->userdata('role');
+
+			if ( $roleId == 8 ) {
+
+				$result 		= $this->User->getOrganisationsList();
+				$selectedOrg 	= $this->User->getSelectedOrganisation($this->session->userdata('loggedUser_id'));
+				$selectedId 	= (!empty($selectedOrg) && !empty($selectedOrg['organisation_id'])) ? $selectedOrg['organisation_id'] : ( !empty($result) ? $result[0]['id'] : '');
 				$selectedOrgName = (!empty($selectedOrg) && !empty($selectedOrg['name'])) ? $selectedOrg['name'] : ( !empty($result) ? $result[0]['first_name'] : '');
+
+				if ( !isset($selectedOrg) || empty($selectedOrg['name']) ) {					
+					$data['name'] = $selectedOrgName;
+					$data['organisation_id'] = $selectedId;
+					$this->User->setSelectedOrganisation($this->session->userdata('loggedUser_id'),$data);
+				} 
+
+				if( !empty($result)) {
+					$key = array_search($selectedId, array_column($result, 'id'));
+					$temp = $result[$key];
+					unset($result[$key]);
+					array_unshift($result, $temp);
+				}
+				$redirectTo 		= 'dashboard';
+				$showGlobalDropDown = true;
 			} else {
-				$result = array();
-				$selectedOrgName = $selectedId = '';
+				$result 			= array();
+				$selectedOrgName 	= $selectedId = '';
+				$showGlobalDropDown = false;
+
+				if ( $roleId == 9 ) {
+					$selectedId = $this->session->userdata('loggedUser_id');
+					$getAllowedActions = $this->User->orgAllowedActions($this->session->userdata('loggedUser_id'));
+				} else {
+					$getAllowedActions = $this->User->roleAllowedActions($roleId);	
+					$selectedId = $this->session->userdata('loggedUser_parentId');
+				}	
+
+				if ( !empty($getAllowedActions)) {
+					$getAllowedActions = array_column($getAllowedActions,'action');
+					if ( in_array('dashboard',$getAllowedActions) )
+						$redirectTo = 'dashboard';
+					else if ( in_array('assignedloads',$getAllowedActions))
+						$redirectTo = 'myLoad';
+					else if ( in_array('drivers',$getAllowedActions))
+						$redirectTo = 'drivers';
+					else if ( in_array('vehicles',$getAllowedActions))
+						$redirectTo = 'trucks';
+					else if ( in_array('reports',$getAllowedActions))
+						$redirectTo = 'report';
+					else if ( in_array('investors',$getAllowedActions))
+						$redirectTo = 'investor';
+					else if ( in_array('trailers',$getAllowedActions))
+						$redirectTo = 'trailers';
+					else if ( in_array('brokers',$getAllowedActions))
+						$redirectTo = 'broker';
+					else
+						$redirectTo = 'logout';
+				} else {
+					$redirectTo = 'logout';
+				}				
 			}
 
 			echo json_encode(
 				array(
-					'success'=>true,
-					'LastName' 			=> $this->session->userdata('LastName'),
-					'color' 			=> $this->session->userdata('color'),
-					'loggedUser_email' 	=> $this->session->userdata('loggedUser_email'),
+					'success'			  =>true,
+					'LastName' 			  => $this->session->userdata('LastName'),
+					'color' 			  => $this->session->userdata('color'),
+					'loggedUser_email' 	  => $this->session->userdata('loggedUser_email'),
 					'loggedUser_username' => $this->session->userdata('loggedUser_username'),
-					'loggedUser_fname' 	=> $this->session->userdata('loggedUser_fname'),
-					'loggedUser_id' 	=> $this->session->userdata('loggedUser_id'),
-					'loggedUserRole_id' => $this->session->userdata('role'),
-					'profile_img' 		=> $profile_img,
-					'organisations' => $result,'selectedOrgName' => $selectedOrgName, 'selectedId' => $selectedId
+					'loggedUser_fname' 	  => $this->session->userdata('loggedUser_fname'),
+					'loggedUser_id' 	  => $this->session->userdata('loggedUser_id'),
+					'loggedUserRole_id'   => $this->session->userdata('role'),
+					'profile_img' 		  => $profile_img,
+					'organisations'       => $result,
+					'selectedOrgName'     => $selectedOrgName, 
+					'selectedId'   		  => $selectedId, 
+					'redirectUserTo' 	  => $redirectTo,
+					'showGlobalDropDown'  => $showGlobalDropDown
 					)
 				);
 
@@ -69,13 +135,26 @@ class Login extends CI_Controller {
 	}
 	
 	public function checkLogin() {
-	
-		$user_logged_username = $this->session->userdata('loggedUser_username');
-		$user_logged_id = $this->session->userdata('loggedUser_id');
-		$user_logged_in = $this->session->userdata('loggedUser_loggedin');
-		
+
+		$user_logged_username 	= $this->session->userdata('loggedUser_username');
+		$user_logged_id 		= $this->session->userdata('loggedUser_id');
+		$user_logged_in 		= $this->session->userdata('loggedUser_loggedin');
+		$user_role_id 			= $this->session->userdata('role');
+		$myModules = [];
 		if( (isset($user_logged_username) && $user_logged_username != '') && (isset($user_logged_id) && $user_logged_id != '') && (isset($user_logged_in) && $user_logged_in == true) ) {
-			echo json_encode(array('success' => true ));
+				$myModules = $this->User->getAssignedModules();
+				$selectedOrgId = 0;
+				if(in_array($user_logged_id, $this->config->item('superAdminIds'))){
+					$res = $this->User->getSelectedOrganisation($user_logged_id);
+					$selectedOrgId = ( !empty($res)) ? $res['organisation_id'] : 0;
+				} else if ( $user_role_id == 9 ) {
+					$selectedOrgId = $user_logged_id;
+				} else {
+					$selectedOrgId = $this->session->userdata('loggedUser_parentId');
+				}
+
+			echo json_encode(array('success' => true ,'modules'=>$myModules,'superadmin'=>$this->superAdmin,"selectedOrgId"=>$selectedOrgId));
+
 		} else {
 			echo json_encode(array('success' => false ));
 		}
@@ -252,7 +331,7 @@ class Login extends CI_Controller {
 	/**
 	 * Loading all the languages into one file
 	 */
-	 
+
 	public function loadLanguages() {
 		
 		$cookieVariable = get_cookie('setLanguageGlobalVariable');
@@ -261,7 +340,7 @@ class Login extends CI_Controller {
 				'name'   => 'setLanguageGlobalVariable',
 				'value'  => 'english',
 				// 'expire' => time()+86500,
-			 );
+				);
 			set_cookie($cookie);
 		}		
 		//~ $this->config->set_item('language',$_COOKIE['setLanguageGlobalVariable']);
@@ -300,15 +379,50 @@ class Login extends CI_Controller {
 		$this->lang->load('billing');
 		$languageArray['billing'] = json_encode($this->lang->language);
 		echo "languageArr['billing']=".$languageArray['billing'].';';
+
+		$this->lang->load('users');
+		$languageArray['users'] = json_encode($this->lang->language);
+		echo "languageArr['users']=".$languageArray['users'].';';
 		
 		//~ $this->lang->load('loads');	
 		//~ $load = json_encode($this->lang->language);
 		//~ echo "var loadsArr=".$load.';';
 	}
-	
 
+	public function get_current_user_sidebar(){
 
-	
+	}
 
+	/**
+	* set forgot password
+	*/
+
+	public function forgotPassword() {
+		$postData = json_decode(file_get_contents('php://input'), true);
+		$email = $postData['email'];
+		$res = $this->User->forgotPassword($email);
+		if($res == 'emailNotExist') {
+			echo json_encode(array('status' => 'emailNotExist'));
+		} else{
+			echo json_encode(array('status' => 'success'));
+		}
+	}
+
+	/**
+	* 
+	* set reset password
+	*/
+
+	public function resetPassword( $hash=null ) {
+		
+		$postData 	= json_decode(file_get_contents('php://input'), true);
+
+		if(!empty($_REQUEST['hash'])){
+			echo json_encode(array('data'=>$_REQUEST['hash']));die();
+		}
+		
+		if(!empty($postData['password'])){
+			echo json_encode(array('status'=>$this->User->resetPassword($postData)));die();
+		}
+	}
 }
-?>

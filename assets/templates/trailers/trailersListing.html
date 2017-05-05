@@ -33,6 +33,13 @@
 									</button>
 								</a>
 
+								<a href="javascript:void(0)" ng-click="openAddPopup()" >
+									<button class="btn btn-primary">
+										<i class="fa fa-plus" style="margin-right:3px"></i>
+										<span class="bold">sdadsf</span>
+									</button>
+								</a>
+
 								<a href="" class="add-new-data-button" style="right: 150px;" ng-click="exportCsvData('trailers')">
   									<button title="Export" class="btn btn-primary btn-cons m-b-10" type="button">
   										<i class="fa fa-file-excel-o"></i> 
@@ -55,7 +62,7 @@
 									</thead>
 									<tbody>
 										
-										<tr ng-repeat="value in trailers track by value.id" >
+										<tr ng-repeat="value in trailers track by value.id" ng-click="mctrl.moveEntitiesToEditState(value.id,'editTrailer')" class="tr-pointer" >
 											
 											<td>{{ value.unit_id }} </td>
 											<td>{{ value.label }}</td>
@@ -64,14 +71,14 @@
 											<td>{{ value.owner }} </td>
 											<td>{{ value.type}} </td>
 											<td>{{ value.description}} </td>										
-											<td class="text-center action-btn-ryt"> 
+											<td class="text-center action-btn-ryt" ng-click="$event.stopPropagation()"> 
 												<div class="export-options-container">
 													<div class="exportOptions">
 														<div class="DTTT btn-group">
-															<a href="#/editTrailer/{{value.id}}" class="btn btn-default DTTT_button_pdf" title="{{languageCommonVariables.editTrailer}}" ui-jq="tooltip" >
+															<!--a href="#/editTrailer/{{value.id}}" class="btn btn-default DTTT_button_pdf" title="{{languageCommonVariables.editTrailer}}" ui-jq="tooltip" >
 																<span><i class="fa fa-edit" aria-hidden="true"></i></span>
 															</a>
-															<!--a class="btn btn-default DTTT_button_copy" title="{{languageCommonVariables.deleteTrailer}}" ui-jq="tooltip" ng-click='removeTrailer(value.id,$index)' >
+															<!-a class="btn btn-default DTTT_button_copy" title="{{languageCommonVariables.deleteTrailer}}" ui-jq="tooltip" ng-click='removeTrailer(value.id,$index)' >
 																<span><i class="fa fa-trash" aria-hidden="true"></i></span>
 															</a-->
 															<a class="btn btn-default DTTT_button_csv" title="{{languageCommonVariables.deactivateTrailer}}" ui-jq="tooltip" ng-click="changeTrailerStatus(value.id,value.status,$index)" ng-if="value.status == 1">
@@ -101,3 +108,8 @@
 	</div>
 </div>
 <ng-include src="'./assets/templates/common_modals.html'"></ng-include>
+
+
+<script type="text/ng-template" id="mcqtest.html">
+  dfsgdfgdfg
+</script>

@@ -41,8 +41,9 @@
     <link type="text/css" rel="stylesheet" href="assets/plugins/jquery-datatable/media/css/jquery.dataTables.css">
     <link type="text/css" rel="stylesheet" href="assets/plugins/jquery-datatable/extensions/fixedheader/css/fixedHeader.dataTables.min.css">
     <link type="text/css" rel="stylesheet" href="assets/plugins/jquery-datatable/extensions/RowReorder/css/rowReorder.dataTables.min.css">
-    <link type="text/css" rel="stylesheet" href="assets/plugins/jquery-datatable/extensions/Responsive/css/responsive.dataTables.min.css">    
-   <!-- BEGIN VENDOR JS -->
+    <link type="text/css" rel="stylesheet" href="assets/plugins/jquery-datatable/extensions/Responsive/css/responsive.dataTables.min.css">   
+    <link type="text/css" rel="stylesheet" href="assets/js/sweetalert/dist/sweetalert.css">   
+    <!-- BEGIN VENDOR JS -->
 
 
 </head>
@@ -83,9 +84,11 @@
     <?php 
     createScriptOrLinkTag('app/routes.js','script');
     createScriptOrLinkTag('app/mainController.js','script');?>
-    
     <script src="app/config.lazyload.js" type="text/javascript"></script>
     <script src="assets/js/jstz.min.js" type="text/javascript"></script>
+    <script src="assets/js/jquery.isotope.js" type="text/javascript"></script>
+    <script src="assets/js/angular-isotope.js" type="text/javascript"></script>
+    
 
     <script src="assets/js/directives/pg-sidebar.js" type="text/javascript"></script>
     <script src="assets/js/directives/datepicker.js" type="text/javascript"></script>
@@ -102,14 +105,20 @@
     <script src="assets/plugins/angular-signature/src/signature.js"></script>
     <script src="assets/plugins/angular/angular-sortable-view.min.js"></script>
     <script src="assets/plugins/angular/angular.dcb-img-fallback.min.js"></script>
-    
+    <script src="assets/js/elasticsearch.angular.min.js" type="text/javascript"></script>
     <script src="assets/js/directives/skycons.js"></script>
-    <script src='assets/plugins/bootstrap-datepicker/js/bootstrap-datepicker.js'></script>
-   
+    <script src='assets/plugins/bootstrap-datepicker/js/bootstrap-datepicker.js'></script>   
+    <script src="assets/js/ui-bootstrap-tpls.min.js"></script>
     <script src="app/packages/dirPagination.js"></script>
     <?php createScriptOrLinkTag('app/services/myServices.js','script');?>
+
     <script src="app/services/sample.js"></script>
     <script src="app/helper/myHelper.js"></script>
+    <script src="assets/js/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="assets/js/ngSweetAlert/SweetAlert.js"></script>
+    <script src="assets/js/ngstorage/ngStorage.min.js"></script>
+    <!--script src="assets/js/ng-file-upload/ng-file-upload.js"></script>
+    <script src="assets/js/ng-file-upload/ng-file-upload-shim.js"></script-->
 
     <!-- App Controller -->
     <?php 
@@ -140,9 +149,15 @@
     createScriptOrLinkTag('app/controllers/outboxPaymentController.js','script');
     createScriptOrLinkTag('app/services/investorService.js','script');
     createScriptOrLinkTag('app/services/shipperService.js','script');
+    createScriptOrLinkTag('app/services/forgotService.js','script');
+    createScriptOrLinkTag('app/services/esClient.js','script');
+    createScriptOrLinkTag('app/services/rolesService.js','script');
+
     createScriptOrLinkTag('app/services/environmentconfig.js','script');
     createScriptOrLinkTag('app/controllers/aclController.js','script');    
     createScriptOrLinkTag('app/controllers/usersController.js','script');    
+    createScriptOrLinkTag('app/controllers/forgotPassword.js','script');    
+    createScriptOrLinkTag('app/controllers/resetPassword.js','script');    
     ?>
     <script src="login/loadLanguages"></script>
     <!--for footable-->

@@ -1,14 +1,14 @@
 <div class="page-content-wrapper ">
 	<div class="content sm-gutter">
 		<div class="container-fluid padding-25 sm-padding-10">
-			<div ng-show="dataNotFound == true" class="alert alert-danger" role="alert">
-				<button ng-click = "hideloadmessage()" class="close"></button>
-				{{errorMessage}}
+			<div ng-show="users.imageError == true" class="alert alert-danger" role="alert">
+				<button ng-click = "users.hidemessages()" class="close"></button>
+				<p dynamic="users.imageUploadError" ></p>
 			</div>
 			<div class="row">
 				<div class="col-md-12 col-xlg-12">
-				<div class="commen-heading">
-					<h2 class="oprate-dashbord ng-binding"> {{ languageArray.addUser }}</h2>
+				<div class="commen-heading no-padding">
+					<h2 class="oprate-dashbord ng-binding"><i class="fa fa-user-plus"></i> {{ users.userHeading }}</h2>
 				</div>
 				</div>
 			</div>
@@ -31,48 +31,45 @@
 								<div class="row clearfix">
 									<div class="col-sm-6">
 										<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':newuser.first_name.$invalid && !newuser.first_name.$pristine || newuser.$submitted && newuser.first_name.$invalid}">
-											<label>First Name</label>
+											<label>{{ languageCommonVariables.firstname }}</label>
 											<input type="text" class="form-control" name="first_name" ng-model="users.userData.first_name" required />
 										</div>
-										<label class="error" for="first_name" ng-show="newuser.first_name.$invalid && !newuser.first_name.$pristine || newuser.$submitted && newuser.first_name.$invalid">Please enter first name.</label>
+										<label class="error" for="first_name" ng-show="newuser.first_name.$invalid && !newuser.first_name.$pristine || newuser.$submitted && newuser.first_name.$invalid">{{ languageArray.validationFName }}</label>
 									</div>
 									<div class="col-sm-6">
 										<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':newuser.last_name.$invalid && !newuser.last_name.$pristine || newuser.$submitted && newuser.last_name.$invalid}">
-											<label>Last Name</label>
+											<label>{{ languageCommonVariables.lastname }}</label>
 											<input type="text" class="form-control" name="last_name" ng-model="users.userData.last_name" required / >
 										</div>
-										<label class="error" for="last_name" ng-show="newuser.last_name.$invalid && !newuser.last_name.$pristine || newuser.$submitted && newuser.last_name.$invalid">Please enter last name.</label>
+										<label class="error" for="last_name" ng-show="newuser.last_name.$invalid && !newuser.last_name.$pristine || newuser.$submitted && newuser.last_name.$invalid">{{ languageArray.validationLName }}</label>
 									</div>
 								</div>
 								<!--row-end-->
 								<!--row-->
-								<div class="row clearfix">
-									
+								<div class="row clearfix">									
 									<div class="col-sm-6">
 										<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':newuser.username.$invalid && !newuser.username.$pristine || newuser.$submitted && newuser.username.$invalid || userData.username.$invalid, 'has-error-new' : users.notSaveUser == false}">
-											<label>Username</label>
+											<label>{{ languageCommonVariables.username }}</label>
 											<input type="text" id='checkUnique' ng-blur = "users.checkUnique()" class="form-control" name="username" ng-model="users.userData.username" required / >
 										</div>
-										<label class="error" for="username" ng-show="newuser.username.$invalid && !newuser.username.$pristine || newuser.$submitted && newuser.username.$invalid">Please enter username</label>
-										<label class="error" for="username" ng-show="users.notSaveUser == false">Username already in used.Please choose diffrent.</label>
+										<label class="error" for="username" ng-show="newuser.username.$invalid && !newuser.username.$pristine || newuser.$submitted && newuser.username.$invalid">{{ languageArray.validationUserName }}</label>
+										<label class="error" for="username" ng-show="users.notSaveUser == false">{{ languageArray.usernameerror }}</label>
 									</div>
 
 									<div ng-if="request=='addUser'" class="col-sm-6">
 										<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':newuser.password.$invalid && !newuser.password.$pristine || newuser.$submitted && newuser.password.$invalid}">
-											<label>Password</label>
+											<label>{{ languageCommonVariables.password }}</label>
 											<input type="password" class="form-control" name="password" ng-model="users.userData.password" required / >
 										</div>
-										<label class="error" for="password" ng-show="newuser.password.$invalid && !newuser.password.$pristine || newuser.$submitted && newuser.password.$invalid">Please enter password.</label>
+										<label class="error" for="password" ng-show="newuser.password.$invalid && !newuser.password.$pristine || newuser.$submitted && newuser.password.$invalid">{{ languageCommonVariables.validationPassword }}</label>
 									</div>
 
 									<div class="col-sm-6" ng-if="request=='editUser'">
 										<div pg-form-group class="form-group form-group-default">
-											<label>Password</label>
+											<label>{{ languageCommonVariables.password }}</label>
 											<input type="password" class="form-control" name="password" ng-model="users.userData.newpassword"/>
 										</div>
 									</div>
-
-
 								</div>								
 								<!--row-end-->
 								<!--row-->
@@ -80,33 +77,32 @@
 									
 									<div class="col-sm-6">
 										<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':newuser.email.$invalid && !newuser.email.$pristine || newuser.$submitted && newuser.email.$invalid}">
-											<label>Email</label>
-											<input type="text" class="form-control" name="email" ng-model="users.userData.email" required / >
+											<label>{{ languageCommonVariables.email }}</label>
+											<input type="email" class="form-control" name="email" ng-model="users.userData.email" required / >
 										</div>
-										<label class="error" for="email" ng-show="newuser.email.$invalid && !newuser.email.$pristine || newuser.$submitted && newuser.email.$invalid">Please enter email address.</label>
+										<label class="error" for="email" ng-show="newuser.email.$invalid && !newuser.email.$pristine || newuser.$submitted && newuser.email.$invalid">{{ languageCommonVariables.validationEmail }}</label>
 									</div>
 
 									<div class="col-sm-6">
 										<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':newuser.phone.$invalid && !newuser.phone.$pristine || newuser.$submitted && newuser.phone.$invalid}">
-											<label>Phone</label>
+											<label>{{ languageCommonVariables.phone }}</label>
 											<input type="text" class="form-control" name="phone" ui-jq="mask" ui-options="'(999) 999-9999'" ng-model="users.userData.phone" required / >
 										</div>
-										<label class="error" for="phone" ng-show="newuser.phone.$invalid && !newuser.phone.$pristine || newuser.$submitted && newuser.phone.$invalid">Please enter phone.</label>
+										<label class="error" for="phone" ng-show="newuser.phone.$invalid && !newuser.phone.$pristine || newuser.$submitted && newuser.phone.$invalid">{{ languageCommonVariables.validationPhone }}</label>
 									</div>
 								</div>								
 								<!--row-end-->
 								<!--row-->
-								<div class="row clearfix">
-									
+								<div class="row clearfix">									
 									<div class="col-sm-6">
 										<div pg-form-group class="form-group form-group-default">
-											<label>City</label>
+											<label>{{ languageCommonVariables.city }}</label>
 											<input type="text" class="form-control" name="city" ng-model="users.userData.city"/>
 										</div>
 									</div>
 									<div class="col-sm-6">
 										<div pg-form-group class="form-group form-group-default">
-											<label>State</label>
+											<label>{{ languageCommonVariables.state }}</label>
 											<input type="text" class="form-control" name="state" ng-model="users.userData.state"/>
 										</div>
 									</div>
@@ -117,18 +113,18 @@
 									
 									<div class="col-sm-6">
 										<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':newuser.zipcode.$invalid && !newuser.zipcode.$pristine || newuser.$submitted && newuser.zipcode.$invalid}">
-											<label>Zip Code</label>
+											<label>{{ languageCommonVariables.zipcode }}</label>
 											<input type="text" class="form-control" name="zipcode" ng-model="users.userData.zipcode" required / >
 										</div>
-										<label class="error" for="zipcode" ng-show="newuser.zipcode.$invalid && !newuser.zipcode.$pristine || newuser.$submitted && newuser.zipcode.$invalid">Please enter zip code.</label>
+										<label class="error" for="zipcode" ng-show="newuser.zipcode.$invalid && !newuser.zipcode.$pristine || newuser.$submitted && newuser.zipcode.$invalid">{{ languageCommonVariables.validationZip }}</label>
 									</div>
 
 									<div class="col-sm-6">
 										<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':newuser.address.$invalid && !newuser.address.$pristine || newuser.$submitted && newuser.address.$invalid}">
-											<label>Address</label>
+											<label>{{ languageCommonVariables.address }}</label>
 											<input type="text" class="form-control" name="address" ng-model="users.userData.address" required / >
 										</div>
-										<label class="error" for="address" ng-show="newuser.address.$invalid && !newuser.address.$pristine || newuser.$submitted && newuser.address.$invalid">Please enter address.</label>
+										<label class="error" for="address" ng-show="newuser.address.$invalid && !newuser.address.$pristine || newuser.$submitted && newuser.address.$invalid">{{ languageCommonVariables.validationAddress }}</label>
 									</div>
 								</div>								
 								<!--row-end-->
@@ -136,7 +132,7 @@
 								<div class="row clearfix">
 									<div class="col-sm-6">
 										<div pg-form-group class="form-group form-group-default required th-select" ng-class="{'has-error':newuser.role_id.$invalid && !newuser.role_id.$pristine || newuser.$submitted && newuser.role_id.$invalid}">
-											<label>SELECT ROLE</label>
+											<label>{{ languageArray.selectrole }}</label>
 											<ui-select name="role_id" ng-model="users.userData.role_id" theme="bootstrap" required on-select="onSelectRoleCallback($item, $model)">
 												<ui-select-match class="ui-select-match" placeholder="Select Role">{{users.selectedRole}}</ui-select-match>
 												<ui-select-choices class="ui-select-choices" repeat="item in roleList | filter: $select.search">
@@ -144,26 +140,32 @@
 												</ui-select-choices>
 											</ui-select>
 										</div>
-										<label class="error" for="role_id" ng-show="newuser.role_id.$invalid && !newuser.role_id.$pristine || newuser.$submitted && newuser.role_id.$invalid">Please select role.</label>
+										<label class="error" for="role_id" ng-show="newuser.role_id.$invalid && !newuser.role_id.$pristine || newuser.$submitted && newuser.role_id.$invalid">{{ languageArray.validationRole }}</label>
 									</div>
 
 									<div class="col-sm-6">
-										&nbsp;
-									</div>
-									<!--div class="col-sm-6">
-										<div pg-form-group class="form-group form-group-default th-select">
-											<label>Profile Image</label>
-											<input type="file" id="profileImage" class="form-control" name="profile_image" ng-model="userData.profile_image"/>
+										<div pg-form-group class="form-group form-group-default">
+											<!--label>Profile Image</label-->
+											<div class="col-sm-8">
+                                                <label>{{ languageArray.driverprofileimg }}</label>
+                                                <div class="input-file-browse">
+                                               		 <input type="file" id="profileImage" file-model = "users.profile_image" class="form-control" name="profile_image" />
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4 img-cont" ng-if="users.userData.profile_image != undefined && users.userData.profile_image != ''">
+                                                <img class="center-me" fallback-src="pages/img/user.png" ng-src="./assets/uploads/users/thumbnail/{{users.userData.profile_image}}" width="70" height="50">
+                                            </div>	
 										</div>
-										
-									</div-->
+									</div>
 								</div>	
+
+								<input type="hidden" ng-model="users.userData.profile_image" />
 								<!--row-end-->
 								<div class="update-truck-block-btn">
 									<button ng-click="submitted=true" class="btn btn-primary btn-cons m-b-10" type="submit">
 										<i class="fa fa-plus"></i>
-										<span ng-disable="username" ng-hide="users.userData.id" class="bold"> {{languageArray.brokerListingTableAddbutton|capitalize }}</span>
-										<span ng-disable="username" ng-show="users.userData.id" class="bold"> {{languageArray.brokerListingTableEditbutton|capitalize }}</span>
+										<span ng-disable="username" ng-hide="users.userData.id" class="bold"> {{languageArray.addUser|capitalize }}</span>
+										<span ng-disable="username" ng-show="users.userData.id" class="bold"> {{languageArray.editUser|capitalize }}</span>
 									</button>
 									<a href="#/users">
 										<button class="btn btn-danger btn-cons m-b-10" type="button">

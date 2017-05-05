@@ -48,7 +48,6 @@ class Iterationloads extends Admin_Controller{
 		
 		$this->load->model(array('Vehicle','Job','User','Driver'));
 		$this->load->helper('truckstop');
-		$this->userId 		= $this->session->loggedUser_id;
 		$this->origin_state  = $this->Vehicle->get_vehicles_state($this->session->admin_id);
 		
 		$this->weeklyDrivingHours 	= 70;
@@ -81,18 +80,18 @@ class Iterationloads extends Admin_Controller{
 		$pickupDateDest = '';
 		
 		$userId = false;
-		$parentId = $this->userId;
+		$parentId = $this->userID;
 		$childIds  = array();
 		
-		if ( $this->userRoleId == 4 ) {
-			$parentIdCheck = $this->session->userdata('loggedUser_parentId');
+		if ( $this->globalRoleId == 4 ) {
+			$parentIdCheck = $this->session->userdata('dispCord_parent');
 			if( isset($parentIdCheck) && $parentIdCheck != 0 ) {
 				$userId = $parentIdCheck;
 				$parentId = $parentIdCheck;
 			}
 		}
 
-		$childIds = $this->User->fetchDispatchersChilds($this->userId);
+		$childIds = $this->User->fetchDispatchersChilds($this->userID);
 
 		$gVehicleId = false;
 		$driverType = "driver";
@@ -109,7 +108,7 @@ class Iterationloads extends Admin_Controller{
 				$gVehicleId = $gDropdown["vid"];
 			}
 			$vehParentId = isset($gDropdown['dispId']) ? $gDropdown['dispId'] : '';
-		 $driverType = isset($gDropdown["label"]) && ($gDropdown["label"] == "team" || $gDropdown["label"] == "_team") ? "team" : "driver";
+		 	$driverType = isset($gDropdown["label"]) && ($gDropdown["label"] == "team" || $gDropdown["label"] == "_team") ? "team" : "driver";
 		} else {
 			$vehParentId = $parentId;
 		}
@@ -134,8 +133,8 @@ class Iterationloads extends Admin_Controller{
 			//-----------------------------------
 			$userId = false;
 			if($this->userRoleId == _DISPATCHER){
-				$userId = $this->userId;
-			} else if ( $this->userRoleId == 4 ) {
+				$userId = $this->userID;
+			} else if ( $this->globalRoleId == 4 ) {
 				$userId = $parentId;
 			}
 			
@@ -302,7 +301,7 @@ class Iterationloads extends Admin_Controller{
 			$defaultLength 	= 45;
 
 			if ( $vehicleId != '' && $vehicleId != null ) {
-				$vehicle_details = $this->Vehicle->get_vehicles_fuel_consumption($this->userId,$vehicleId);
+				$vehicle_details = $this->Vehicle->get_vehicles_fuel_consumption($vehicleId);
 				if ( !empty($vehicle_details) ) {
 					$truckAverage =round( 100/$vehicle_details[0]['fuel_consumption'],2);
 					//$truckAverage =(int)($vehicle_details[0]['fuel_consumption']/100);

@@ -54,7 +54,7 @@
 										</tr>
 									</thead>
 									<tbody>
-										<tr ng-repeat="value in data track by value.id">
+										<tr ng-repeat="value in data track by value.id" ng-click="mctrl.moveEntitiesToEditState(value.id,'editbroker')" class="tr-pointer" >
 											<td>{{ value.TruckCompanyName }}</td>
 											<td class="rating-alignment">
 												<div ng-init="rating = value.rating "></div>
@@ -68,13 +68,13 @@
 											<td>{{ value.CarrierMC }}</td>
 											<td>{{ value.DOTNumber }}</td>
 											<td>{{ value.brokerStatus }}</td>
-											<td class="text-center action-btn-ryt"> 
+											<td class="text-center action-btn-ryt" ng-click="$event.stopPropagation()"> 
 												<div class="export-options-container">
 													<div class="exportOptions">
 														<div class="DTTT btn-group">
-															<a href="#/editbroker/{{value.id}}" class="btn btn-default DTTT_button_pdf" data-original-title="{{languageCommonVariables.editBroker}}" ui-jq="tooltip" >
+															<!--a href="#/editbroker/{{value.id}}" class="btn btn-default DTTT_button_pdf" data-original-title="{{languageCommonVariables.editBroker}}" ui-jq="tooltip" >
 																<span><i class="fa fa-edit" aria-hidden="true"></i></span>
-															</a>
+															</a-->
 															<a class="btn btn-default DTTT_button_copy" title="{{languageCommonVariables.deleteBroker}}" ui-jq="tooltip" ng-click='removeBroker(value.id,$index)' >
 																<span><i class="fa fa-trash" aria-hidden="true"></i></span>
 															</a>

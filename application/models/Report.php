@@ -9,6 +9,7 @@ class Report extends CI_Model {
 		$this->db->select('id,tracker_id, CONCAT("T",label) as truck');
 		$this->db->where('tracker_id !=','');
 		$this->db->where('tracker_id !=','0');
+		$this->db->where('vehicles.organisation_id',$this->selectedOrgId);
 		$query = $this->db->get('vehicles');
 		if ($query->num_rows() > 0) {
 			return $query->result_array();
@@ -115,12 +116,6 @@ class Report extends CI_Model {
 		$this->db->join("broker_info as b", "l.broker_id = b.id","Left");
 		$this->db->join('drivers as team','team.id = l.second_driver_id','LEFT');
 		
-		/*if( (isset($args["scope"]) && $args["scope"] != "" && $args["scope"] != "all"  ) && (isset($args["selScope"]) && !empty($args["selScope"]) ) || ( ($type != "export" && $type != "drivers" && !empty($args["selScope"]) )  ) ){
-
-			$this->db->where_in("l.vehicle_id",$args["selScope"]);
-		}*/
-
-
 		if ( $from == 'dashboard' && ( $type == 'loads' || $type == 'team') ) {
 			$args['scope'] = $type;
 		}
@@ -154,6 +149,7 @@ class Report extends CI_Model {
 
 		$this->db->where_in("l.JobStatus",$this->config->item('loadStatus'));
 		$this->db->where('delete_status',0);
+		$this->db->where('l.organisation_id',$this->selectedOrgId);
 		$this->db->order_by("l.DeliveryDate DESC");
 		$query = $this->db->get('loads as l');
 		 //echo $this->db->last_query();die;
@@ -181,9 +177,7 @@ class Report extends CI_Model {
 		if($args["selScope"] && is_array($args["selScope"]) && count($args["selScope"] > 0 ) && $group_by != "drivers"){
 			//$this->db->where_in("l.vehicle_id",$args["selScope"]);
 		}
-// echo $group_by; 
-// pr($args);
-// die;
+
 		if(isset($args["secondDriverId"]) && !empty($args['secondDriverId']) && isset($args['scope']) && $args['scope'] == "team"){
 			$driverId = $args["driverId"];
 			$this->db->where(array("l.driver_id" => $args["driverId"], 'l.second_driver_id' => $args['secondDriverId']));
@@ -212,6 +206,7 @@ class Report extends CI_Model {
 		$this->db->where("l.driver_id IS NOT NULL");
 		$this->db->where("l.driver_id != 0");
 		$this->db->where("l.driver_id != ''");
+		$this->db->where('l.organisation_id',$this->selectedOrgId);
 		if(($group_by && $group_by == "dispatchers") || (isset($args["scope"]) && $args["scope"] == "all") || (isset($args["scope"]) && $args["scope"] == "")){
 			$this->db->group_by("l.dispatcher_id");	
 		} else {
@@ -321,6 +316,7 @@ class Report extends CI_Model {
 
 		$this->db->where('delete_status',0);
 		$this->db->where_in("l.JobStatus",$this->config->item('loadStatus'));
+		$this->db->where('l.organisation_id',$this->selectedOrgId);
 
 		if(!$total){
 			$args["limitStart"] = $args["limitStart"] == 1 ? 0 : $args["limitStart"];
@@ -376,6 +372,8 @@ class Report extends CI_Model {
 		$this->db->where("l.driver_id IS NOT NULL");
 		$this->db->where("l.driver_id != 0");
 		$this->db->where("l.driver_id != ''");
+		$this->db->where("l.organisation_id",$this->selectedOrgId);
+		$this->db->where_in("l.JobStatus",$this->config->item('loadStatus'));
 		if(($group_by && $group_by == "dispatchers") || (isset($args["scope"]) && $args["scope"] == "all") || (isset($args["scope"]) && $args["scope"] == "")){
 			$this->db->group_by("l.dispatcher_id");	
 		} else {
@@ -476,6 +474,7 @@ class Report extends CI_Model {
 			$this->db->where('users.status',1);
 			$this->db->where_in('users.role_id',$inArray);
 			$this->db->where_not_in('users.id',array(23,25,27));
+			$this->db->where('users.parent_id',$this->selectedOrgId);
 			$result = $this->db->get('users');
 			if ( $result->num_rows() > 0 ) {
 				return $result->result_array();

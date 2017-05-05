@@ -6,6 +6,7 @@ class Trailers extends Admin_Controller {
     public $roleId;
     public $userName;
     public $data;
+    public $table = 'trailers';
     
     function __construct()
     { 
@@ -40,8 +41,8 @@ class Trailers extends Admin_Controller {
 	* @return type null
 	*/
 	public function add(){
-		$this->data['fetchTrucks'] = $this->Vehicle->fetchTruckListForTrailers();
-		$this->data['trailerAddEdit'] = 'add';
+		$this->data['fetchTrucks'] 		= $this->Vehicle->fetchTruckListForTrailers();
+		$this->data['trailerAddEdit'] 	= 'add';
 		echo json_encode($this->data);
 	}
 	 
@@ -54,6 +55,9 @@ class Trailers extends Admin_Controller {
 	*/
 	
 	public function edit( $trailerId = null ) {
+
+		$this->checkOrganisationIsValid($trailerId,$this->table);
+
 		$this->data['fetchTrucks'] = $this->Vehicle->fetchTruckListForTrailers();
 		$this->data['trailerData'] = $this->Trailer->getTrailerInfo( $trailerId );
 		$this->data['trailerDocuments'] = $this->Trailer->fetchContractDocuments($trailerId, 'trailer');
@@ -71,7 +75,7 @@ class Trailers extends Admin_Controller {
 	* Comment: Used for add or edit the trailer record
 	*/
 
-	public function addEditTrailer($submitType = 'add')
+	public function skipAcl_addEditTrailer($submitType = 'add')
 	{
 		try{
 

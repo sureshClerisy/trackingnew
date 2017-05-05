@@ -10,15 +10,16 @@ class BrokersModel extends Parent_Model
 		
     }
 
-    public function get_brokers()
-    {
-        $this->db->select('*')->from('broker_info');
-        $this->db->where("delete_broker",0);
-        $result = $this->db->get(); 
-        if($result->num_rows()>0){
+    public function get_brokers() {
+
+        $result = $this->db->select('*')->from('broker_info')
+        		->where(["delete_broker"=>0,'organisation_id'=>$this->selectedOrgId])
+        		->get(); 
+        
+        if($result->num_rows() > 0){
 			return $result->result_array();
         } else {
-			return false;
+			return [];
 		}
     } 
   
@@ -29,6 +30,7 @@ class BrokersModel extends Parent_Model
 		$this->db->select('id');
 		$this->db->where('MCNumber',$data['MCNumber']);
 		$brokerRes = $this->db->get('broker_info');
+
 		if ( $brokerRes->num_rows() > 0 ) {
 			$finalResult = $brokerRes->row_array();
 		
@@ -42,6 +44,7 @@ class BrokersModel extends Parent_Model
 				$this->db->update('broker_info',$data,"id={$id}");
 				$brokerLastId = $id;
 			} else {
+				$data['organisation_id'] = $this->selectedOrgId;
 				$this->db->insert('broker_info',$data);
 				$brokerLastId = $this->db->insert_id();
 			}
@@ -65,9 +68,11 @@ class BrokersModel extends Parent_Model
     }
 	
 	public function getRelatedBroker($broker_id = null){
-		$this->db->select('*');
-		$this->db->where('id',$broker_id);
-		$result = $this->db->get('broker_info');
+
+		$result = $this->db->select('*')
+				->where('id',$broker_id)
+				->get('broker_info');
+
 		if ( $result->num_rows() > 0 ) {
 			return $result->row_array();
 		} else {
@@ -244,9 +249,11 @@ class BrokersModel extends Parent_Model
 	 */
 	  
 	public function checkTriumphDataExist ( $mcNumber = null ) {
-		$this->db->select('*');
-		$this->db->where('MCNumber',$mcNumber);
-		$result = $this->db->get('broker_info');
+		
+		$result = $this->db->select('*')
+						->where(['MCNumber'=>$mcNumber,'organisation_id'=>$this->selectedOrgId])
+						->get('broker_info');
+
 		if ($result->num_rows() > 0 ) {
 			return $result->row_array();
 		} else {
@@ -282,13 +289,15 @@ class BrokersModel extends Parent_Model
 		}
 
 		$this->db->where_in("loads.JobStatus",$this->config->item('loadStatus'));
-		$this->db->where('delete_status',0);
+		$this->db->where(['delete_status'=>0,'loads.organisation_id'=>$this->selectedOrgId]);
+
 		$this->db->where('broker_id is NOT NULL', NULL, FALSE);
 		$this->db->group_by("loads.broker_id");
 		$this->db->order_by("Total DESC");
-		$this->db->limit(5,0);
-		$result = $this->db->get('loads');
+		$result = $this->db->limit(5,0)->get('loads');
+		
 		// echo $this->db->last_query();
+
 		if( $result->num_rows() > 0 )
 			return $result->result_array();
 		else
@@ -414,9 +423,9 @@ class BrokersModel extends Parent_Model
 
 	public function fetchDriversForCSV($search = null) {
 
-        $this->db->select('*')->from('broker_info');
+        $this->db->select('*')->from('broker_info')
+        			->where(["delete_broker"=>0,'organisation_id'=>$this->selectedOrgId]);
 
-        $this->db->where("delete_broker",0);
         if(!empty($search['searchText'])){
         	$this->db->like('broker_info.TruckCompanyName',$search['searchText']); 
 			$this->db->or_like('broker_info.postingAddress',$search['searchText']);
@@ -434,7 +443,7 @@ class BrokersModel extends Parent_Model
         if($result->num_rows()>0){
 			return $result->result_array();
         } else {
-			return false;
+			return [];
 		}
     } 
 }

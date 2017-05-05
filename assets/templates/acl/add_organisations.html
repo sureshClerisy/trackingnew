@@ -1,14 +1,14 @@
 <div class="page-content-wrapper ">
 	<div class="content sm-gutter">
 		<div class="container-fluid padding-25 sm-padding-10">
-			<div ng-show="dataNotFound == true" class="alert alert-danger" role="alert">
-				<button ng-click = "hideloadmessage()" class="close"></button>
-				{{errorMessage}}
+			<div ng-show="org.imageError == true" class="alert alert-danger" role="alert">
+				<button ng-click = "org.hidemessages()" class="close"></button>
+				<p dynamic="org.imageUploadError" ></p>
 			</div>
 			<div class="row">
 				<div class="col-md-12 col-xlg-12">
-				<div class="commen-heading">
-					<h2 class="oprate-dashbord ng-binding"> {{ languageCommonVariables.orgHeaderAdd }}</h2>
+				<div class="commen-heading no-padding">
+					<h2 class="oprate-dashbord ng-binding"><i class="fa fa-sitemap"></i> {{ org.heading }}</h2>
 				</div>
 				</div>
 			</div>
@@ -31,28 +31,19 @@
 								<div class="row clearfix">
 									<div class="col-sm-6">
 										<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':neworg.first_name.$invalid && !neworg.first_name.$pristine || neworg.$submitted && neworg.first_name.$invalid}">
-											<label>Organization Name</label>
+											<label>{{ languageArray.organisationName }}</label>
 											<input type="text" class="form-control" name="first_name" ng-model="org.organisations.first_name" required />
 										</div>
-										<label class="error" for="first_name" ng-show="neworg.first_name.$invalid && !neworg.first_name.$pristine || neworg.$submitted && neworg.first_name.$invalid">Please enter organization name.</label>
+										<label class="error" for="first_name" ng-show="neworg.first_name.$invalid && !neworg.first_name.$pristine || neworg.$submitted && neworg.first_name.$invalid">{{ languageArray.validationOrganisationName }}</label>
 									</div>
 
 									<div class="col-sm-6">
 										<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':neworg.email.$invalid && !neworg.email.$pristine || neworg.$submitted && neworg.email.$invalid}">
-											<label>Email</label>
-											<input type="text" class="form-control" name="email" ng-model="org.organisations.email" required / >
+											<label>{{ languageCommonVariables.email }}</label>
+											<input type="email" class="form-control" name="email" ng-model="org.organisations.email" required / >
 										</div>
-										<label class="error" for="email" ng-show="neworg.email.$invalid && !neworg.email.$pristine || neworg.$submitted && neworg.email.$invalid">Please enter email address.</label>
-
+										<label class="error" for="email" ng-show="neworg.email.$invalid && !neworg.email.$pristine || neworg.$submitted && neworg.email.$invalid">{{ languageCommonVariables.validationEmail }}</label>
 									</div>
-
-									<!--div class="col-sm-6">
-										<div pg-form-group class="form-group form-group-default th-select">
-											<label>Profile Image</label>
-											<input type="file" id="profileImage" class="form-control" name="profile_image" ng-model="organisations.profile_image"/>
-										</div>										
-									</div-->
-									
 								</div>
 								<!--row-end-->
 								<!--row-->
@@ -60,25 +51,25 @@
 									
 									<div class="col-sm-6">
 										<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':neworg.username.$invalid && !neworg.username.$pristine || neworg.$submitted && neworg.username.$invalid || organisations.username.$invalid, 'has-error-new' : org.notSaveOrg == false}">
-											<label>Username</label>
+											<label>{{ languageCommonVariables.username }}</label>
 											<input type="text" id='checkUnique' ng-blur = "org.checkUniqueUsername()" class="form-control" name="username" ng-model="org.organisations.username" required / >
 										</div>
-										<label class="error" for="username" autocomplete="off" ng-show="neworg.username.$invalid && !neworg.username.$pristine || neworg.$submitted && neworg.username.$invalid">Please enter username</label>
-										<label class="error" for="username" ng-if="org.notSaveOrg == false">Username already exist.Please enter another username.</label>
+										<label class="error" for="username" autocomplete="off" ng-show="neworg.username.$invalid && !neworg.username.$pristine || neworg.$submitted && neworg.username.$invalid">{{ languageArray.validationUserName }}</label>
+										<label class="error" for="username" ng-if="org.notSaveOrg == false">{{ languageArray.usernameerror }}</label>
 									</div>
 
 									<div class="col-sm-6">
 										<div ng-if="!org.organisations.id.length" pg-form-group class="form-group form-group-default required" ng-class="{'has-error':neworg.password.$invalid && !neworg.password.$pristine || neworg.$submitted && neworg.password.$invalid}">
-											<label>Password</label>
+											<label>{{ languageCommonVariables.password }}</label>
 											<input type="password" class="form-control" name="password" ng-model="org.organisations.password" required / >
 										</div>
 
 										<div ng-if="org.organisations.id.length"  pg-form-group class="form-group form-group-default">
-											<label>Password</label>
+											<label>{{ languageCommonVariables.password }}</label>
 											<input type="password" class="form-control" name="password" ng-model="organisations.password"/>
 										</div>
 
-										<label ng-if="!organisations.id.length" class="error" for="password" ng-show="neworg.password.$invalid && !neworg.password.$pristine || neworg.$submitted && neworg.password.$invalid">Please enter password.</label>
+										<label ng-if="!organisations.id.length" class="error" for="password" ng-show="neworg.password.$invalid && !neworg.password.$pristine || neworg.$submitted && neworg.password.$invalid">{{ languageCommonVariables.validationPassword }}</label>
 									</div>
 
 								</div>								
@@ -88,14 +79,14 @@
 								<div class="row clearfix">
 									<div class="col-sm-6">
 										<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':neworg.address.$invalid && !neworg.address.$pristine || neworg.$submitted && neworg.address.$invalid}">
-											<label>Address</label>
+											<label>{{ languageCommonVariables.address }}</label>
 											<input type="text" class="form-control" name="address" ng-model="org.organisations.address" required / >
 										</div>
-										<label class="error" for="address" ng-show="neworg.address.$invalid && !neworg.address.$pristine || neworg.$submitted && neworg.address.$invalid">Please enter address.</label>
+										<label class="error" for="address" ng-show="neworg.address.$invalid && !neworg.address.$pristine || neworg.$submitted && neworg.address.$invalid">{{ languageCommonVariables.validationAddress }}</label>
 									</div>
 									<div class="col-sm-6">
 										<div pg-form-group class="form-group form-group-default">
-											<label>City</label>
+											<label>{{ languageCommonVariables.city }}</label>
 											<input type="text" class="form-control" name="city" ng-model="org.organisations.city"/>
 										</div>
 									</div>
@@ -106,16 +97,16 @@
 								<div class="row clearfix">
 									<div class="col-sm-6">
 										<div pg-form-group class="form-group form-group-default">
-											<label>State</label>
+											<label>{{ languageCommonVariables.state }}</label>
 											<input type="text" class="form-control" name="state" ng-model="org.organisations.state"/>
 										</div>
 									</div>
 									<div class="col-sm-6">
 										<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':neworg.zipcode.$invalid && !neworg.zipcode.$pristine || neworg.$submitted && neworg.zipcode.$invalid}">
-											<label>Zip Code</label>
+											<label>{{ languageCommonVariables.Zipcode }}</label>
 											<input type="text" class="form-control" name="zipcode" ng-model="org.organisations.zipcode" required / >
 										</div>
-										<label class="error" for="zipcode" ng-show="neworg.zipcode.$invalid && !neworg.zipcode.$pristine || neworg.$submitted && neworg.zipcode.$invalid">Please enter zip code.</label>
+										<label class="error" for="zipcode" ng-show="neworg.zipcode.$invalid && !neworg.zipcode.$pristine || neworg.$submitted && neworg.zipcode.$invalid">{{ languageCommonVariables.validationZip }}</label>
 									</div>									
 								</div>								
 								<!--row-end-->
@@ -124,13 +115,23 @@
 								<div class="row clearfix">
 									<div class="col-sm-6">
 										<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':neworg.phone.$invalid && !neworg.phone.$pristine || neworg.$submitted && neworg.phone.$invalid}">
-											<label>Phone</label>
+											<label>{{ languageCommonVariables.phone }}</label>
 											<input type="text" class="form-control" ui-jq="mask" ui-options="'(999) 999-9999'" name="phone" ng-model="org.organisations.phone" required / >
 										</div>
-										<label class="error" for="phone" ng-show="neworg.phone.$invalid && !neworg.phone.$pristine || neworg.$submitted && neworg.phone.$invalid">Please enter phone number.</label>
+										<label class="error" for="phone" ng-show="neworg.phone.$invalid && !neworg.phone.$pristine || neworg.$submitted && neworg.phone.$invalid">{{ languageCommonVariables.validationPhone }}</label>
 									</div>
 									<div class="col-sm-6">
-									&nbsp;
+										<div pg-form-group class="form-group form-group-default">
+											<div class="col-sm-8">
+                                                <label>{{ languageArray.driverprofileimg }}</label>
+                                                <div class="input-file-browse">
+                                               		 <input type="file" id="profileImage" file-model = "org.profile_image" class="form-control" name="profile_image" />
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4 img-cont" ng-if="org.organisations.profile_image != undefined && org.organisations.profile_image != ''">
+                                                <img class="center-me" fallback-src="pages/img/user.png" ng-src="./assets/uploads/users/thumbnail/{{org.organisations.profile_image}}" width="70" height="50">
+                                            </div>	
+										</div>
 									</div>
 								</div>								
 								<!--row-end-->
@@ -138,8 +139,8 @@
 								<div class="update-truck-block-btn">
 									<button ng-click="submitted=true" class="btn btn-primary btn-cons m-b-10" type="submit">
 										<i class="fa fa-plus"></i>
-										<span ng-disable="username" ng-hide="org.organisations.id" class="bold"> {{languageArray.brokerListingTableAddbutton|capitalize }}</span>
-										<span ng-disable="username" ng-show="org.organisations.id" class="bold"> {{languageArray.brokerListingTableEditbutton|capitalize }}</span>
+										<span ng-disable="username" ng-hide="org.organisations.id" class="bold"> {{languageCommonVariables.addbutton|capitalize }}</span>
+										<span ng-disable="username" ng-show="org.organisations.id" class="bold"> {{languageCommonVariables.updatebutton|capitalize }}</span>
 									</button>
 									<a ui-sref="organizations">
 										<button class="btn btn-danger btn-cons m-b-10" type="button">

@@ -171,6 +171,7 @@ class Billing extends CI_Model {
 			//$this->db->where('loads.sent_for_payment!=',1);
 		}
 
+		$this->db->where('loads.organisation_id',$this->selectedOrgId);
 		if(isset($filters["sortColumn"]) && $filters["sortColumn"] == "driverName"){
 			$this->db->order_by('CASE 
 								     WHEN loads.driver_type  = "team" THEN CONCAT(TRIM(drivers.first_name), " + ", TRIM(team.first_name)) 
@@ -205,7 +206,7 @@ class Billing extends CI_Model {
 		if ( $result->num_rows() > 0 ) {
 			return $result->result_array();
 		} else {
-			return false;
+			return array();
 		}
 	} 
 
@@ -229,11 +230,6 @@ class Billing extends CI_Model {
 		if(count($filters) <= 0){
 			$filters = array("itemsPerPage"=>20, "limitStart"=>1, "sortColumn"=>"DeliveryDate", "sortType"=>"DESC");
 		}
-
-		/*if(!$exportRequest){
-
-			$ohterColumns = ',loads.DeliveryDate,loads.PickupAddress, loads.OriginCity, loads.OriginState, loads.DestinationCity, loads.DestinationState, loads.DestinationAddress, loads.PaymentAmount, loads.Mileage,loads.DeliveryDate,  loads.truckstopID,  loads.deadmiles, loads.PickupDate, loads.load_source,loads.ready_for_invoice,loads.billType,vehicles.id as vehicleID,loads.created';
-		}*/
 
 		$this->db->select('DATE_FORMAT(loads.created,"%m/%d") as date,
 		case loads.driver_type
@@ -297,47 +293,7 @@ class Billing extends CI_Model {
 			$this->db->group_by('documents.load_id');
 			$this->db->having('count(*) > 1', null, false );
 				
-		} else {
-			$this->db->where(array('loads.vehicle_id != ' => null, 'loads.vehicle_id != ' => 0, 'loads.delete_status' => 0));
-			$this->db->where_not_in('loads.id', $in_aray);
-
-			if(isset($filters["startDate"]) && !empty($filters["startDate"])){
-				$this->db->where("DATE(loads.PickupDate) >= ",date("Y-m-d",strtotime($filters["startDate"])));
-			}
-
-			if(isset($filters["endDate"]) && !empty($filters["endDate"])){
-				
-				$this->db->where("DATE(loads.PickupDate) <= ",date("Y-m-d",strtotime($filters["endDate"])));
-			}
-			
-
-			if(isset($filters["searchQuery"]) && !empty($filters["searchQuery"])){
-	            $this->db->group_start();
-	            $this->db->like('LOWER(CONCAT(TRIM(drivers.first_name)," ", TRIM(drivers.last_name)))', 		strtolower($filters['searchQuery']));
-	            $this->db->or_like('loads.id', $filters['searchQuery'] );
-	            $this->db->or_like('loads.invoiceNo', $filters['searchQuery'] );
-	            $this->db->or_like('LOWER(loads.LoadType)', strtolower($filters['searchQuery']) );
-	            $this->db->or_like('loads.PickupDate', $filters['searchQuery'] );
-	            $this->db->or_like('loads.DeliveryDate', $filters['searchQuery'] );
-	            $this->db->or_like('LOWER(loads.OriginCity)', strtolower($filters['searchQuery']) );
-	            $this->db->or_like('LOWER(loads.OriginState)', strtolower($filters['searchQuery']) );
-	            $this->db->or_like('LOWER(loads.DestinationCity)', strtolower($filters['searchQuery']) );
-	            $this->db->or_like('LOWER(loads.DestinationState)', strtolower($filters['searchQuery']) );
-	            $this->db->or_like('LOWER(loads.PickupAddress)', strtolower($filters['searchQuery']) );
-	            $this->db->or_like('LOWER(loads.DestinationAddress)', strtolower($filters['searchQuery']) );
-	            $this->db->or_like('loads.PaymentAmount', $filters['searchQuery']);
-	            $this->db->or_like('loads.Mileage', $filters['searchQuery']);
-	            $this->db->or_like('loads.deadmiles', $filters['searchQuery']);
-	            $this->db->or_like('LOWER(loads.JobStatus)', strtolower($filters['searchQuery']) );
-	            $this->db->or_like('LOWER(loads.load_source)', strtolower($filters['searchQuery']) );
-	            $this->db->or_like('LOWER(loads.billType)', strtolower($filters['searchQuery']) );
-	            $this->db->or_like('LOWER(broker_info.TruckCompanyName)', strtolower($filters['searchQuery']) );
-	             $this->db->or_like('LOWER(shippers.shipperCompanyName)', strtolower($filters['searchQuery']) );
-	            $this->db->group_end();
-			}
 		}
-
-		//$this->db->order_by("loads.".$filters["sortColumn"],$filters["sortType"]);
 		if(isset($filters["sortColumn"]) && $filters["sortColumn"] == "driverName"){
 			$this->db->order_by('CASE 
 								     WHEN loads.driver_type  = "team" THEN CONCAT(drivers.first_name, " + ", team.first_name) 
@@ -364,7 +320,7 @@ class Billing extends CI_Model {
 		}
 
 		$this->db->where_IN('loads.JobStatus',$this->config->item('loadStatus'));
-		$this->db->where('loads.id >',9999);
+		$this->db->where(array('loads.organisation_id' => $this->selectedOrgId,'loads.id >' => 9999));
 		$result = $this->db->get('loads');
 		// echo $this->db->last_query();
 
@@ -396,8 +352,8 @@ class Billing extends CI_Model {
 	} 
 	
 	/**
-	 * Fetching documents to bundle
-	 */
+	* Fetching documents to bundle
+	*/
 	
 	public function fetchDocToBundle( $loadId = null ) {
 		$this->db->select('*');
@@ -442,7 +398,7 @@ class Billing extends CI_Model {
 		$this->db->join("shippers", "shippers.id = loads.broker_id AND loads.billType = 'shipper'","LEFT");
 
 		$this->db->where_in('loads.id', $in_aray);
-		$this->db->where(array('loads.sent_for_payment' => 0, 'loads.delete_status' => 0, 'loads.flag_perm' => 0));
+		$this->db->where(array('loads.sent_for_payment' => 0, 'loads.delete_status' => 0, 'loads.flag_perm' => 0, 'loads.organisation_id' => $this->selectedOrgId));
 		$this->db->order_by('loads.invoicedDate','DESC');
 		$result = $this->db->get('loads');
 
@@ -462,7 +418,7 @@ class Billing extends CI_Model {
 		$this->db->join('drivers','drivers.id = loads.driver_id','LEFT');
 		$this->db->join('vehicles','vehicles.id = loads.vehicle_id','LEFT');
 		$this->db->where_in('loads.id', $in_aray);
-		$this->db->where(array('loads.sent_for_payment' => 0, 'loads.delete_status' => 0, 'loads.flag_perm' => 0));
+		$this->db->where(array('loads.sent_for_payment' => 0, 'loads.delete_status' => 0, 'loads.flag_perm' => 0, 'loads.organisation_id' => $this->selectedOrgId));
 		$num_rows = $this->db->count_all_results('loads');
 		return $num_rows;
 	}
@@ -471,7 +427,7 @@ class Billing extends CI_Model {
 	 */
 	
 	public function sentPaymentCount() {
-		$this->db->where(array('loads.sent_for_payment' => 1, 'loads.delete_status' => 0));
+		$this->db->where(array('loads.sent_for_payment' => 1, 'loads.delete_status' => 0, 'loads.organisation_id' => $this->selectedOrgId));
 		$num_rows = $this->db->count_all_results('loads');
 		return $num_rows;
 	}
@@ -481,7 +437,7 @@ class Billing extends CI_Model {
 	 */
 	 
 	public function flaggedPaymentCount() {
-		$where = array('loads.flag' => 1, 'loads.flag_perm' => 0, 'loads.sent_for_payment' => 0, 'loads.delete_status' => 0);
+		$where = array('loads.flag' => 1, 'loads.flag_perm' => 0, 'loads.sent_for_payment' => 0, 'loads.delete_status' => 0, 'loads.organisation_id' => $this->selectedOrgId);
 		$this->db->where($where);
 		$num_rows = $this->db->count_all_results('loads');
 		return $num_rows;
@@ -492,7 +448,7 @@ class Billing extends CI_Model {
 	*/
 
 	public function factoredPaymentCount() {
-		$where = array('loads.flag' => 1, 'loads.flag_perm' => 1, 'loads.sent_for_payment' => 0, 'loads.delete_status' => 0 , 'loads.payment_type' => 'triumph');
+		$where = array('loads.flag' => 1, 'loads.flag_perm' => 1, 'loads.sent_for_payment' => 0, 'loads.delete_status' => 0 , 'loads.payment_type' => 'triumph', 'loads.organisation_id' => $this->selectedOrgId);
 		$this->db->where($where);
 		$num_rows = $this->db->count_all_results('loads');
 		return $num_rows;
@@ -524,7 +480,7 @@ class Billing extends CI_Model {
 		$this->db->join("broker_info", "broker_info.id = loads.broker_id AND loads.billType = 'broker'","LEFT");
 		$this->db->join("shippers", "shippers.id = loads.broker_id AND loads.billType = 'shipper'","LEFT");
 
-		$this->db->where(array('loads.sent_for_payment' => 1, 'loads.delete_status' => 0 ));
+		$this->db->where(array('loads.sent_for_payment' => 1, 'loads.delete_status' => 0, 'loads.organisation_id' => $this->selectedOrgId ));
 
 		if(isset($args["searchQuery"]) && !empty($args["searchQuery"])){
             $this->db->group_start();
@@ -596,7 +552,7 @@ class Billing extends CI_Model {
 		$this->db->join("broker_info", "broker_info.id = loads.broker_id AND loads.billType = 'broker'","LEFT");
 		$this->db->join("shippers", "shippers.id = loads.broker_id AND loads.billType = 'shipper'","LEFT");
 
-		$where = array('loads.flag' => 1, 'loads.flag_perm' => 1, 'loads.sent_for_payment' => 0, 'loads.delete_status' => 0 , 'payment_type' => 'triumph');
+		$where = array('loads.flag' => 1, 'loads.flag_perm' => 1, 'loads.sent_for_payment' => 0, 'loads.delete_status' => 0 , 'payment_type' => 'triumph', 'loads.organisation_id' => $this->selectedOrgId);
 		$this->db->where($where);
 		$this->db->order_by('loads.invoicedDate','DESC');
 		$result = $this->db->get('loads');
@@ -752,6 +708,7 @@ class Billing extends CI_Model {
 			'loadIds' => $ids,
 			'confirmationCode' => $code,
 			'user_id' => $this->userId,
+			'organisation_id' => $this->selectedOrgId
 		);
 		
 		$this->db->insert('save_payment_confirmCode', $data);
@@ -811,6 +768,7 @@ class Billing extends CI_Model {
 		$this->db->select("SUM( paymentamount )  as sentPayment");
 		$this->db->where("FIND_IN_SET( id, ( SELECT GROUP_CONCAT( sp.loadids ) AS id FROM `save_payment_confirmCode` AS `sp` WHERE DATE( sp.created ) >= '".$fromDate."' AND DATE( sp.created ) <= '".$toDate."'))");
 		$this->db->where("loads.delete_status", 0);
+		$this->db->where('loads.organisation_id',$this->selectedOrgId);
 		$result = $this->db->get('loads');
 		//echo $this->db->last_query()."<br/><br/>";
 		if ( $result->num_rows() > 0 )
@@ -837,6 +795,7 @@ class Billing extends CI_Model {
 			$this->db->limit($limit);		
 		}
 		
+		$this->db->where('spCode.organisation_id',$this->selectedOrgId);
 		$this->db->order_by("created","DESC");
 		$result = $this->db->get('save_payment_confirmCode as spCode');
 
@@ -879,6 +838,7 @@ class Billing extends CI_Model {
 			$this->db->where('sent_for_payment!=',1);	
 		}
 
+		$this->db->where('loads.organisation_id',$this->selectedOrgId);
 		$result = $this->db->get('loads');
 
 		//echo $this->db->last_query()."<br/><br/>";

@@ -1,5 +1,5 @@
-app.controller('mainController', function (dataFactory,  PubNub, $scope, $sce,$rootScope, $location, $http , $cookies, $state, $localStorage, $q, $timeout,$window, $compile) {
-$rootScope.logoutmessage=false;
+app.controller('mainController', function (dataFactory, esClient, esFactory, PubNub, $scope, $sce,$rootScope, $location, $http , $cookies, $state, $localStorage, $q, $timeout,$window, $compile,SweetAlert) {
+	$rootScope.logoutmessage=false;
     $scope.login = {};
 
     $rootScope.globalItemsPerPage = 20;
@@ -47,17 +47,64 @@ $rootScope.logoutmessage=false;
 	if ( $cookies.get('loggedUserRoleId') != undefined && $cookies.get('loggedUserRoleId') == 8 ) {				// get list of organisations when superadmin logins
 		$rootScope.fetchOrganisationsList();
 	}
-
+	
 	/**
 	* changing Organisation List for superadmin users
 	*/
 
 	main.onSelectOrganisationCallback = function(item) {
+		$cookies.remove("_globalDropdown");
+		cokieData = {
+			'driverName': 'All Groups',
+			'label' : '',
+			'latitude' : '',
+			'longitude' : '',
+			'profile_image' : '',
+			'vid' : '',
+		};
+		$cookies.putObject('_globalDropdown', cokieData); 
 		dataFactory.httpRequest(URL + '/users/skipAcl_setSelectedOrganisation','POST',{},{	organisation_id:item.id, name:item.first_name}).then(function(data) {
 			$rootScope.organisationSelected = item.first_name;
 			$rootScope.globalSelectedOrganisationId = item.id;
+			$rootScope.organisationsList = data.organisations;
 			$state.reload();
 		});	
+	}
+
+	$localStorage.redirectUserTo = ($localStorage.redirectUserTo != undefined ) ? $localStorage.redirectUserTo : 'logout';
+	/**
+	* logout logged user
+	*/
+
+	$rootScope.logoutUser = function() {
+		$state.go('logout');
+	}
+
+	/**
+	* show error message to user if permission is not allowed
+	*/
+
+	$rootScope.permissionNotAllowed = function( status ) {
+		if( status == 'showAlertPopup') {
+			SweetAlert.swal({
+	          title: 'Unauthorised Access',
+	          text: 'Woops - It seems you do not have permission to access this page please contact admin for access.',
+	          type: 'error',
+	          showCancelButton: false,
+	          cancelButtonText: $rootScope.languageCommonVariables.confirmdeleteno,
+	          confirmButtonColor: '#c92d2d',
+	          confirmButtonText: 'OK',
+	          closeOnConfirm: true,
+	          html: true
+	      	}, function(isConfirm){
+	          if(isConfirm) {
+	            
+	       	 	} 
+	    	});
+		}
+		if( $rootScope.srcPage == undefined || $rootScope.srcPage == '' ) {
+			$state.go($localStorage.redirectUserTo);
+		}
 	}
 		
 	//~~~~~~~~~~~~~~~~~~~~~~~ Pubnub Code ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -103,9 +150,134 @@ $rootScope.logoutmessage=false;
 	    //}
     };
 
+    $rootScope.output = {};
+    $scope.eSuggest = function(q){
+    	esClient.suggest({
+			index: ['jobs','vehicles','drivers','brokers','shippers'],
+			body: {
+			  phrase: {
+			    text: q,
+			    term: {
+			      field: "_all",
+			      suggest_mode:"missing"
+			    }
+			  }
+			}
+		}, function (error, response) {
+			console.log(response);
+		});
+    }
+    $scope.eSearch  = function(q){
+    	console.log($rootScope.esIndexes);
+    	if(q != "" && $rootScope.esIndexes.length > 0  && q.length >= 3){
+    		esClient.search({ 
+	            index: $rootScope.esIndexes.join(),
+	            type : $rootScope.esTypes.join(),
+	            body : {
+	            	query: {
+		            	"bool": {
+				            "must": {
+				                "multi_match" : {
+							      "query"  : q,
+							      "type"   :    "phrase_prefix",
+							      "fields" : [ "_all" ], 
+							    }
+				            },
+				            "filter": {
+					          "term": {
+					            "organisation_id": $rootScope.globalSelectedOrganisationId
+					          }
+					        }
+				        }
+					    /*"multi_match" : {
+					      "query"  : q,
+					      "type"   :    "phrase_prefix",
+					      "fields" : [ "_all" ], 
+					    }*/
+		            },
+		           /* "suggest": {
+				    "text": q,
+				    "simple_phrase": {
+				      "phrase": {
+				        "field": "_all",
+				        "size": 1,
+				        "gram_size": 3,
+				        "direct_generator": [ {
+				          "field": "_all",
+				          "suggest_mode": "always"
+				        } ],
+				        "highlight": {
+				          "pre_tag": "<em>",
+				          "post_tag": "</em>"
+				        }
+				      }
+				    }
+				  },  */   
+		            "size": 100,
+		            "aggs": {
+		                "count_by_type": {
+		                    "terms": {
+		                        "field": "_type"
+		                    }
+		                }
+		            }, 
+		            "highlight": {	
+		            	"order" : "score",
+		            	"pre_tags" : ["<em class='highlight'>"],
+        				"post_tags" : ["</em>"],
+			            "fields": {
+			              "*": {  "require_field_match": false  }
+			              /*"pointofcontact": {},
+			              "city": {},
+			              "truckcompanyfax" : {}*/
+			            }
+			        }
+	            }
+	            
+	        }).then(function (body) {
+	            //var output = {};
+	            //var hits = body.hits.hits;
+	            $rootScope.output = body.hits.hits;
+	            //var hitCount = body.hits.total;
+	            /*hits.forEach(function (item) {
+	              var source = item._index;
+	              if (!output.hasOwnProperty(source)) {
+	                  output[source] = {};
+	                  output[source]["record"] = [];
+	                  output[source]["count"]  = 1;
+	                  output[source]["record"]["highlight"]  = [];
+	              }else{
+	                 output[source]["count"]++;
+	              }
+	              
+	              
+	              var record = item._source;
+	              record.highlight = [];
+	              angular.forEach(item.highlight, function(value, key) {
+	              		if(key.indexOf(".keyword") === -1){
+	              			record.highlight.push(value);
+	              		}
+	              });
+	              output[source]["record"].push(record);
+	            });
+	            $rootScope.output = output;*/
+	           	$rootScope.shownewSearch = false;	
+	           	$rootScope.toggleSearchTitle = $rootScope.languageCommonVariables.triggerLoadSearch;
+	            
+	            console.log($rootScope.output);
+	        }, function (error) {
+	            console.log(error);
+	            $rootScope.toggleSearchTitle = $rootScope.languageCommonVariables.closeLoadSearch;
+	        });
+    	}else{
+    		$rootScope.output = {};
+    		$rootScope.shownewSearch = true;
+    		$rootScope.toggleSearchTitle = $rootScope.languageCommonVariables.closeLoadSearch;
+    	}
+        
+      }
 
-
-     $scope.selectPortlet = function($event,widgetID) {
+    $scope.selectPortlet = function($event,widgetID) {
     	
     	visibility = 1;
     	$scope.autoFetchLoads = true;
@@ -113,7 +285,7 @@ $rootScope.logoutmessage=false;
 		if(angular.element($event.currentTarget).hasClass('vis-1')){
 			visibility = 0;
 		}
-		$http.post(URL + '/dashboard/widgetVisibility',{'visibility':visibility,'widgetID':widgetID}).then(function(data){
+		$http.post(URL + '/dashboard/skipAcl_widgetVisibility',{'visibility':visibility,'widgetID':widgetID}).then(function(data){
     		$scope.visibility = data.data.visibility;
     	});
     	
@@ -129,7 +301,7 @@ $rootScope.logoutmessage=false;
 
     $scope.showHidePortlet = function() {
     	if(!angular.element('#appMenu').hasClass('show')){
-    		$http.get(URL + '/dashboard/getPortletVisibility').then(function(data){
+    		$http.get(URL + '/dashboard/skipAcl_getPortletVisibility').then(function(data){
     			$scope.visibility = data.data.visibility;
     		});
     	}
@@ -146,9 +318,51 @@ $rootScope.logoutmessage=false;
 
 	$rootScope.loginCheck = function( currentState ) {
 		angular.element("body").removeAttr("style");
-		//~ if ( $cookies.get('userIsLoggedIn') == 1 ) {
 		dataFactory.httpRequest(URL + '/login/checkLogin').then(function(data) {
 			if ( data.success == true ) {
+				main.allowedModules = data.modules;
+				$rootScope.globalSelectedOrganisationId = data.selectedOrgId;
+				$rootScope.esIndexes = [];
+				$rootScope.esTypes   =  [];
+
+
+				if( main.allowedModules.indexOf("assignedloads") !== -1  || main.allowedModules.indexOf("assignedloads/index") !== -1){
+					$rootScope.esIndexes.push("jobs", "job_extra_stops");
+					$rootScope.esTypes.push("job", "job_extra_stop");
+				}
+
+				if( main.allowedModules.indexOf("vehicles") !== -1 || main.allowedModules.indexOf("vehicles/index") !== -1   ){
+					$rootScope.esIndexes.push("vehicles");
+					$rootScope.esTypes.push("vehicle");
+				}
+
+				if( main.allowedModules.indexOf("drivers") !== -1  || main.allowedModules.indexOf("drivers/index") !== -1 ){
+					$rootScope.esIndexes.push("drivers");
+					$rootScope.esTypes.push("driver");
+				}
+
+				if( main.allowedModules.indexOf("brokers") !== -1 || main.allowedModules.indexOf("brokers/index") !== -1 ){
+					$rootScope.esIndexes.push("brokers");
+					$rootScope.esTypes.push("broker");
+				}
+
+				if( main.allowedModules.indexOf("shippers") !== -1 || main.allowedModules.indexOf("shippers/index") !== -1 ){
+					$rootScope.esIndexes.push("shippers");
+					$rootScope.esTypes.push("shipper");
+				}
+
+				if( main.allowedModules.indexOf("filteredbillings") !== -1 || main.allowedModules.indexOf("filteredbillings/index") !== -1 ){
+					$rootScope.esIndexes.push("payments_triumph");
+					$rootScope.esTypes.push("payment_triumph");
+				}
+
+				if( main.allowedModules.indexOf("trailers") !== -1 || main.allowedModules.indexOf("trailers/index") !== -1 ){
+					$rootScope.esIndexes.push("trailers");
+					$rootScope.esTypes.push("trailer");
+				}
+
+
+
 				$rootScope.loggedUserFirstName = $cookies.get('loggedUserFirstNameCookie');
 				$rootScope.LastName = $cookies.get('LastName');
 				$rootScope.color = $cookies.get('color');
@@ -166,7 +380,7 @@ $rootScope.logoutmessage=false;
 						}
 					});
 				}
-				$rootScope.getNextPredictedJobs();
+				// $rootScope.getNextPredictedJobs();
 				$rootScope.getNotifications();
 				$rootScope.loggedInUser = true;
 				$rootScope.showHeader = true;
@@ -175,14 +389,11 @@ $rootScope.logoutmessage=false;
 				$rootScope.profileImage = $cookies.get('profileImage');
 				if ( $rootScope.previousUrl != undefined && $rootScope.previousUrl != '' ) {
 					var prevUrl = $rootScope.previousUrl.split('#/');
-					if ( prevUrl[1] != 'login' )
+					if ( prevUrl[1] != 'login' && prevUrl[1] != 'forgotPassword' )
 						$location.path(prevUrl[1]);
 				} else {
-					if( currentState == 'login' ) {
-						if ( $cookies.get('loggedUserRoleId') != undefined && $cookies.get('loggedUserRoleId') == 7 )
-							$location.path('investor');
-						else
-							$location.path('dashboard');
+					if( currentState == 'login' || currentState == 'forgotPassword' ) {
+						$location.path($localStorage.redirectUserTo);
 					}
 				}
 				$rootScope.previousUrl = ''; 
@@ -452,14 +663,14 @@ $rootScope.logoutmessage=false;
 			$scope.$broadcast('toggleSearchOverlay', {
                 show: true
             });
-            
+            $rootScope.output = {};
             $rootScope.shownewSearch = false;
             $rootScope.form = {};
           
             $rootScope.openNewSearchPopUp();
             $rootScope.searchDriversList = '';
             /**Fetching trailer types from db*/
-			dataFactory.httpRequest(URL + '/truckstop/fetchTrailerType').then(function(data) {
+			dataFactory.httpRequest(URL + '/truckstop/skipAcl_fetchTrailerType').then(function(data) {
 				$rootScope.trailerTypes = data.trailerTypes;
 				$rootScope.vDriversList = data.driversList;
 			});
@@ -1104,7 +1315,7 @@ $rootScope.logoutmessage=false;
 							main.showSelectedShipOrBrok = 'broker';
 
 						$scope.showEditButton = true;
-						if ( ($rootScope.editSavedLoad.flag != undefined && $rootScope.editSavedLoad.flag == '1' && data.userRoleId != '1' && data.userRoleId != '3' && data.userRoleId != '5') || (data.userRoleId == 7 ) ) {
+						if ( ($rootScope.editSavedLoad.flag != undefined && $rootScope.editSavedLoad.flag == '1' && data.userRoleId != '1' && data.userRoleId != '3' && data.userRoleId != '5' && data.userRoleId != '8' && data.userRoleId != '9') || (data.userRoleId == 7 ) ) {
 							$scope.showEditButton = false;
 						}
 						
@@ -1685,7 +1896,7 @@ $rootScope.logoutmessage=false;
 		$scope.selectedBrokerName = 'Select Broker';		
 		main.selectedShipperName = 'Select Shipper';
 		if ( $rootScope.editSavedLoad.broker_id != '' && $rootScope.editSavedLoad.broker_id != undefined && $rootScope.editSavedLoad.broker_id != null ) {
-			dataFactory.httpRequest(URL+'/brokers/getBrokerShipperDocumentUploaded/'+$rootScope.editSavedLoad.broker_id+'/'+$rootScope.editSavedLoad.billType).then(function(data) {			// Fetching broker document uploaded information
+			dataFactory.httpRequest(URL+'/brokers/skipAcl_getBrokerShipperDocumentUploaded/'+$rootScope.editSavedLoad.broker_id+'/'+$rootScope.editSavedLoad.billType).then(function(data) {			// Fetching broker document uploaded information
 				//~ $rootScope.BrokerDocUploaded = data.BrokerDocUploaded;
 				if ( data.brokerDocuments != undefined && data.brokerDocuments.length > 0 ) {
 					$scope.brokerDocuments = data.brokerDocuments;
@@ -1694,7 +1905,7 @@ $rootScope.logoutmessage=false;
 		}
 				
 		if ( loadId != "" && loadId != undefined && loadId != null ) {
-			dataFactory.httpRequest(URL+'/assignedloads/getBrokersList/'+loadId+'/'+$rootScope.editSavedLoad.billType).then(function(data) {		// Fetching brokers info to show in dropdown
+			dataFactory.httpRequest(URL+'/assignedloads/skipAcl_getBrokersList/'+loadId+'/'+$rootScope.editSavedLoad.billType).then(function(data) {		// Fetching brokers info to show in dropdown
 				$scope.brokersList = data.brokersList;
 				main.shippersList = data.shippersList;
 				
@@ -1977,7 +2188,7 @@ $rootScope.logoutmessage=false;
 		} else {
 			$rootScope.showNoRoutesSelected = true;					// to show empty div in routes tab in load is not saved
 			$rootScope.alertExceedMsg = true;
-			$rootScope.ExceedMessage = 'Error !: Please enter the pickup and destination address to view routes.';
+			$rootScope.ExceedMessage = $scope.languageCommonVariables.routeerror;
 			return false;	
 		}
 				
@@ -2775,7 +2986,7 @@ $rootScope.logoutmessage=false;
 		$scope.selectedBrokerName = 'Select Broker';		
 		main.selectedShipperName = 'Select Shipper';	
 		main.showSelectedShipOrBrok = 'broker';	
-		dataFactory.httpRequest(URL+'/assignedloads/getBrokersList/'+primaryAddId).then(function(data) {			// Fetching brokers info to show in dropdown
+		dataFactory.httpRequest(URL+'/assignedloads/skipAcl_getBrokersList/'+primaryAddId).then(function(data) {			// Fetching brokers info to show in dropdown
 			$scope.brokersList = data.brokersList;
 			main.shippersList = data.shippersList;
 			if ( data.brokerLoadDetail.length != 0 ) {
@@ -3252,7 +3463,7 @@ $rootScope.logoutmessage=false;
 			}
 			
 			$rootScope.editedItem = {};
-			dataFactory.httpRequest(URL+'/truckstop/edit_live/'+$rootScope.primaryLoadId+'/'+saveType,'POST',{},{jobRecords: $rootScope.editSavedLoad, jobPrimary: $rootScope.primaryLoadId, jobDistance: $rootScope.editSavedDist, vehicleId : $rootScope.vehicleIdRepeat, extraStops : $rootScope.extraStops, timeStorage : $rootScope.tempstorage,  loadSource : $scope.loadSource,driverAssignType : $rootScope.driverAssignType, vehicleDriverFlag : $rootScope.setVehicleIdFlag, srcPage: srcPage}).then(function(data){
+			dataFactory.httpRequest(URL+'/truckstop/SaveLoadRecord/'+$rootScope.primaryLoadId+'/'+saveType,'POST',{},{jobRecords: $rootScope.editSavedLoad, jobPrimary: $rootScope.primaryLoadId, jobDistance: $rootScope.editSavedDist, vehicleId : $rootScope.vehicleIdRepeat, extraStops : $rootScope.extraStops, timeStorage : $rootScope.tempstorage,  loadSource : $scope.loadSource,driverAssignType : $rootScope.driverAssignType, vehicleDriverFlag : $rootScope.setVehicleIdFlag, srcPage: srcPage}).then(function(data){
 				$scope.autoFetchLoads = false;
 				PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
 				
@@ -3390,7 +3601,7 @@ $rootScope.logoutmessage=false;
 
 			if ( vehicleId == undefined || vehicleId == '' || vehicleId == 0 || loadId == '' || loadId == undefined || loadId == 0) {		// checking if load is saved and driver is assigned or not
 				$rootScope.alertExceedMsg = true;
-				$rootScope.ExceedMessage = 'Error !: Please save the load details and assign driver to load to view trip detail page.';
+				$rootScope.ExceedMessage = $scope.languageCommonVariables.exceedmessage;
 				$rootScope.editLoads = false;
 				$rootScope.showMaps  = false;
 				$rootScope.brokerDetailInfo  = false;
@@ -3884,7 +4095,7 @@ $rootScope.logoutmessage=false;
 	$scope.dropzoneConfig = {
 		parallelUploads: 3,
 		maxFileSize: 10,
-		url: URL+ '/truckstop/uploadDocs',
+		url: URL+ '/truckstop/skipAcl_uploadDocs',
 		addRemoveLinks: true, 
 		acceptedFiles: 'image/*, application/pdf, .xls, .xlsx, .doc, .docx, .txt, .bmp, .svg',
 		init:function(){
@@ -3993,7 +4204,7 @@ $rootScope.logoutmessage=false;
 	}
     
     $scope.deleteDoc = function(id,filename,loadId,doc_type, brokerId){
-    	angular.element("#confirm-delete").modal('show');
+       	angular.element("#confirm-delete").modal('show');
 		angular.element("#confirm-delete").data("loadId",loadId);
 		angular.element("#confirm-delete").data("id",id);
 		angular.element("#confirm-delete").data("filename",filename);
@@ -4012,7 +4223,7 @@ $rootScope.logoutmessage=false;
 			var assignedBrokerId  = angular.element("#confirm-delete").data("saveBrokerId");
 			
 			if ( loadId != '' && loadId != undefined ) {
-				dataFactory.httpRequest(URL+'/truckstop/deleteDocument','POST',{},{loadId:loadId,docId:id,filename:filename,doc_type:doc_type,assignedBrokeId : assignedBrokerId,srcPage:$rootScope.srcPage,bloadId:$rootScope.primaryLoadId}).then(function(data){
+				dataFactory.httpRequest(URL+'/truckstop/skipAcl_deleteDocument','POST',{},{loadId:loadId,docId:id,filename:filename,doc_type:doc_type,assignedBrokeId : assignedBrokerId,srcPage:$rootScope.srcPage,bloadId:$rootScope.primaryLoadId}).then(function(data){
 					PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
 					$rootScope.alertExceedMsg = false;
 					if ( doc_type == 'broker' || doc_type == 'shipper') {
@@ -4028,8 +4239,11 @@ $rootScope.logoutmessage=false;
 							$rootScope.noLoadSelected = true;
 							$rootScope.selectedIndex = '';					// setting selected index to empty for send for payment page
 							$rootScope.notHitPaymentLoadRequest = 0;		// not hitting request on send for payment page if invoice is deleted
-							$rootScope.saveTypeLoad == 'sendForPayment'
-							$rootScope.readyToSendPaymentCount = parseInt($rootScope.readyToSendPaymentCount) - 1;	// changing the inbox send for payment count on deleting invoice
+
+							if( $rootScope.changeState != undefined && $rootScope.changeState == 'sendForPayment')
+								$rootScope.readyToSendPaymentCount = parseInt($rootScope.readyToSendPaymentCount) - 1;	// changing the inbox send for payment count on deleting invoice
+							else if( $rootScope.changeState != undefined && $rootScope.changeState == 'factoredLoads')
+								$rootScope.factoredPaymentCount = parseInt($rootScope.factoredPaymentCount) - 1;	// changing the factored send for payment count on deleting invoice
 						} else {
 							$rootScope.Message = 'Success: The document has been deleted successfully.';
 							if($rootScope.saveTypeLoad == 'filteredBillingLoads'){
@@ -4065,7 +4279,7 @@ $rootScope.logoutmessage=false;
 		if ( loadId == undefined || loadId == '' || loadId == 0 ) {
 			$scope.selectTab('documents');
 			$rootScope.alertExceedMsg = true;
-			$rootScope.ExceedMessage = 'Error !: Please save the load details to view documents.';
+			$rootScope.ExceedMessage = $scope.languageCommonVariables.documenterror;
 			$rootScope.whenTicketSaved = false;
 			return false;
 		}
@@ -4078,7 +4292,7 @@ $rootScope.logoutmessage=false;
 				angular.element(".progress-div").hide();
 			});
 		} else {		
-			dataFactory.httpRequest(URL+'/truckstop/fetchDocuments','POST',{},{loadId:$rootScope.primaryLoadId}).then(function(data){
+			dataFactory.httpRequest(URL+'/truckstop/skipAcl_fetchDocuments','POST',{},{loadId:$rootScope.primaryLoadId}).then(function(data){
 				data = angular.fromJson(data);
 				$rootScope.Docs = data.result.dlist;
 				angular.element(".progress-div").hide();
@@ -4220,7 +4434,7 @@ $rootScope.logoutmessage=false;
 	$scope.dropzoneConfigRateSheet = {
 		parallelUploads: 1,
 		maxFileSize: 10,
-		url: URL+'/truckstop/uploadDocs/rateSheet',
+		url: URL+'/truckstop/skipAcl_uploadDocs/rateSheet',
 		addRemoveLinks: true, 
 		acceptedFiles: 'image/*, application/pdf, .xls, .xlsx, .doc, .docx, .txt, .svg, .bmp',
 		init:function(){
@@ -4263,7 +4477,7 @@ $rootScope.logoutmessage=false;
 	$scope.dropzoneConfigPOD = {
 		parallelUploads: 1,
 		maxFileSize: 10,
-		url: URL+ '/truckstop/uploadDocs/pod',
+		url: URL+ '/truckstop/skipAcl_uploadDocs/pod',
 		addRemoveLinks: true, 
 		acceptedFiles: 'image/*, application/pdf, .xls, .xlsx, .doc, .docx, .txt, .svg, .bmp',
 		init:function(){
@@ -4305,7 +4519,7 @@ $rootScope.logoutmessage=false;
 	$scope.dropzoneConfigBrokerDoc = {
 		parallelUploads: 3,
 		maxFileSize: 10,
-		url: URL+ '/truckstop/uploadDocs/',
+		url: URL+ '/truckstop/skipAcl_uploadDocs/',
 		addRemoveLinks: true, 
 		acceptedFiles: 'image/*, application/pdf, .xls, .xlsx, .doc, .docx, .txt, .svg, .bmp',
 		init:function(){
@@ -4489,6 +4703,14 @@ $rootScope.logoutmessage=false;
 			}	
 		}
 	}); 
+
+	/**
+	* go to edit state of entites click on row
+	*/
+
+	main.moveEntitiesToEditState = function(entityId,stateName) {
+		$state.go(stateName,{id: entityId});
+	}
 });
 
 app.filter('thighlight', function($sce) {

@@ -302,8 +302,5 @@ $lang['allnotification'] = 'All Notifications';
 $lang['loadmorenotification'] = 'Load More Notifications';
 
 
-//Roles section
-$lang['usersHeading'] 		= 'Users';
-$lang['editUser'] 		= 'Update User';
-$lang['addUser'] 		= 'Add User';
-$lang['deleteUser'] 	= 'Delete User';
+
+

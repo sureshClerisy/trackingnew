@@ -1,4 +1,4 @@
-{{aclData.name}}
+
 <!-- START PAGE CONTENT WRAPPER -->
 <div class="page-content-wrapper ">
 	<!-- START PAGE CONTENT -->
@@ -11,8 +11,8 @@
 			</div>
 			<div class="row">
 				<div class="col-md-12 col-xlg-12">
-				<div class="commen-heading">
-					<h2 class="oprate-dashbord ng-binding"> {{ languageCommonVariables.roleHeader }}</h2>
+				<div class="commen-heading no-padding">
+					<h2 class="oprate-dashbord ng-binding"><i class="fa fa-users"></i> {{ languageCommonVariables.roleHeader }}</h2>
 				</div>
 				</div>
 			</div>
@@ -41,22 +41,22 @@
 											<label>{{ languageArray.brokerListingTableThName }}</label>
 											<input type="text" class="form-control" name="name" ng-model="roles.aclData.name" required ng-blur="roles.checkRoleExistOrNot(roles.aclData.id,roles.aclData.name)"/>
 										</div>
-										<label class="error" for="name" ng-show="newrole.name.$invalid && !newrole.name.$pristine || newrole.$submitted && newrole.name.$invalid">Please enter role name.</label>
+										<label class="error" for="name" ng-show="newrole.name.$invalid && !newrole.name.$pristine || newrole.$submitted && newrole.name.$invalid">{{ languageArray.roleNameError }}</label>
 									</div>
 									<div class="col-sm-6">
 										<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':newrole.alias.$invalid && !newrole.alias.$pristine || newrole.$submitted && newrole.alias.$invalid}">
-											<label>Alias</label>
+											<label>{{ languageArray.alias }}</label>
 											<input type="text" class="form-control" name="alias" ng-model="roles.aclData.alias" required / >
 										</div>
-										<label class="error" for="street_address" ng-show="newrole.alias.$invalid && !newrole.alias.$pristine || newrole.$submitted && newrole.alias.$invalid">Please enter role alias.</label>
+										<label class="error" for="street_address" ng-show="newrole.alias.$invalid && !newrole.alias.$pristine || newrole.$submitted && newrole.alias.$invalid">{{ languageArray.roleAliasError }}</label>
 									</div>
 								</div>
 								<!--row-end-->
 								<div class="update-truck-block-btn">
 									<button ng-click="submitted=true" class="btn btn-primary btn-cons m-b-10" type="submit">
 										<i class="fa fa-plus"></i>
-										<span ng-hide = "roles.aclData.id" class="bold"> {{ languageArray.brokerListingTableAddbutton|capitalize }}</span>
-										<span ng-show = "roles.aclData.id" class="bold"> {{ languageArray.brokerListingTableEditbutton|capitalize }}</span>
+										<span ng-hide = "roles.aclData.id" class="bold"> {{ languageCommonVariables.addbutton|capitalize }}</span>
+										<span ng-show = "roles.aclData.id" class="bold"> {{ languageCommonVariables.updatebutton|capitalize }}</span>
 									</button>
 									<a href="#/roles">
 										<button class="btn btn-danger btn-cons m-b-10" type="button">

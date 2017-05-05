@@ -1,47 +1,35 @@
 <?php
 class Vehicles extends Admin_Controller {
 
-	// private $entity;
-	// private $event;
-	// private $serverAddr;
-	// private $protocol;
 	public  $search;
-	public  $userId;
-	public  $roleId;
 	public  $userName;
 	
 
 	function __construct()
 	{ 
 		parent::__construct();	
-		$this->userId     = $this->session->loggedUser_id;
-		$this->roleId     = $this->session->role;	
 		$this->userName   = $this->session->loggedUser_username;
 		$this->load->library('user_agent');
 		$this->load->model('Vehicle','vehicle');		
-		$this->load->model('Garage','garage');
 		$this->load->model(array('Job','User'));
-		$this->load->helper('truckstop_helper');
+		
 	}
 
 	public function index() {
 		$data = array();
 		$parent_id = null;
-		$parentIdCheck = $this->session->userdata('loggedUser_parentId');
-		if( isset($parentIdCheck) && $parentIdCheck != 0 ) {
-			$parent_id = $this->session->userdata('loggedUser_parentId');
+	
+		if ( $this->globalRoleId == 2 ) {
+			$parent_id = $this->userID;
 		}
 
-		if ( $this->roleId == 2 ) {
-			$parent_id = $this->userId;
-		}
-		$childIds = $this->User->fetchDispatchersChilds($this->userId);
+		$childIds = $this->User->fetchDispatchersChilds($this->userID);
 		if ( !empty($childIds) ) {
 			$parentId = array();
 			foreach($childIds as $child ) {
 				array_push($parentId,$child['id']);
 			}
-			$parent_id = array_merge($parentId,array($this->userId));
+			$parent_id = array_merge($parentId,array($this->userID));
 		}
 		$data['rows'] = $this->vehicle->get_vechicls($parent_id);
 		$data['total_records'] = count($data['rows']);
@@ -55,7 +43,9 @@ class Vehicles extends Admin_Controller {
 	* Return: vehicle array or empty array
 	* Comment: Used for fetching trucks detail to edit it
 	*/
+
 	public function edit( $vehicle_id = null ){
+		$this->checkOrganisationIsValid($vehicle_id,'vehicles');
 		$data['trucks'] = $this->vehicle->get_row($vehicle_id);
 		$vehicleTypeArray = array();
 		if ( $data['trucks']['vehicle_type'] != '' ) {
@@ -69,7 +59,7 @@ class Vehicles extends Admin_Controller {
 			}
 		}
 		$data['trucks']['vehicle_type'] = $vehicleTypeArray;
-		$data['driversList'] = $this->vehicle->getRelatedDrivers($this->userId);
+		$data['driversList'] = $this->vehicle->getRelatedDrivers($this->userID);
 		$data['states_data'] = $this->Job->getAllStates();
 		$data['truckDocuments'] = $this->vehicle->fetchContractDocuments($vehicle_id, 'truck');
 		echo json_encode($data);
@@ -77,7 +67,7 @@ class Vehicles extends Admin_Controller {
 	 
 	public function skipAcl_states(){
 		$data['states_data'] = $this->Job->getAllStates();
-		$data['driversList'] = $this->vehicle->getRelatedDrivers($this->userId);
+		$data['driversList'] = $this->vehicle->getRelatedDrivers($this->userID);
 		echo json_encode($data);
 	}
 	
@@ -88,7 +78,7 @@ class Vehicles extends Admin_Controller {
 	* Return: array
 	* Comment: Used for update truck information
 	*/
-	public function update() 
+	public function skipAcl_update() 
 	{
 		try{
 
@@ -194,7 +184,7 @@ class Vehicles extends Admin_Controller {
 		try{
 			
 			$_POST = json_decode(file_get_contents('php://input'), true);
-			$_POST['user_id'] = $this->userId;
+			$_POST['user_id'] = $this->userID;
 			$vehicleType = '';
 
 			if ( isset($_POST['vehicle_type']) && !empty($_POST['vehicle_type']) ) {
@@ -315,7 +305,7 @@ class Vehicles extends Admin_Controller {
 	 
 	public function skipAcl_changeDriver( $driverId = null, $vehicleId = null ) {
 		$truckName = '';
-		$result = $this->vehicle->checkChangeDriver($driverId,$vehicleId, $this->userId);
+		$result = $this->vehicle->checkChangeDriver($driverId,$vehicleId, $this->userID);
 		if ( !empty($result) ) {
 			$res = false;
 			$truckName = $result['label'];
@@ -469,22 +459,17 @@ class Vehicles extends Admin_Controller {
 		$data = array();
 		$parent_id = null;
 		$content ='';
-		$parentIdCheck = $this->session->userdata('loggedUser_parentId');
 	
-		if( isset($parentIdCheck) && $parentIdCheck != 0 ) {
-			$parent_id = $this->session->userdata('loggedUser_parentId');
+		if ( $this->globalRoleId == 2 ) {
+			$parent_id = $this->userID;
 		}
-
-		if ( $this->roleId == 2 ) {
-			$parent_id = $this->userId;
-		}
-		$childIds = $this->User->fetchDispatchersChilds($this->userId);
+		$childIds = $this->User->fetchDispatchersChilds($this->userID);
 		if ( !empty($childIds) ) {
 			$parentId = array();
 			foreach($childIds as $child ) {
 				array_push($parentId,$child['id']);
 			}
-			$parent_id = array_merge($parentId,array($this->userId));
+			$parent_id = array_merge($parentId,array($this->userID));
 		}
 
 		$keys = [['Label','Model','Vehicle Type','Tracker ID','Driver Name','Dispatcher','Registration Plate','VIN','Permitted Speed','Cargo Capacity','Cargo Bay Length','Cargo Bay Width','Fuel Type','Fuel Consumption','Tank Capacity','Tyres Size','Tyres Number','State','City','Vehicle Address','Owner','Unit']];

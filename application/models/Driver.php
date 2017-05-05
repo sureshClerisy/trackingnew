@@ -15,22 +15,10 @@ class Driver extends Parent_Model
 		
 	}
 
-	public function countAllRecords($keyword = null, $page = null, $userId=null) {
-        if ($keyword) {
-            $this->db->like('first_name', $keyword);
-            $this->db->or_like('email', $keyword);
-        }
-        
-        if ( $this->session->userdata('role') != 3 ) {
-			if(!empty($userId))
-				$this->db->where('user_id',$userId);
-		}
-		
-        $num_rows = $this->db->count_all_results('drivers');
-       
-        return $num_rows;
-    }
-    
+	/**
+	* fetch all drivers records for listing
+	*/
+
     public function fetchAllRecords($userId = null) {
         $data = array();
        	$this->db->select('CONCAT(SUBSTRING(d.first_name, 1, 1),SUBSTRING(d.last_name, 1, 1)) as userIntial, v.city, d.color,  d.id as driverId, d.first_name,d.last_name,d.phone,d.email,d.driver_license_number,d.id,d.status, CONCAT(u.first_name, " ", u.last_name) AS dispatcher, d.user_id as dispId, v.team_driver_id,  v.label,v.id as vehicle_id');
@@ -43,7 +31,8 @@ class Driver extends Parent_Model
 			$this->db->where_in('d.user_id',$userId); 
 		} else if( $userId != null)
 			$this->db->where('d.user_id',$userId); 
-			 
+		
+		$this->db->where('d.organisation_id',$this->selectedOrgId);
         $query = $this->db->get("drivers as d");
         //echo $this->db->last_query();die;
 		if ($query->num_rows() > 0) {
@@ -68,10 +57,12 @@ class Driver extends Parent_Model
         }
     } 
     
-	public function addDrivers( $data = array(),$userId ){
-		if(empty($data['user_id'])){
-			$data['user_id'] = $userId;
-		}
+    /**
+    * adding driver to database
+    */
+
+	public function addDrivers( $data = array()){
+		$data['organisation_id'] = $this->selectedOrgId;
 		$result = $this->db->insert('drivers',$data);
 		if ($result) {
 			return $this->db->insert_id();
@@ -110,9 +101,7 @@ class Driver extends Parent_Model
 	}
 	
 	public function update( $data = array(),$id=null ){
-
 		$result = $this->db->update('drivers',$data,"id={$id}");
-		
 		if ($result) {
 			return true;
 		} else {
@@ -152,7 +141,10 @@ class Driver extends Parent_Model
 		}
 	}
 	
-	/********* Dispatcher List - r288 ****************/
+	/**
+	* get list of dispatchers
+	*/
+
 	public function get_dispatcher_list( $userId = null, $childIds = false ) {
 		$this->db->where_in('role_id',array(2,5));
 		$this->db->select('id,username');
@@ -162,6 +154,7 @@ class Driver extends Parent_Model
 		} else if ( $userId )
 			$this->db->where('id',$userId);
 
+		$this->db->where('users.parent_id',$this->selectedOrgId);
 		$result = $this->db->get('users');
 		if ($result->num_rows() > 0 ) {
 			return $result->result_array();
@@ -171,14 +164,6 @@ class Driver extends Parent_Model
 	}
 
 	public function get_selected_dispatcher($driver_id = null) {
-		//~ $this->db->where('id',$user_id);
-		//~ $this->db->select('id,username');
-		//~ $result = $this->db->get('users');
-		//~ if ($result->num_rows() > 0 ) {
-			//~ return $result->row_array();
-		//~ } else {
-			//~ return false;
-		//~ }
 		$this->db->where('drivers.id',$driver_id);
 		$this->db->select('drivers.user_id as id,users.username');
 		$this->db->join('users','drivers.user_id = users.id','LEFT');
@@ -214,7 +199,7 @@ class Driver extends Parent_Model
 			//$this->db->where(array('vehicles.driver_type !=' => "team"));	
 			$this->db->where("(vehicles.driver_type IS NULL OR vehicles.driver_type = '' OR vehicles.driver_type = 'driver' OR vehicles.driver_type = 'single')");	
 		}
-
+		$this->db->where('drivers.organisation_id',$this->selectedOrgId);
 		$result = $this->db->get('drivers');
 		if ( $result->num_rows() > 0 ) {
 			return $result->result_array();
@@ -240,11 +225,12 @@ class Driver extends Parent_Model
 			$this->db->where("(vehicles.driver_type IS NULL OR vehicles.driver_type = '' OR vehicles.driver_type = 'driver' OR vehicles.driver_type = 'single')");	
 		}
 
+		$this->db->where('drivers.organisation_id',$this->selectedOrgId);
 		$result = $this->db->get('drivers');
 		if ( $result->num_rows() > 0 ) {
 			return $result->result_array();
 		} else {
-			return false;
+			return array();
 		}
 	}
 
@@ -267,6 +253,7 @@ class Driver extends Parent_Model
 		if($userId){
 			$this->db->where('drivers.user_id',$userId);
 		}
+		$this->db->where('drivers.organisation_id',$this->selectedOrgId);
 		$result = $this->db->get('drivers');
 		if ( $result->num_rows() > 0 ) {
 			return $result->result_array();
@@ -292,6 +279,7 @@ class Driver extends Parent_Model
 		if($userId){
 			$this->db->where('drivers.user_id',$userId);
 		}
+		$this->db->where('drivers.organisation_id',$this->selectedOrgId);
 		$result = $this->db->get('drivers');
 		if ( $result->num_rows() > 0 ) {
 			return $result->result_array();
@@ -326,6 +314,7 @@ class Driver extends Parent_Model
 		if($userId){
 			$this->db->where("users.id",$userId);
 		}
+		$this->db->where('drivers.organisation_id',$this->selectedOrgId);
 		$this->db->group_by('users.id');
 		$result = $this->db->get('drivers');
 		if ( $result->num_rows() > 0 ) {
@@ -359,7 +348,7 @@ class Driver extends Parent_Model
 		$this->db->join('vehicles','vehicles.driver_id = drivers.id');
 		$this->db->join('users','drivers.user_id = users.id');
 		$this->db->where('drivers.status',1)->order_by("driverName","asc");
-		if ( !in_array($this->session->userdata('role'),$this->config->item('with_admin_role'))) {
+		if ( !in_array($this->role,$this->config->item('with_admin_role'))) {
 			if($userId)
 				$this->db->where('drivers.user_id',$userId);
 		}
@@ -401,11 +390,18 @@ class Driver extends Parent_Model
 
 	public function checkLicenceNumberExist( $entityValue = '', $entityName = '' , $table ='', $entityId = null ) {
 		$this->db->select('id');
-		if ( $entityId != '' && $entityId != null )
+		if ( $entityId != '' && $entityId != null ){
 			$this->db->where(array($entityName => $entityValue, 'id !=' => $entityId ));
-		else
+		}
+		else{
 			$this->db->where($entityName, $entityValue);
+		}
+
+		$this->db->where(['organisation_id'=>$this->selectedOrgId]);
+		
 		$result = $this->db->get($table);
+		// echo $this->db->last_query();
+		
 		if ( $result->num_rows() > 0 )
 			return  true;
 		else
@@ -449,7 +445,9 @@ class Driver extends Parent_Model
 		$this->db->join('drivers as team','v.team_driver_id = team.id','left');	
 		$this->db->join('users as u','d.user_id = u.id','left');
 		$this->db->where('d.status',1);
-		$this->db->where('d.id NOT IN ('.$result.')');
+		
+		$this->db->where(['d.status'=>1,'d.organisation_id'=>$this->selectedOrgId]);
+
 		if(!isset($filters["driverId"]) && isset($filters["dispatcherId"]) ){
 			$this->db->where_in('d.user_id',$filters["dispatcherId"]);
 		}
@@ -483,7 +481,6 @@ class Driver extends Parent_Model
 
 
 		$result = $this->db->get('drivers as d');
-		//echo $this->db->last_query();
 		if($total){
 			return $result->row_array()["totalCount"];
 		}
@@ -506,7 +503,8 @@ class Driver extends Parent_Model
 			$this->db->select("v.id as vehicleId, 'trucksWithoutDriver' as recordType,  v.label, v.vin, v.model");	
 		}
 
-		$this->db->where('v.vehicle_status',1);
+		$this->db->where(['v.vehicle_status'=>1,'v.organisation_id'=>$this->selectedOrgId]);
+
 		$this->db->group_start();
 		$this->db->where("v.driver_id = 0 OR v.driver_id IS NULL OR  v.driver_id = ''");
 		$this->db->group_end();
@@ -532,7 +530,9 @@ class Driver extends Parent_Model
 		}
 
 		$result = $this->db->get('vehicles as v');
+		
 		// echo $this->db->last_query();die;
+
 		if($total){
 			return $result->row_array()["totalCount"];
 		}
@@ -560,7 +560,7 @@ class Driver extends Parent_Model
 		$this->db->join('drivers as d','v.driver_id = d.id', 'left');
 		$this->db->join('drivers as team','v.team_driver_id = team.id','left');	
 		$this->db->join('users as u','d.user_id = u.id');
-		$this->db->where(array('v.vehicle_status' => 1, "v.tracker_id != "=>0, "v.tracker_id IS NOT "=>NULL) );
+		$this->db->where(['d.organisation_id'=>$this->selectedOrgId,'v.vehicle_status' => 1, "v.tracker_id != "=>0, "v.tracker_id IS NOT "=>NULL]);
 		$this->db->where("ABS( TIMESTAMPDIFF(MINUTE , Now( ) , v.`modified` ) ) >= 120");
 
 		if(isset($filters["userToken"]) && isset($filters["userType"]) && $filters["userType"] == "dispatcher" ){
@@ -613,7 +613,9 @@ class Driver extends Parent_Model
 
 
 		$result = $this->db->get("vehicles as v");
-		//echo $this->db->last_query();die;
+		
+		// echo $this->db->last_query();
+
 		if($total){
 			return $result->row_array()["total"];
 		}
@@ -648,8 +650,6 @@ class Driver extends Parent_Model
 	}
 
 	public function updateLoadsAssignments($data = array() ) {
-		// $this->db->where('loads.id',$id);
-		// $this->db->update('loads',$data);
 		$this->db->update_batch('loads', $data, 'id'); 
 		return true;
 	}
@@ -686,7 +686,8 @@ class Driver extends Parent_Model
 			$this->db->or_like('d.email',$search['searchText']); 
 			$this->db->or_like('d.driver_license_number',$search['searchText']); 
 		}
-			 
+		
+		$this->db->where('d.organisation_id',$this->selectedOrgId);
         $query = $this->db->get("drivers as d");
 
 		if ($query->num_rows() > 0) {

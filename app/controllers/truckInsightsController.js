@@ -20,7 +20,7 @@ app.controller('truckInsightsController', ["dataFactory","$scope","$rootScope", 
 	
     vmInsights.truckInsights = function(search){
         
-        dataFactory.httpRequest(URL+'/Loads/getTruckInsightsRecords/','Post',{} ,{ pageNo:'', itemsPerPage:vmInsights.itemsPerPage,searchQuery: search, sortColumn:'', sortType:'',filterArgs:vmInsights.filterArgs,'export':1 }).then(function(data){
+        dataFactory.httpRequest(URL+'/Loads/skipAcl_getTruckInsightsRecords/','Post',{} ,{ pageNo:'', itemsPerPage:vmInsights.itemsPerPage,searchQuery: search, sortColumn:'', sortType:'',filterArgs:vmInsights.filterArgs,'export':1 }).then(function(data){
             $rootScope.donwloadExcelFile(data.fileName);
         });
     }
@@ -51,7 +51,7 @@ app.controller('truckInsightsController', ["dataFactory","$scope","$rootScope", 
 
     vmInsights.loadNextPage = function(pageNumber,search,sortColumn,sortType){
     	vmInsights.autoFetchLoads = true;
-        dataFactory.httpRequest(URL+'/Loads/getTruckInsightsRecords/','Post',{} ,{ pageNo:pageNumber, itemsPerPage:vmInsights.itemsPerPage,searchQuery: search, sortColumn:sortColumn, sortType:sortType,filterArgs:vmInsights.filterArgs }).then(function(data){
+        dataFactory.httpRequest(URL+'/Loads/skipAcl_getTruckInsightsRecords/','Post',{} ,{ pageNo:pageNumber, itemsPerPage:vmInsights.itemsPerPage,searchQuery: search, sortColumn:sortColumn, sortType:sortType,filterArgs:vmInsights.filterArgs }).then(function(data){
         	vmInsights.autoFetchLoads = false;
         	vmInsights.trucks = data.data;
 

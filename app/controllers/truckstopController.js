@@ -159,7 +159,7 @@ app.controller('truckstopController', function( dataFactory,$scope,$sce,$http ,$
 		$scope.setDeleteIndex = index;
 	}
 
-	$scope.confirmDelete = function(confirm){
+	$rootScope.confirmDelete = function(confirm){
 		if(confirm == 'yes'){
 			var truckstopId =  angular.element("#confirm-delete").data("item");
 			var x = $("#data").find("tr[data-uinfo='"+truckstopId+"']");

@@ -38,6 +38,11 @@ class Test extends Admin_Controller {
 	public $deadMilesActual;
 	public $triumphToken;
 	public $defaultTruckAvg;
+
+	private $table 				= 'acl_actions_updated';
+	private $parentController;
+	
+	
 	
 	function __construct(){
 
@@ -1063,6 +1068,28 @@ class Test extends Admin_Controller {
         curl_close ($ch);
         return $data;
     }
+
+	public function update_acl_action_Table(){
 	
-	
+		$this->load->model('AclModel','Acl');
+		
+		$actions = $this->db->select('*')->get($this->table)->result_array();
+
+		foreach ($actions as $key => $value) {
+
+			if($value['parent_id']==""){
+				
+				$this->parentController = strtolower($value['action']);
+
+				$value['slug'] 	 = $this->parentController.'/index';
+			}
+			else{
+				$value['slug'] 	 = "{$this->parentController}/{$value['action']}";	
+			}
+			$this->db->where('id',$value['id']);
+			$this->db->update($this->table,['slug'=>$value['slug']]);
+			
+		}
+
+	}
 }

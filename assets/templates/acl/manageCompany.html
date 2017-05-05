@@ -3,42 +3,45 @@
 		<div class="container-fluid padding-25 sm-padding-10">
 			<div class="row">
 				<div class="col-md-12 col-xlg-12">
-					<div ng-show="alertmsg == true" class="alert alert-success" role="alert">
-						<button class="close" data-dismiss="alert"></button>						
-						{{message}}
-					</div>
-					<div ng-show="alertdeletemsg == true" class="alert alert-success" role="alert">
-						<button ng-click = "hidedeletemessage()" class="close"></button>
-						{{deleteMessage}}
-					</div>
-					<div class="commen-heading brokers-page">
-						<h2 class="oprate-dashbord"> {{companyName}}</h2>
+					<div class="commen-heading">
+						<h2 class="oprate-dashbord" style="padding-left: 0px;">
+							<i class="fa fa-building" aria-hidden="true"></i> {{ languageArray.manageFeature }}{{companyName}}
+						</h2>
+						<div ng-show="alertmsg == true" class="alert alert-success" role="alert">
+							<button class="close" ng-click="acl.hidemessage()"></button>						
+							{{message}}
+						</div>
 					</div>
 				</div>
 			</div>
 			<div class="row invocie-block-row ">
 				<div class="col-md-12 col-xlg-12">
-					<div class="load-new-block-table">
-                        <div>
-                            <span style="margin-left: 4px;cursor: pointer;margin-top: 5px;float: left;font-weight: bold;" ng-click="backToList()" class="ng-binding"> 
-                                <i class="fa fa-arrow-left"></i> Back to list
-                            </span>
-                        </div>
-						<div class="add-new-data fix-page">
+					<div class="load-new-block-table check-outer-block-list">
+                        <div class="add-new-data fix-page">
 							<div class="load-tabe-auto map-load-section">
-                                <div class="truck-detail-block" ng-repeat="value in getAction">
-                                  <div class="truck-detail-heading controller-listing">
-                                    <h3>
-                                        <input type="checkbox" ng-checked="value.status ==1 " ng-click="assignRemove(value.id,$event)">
-                                        <span>{{ value.action }}</span>
-                                    </h3>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+								<div class="truck-detail-block">
+	                                  <div class="truck-detail-heading controller-listing truck-detail-selectAll" >
+	                                    <div class="check-box-listing-blk">
+	                                        <input type="checkbox" id="checkall" ng-checked="acl.checkAllParent == 1" ng-model="acl.selectAll" ng-click="acl.selectAllValues()">
+	                                        <label for="checkall">{{ languageArray.selectAll }}</label>
+	                                    </div>
+	                                </div>
+	                            </div>
+							
+							  	<div class="truck-detail-block" ng-repeat="value in getAction">
+                                  	<div class="truck-detail-heading controller-listing" ng-class="{'yellow': value.status == 1}" >
+                                    	<div class="check-box-listing-blk">
+	                                        <input type="checkbox" ng-checked="value.status == 1 || selectAll == true" ng-click="assignRemove(value.id,$event,value.action,$index)" id="check-{{$index}}">
+	                                        <label for="check-{{$index}}">{{ value.name }}</label>
+	                                        <p class="content-blk" class="actino-label"> {{ value.description }} </p>  
+                                   		</div>
+                                	</div>
+                           		</div>
+                       		</div>
+                   		</div>
+                	</div>
+           		</div>
+        	</div>
     </div>
 </div>
 </div>

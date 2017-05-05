@@ -26,6 +26,7 @@ class Vehicle extends Parent_Model
         } else if($userId)
 			$this->db->where('drivers.user_id',$userId);   
 			
+        $this->db->where('vehicles.organisation_id',$this->selectedOrgId);
 		$this->db->Group_by('vehicles.id');
         $result = $this->db->get(); 
         if($result->num_rows()>0){
@@ -35,28 +36,6 @@ class Vehicle extends Parent_Model
 		}
     } 
     
-    public function get_vechicles_count($search = '', $page = null, $userId=null) {
-
-        if($search){
-			$this->db->or_group_start();
-            $this->db->like('model', $search);
-            $this->db->or_like('label', $search);
-            $this->db->or_like('vehicle_type', $search);
-            $this->db->group_end();
-        }
-       
-        if(!empty($userId)){
-            $this->db->where('vehicles.user_id',$userId);    
-        }
-		
-		$num_rows = $this->db->count_all_results('vehicles');
-
-		// echo $this->db->last_query();
-
-		return $num_rows;
-
-	}
-
     public function add_edit_vehicle($data = array(),$id = null) {
 
         $data = $data;
@@ -100,11 +79,12 @@ class Vehicle extends Parent_Model
 		unset($data['organization_name']);
 		unset($data['driverName']);
     
-		if (!empty($id)) {
+    	if (!empty($id)) {
 			$this->db->update('vehicles',$data,"id={$id}");
 			$last_id = $id;
 		} else {
-			$this->db->insert('vehicles', $data);
+            $data['organisation_id'] = $this->selectedOrgId;
+           	$this->db->insert('vehicles', $data);
 			$last_id = $this->db->insert_id();
 		}
 		return $last_id;
@@ -208,7 +188,7 @@ class Vehicle extends Parent_Model
         $this->db->join('users','drivers.user_id = users.id');
         $this->db->join('drivers as team','vehicles.team_driver_id = team.id','left');
         
-        if ( !in_array($this->session->userdata('role'),$this->config->item('with_admin_role'))) {
+        if ( !in_array($this->role,$this->config->item('with_admin_role'))) {
 			if(!empty($userid))
             	$this->db->where('drivers.user_id',$userid);
         }
@@ -221,9 +201,10 @@ class Vehicle extends Parent_Model
         }
 
         $this->db->where('drivers.status',1);
-		$this->db->order_by('driverName',"asc");
+		$this->db->where('drivers.organisation_id',$this->selectedOrgId);
+        $this->db->order_by('driverName',"asc");
+
         $data = $this->db->get('drivers');
-        //echo $this->db->last_query();die;
         if ( $data->num_rows() > 0 ) 
 			return $data->result_array();
 		else
@@ -231,15 +212,12 @@ class Vehicle extends Parent_Model
     }
 
 
-    public function get_vehicles_fuel_consumption( $userid = null , $vehicle_id = null){
-
+    public function get_vehicles_fuel_consumption($vehicle_id = null){
         $this->db->select('fuel_consumption,destination_address,vehicle_address,city,state,cargo_capacity,cargo_bay_l');
-       
         if ( $vehicle_id != '' && $vehicle_id != 0 && $vehicle_id != null ) {
 			$this->db->where('vehicles.id',$vehicle_id);
 		}
         
-        //~ $this->db->where('vehicles.vehicle_status',1);
         $data = $this->db->get('vehicles');
       	if( $data->num_rows() > 0 ) {
 			return $data->result_array();
@@ -403,7 +381,7 @@ class Vehicle extends Parent_Model
 	  
 	public function getVehicleInfo( $vehicleId = null ) {
         $this->db->select('vehicles.id,label,vehicle_type,cargo_capacity,cargo_bay_l,cargo_bay_w,fuel_consumption,vehicles.vehicle_image,drivers.profile_image,trailers.unit_id');
-        $this->db->join('drivers', 'drivers.id = vehicles.driver_id');
+        $this->db->join('drivers', 'drivers.id = vehicles.driver_id','LEFT');
         $this->db->join('trailers', 'trailers.truck_id = vehicles.id','LEFT');
         $this->db->where('vehicles.id',$vehicleId);
         $result = $this->db->get('vehicles');
@@ -420,7 +398,7 @@ class Vehicle extends Parent_Model
 	  
     public function getTeamVehicleInfo( $loadId = null ) {
         $this->db->select('CONCAT( drivers.first_name, " + ", team.first_name," - ",vehicles.label) AS driverName, vehicles.id,label,vehicle_type,cargo_capacity,cargo_bay_l,cargo_bay_w,drivers.first_name,drivers.last_name,fuel_consumption,vehicles.driver_id,vehicles.vehicle_image,drivers.profile_image,trailers.unit_id');
-        $this->db->join('drivers', 'drivers.id = loads.driver_id');
+        $this->db->join('drivers', 'drivers.id = loads.driver_id','LEFT');
         $this->db->join('drivers as team','loads.second_driver_id = team.id','left');
         $this->db->join('vehicles', 'vehicles.id = loads.vehicle_id','Left');
         $this->db->join('trailers', 'trailers.truck_id = vehicles.id','LEFT');
@@ -497,11 +475,13 @@ class Vehicle extends Parent_Model
 		$this->db->select('drivers.id,concat(drivers.first_name," ",drivers.last_name) as driverName, users.username')->order_by("driverName","asc");
         $this->db->join('users',"drivers.user_id = users.id");  
         //role#4 is for role Disp. Coordinator
-        if ( in_array($this->session->userdata('role'),$this->config->item('with_admin_role')) || $this->session->userdata('role') == 4) {
-			$this->db->where('drivers.status',1);
+        if ( in_array($this->role,$this->config->item('with_admin_role')) || $this->role == 4) {
+			
 		} else {
-			$this->db->where(array('user_id'=>$userId,'drivers.status'=>1));
+			$this->db->where('user_id', $userId);
 		}
+
+        $this->db->where(array('drivers.organisation_id' => $this->selectedOrgId,'drivers.status'=>1));
 		$result = $this->db->get('drivers');
 		if ( $result->num_rows() > 0 ) {
 			return $result->result_array();
@@ -517,12 +497,13 @@ class Vehicle extends Parent_Model
 	public function checkChangeDriver( $driverId = null, $vehicleId = null, $userId = null ) {
 		$finalArray = array();
 		$this->db->select('id,driver_id,label');
-		if ( $this->session->userdata('role') == 3 ) {
+		if (in_array($this->role,$this->config->item('with_admin_role'))) {
 			$condition = array('driver_id' => $driverId, 'id !=' => $vehicleId);
-		} else {
+    	} else {
 			$condition = array('user_id' => $userId, 'driver_id' => $driverId, 'id !=' => $vehicleId);
 		}
 		$this->db->where($condition);
+        $this->db->where('vehicles.organisation_id', $this->selectedOrgId);
 		$result = $this->db->get('vehicles');
 		if ( $result->num_rows() > 0 ) {
 			$finalArray = $result->row_array();
@@ -588,34 +569,6 @@ class Vehicle extends Parent_Model
 		return $this->db->get('equipment_types')->result_array();
     } 
     
-    /**
-     * getting infomation of load after assinging load to another driver
-     */
-      
-    public function get_vehicles_aferAssign($userid = null, $vehicle_id = null){
-
-        //~ $this->db->select('state,vehicles.id,city,label,concat(first_name," ",last_name) as driverName,destination_address')
-        //~ ->from('vehicles')->join('drivers','drivers.id = vehicles.driver_id');
-        
-		$this->db->select('drivers.id as driver_id, concat(drivers.first_name," ",drivers.last_name," - ",vehicles.label) as driverName,vehicles.label,users.username,vehicles.id,vehicles.city,vehicles.vehicle_address, vehicles.state, destination_address');
-        $this->db->join('vehicles','vehicles.driver_id = drivers.id');
-        $this->db->join('users','drivers.user_id = users.id');
-        $this->db->where('drivers.status',1);
-       
-        if ( $this->session->userdata('role') !=  3 && $this->session->userdata('role') != 1 ) {
-			//~ if(!empty($userid))
-				//~ $this->db->where('drivers.user_id',$userid);
-		}
-       
-		$this->db->where('vehicles.id',$vehicle_id);
-        $result = $this->db->get('drivers');
-        if ( $result->num_rows() > 0 ) {
-            return $result->row_array();
-        } else {
-            return array();
-        }       
-    }
-    
     /*
      * CHange status
      */
@@ -635,22 +588,9 @@ class Vehicle extends Parent_Model
 		return true;
 	}
 	
-	/**
-	 * Fetching trucks list for trailers dropdown
-	 */
-	
-	//~ public function fetchTruckListForTrailers() {
-		//~ $this->db->select('vehicles.id,concat("Truck-",vehicles.label) as vehicleName');
-		//~ $result = $this->db->get('vehicles');
-		//~ if ( $result->num_rows() > 0 ) {
-			//~ return $result->result_array();		
-		//~ } else {
-			//~ return array();
-		//~ }
-	//~ }
 	public function fetchTruckListForTrailers() {
 		$this->db->select('vehicles.id,concat("Truck-",vehicles.label) as vehicleName');
-		$result = $this->db->get('vehicles');
+		$result = $this->db->where(['organisation_id' => $this->selectedOrgId])->get('vehicles');
 		if ( $result->num_rows() > 0 ) {
 			return $result->result_array();		
 		} else {
@@ -668,7 +608,8 @@ class Vehicle extends Parent_Model
 			$this->db->where(array('label' => $truckNo,'id !=' => $id));
 		else
 			$this->db->where('label',$truckNo);
-			
+		
+        $this->db->where('vehicles.organisation_id',$this->selectedOrgId);
 		$result = $this->db->get('vehicles');
 		if ( $result->num_rows() > 0 ) {
 			return $result->row_array();
@@ -780,6 +721,10 @@ class Vehicle extends Parent_Model
             return false;
     }
 
+    /**
+    * data for importing excel
+    */
+    
     public function fetchVehiclesForCSV( $userId = false ,$search = null) {   
         $this->db->DISTINCT();
         $this->db->select('vehicles.label,vehicles.model,vehicles.vehicle_type,vehicles.tracker_id,CONCAT(drivers.first_name, " ", `drivers`.`last_name` ),CONCAT(users.first_name, " ", `users`.`last_name` ),vehicles.registration_plate,vehicles.vin,vehicles.permitted_speed,CONCAT(vehicles.cargo_capacity," ","lbs"),vehicles.cargo_bay_l,vehicles.cargo_bay_w,vehicles.fuel_type,vehicles.fuel_consumption,vehicles.tank_capactiy,vehicles.tyres_size,vehicles.tyres_number,vehicles.state,vehicles.city,vehicles.vehicle_address,vehicles.unit')
@@ -805,6 +750,7 @@ class Vehicle extends Parent_Model
             $this->db->or_like('vehicles.cargo_capacity',$search['searchText']); 
         }
 
+        $this->db->where('vehicles.organisation_id',$this->selectedOrgId);
         $this->db->Group_by('vehicles.id');
         $result = $this->db->get(); 
         if($result->num_rows()>0){

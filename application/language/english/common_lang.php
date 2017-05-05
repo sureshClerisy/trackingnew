@@ -3,12 +3,28 @@
 // {{ languageCommonVariables.cancelbutton }}
 /***Login page****/
 $lang['loginHeading'] = 'Login';
+$lang['restLoginHeading'] = 'Reset Your password';
+
 $lang['loginSubHeading'] = 'For Your Information';
+$lang['resetloginSubHeading'] = 'Update your password';
+
 $lang['loginUsernameLabel'] = 'Login';
 $lang['loginPasswordLabel'] = 'Password';
+$lang['confPasswordLabel'] 	= 'Confirm Password';
 $lang['loginSignInButton'] = 'Sign In';
+$lang['passwordUpdateButton'] = 'Update Password';
+
 $lang['InvalidUsernamePassword'] = 'Invalid username or password.';
 $lang['Inactivity5Minutes'] = 'Inctivity since last 5 minutes! Please Login!';
+
+/**ForgotPassword**/
+
+$lang['FrogotPassword'] = 'Forgot Password.';
+$lang['EmailReq'] = 'Enter email address';
+$lang['Submit'] = 'Submit';
+$lang['EmailedPassword'] = 'Reset password link has been generated and sent to your email address.';
+$lang['EmailNotRegistered'] = 'Error! : This email address does not exist. Please try another one.';
+
 /***Login page ends**/
 
 
@@ -380,11 +396,31 @@ $lang['editRole'] 		= 'Update Role';
 $lang['deleteRole'] 	= 'Delete Role';
 $lang['roleHeader'] 	= 'Roles';
 $lang['orgHeaderAdd'] 	= 'Add Organization';
-$lang['orgHeaderEdit'] 	= 'Update Organization';
+$lang['orgHeaderEdit'] 	= 'Edit Organization';
 
 //Roles section
 $lang['usersHeading'] 	= 'Users';
-$lang['editUser'] 		= 'Update User';
+$lang['editUser'] 		= 'Edit User';
 $lang['addUser'] 		= 'Add User';
 $lang['deleteUser'] 	= 'Delete User';
+
+// user
+$lang['id'] = 'Id';
+$lang['fullname'] = 'Full Name';
+$lang['email'] = 'E-Mail';
+$lang['phone'] = 'Phone';
+$lang['rolename'] = 'Rolename';
+
+$lang['firstname'] = 'First Name';
+$lang['lastname'] = 'Last Name';
+$lang['password'] = 'Password';
+$lang['confpassword'] = 'Confirm Password';
+
+// commonValidationErrors
+
+$lang['validationEmail'] = 'Please enter valid email address.';
+$lang['validationPhone'] = 'Please enter phone.';
+$lang['validationZip'] = 'Please enter zip code.';
+$lang['validationAddress'] = 'Please enter address.';
+$lang['validationPassword'] = 'Please enter password.';
 

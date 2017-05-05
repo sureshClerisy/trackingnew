@@ -1,4 +1,4 @@
-app.controller('trucksController', function(dataFactory,$scope, PubNub, $http ,$rootScope , $location , $cookies,getTrucksListing){
+app.controller('trucksController', function(dataFactory,$scope, PubNub, $http ,$rootScope , $location , $cookies,getTrucksListing,$uibModal){
 	
 	if($rootScope.loggedInUser == false)
 		$location.path('login');
@@ -18,7 +18,7 @@ app.controller('trucksController', function(dataFactory,$scope, PubNub, $http ,$
 
 	$rootScope.uniqueFieldsValue = true;	
 
-  	$scope.Message = $rootScope.truckEditMessage;
+	$scope.Message = $rootScope.truckEditMessage;
 	if($scope.Message!== undefined){
 		$scope.alertmsg = true;
 	}else{
@@ -48,22 +48,22 @@ app.controller('trucksController', function(dataFactory,$scope, PubNub, $http ,$
 		getResultsPage(1);
 	}
 
-  	$scope.searchTruckDB = function(){
-	    if($scope.searchText.length >= 3){
-	        if($.isEmptyObject($scope.libraryTemp)){
-	            $scope.libraryTemp = $scope.data;
-	            $scope.totalItemsTemp = $scope.totalItems;
-	            $scope.data = {};
-	        }
-	        getResultsPage(1);
-	      } else {
+	$scope.searchTruckDB = function(){
+		if($scope.searchText.length >= 3){
+			if($.isEmptyObject($scope.libraryTemp)){
+				$scope.libraryTemp = $scope.data;
+				$scope.totalItemsTemp = $scope.totalItems;
+				$scope.data = {};
+			}
+			getResultsPage(1);
+		} else {
 			if(! $.isEmptyObject($scope.libraryTemp)){
-		        $scope.data = $scope.libraryTemp ;
-	            $scope.totalItems = $scope.totalItemsTemp;
-	            $scope.libraryTemp = {};
-	        }
-	    }
- 	 }
+				$scope.data = $scope.libraryTemp ;
+				$scope.totalItems = $scope.totalItemsTemp;
+				$scope.libraryTemp = {};
+			}
+		}
+	}
 
 	$scope.hidedeletemessage = function(){
 		$scope.alertdeletemsg = false;
@@ -75,38 +75,9 @@ app.controller('trucksController', function(dataFactory,$scope, PubNub, $http ,$
 
 	$rootScope.dataTableOpts(10,8);			 //set datatable options   -r288
 	
-	$scope.removeTruck = function(truckid,index){
-		angular.element("#confirm-delete").modal('show');
-		angular.element("#confirm-delete").data("truckid",truckid);
-		angular.element("#confirm-delete").data("index",index);
-	}
-
-	$scope.confirmDelete = function(confirm){
-		if(confirm == 'yes'){
-			var truckid = angular.element("#confirm-delete").data("truckid");
-			var index  = angular.element("#confirm-delete").data("index");
-			if ( truckid != '' && truckid != undefined ) {
-				dataFactory.httpRequest(URL + '/vehicles/delete/'+truckid).then(function(data) {
-					PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
-					if ( data.success == true ) {
-						$scope.truckdeleteMessage = $rootScope.languageArray.truckDeleteSuccMsg;
-						$scope.alertdeletemsg = true;
-						$scope.data.splice(index,1);
-					} else {
-						$scope.truckdeleteMessage = $rootScope.languageArray.truckDeleteErrMsg;
-						$scope.alertdeleteErrormsg = true;
-					}
-		      	});
-			}
-		} else {
-			angular.element("#confirm-delete").removeData("truckid");
-			angular.element("#confirm-delete").removeData("index");
-		}
-		angular.element("#confirm-delete").modal('hide');
-	}
 	
 	/** Change Driver Status **/
-  
+
 	$scope.changeVehicleStatus = function( vehicleId, status, index) {
 		$scope.vehicleId = vehicleId;
 		$scope.Status = status; 
@@ -129,12 +100,35 @@ app.controller('trucksController', function(dataFactory,$scope, PubNub, $http ,$
 			});
 		} 
 		angular.element("#vehicle-list-status").modal('hide');
-	}  		
+	} 
+
+	$scope.addEditTrruck = function(truckId){
+		
+		var modalInstance = $uibModal.open({
+			// templateUrl: 'assets/templates/trailers/editTemp.html',
+			templateUrl: 'assets/templates/vehicles/editVehicle.html',
+			controller: 'editTruckController',
+			controllerAs: 'vehicles',
+			openedClass: 'main-popup-custom',
+			size: 'lg',
+			resolve: {
+				getTruckData: function(dataFactory, $stateParams) {
+					 return dataFactory.httpRequest(URL+'/vehicles/edit/' + truckId);
+				}
+			}
+		});
+	}
+
+	$scope.saveTruck = function(){
+
+		alert('indexController');
+	}
+
 });
 
-app.controller('editTruckController', function(dataFactory,getTruckData,$sce,$scope, PubNub, $http ,$rootScope , $location , $cookies, $stateParams){
+app.controller('editTruckController', function($uibModalInstance,dataFactory,getTruckData,$sce,$scope, PubNub, $http ,$rootScope , $location , $cookies, $stateParams){
 	if($rootScope.loggedInUser == false)
-	$location.path('logout');	
+		$location.path('logout');	
 	
 	$scope.myFile = {};
 	$scope.truckData = {};
@@ -159,7 +153,7 @@ app.controller('editTruckController', function(dataFactory,getTruckData,$sce,$sc
 		$scope.dtype = 'team';	
 		//On load page
 		if($scope.truckData.driverName===null||$scope.truckData.driverName===undefined||$scope.truckData.driverName===''){
-		  }
+		}
 		$scope.tempTeamDriverOne = $scope.truckData.driverName === null ? "Select Driver" : $scope.truckData.driverName;
 		$scope.temp_team_driver_one = $scope.truckData.driver_id;
 		$scope.tempTeamDriverTwo = $scope.truckData.teamDriverTwo;
@@ -183,23 +177,27 @@ app.controller('editTruckController', function(dataFactory,getTruckData,$sce,$sc
 
 	$scope.trustAsHtml = function(value) {
 		return $sce.trustAsHtml(value);
-    };
-    
-    $scope.truckData.label = parseInt($scope.truckData.label);
-    if($scope.truckData.driverName===null||$scope.truckData.driverName===undefined||$scope.truckData.driverName===''){
+	};
+
+	$scope.close = function() {
+		$uibModalInstance.close();
+	};
+
+	$scope.truckData.label = parseInt($scope.truckData.label);
+	if($scope.truckData.driverName===null||$scope.truckData.driverName===undefined||$scope.truckData.driverName===''){
 		$scope.truckData.driverName = 'Unassign';
 		$scope.truckData.driver_id = '0';
 	}
 
-    $scope.tempDriveId = $scope.truckData.driver_id;
-    $scope.tempDriverName = $scope.truckData.driverName;
-    
+	$scope.tempDriveId = $scope.truckData.driver_id;
+	$scope.tempDriverName = $scope.truckData.driverName;
+
 	$scope.fuelType = [{ 'val' : 'Diesel','key' : 'diesel'},{ 'val' : 'Petrol','key' : 'petrol'},{ 'val' : 'Gas','key' : 'gas'}];
-    $scope.onSelectVehicleTypeCallback = function (item, model){
+	$scope.onSelectVehicleTypeCallback = function (item, model){
 		$scope.truckData.vehicle_type = item.key;
 	};
 	
-    $scope.onSelectFuelTypeCallback = function (item, model){
+	$scope.onSelectFuelTypeCallback = function (item, model){
 		$scope.truckData.fuel_type = item.key;
 	};
 	
@@ -211,12 +209,12 @@ app.controller('editTruckController', function(dataFactory,getTruckData,$sce,$sc
 		$scope.truckData.state = item.code;
 	};
 	$scope.groupFind = function(item){
-        if(item.username !== "")
-            return 'Dispatcher: '+item.username;
-        else
-            return item.username;
-    }
-    
+		if(item.username !== "")
+			return 'Dispatcher: '+item.username;
+		else
+			return item.username;
+	}
+
 	$scope.onSelectDriverNameCallback = function (item, model){
 		if ( item.id == '' || item.id == undefined ){
 			$scope.driversList="Unassigned";
@@ -305,6 +303,7 @@ app.controller('editTruckController', function(dataFactory,getTruckData,$sce,$sc
 	*/ 
 	
 	$scope.deleteDocument = function( docId, documentName, index) {
+
 		$scope.docId = docId;
 		$scope.documentName = documentName; 
 		$scope.documentIndex = index; 
@@ -313,12 +312,12 @@ app.controller('editTruckController', function(dataFactory,getTruckData,$sce,$sc
 	
 	$rootScope.confirmCommonDocumentStatus = function(confirm){
 		if(confirm=='yes'){
-		dataFactory.httpRequest(URL + '/vehicles/skipAcl_deleteContractDocs/'+$scope.docId+"/"+$scope.documentName).then(function(data) {
-			PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
-			if(data.success == true) {
-				$scope.truckDocuments.splice($scope.documentIndex,1);
-			}
-	    });
+			dataFactory.httpRequest(URL + '/vehicles/skipAcl_deleteContractDocs/'+$scope.docId+"/"+$scope.documentName).then(function(data) {
+				PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
+				if(data.success == true) {
+					$scope.truckDocuments.splice($scope.documentIndex,1);
+				}
+			});
 		}	
 		angular.element("#common-document-status").modal('hide');
 	}
@@ -354,25 +353,30 @@ app.controller('editTruckController', function(dataFactory,getTruckData,$sce,$sc
 		},
 	};
 	
-	$scope.saveTruck = function(from){
+	$scope.saveTruck = function(){
+
+		// alert('/////');
+
 		if ( $rootScope.uniqueFieldsValue == false ) {
 			return false;
 		}
 
-		var file = $scope.myFile;
-        $scope.name = $scope.truckData.vehicle_image;
-        var fd = new FormData();
-            fd.append('vehicle_image', file);
-			fd.append('data1',$scope.name);
-              $http.post(URL+'/vehicles/skipAcl_image/',fd,{
-                  transformRequest: angular.identity,
-                  headers: {'Content-Type': undefined}
-               }).then(function successCallback(response) {
-				   if(response.data!=='')
-				   {
-					$scope.truckData.vehicle_image = response.data;
-					}
-			dataFactory.httpRequest(URL+'/vehicles/update/'+$scope.truckData.id,'POST',{},$scope.truckData).then(function(data) {
+		var file 	= $scope.myFile;
+		$scope.name = $scope.truckData.vehicle_image;
+		var fd 		= new FormData();
+		
+		fd.append('vehicle_image', file);
+		fd.append('data1',$scope.name);
+		
+		$http.post(URL+'/vehicles/skipAcl_image/',fd,{
+			transformRequest: angular.identity,
+			headers: {'Content-Type': undefined}
+		}).then(function successCallback(response) {
+			if(response.data!=='')
+			{
+				$scope.truckData.vehicle_image = response.data;
+			}
+			dataFactory.httpRequest(URL+'/vehicles/skipAcl_update/'+$scope.truckData.id,'POST',{},$scope.truckData).then(function(data) {
 				PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
 				if ( data.success == true ) {
 					$rootScope.truckEditMessage = $rootScope.languageArray.truckUpdatedSuccMsg;
@@ -387,32 +391,34 @@ app.controller('editTruckController', function(dataFactory,getTruckData,$sce,$sc
 			});
 		});
 	}
+
+
 	
 	/*
 	 * Check if same truck no exist
 	 */
 	 
-	$scope.checkVehicleLabelExist = function( truckNo, truckId ) {
-		if ( truckNo != '' && truckNo != undefined ) {
-			dataFactory.httpRequest(URL+'/vehicles/skipAcl_checkTruckNumber/'+truckNo+'/'+truckId).then(function(data) {
-				if ( data.success == false ) {
-					$rootScope.showErrorMessage = true;
-					$scope.errorMessage = 'Error! : This truck number already exist, please try another number.';
-					$scope.truckData.label = '';
-				} else {
-					$rootScope.showErrorMessage = false;
-					$scope.errorMessage = '';
-				}
-			});
-		}
-	}
-});
+	 $scope.checkVehicleLabelExist = function( truckNo, truckId ) {
+	 	if ( truckNo != '' && truckNo != undefined ) {
+	 		dataFactory.httpRequest(URL+'/vehicles/skipAcl_checkTruckNumber/'+truckNo+'/'+truckId).then(function(data) {
+	 			if ( data.success == false ) {
+	 				$rootScope.showErrorMessage = true;
+	 				$scope.errorMessage = 'Error! : This truck number already exist, please try another number.';
+	 				$scope.truckData.label = '';
+	 			} else {
+	 				$rootScope.showErrorMessage = false;
+	 				$scope.errorMessage = '';
+	 			}
+	 		});
+	 	}
+	 }
+	});
 
- 
- app.controller('addTruckController', function(dataFactory,getTruckData,$sce,$scope,PubNub, $http ,$rootScope , $location , $cookies, $stateParams){
+
+app.controller('addTruckController', function(dataFactory,getTruckData,$sce,$scope,PubNub, $http ,$rootScope , $location , $cookies, $stateParams){
 	if($rootScope.loggedInUser == false)
 		$location.path('logout');
-		
+
 	$scope.myFile = {};
 	$scope.addTruckData = {};
 	$scope.truckData = {};
@@ -434,68 +440,68 @@ app.controller('editTruckController', function(dataFactory,getTruckData,$sce,$sc
 	$scope.dtype = 'single';
 	$scope.addTruckData.driverType ='single';
 
-    
-    
+
+
 	$scope.trustAsHtml = function(value) {
 		return $sce.trustAsHtml(value);
-    };
-    
+	};
+
 	$scope.fuelType = [{ 'val' : 'Diesel','key' : 'diesel'},{ 'val' : 'Petrol','key' : 'petrol'},{ 'val' : 'Gas','key' : 'gas'}];
     $scope.addTruckData.fuel_consumption = 600;					// set value of fuel consumption per 100 miles to 600
     $scope.addTruckData.permitted_speed = 75;					// set value of permitted speed to 75
     $scope.addTruckData.vehicle_type = [{ 'abbrevation' : 'F','name' : 'Flatbed'}];
     
     dataFactory.httpRequest(URL + '/truckstop/skipAcl_fetchTrailerType').then(function(data) {
-		$scope.trailerTypes = data.trailerTypes;
-	});
-			
+    	$scope.trailerTypes = data.trailerTypes;
+    });
+
     $scope.onSelectVehicleTypeCallback = function (item, model){
-		$scope.addTruckData.vehicle_type = item.key;
-	};
+    	$scope.addTruckData.vehicle_type = item.key;
+    };
     
     $scope.onSelectFuelTypeCallback = function (item, model){
-		$scope.addTruckData.fuel_type = item.key;
-	};
+    	$scope.addTruckData.fuel_type = item.key;
+    };
     
     $scope.onSelectStateCallback = function (item, model){
-		$scope.addTruckData.state = item.code;
-	};
-	$scope.groupFind = function(item){
-        if(item.username !== "")
-            return 'Dispatcher: '+item.username;
-        else
-            return item.username;
+    	$scope.addTruckData.state = item.code;
+    };
+    $scope.groupFind = function(item){
+    	if(item.username !== "")
+    		return 'Dispatcher: '+item.username;
+    	else
+    		return item.username;
     }
-	
-	$scope.changeDriverType = function(type){
-		$scope.dtype = type;
-	}
 
-	$scope.onSelectDriverNameCallback = function (item, model){
-		var driverId =item.id;
-		if ( item.id == '' || item.id == undefined ){
-			$scope.driversList="Unassigned";
-		}
-		if ( driverId != '' && driverId != undefined )  {
-			$scope.addTruckData.driver_id = item.id;
-			if(driverId === '0'){
-				$scope.truckData.driverName = 'Not Assigned';
-			}
-			$scope.addTruckData.driverName = item.driverName;
-			$scope.truckData.driverName = item.driverName;
-			if(driverId !== '0'){
-				dataFactory.httpRequest(URL+'/vehicles/skipAcl_changeDriver/'+driverId+'/'+$scope.addTruckData.id).then(function(data) {
-					if ( data.result == false ) {
-						$scope.truckName = data.truckName;
-						$('#changeDriverOnTruck').modal('show');
-					}
-				});
-			}
-		}
-	};
+    $scope.changeDriverType = function(type){
+    	$scope.dtype = type;
+    }
+
+    $scope.onSelectDriverNameCallback = function (item, model){
+    	var driverId =item.id;
+    	if ( item.id == '' || item.id == undefined ){
+    		$scope.driversList="Unassigned";
+    	}
+    	if ( driverId != '' && driverId != undefined )  {
+    		$scope.addTruckData.driver_id = item.id;
+    		if(driverId === '0'){
+    			$scope.truckData.driverName = 'Not Assigned';
+    		}
+    		$scope.addTruckData.driverName = item.driverName;
+    		$scope.truckData.driverName = item.driverName;
+    		if(driverId !== '0'){
+    			dataFactory.httpRequest(URL+'/vehicles/skipAcl_changeDriver/'+driverId+'/'+$scope.addTruckData.id).then(function(data) {
+    				if ( data.result == false ) {
+    					$scope.truckName = data.truckName;
+    					$('#changeDriverOnTruck').modal('show');
+    				}
+    			});
+    		}
+    	}
+    };
 
 
-	$scope.teamDispatcher = "";
+    $scope.teamDispatcher = "";
 	//Select Driver as Team
 	$scope.onSelectTeamDriverCallback = function (item, model,driverIndex){
 		$scope.dindex = driverIndex;
@@ -533,7 +539,7 @@ app.controller('editTruckController', function(dataFactory,getTruckData,$sce,$sc
 		}
 		$('#changeDriverOnTruck').modal('hide');
 	}
-		
+
 	if($scope.addTruckData.vehicle_image==''||$scope.addTruckData.vehicle_image==null)
 	{
 		$scope.showimage = false;
@@ -577,26 +583,26 @@ app.controller('editTruckController', function(dataFactory,getTruckData,$sce,$sc
 
 		var file = $scope.myFile;
 		var fd = new FormData();
-            fd.append('vehicle_image', file);
-			
-              $http.post(URL+'/vehicles/skipAcl_image/',fd,{
-                  transformRequest: angular.identity,
-                  headers: {'Content-Type': undefined}
-               }).then(function successCallback(response) {
-					if(response.data!=='') {
-						$scope.addTruckData.vehicle_image = response.data;
-					}
-	
-					dataFactory.httpRequest(URL+'/vehicles/addTruck/','POST',{},$scope.addTruckData).then(function(data) {
-						PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
-						if ( data.success == true ) {
-							$rootScope.truckEditMessage = $rootScope.languageArray.truckSavedSuccMsg;
-							$scope.lastAddedTruck = data.lastTruckId;
-							$scope.dropzone.processQueue();
-						} else {
-							$rootScope.truckEditErrorMessage = $rootScope.languageArray.truckSavedErrMsg;
-						}
-					$location.path('trucks');
+		fd.append('vehicle_image', file);
+
+		$http.post(URL+'/vehicles/skipAcl_image/',fd,{
+			transformRequest: angular.identity,
+			headers: {'Content-Type': undefined}
+		}).then(function successCallback(response) {
+			if(response.data!=='') {
+				$scope.addTruckData.vehicle_image = response.data;
+			}
+
+			dataFactory.httpRequest(URL+'/vehicles/addTruck/','POST',{},$scope.addTruckData).then(function(data) {
+				PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
+				if ( data.success == true ) {
+					$rootScope.truckEditMessage = $rootScope.languageArray.truckSavedSuccMsg;
+					$scope.lastAddedTruck = data.lastTruckId;
+					$scope.dropzone.processQueue();
+				} else {
+					$rootScope.truckEditErrorMessage = $rootScope.languageArray.truckSavedErrMsg;
+				}
+				$location.path('trucks');
 			});
 		});
 	}
@@ -605,56 +611,56 @@ app.controller('editTruckController', function(dataFactory,getTruckData,$sce,$sc
 	 * Check if same truck no exist
 	 */
 	 
-	$scope.checkVehicleLabelExist = function( truckNo ) {
-		if ( truckNo != '' && truckNo != undefined ) {
-			dataFactory.httpRequest(URL+'/vehicles/skipAcl_checkTruckNumber/'+truckNo).then(function(data) {
-				if ( data.success == false ) {
-					$rootScope.showErrorMessage = true;
-					$scope.errorMessage = 'Caution! : This truck number already exist, please try another number.';
-					$scope.addTruckData.label = '';
-				} else {
-					$rootScope.showErrorMessage = false;
-					$scope.errorMessage = '';
-				}
+	 $scope.checkVehicleLabelExist = function( truckNo ) {
+	 	if ( truckNo != '' && truckNo != undefined ) {
+	 		dataFactory.httpRequest(URL+'/vehicles/skipAcl_checkTruckNumber/'+truckNo).then(function(data) {
+	 			if ( data.success == false ) {
+	 				$rootScope.showErrorMessage = true;
+	 				$scope.errorMessage = 'Caution! : This truck number already exist, please try another number.';
+	 				$scope.addTruckData.label = '';
+	 			} else {
+	 				$rootScope.showErrorMessage = false;
+	 				$scope.errorMessage = '';
+	 			}
+	 		});
+	 	}
+	 }
+
+	});
+
+
+
+
+app.directive('fileModel', ['$parse', function ($parse) {
+	return {
+		restrict: 'A',
+		link: function(scope, element, attrs) {
+			var model = $parse(attrs.fileModel);
+			var modelSetter = model.assign;
+
+			element.bind('change', function(){
+				scope.$apply(function(){
+					modelSetter(scope, element[0].files[0]);
+				});
 			});
 		}
-	}
-	
-});
- 
-
- 
-
- app.directive('fileModel', ['$parse', function ($parse) {
-	return {
-	   restrict: 'A',
-	   link: function(scope, element, attrs) {
-		  var model = $parse(attrs.fileModel);
-		  var modelSetter = model.assign;
-		  
-		  element.bind('change', function(){
-			 scope.$apply(function(){
-				modelSetter(scope, element[0].files[0]);
-			 });
-		  });
-	   }
 	};
- }]);
- 
- app.service('fileUpload', ['$http', function ($http) {
+}]);
+
+app.service('fileUpload', ['$http', function ($http) {
 	this.uploadFileToUrl = function(file, uploadUrl){
-	   var fd = new FormData();
-	   fd.append('file', file);
-	
-	   $http.post(uploadUrl, fd, {
-		  transformRequest: angular.identity,
-		  headers: {'Content-Type': undefined}
-	   })
-	
-	   .success(function(){
-	   })
-	
-	   .error(function(){
-	   });
+		var fd = new FormData();
+		fd.append('file', file);
+
+		$http.post(uploadUrl, fd, {
+			transformRequest: angular.identity,
+			headers: {'Content-Type': undefined}
+		})
+
+		.success(function(){
+		})
+
+		.error(function(){
+		});
 	}
- }]);
+}]);

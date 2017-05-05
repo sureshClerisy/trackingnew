@@ -302,3 +302,4 @@ $lang['loadsperformancecontext'] = 'Relatório de desempenho de cargas';
 
 $lang['allnotification'] = 'Todas as notificações';
 $lang['loadmorenotification'] = 'Carregar Mais Notificações';
+$lang['milesvsdeadmile'] 	= 'Milhas contra deadmiles';

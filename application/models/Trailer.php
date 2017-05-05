@@ -18,8 +18,10 @@ class Trailer extends Parent_Model {
     public function getTrailersList() {
 		$this->db->select('trailers.id,trailers.truck_id,trailers.unit_id,trailers.year,trailers.vin,trailers.owner,trailers.type,trailers.description,trailers.status,vehicles.label');
 		$this->db->join('vehicles','vehicles.id = trailers.truck_id','LEFT');
-        $result = $this->db->get('trailers'); 
-        //echo $this->db->last_query();die;
+
+        $result = $this->db->where(['trailers.organisation_id'=>$this->selectedOrgId])->get('trailers'); 
+        
+         // echo $this->db->last_query();die;
         if( $result->num_rows() > 0){
 			return $result->result_array();
         } else {
@@ -57,6 +59,8 @@ class Trailer extends Parent_Model {
 			$this->db->update('trailers',$saveData,"id={$saveData['id']}");
 			$lastId = $saveData['id'];
 		} else {
+			date_default_timezone_set('UTC');
+			$saveData["created"] = date('Y-m-d H:i:s', time());
 			$this->db->insert('trailers', $saveData);
 			$lastId = $this->db->insert_id();
 		}
@@ -119,12 +123,15 @@ class Trailer extends Parent_Model {
 	 */
 	 
 	public function checkTrailerUnitExist( $trailerNo = null, $id = null ) {
+		
 		$this->db->select('id');
-		if ( $id != null && $id != '' )
+		if ( $id != null && $id != '' ){
 			$this->db->where(array('unit_id' => $trailerNo,'id !=' => $id));
-		else
+		}else{
 			$this->db->where('unit_id',$trailerNo);
-			
+		}
+		
+		$this->db->where(['organisation_id' => $this->selectedOrgId]);
 		$result = $this->db->get('trailers');
 		if ( $result->num_rows() > 0 ) {
 			return $result->row_array();
@@ -144,9 +151,7 @@ class Trailer extends Parent_Model {
 			$this->db->or_like('trailers.description',$search['searchText']);
 		}
 
-        $result = $this->db->get('trailers');
-        // echo $this->db->last_query();
-        
+        $result = $this->db->where(['trailers.organisation_id'=>$this->selectedOrgId])->get('trailers');
         if( $result->num_rows() > 0){
 			return $result->result_array();
         } else {

@@ -50,7 +50,7 @@ angular.module('app')
          *****************************/
         function refreshPortlets(portlet, params) {
              return $http({
-                    url   : EnvironmentConfig.api + 'investors/getSpecificPortletData/'+portlet,
+                    url   : EnvironmentConfig.api + 'investors/skipAcl_getSpecificPortletData/'+portlet,
                     method: 'POST',
                     data  : $httpParamSerializerJQLike(params)
                 })

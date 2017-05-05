@@ -5,7 +5,7 @@
 *                           *
 *****************************/
 
-class Utilities extends Admin_Controller{
+class Utilities extends CI_Controller{
 	private $userRoleId;
 	private $userId;
 
@@ -18,8 +18,10 @@ class Utilities extends Admin_Controller{
 
 
 	public function getNextPredictedJobs($dispatcherId){
+
+		$response = array();
 		$this->load->model("Utility");
-		$args = json_decode( $_COOKIE["_globalDropdown"], true );
+		$args = @json_decode( $_COOKIE["_globalDropdown"], true );
 
 		if($this->userRoleId == _DISPATCHER){
 			$response = $this->Utility->getNextPredictedJobs($args, $dispatcherId);
@@ -31,8 +33,6 @@ class Utilities extends Admin_Controller{
 			foreach ($response as $key => $value) {
 				$response[$key]["jobs"] = (array) unserialize($value["jobs"]);
 			}	
-		}else{
-			$response = array();
 		}
 		echo json_encode( $response , JSON_FORCE_OBJECT);
 	}

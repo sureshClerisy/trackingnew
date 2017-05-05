@@ -1,34 +1,32 @@
 <!-- START EMAIL SIDEBAR MENU-->
     <nav class="secondary-sidebar padding-30">
         <ul class="main-menu"> 
-            <li ng-class="showPaymentSidebarLiSelected == 'billingDashboard' ? 'active' : ''">
+            <li ng-class="showPaymentSidebarLiSelected == 'billingDashboard' ? 'active' : ''" ng-if="mctrl.allowedModules.indexOf('billings') > -1 || mctrl.allowedModules.indexOf('billings/billingstats') > -1 " >
                 <a ui-sref="billingDashboard" >
                     <span class="title"><i class="fa fa-dashboard"></i> {{ languageArray.dashboard }}</span>
                     <span class="badge pull-right"></span>
                 </a>
             </li>
-            <li ng-class="showPaymentSidebarLiSelected == 'billable' ? 'active' : ''">
+            <li ng-class="showPaymentSidebarLiSelected == 'billable' ? 'active' : ''" ng-if="mctrl.allowedModules.indexOf('billings') > -1 || mctrl.allowedModules.indexOf('billings/index') > -1 ">
                 <a ui-sref="billing">
                     <span class="title"><i class="fa fa-file-text-o"></i>{{ languageCommonVariables.billingHeading}}</span>
                     <span class="badge pull-right"></span>
                 </a>
             </li>
-            <li ng-class="showPaymentSidebarLiSelected == 'inbox' ? 'active' : ''">
+            <li ng-class="showPaymentSidebarLiSelected == 'inbox' ? 'active' : ''" ng-if="mctrl.allowedModules.indexOf('billings') > -1 || mctrl.allowedModules.indexOf('billings/sendforpayment') > -1 ">
                 <a ui-sref="sendForPayment">
                     <span class="title"><i class="fa pg-inbox "></i>{{ languageArray.inbox }}</span>
                     <span class="badge pull-right">{{ readyToSendPaymentCount }}</span>
                 </a>
             </li>
-            <li ng-class="showPaymentSidebarLiSelected == 'factoring' ? 'active' : ''">
-                <!--a ng-click="showFactoredPaymentRecords(billPaymentMode)"-->
+            <li ng-class="showPaymentSidebarLiSelected == 'factoring' ? 'active' : ''" ng-if="mctrl.allowedModules.indexOf('billings') > -1 || mctrl.allowedModules.indexOf('billings/fetchfactoredpaymentrecords') > -1 ">
                 <a ui-sref="factoredLoads">
                     <span class="title"><i class="pg-credit_card"></i> {{ languageArray.factoring }}</span>
                     <span class="badge pull-right">{{ factoredPaymentCount }}</span>
                 </a>
             </li>
-            <li ng-class="showPaymentSidebarLiSelected == 'outbox' ? 'active' : ''">
-                <!--a ng-click="showAlreadySentPaymentRecords()"-->
-                <a ui-sref="outbox">
+            <li ng-class="showPaymentSidebarLiSelected == 'outbox' ? 'active' : ''" ng-if="mctrl.allowedModules.indexOf('billings') > -1 || mctrl.allowedModules.indexOf('billings/fetchsentpaymentrecords') > -1 ">
+                 <a ui-sref="outbox">
                     <span class="title"><i class="pg-sent"></i> {{ languageArray.outbox }}</span>
                     <span class="badge pull-right">{{ sentPaymentCount }}</span>
                 </a>

@@ -23,24 +23,22 @@ class Reports extends Admin_Controller{
 
 		$userId = false;
 		$parentId = false;
-		$tempUserId = $this->userId;
 		$childIds  = array();				// dispatchers child list
-		if($this->userRoleId == _DISPATCHER ){
-			$userId = $this->userId;
-			$parentId =  $this->userId;
-			$childIds = $this->User->fetchDispatchersChilds($userId);
-		} else if ( $this->userRoleId == 4 ) {
-			$parentIdCheck = $this->session->userdata('loggedUser_parentId');
+		if($this->userRoleId == _DISPATCHER ) {
+			$userId 	= $this->userID;
+			$parentId 	= $this->userID;
+			$childIds 	= $this->User->fetchDispatchersChilds($userId);
+		} else if ( $this->globalRoleId == 4 ) {
+			$parentIdCheck = $this->session->userdata('dispCord_parent');
 			if( isset($parentIdCheck) && $parentIdCheck != 0 ) {
-				$userId = $parentIdCheck;
-				$parentId = $parentIdCheck;
-				$tempUserId = $parentIdCheck;
+				$userId 	   = $parentIdCheck;
+				$parentId 	   = $parentIdCheck;
 			}
 		}
 		
-		$allVehicles = $this->Driver->getDriversListNew($userId);
+		$allVehicles 	= $this->Driver->getDriversListNew($userId);
 		$dispatcherList = $this->Driver->getDispatcherList($parentId); 	//for add all drivers under every dispatcher
-		$teamList = $this->Driver->getDriversListAsTeamNew($userId);
+		$teamList 		= $this->Driver->getDriversListAsTeamNew($userId);
 
 		if ( !empty($childIds)) {
 			$childVehicles = array();
@@ -69,13 +67,11 @@ class Reports extends Admin_Controller{
 			foreach ($dispatcherList as $key => $value) {
 				array_unshift($vDriversList, $value);
 			}
-
-				$new = array("id"=>"","profile_image"=>"","driverName"=>"All Groups","label"=>"","username"=>"","latitude"=>"","longitude"=>"","vid"=>"","city"=>"","vehicle_address"=>"","state"=>"");
-				array_unshift($vDriversList, $new);
 		}	
+		$new = array("id"=>"","profile_image"=>"","driverName"=>"All Groups","label"=>"","username"=>"","latitude"=>"","longitude"=>"","vid"=>"","city"=>"","vehicle_address"=>"","state"=>"");
+		array_unshift($vDriversList, $new);
 
 		$response = array("vehicles"=>$vehicles,"vDriversList"=>$vDriversList);
-
 		echo json_encode($response);
 	}
 	
@@ -397,6 +393,12 @@ class Reports extends Admin_Controller{
 			}
 		} else {
 			$result = array();
+			$totalInvoices 		= 0;
+			$totalMiles 		= 0;
+			$totalDeadMiles 	= 0;
+			$totalCharges		= 0;
+			$totalProfit 		= 0;
+			$totalProfitPercent = 0;
 		}
 
 		if ( $filters["args"]["reportType"] == 'performance') {

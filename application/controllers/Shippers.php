@@ -2,6 +2,8 @@
 
 class Shippers extends Admin_Controller {
 
+	protected $table = 'shippers';
+
 	function __construct(){
 
 		parent::__construct();	
@@ -9,11 +11,12 @@ class Shippers extends Admin_Controller {
 		$this->load->model(array('Shipper'));
 		$this->load->model(array('BrokersModel',"Job"));
 		$this->load->helper('truckstop_helper');
-		$this->roleId   = $this->session->role;	
+		$this->roleId   = $this->session->role;
 		$this->data 	= array();
 		$this->userName = $this->session->loggedUser_username;
 
 		$this->itemsPerPage = $this->config->item('limit_per_page');
+
 		if($this->session->role != 1){
 			$this->userId = $this->session->loggedUser_id;
 		}
@@ -28,6 +31,7 @@ class Shippers extends Admin_Controller {
 	*/
 
 	public function index(){
+
 		if ( isset($_POST) && count($_POST) > 0 ) {
 			$filters = $_POST;
 			if($filters["pageNo"] < 1){
@@ -44,10 +48,11 @@ class Shippers extends Admin_Controller {
 				"sortType" => "DESC"
 			);
 		}
-
+		
 		$this->data['rows']  = $this->Shipper->getShippersList( $filters, false );
 		$this->data['total'] = $this->Shipper->getShippersList( $filters, true );
 		$this->data['total'] = $this->data['total'][0]['totalRows'];
+
 		echo json_encode($this->data);
 	}	
 
@@ -68,12 +73,15 @@ class Shippers extends Admin_Controller {
 
 	public function update( $shipperId = Null ){
 		
+		$this->checkOrganisationIsValid($shipperId,$this->table);
+
 		if($this->input->server('REQUEST_METHOD') =='POST'){
+
 			try{
-				$postData = json_decode(file_get_contents('php://input'), true);
+				$postData 		= json_decode(file_get_contents('php://input'), true);
 				$shipperOldData = $this->Shipper->getshippersById($postData['id']);
 		       	$this->Shipper->insertUpdateShipper($postData);
-				$editedFields = array_diff_assoc($postData,$shipperOldData);
+				$editedFields 	= array_diff_assoc($postData,$shipperOldData);
 				
 				if(count($editedFields) > 0){
 					$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> edited a shipper <a class="notify-link" href="'.$this->serverAddr.'#/editshipper/'.$postData['id'].'">'.$shipperOldData["shipperCompanyName"]."</a>.";
@@ -101,8 +109,8 @@ class Shippers extends Admin_Controller {
 			}
 		}
 
-		$this->data['brokerData'] = $this->Shipper->getshippersById($shipperId);
-		$this->data['brokerDocuments'] = $this->Shipper->fetchContractDocuments($shipperId, 'shipper');
+		$this->data['brokerData'] 		= $this->Shipper->getshippersById($shipperId);
+		$this->data['brokerDocuments'] 	= $this->Shipper->fetchContractDocuments($shipperId, 'shipper');
 		echo json_encode($this->data);
 	}
 
@@ -235,9 +243,11 @@ class Shippers extends Admin_Controller {
 		$postObj 	= json_decode(file_get_contents("php://input"),true);
 		$keys = [['Company Name','Posting Address','City','State','Zipcode','Status','Rating','Deleted']];
 		$dataRow  	= $this->Shipper->exportShippers($postObj);
+		
 		foreach ($dataRow as $key => $value) {
 			
 			unset($dataRow[$key]['id']);
+			unset($dataRow[$key]['organisation_id']);
 			$dataRow[$key]['deleted'] = ($value['deleted']==1)?'Yes':'No';
 			$dataRow[$key]['status']  = ($value['status']==1)?'Active':'In-Active';
 		}

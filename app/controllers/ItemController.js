@@ -1,8 +1,9 @@
 
-app.controller('AdminController', function($scope,$interval, $document,$timeout, $http,$rootScope, $localStorage,$sce,$location, $window, $cookies, $state, $stateParams,dataFactory){
+app.controller('AdminController', function($scope,$interval, $document,$timeout, $http,$rootScope, $localStorage,$sce,$location, $window, $cookies, $state, $stateParams,dataFactory,getDashboardData){
+
     $scope.fuelType = [{ 'val' : 'Diesel','key' : 'diesel'},{ 'val' : 'Petrol','key' : 'petrol'},{ 'val' : 'Gas','key' : 'gas'}];
     $scope.pools = [];
-        $scope.printloadchart = "";
+    $scope.printloadchart = "";
     $scope.todayReport = {};
     $scope.todayReport.totals = {};
     $rootScope.showHeader = true;
@@ -512,72 +513,38 @@ app.controller('AdminController', function($scope,$interval, $document,$timeout,
     $scope.selDrivers = []; //Dashboard drivers multiview && aggregated
     $scope.driverName = false;
     dataFactory.httpRequest(URL+'/dashboard/skipAcl_fetchWidgetsOrder').then(function(data){
-    
-    
-
-    if(data.widgetsOrder.length == 0 ) {
-
-        $scope.tSortableWidgetsLeft  = '1,2,3,4,5,12';
-        $scope.tSortableWidgetsRight = '6,7,8,9,10,11';
-    } else {
-        $scope.tSortableWidgetsLeft  = data.widgetsOrder.left;
-        $scope.tSortableWidgetsRight = data.widgetsOrder.right;
-    }
-    
-    $scope.visibility   = data.widgetVisibility;
-    $scope.user_role    = data.user_role;
-    var orderArray      = $scope.tSortableWidgetsLeft.split(',');
-    var listArray       = $('.widget_div .wpanel');
-    
-    for (var i = 0; i < orderArray.length; i++) {
-        
-        $('#placeholder_left').append(listArray[orderArray[i]-1]);
-    }
-
-    var orderArray1 = $scope.tSortableWidgetsRight.split(',');
-    for (var i = 0; i < orderArray1.length; i++) {
-
-        $('#placeholder_right').append(listArray[orderArray1[i]-1]);
-    } 
-
-
-    if( ($rootScope.ofDriver == undefined || $rootScope.ofDriver == '') && data.selDrivers.length > 0){
-        if( $cookies.getObject('_globalDropdown') ){
-            var tempBuffer = $cookies.getObject('_globalDropdown');
-            if(tempBuffer.vid !="" && tempBuffer.vid != undefined && tempBuffer.label != "_idispatcher"){
-                $rootScope.ofDriver = tempBuffer.vid;
-                $scope.skipClick = false;
-                if(tempBuffer.label == "_team"){
-                    $rootScope.vtype = "_iteam";
-                }
-            }else if (tempBuffer.label == "_idispatcher"){
-                $scope.skipClick = true;
-                $rootScope.ofFilter = {};
-                $rootScope.ofFilter.vtype="_idispatcher";
-                $rootScope.ofFilter.did= tempBuffer.dispId;
-            }
-            $rootScope.ofDriver = ($rootScope.ofDriver == undefined) ? '':$rootScope.ofDriver;
-            $scope.dashboardData($rootScope.ofDriver);    
-        }else{
-            $scope.skipClick = true;
-            $scope.selDrivers = data.selDrivers;
-            $scope.vtype = '_idispatcher';
-            $scope.search_vehicle1 = {};
-            $scope.search_vehicle1.selected = data.selectedDriver;
-            $cookies.remove("_globalDropdown");
-            $cookies.putObject('_globalDropdown', data.selectedDriver);    
-            $scope.driverName = true;
-            $scope.getWeatherInfo();
+        if(data.widgetsOrder.length == 0 ) {
+            $scope.tSortableWidgetsLeft  = '1,2,3,4,5,12';
+            $scope.tSortableWidgetsRight = '6,7,8,9,10,11';
+        } else {
+            $scope.tSortableWidgetsLeft  = data.widgetsOrder.left;
+            $scope.tSortableWidgetsRight = data.widgetsOrder.right;
         }
-    }else {
-        if($rootScope.ofDriver == "" || $rootScope.ofDriver == undefined){
+        
+        $scope.visibility   = data.widgetVisibility;
+        $scope.user_role    = data.user_role;
+        var orderArray      = $scope.tSortableWidgetsLeft.split(',');
+        var listArray       = $('.widget_div .wpanel');
+        
+        for (var i = 0; i < orderArray.length; i++) {
+            
+            $('#placeholder_left').append(listArray[orderArray[i]-1]);
+        }
+
+        var orderArray1 = $scope.tSortableWidgetsRight.split(',');
+        for (var i = 0; i < orderArray1.length; i++) {
+
+            $('#placeholder_right').append(listArray[orderArray1[i]-1]);
+        } 
+
+        if( ($rootScope.ofDriver == undefined || $rootScope.ofDriver == '') && data.selDrivers.length > 0){
             if( $cookies.getObject('_globalDropdown') ){
-                var tempBuffer = $cookies.getObject('_globalDropdown'); 
-                if(tempBuffer.vid !="" && tempBuffer.vid != undefined && tempBuffer.label != "_idispatcher" && tempBuffer.label != "_iall" && tempBuffer.label != ""){
-                    $scope.skipClick = false;
+                var tempBuffer = $cookies.getObject('_globalDropdown');
+                if(tempBuffer.vid !="" && tempBuffer.vid != undefined && tempBuffer.label != "_idispatcher"){
                     $rootScope.ofDriver = tempBuffer.vid;
+                    $scope.skipClick = false;
                     if(tempBuffer.label == "_team"){
-                        $scope.vtype = "_iteam";
+                        $rootScope.vtype = "_iteam";
                     }
                 }else if (tempBuffer.label == "_idispatcher"){
                     $scope.skipClick = true;
@@ -585,30 +552,57 @@ app.controller('AdminController', function($scope,$interval, $document,$timeout,
                     $rootScope.ofFilter.vtype="_idispatcher";
                     $rootScope.ofFilter.did= tempBuffer.dispId;
                 }
-            }    
-        }else{
-            $scope.search_vehicle1 = {};
-            $scope.search_vehicle1.selected = $rootScope.driverBeingSelected;
-            if($rootScope.driverBeingSelected.team_driver_id != 0 && $rootScope.driverBeingSelected.team_driver_id != ""){
-                $scope.vtype = '_team';    
-            }else{
-                $scope.vtype = "_idriver";
+                $rootScope.ofDriver = ($rootScope.ofDriver == undefined) ? '':$rootScope.ofDriver;
+                $scope.dashboardData($rootScope.ofDriver);    
+            } else {
+                $scope.skipClick = true;
+                $scope.selDrivers = data.selDrivers;
+                $scope.vtype = '_idispatcher';
+                $scope.search_vehicle1 = {};
+                $scope.search_vehicle1.selected = data.selectedDriver;
+                $cookies.remove("_globalDropdown");
+                $cookies.putObject('_globalDropdown', data.selectedDriver);    
+                $scope.driverName = true;
+                $scope.getWeatherInfo();
             }
-            $rootScope.ofFilter.did= $rootScope.driverBeingSelected.dispId;
-            $rootScope.ofFilter.vid= $rootScope.driverBeingSelected.vid;
-            $rootScope.ofFilter.driverId= $rootScope.driverBeingSelected.driverId;
-            $rootScope.ofFilter.team_driver_id = $rootScope.driverBeingSelected.team_driver_id;
-            $rootScope.ofFilter.vtype = $scope.vtype;
+        } else {
+            if($rootScope.ofDriver == "" || $rootScope.ofDriver == undefined){
+                if( $cookies.getObject('_globalDropdown') ){
+                    var tempBuffer = $cookies.getObject('_globalDropdown'); 
+                    if(tempBuffer.vid !="" && tempBuffer.vid != undefined && tempBuffer.label != "_idispatcher" && tempBuffer.label != "_iall" && tempBuffer.label != ""){
+                        $scope.skipClick = false;
+                        $rootScope.ofDriver = tempBuffer.vid;
+                        if(tempBuffer.label == "_team"){
+                            $scope.vtype = "_iteam";
+                        }
+                    }else if (tempBuffer.label == "_idispatcher"){
+                        $scope.skipClick = true;
+                        $rootScope.ofFilter = {};
+                        $rootScope.ofFilter.vtype="_idispatcher";
+                        $rootScope.ofFilter.did= tempBuffer.dispId;
+                    }
+                }    
+            } else {
+                $scope.search_vehicle1 = {};
+                $scope.search_vehicle1.selected = $rootScope.driverBeingSelected;
+                if($rootScope.driverBeingSelected.team_driver_id != 0 && $rootScope.driverBeingSelected.team_driver_id != ""){
+                    $scope.vtype = '_team';    
+                }else{
+                    $scope.vtype = "_idriver";
+                }
+                $rootScope.ofFilter.did= $rootScope.driverBeingSelected.dispId;
+                $rootScope.ofFilter.vid= $rootScope.driverBeingSelected.vid;
+                $rootScope.ofFilter.driverId= $rootScope.driverBeingSelected.driverId;
+                $rootScope.ofFilter.team_driver_id = $rootScope.driverBeingSelected.team_driver_id;
+                $rootScope.ofFilter.vtype = $scope.vtype;
+            }
+
+
+            $rootScope.ofDriver = ($rootScope.ofDriver == undefined) ? '':$rootScope.ofDriver;
+            $scope.dashboardData($rootScope.ofDriver);    
         }
+    });
 
-
-        $rootScope.ofDriver = ($rootScope.ofDriver == undefined) ? '':$rootScope.ofDriver;
-        $scope.dashboardData($rootScope.ofDriver);    
-    }
-
-
-
-});
     $rootScope.ofFilter = {};
     $scope.changeLang = function(){
         // if($scope.user_role != 2 && $scope.user_role != 4){
@@ -647,10 +641,16 @@ app.controller('AdminController', function($scope,$interval, $document,$timeout,
             $scope.summary        = data.loadsChart.summary;
             $scope.todayReport    = data.todayReport;
             $scope.todayReport.totals    = data.totals;
+
             if($scope.user_role  == 2){
-                $scope.vehicleList[0].driverName = $rootScope.languageArray.allDrivers;  //r288    
-            }else{$scope.did
-                $scope.vehicleList[0].driverName = $rootScope.languageArray.allGroups;  //r288    
+                $scope.vehicleList[0].driverName = $rootScope.languageArray.allDrivers;  //r288
+            }
+            else{
+                $scope.did
+                
+                if($scope.vehicleList.length > 0){
+                    $scope.vehicleList[0].driverName = $rootScope.languageArray.allGroups;  //r288
+                }
             }
             
             $scope.liveTrucks = data.vehicleLocation.allVehicles;
@@ -722,7 +722,9 @@ app.controller('AdminController', function($scope,$interval, $document,$timeout,
                 case "_idriver"     : $scope.fColumn = $rootScope.languageArray.loadno; $scope.skipClick = false;break;
                 default             : $scope.fColumn = $rootScope.languageArray.dispatcher;$scope.skipClick = true;break;
             }
+
             $scope.chartConfig.xAxis    = { categories: data.chartStack.xaxis };
+          
             if ( $scope.typeOfData == '_iteam' || $scope.typeOfData == '_idriver') {
                 $scope.chartConfig.series   = [
                     {"name":  $rootScope.languageCommonVariables.profit,    "data" : data.chartStack.profitAmount, type: "column", id: 's5', color : '#90ED7D'},
@@ -950,7 +952,7 @@ $scope.print_todayInsights = function(){
         "vtype": $scope.vtype
     };
 
-    dataFactory.httpRequest(URL + '/dashboard/getTodayReport/booked', 'POST', {}, data).then(function(data) {
+    dataFactory.httpRequest(URL + '/dashboard/skipAcl_getTodayReport/booked', 'POST', {}, data).then(function(data) {
         if (data.todayReport.length != 0) {
             console.log(data);
             html = html + "</br><table cellpadding='0' cellspacing='0' style='width:1170px; margin:0px auto;padding:0px;font-family:arial;padding:30px 0px 15px;'><tr><td><h3 style='font-size:18px;margin:0px; padding:0px;'>"+$rootScope.languageArray.pickup+"</h3></td></tr></table>";
@@ -968,7 +970,7 @@ $scope.print_todayInsights = function(){
             html = html + '<tr style=" text-transform: uppercase;font-size:12px; "><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "><b>Total</b></td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "></td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "></td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "></td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "></td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "></td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "></td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "></td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "></td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "><b>$' + rPayment.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,") + '</b></td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "><b>$' + rRPM.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,") + '</b></td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "><b>' + rMileage.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,") + '</b></td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "><b>' + rDeadMile.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,") + '</b></td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "><span style="min-width:250px; float:left;"></span></td><tr></tbody></table>';
         }
     });
-    dataFactory.httpRequest(URL + '/dashboard/getTodayReport/inprogress', 'POST', {}, data).then(function(data) {
+    dataFactory.httpRequest(URL + '/dashboard/skipAcl_getTodayReport/inprogress', 'POST', {}, data).then(function(data) {
         if (data.todayReport.length != 0) {
             html = html + "</br></br><table cellpadding='0' cellspacing='0' style='width:1170px; margin:0px auto;padding:0px;font-family:arial;padding:30px 0px 15px;'><tr><td><h3 style='font-size:18px;margin:0px; padding:0px;'>"+$rootScope.languageArray.inprogress+"</h3></td></tr></table>";
             html = html + '<table cellpadding="0" cellspacing="0" style="width:1170px; margin:0px auto;padding:0px;font-family:arial;padding:30px 0px 0px;"><thead>';
@@ -985,7 +987,7 @@ $scope.print_todayInsights = function(){
             html = html + '<tr style=" text-transform: uppercase;font-size:12px; "><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "><b>Total</b></td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "></td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "></td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "></td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "></td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "></td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "></td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "></td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "></td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "><b>$' + rPayment.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,") + '</b></td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "><b>$' + rRPM.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,") + '</b></td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "><b>' + rMileage.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,") + '</b></td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "><b>' + rDeadMile.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,") + '</b></td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "><span style="min-width:250px; float:left;"></span></td><tr></tbody></table>';
         }
     });
-    dataFactory.httpRequest(URL + '/dashboard/getTodayReport/delivery', 'POST', {}, data).then(function(data) {
+    dataFactory.httpRequest(URL + '/dashboard/skipAcl_getTodayReport/delivery', 'POST', {}, data).then(function(data) {
         if (data.todayReport.length != 0) {
             html = html + "</br></br><table cellpadding='0' cellspacing='0' style='width:1170px; margin:0px auto;padding:0px;font-family:arial;padding:30px 0px 15px;'><tr><td><h3 style='font-size:18px;margin:0px; padding:0px;'>"+$rootScope.languageArray.delivery+"</h3></td></tr></table>";
             html = html + '<table cellpadding="0" cellspacing="0" style="width:1170px; margin:0px auto;padding:0px;font-family:arial;padding:30px 0px 0px;"><thead>';
@@ -1002,7 +1004,7 @@ $scope.print_todayInsights = function(){
             html = html + '<tr style=" text-transform: uppercase;font-size:12px; "><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "><b>Total</b></td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "></td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "></td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "></td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "></td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "></td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "></td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "></td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "></td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "><b>$' + rPayment.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,") + '</b></td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "><b>$' + rRPM.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,") + '</b></td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "><b>' + rMileage.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,") + '</b></td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "><b>' + rDeadMile.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,") + '</b></td><td style="padding:15px 7px;color:#363636 ;border-bottom: 1px solid #dedede; "><span style="min-width:250px; float:left;"></span></td><tr></tbody></table>';
         }
     });
-    dataFactory.httpRequest(URL + '/dashboard/getTodayReport/idle', 'POST', {}, data).then(function(data) {
+    dataFactory.httpRequest(URL + '/dashboard/skipAcl_getTodayReport/idle', 'POST', {}, data).then(function(data) {
 
         if (data.todayReport.length != 0) {
             console.log(data);
@@ -1039,7 +1041,7 @@ $scope.print_todayInsights = function(){
 $scope.exportWeather = function(){
     
     data = {currentWeather:$scope.currentWeather,dailyForecast:$scope.dailyForecast};
-    dataFactory.httpRequest(URL + '/dashboard/exportWeather', 'POST', {}, data).then(function(data) {
+    dataFactory.httpRequest(URL + '/dashboard/skipAcl_exportWeather', 'POST', {}, data).then(function(data) {
         $rootScope.donwloadExcelFile(data.fileName);
     });
 
@@ -1280,7 +1282,7 @@ $rootScope.getTodayReport = function(reporttype){
         default           : $('a[href="#todayPickup"]').tab('show'); reporttype='booked' ;
     }
 
-    dataFactory.httpRequest(URL+'/dashboard/getTodayReport/'+reporttype,'POST',{},data).then(function(data){
+    dataFactory.httpRequest(URL+'/dashboard/skipAcl_getTodayReport/'+reporttype,'POST',{},data).then(function(data){
         angular.element(".today-progress").hide();
         if(data.success){
             $scope.todayReport = data.todayReport;    
@@ -1296,7 +1298,7 @@ $rootScope.exportTodayReport = function(){
     
     reporttype = ($rootScope.todayInsightActive === 'undefined' )?'booked':$rootScope.todayInsightActive;
     data = {'export':1};
-    dataFactory.httpRequest(URL+'/dashboard/getTodayReport/'+reporttype,'POST',{},data).then(function(data){
+    dataFactory.httpRequest(URL+'/dashboard/skipAcl_getTodayReport/'+reporttype,'POST',{},data).then(function(data){
         $rootScope.donwloadExcelFile(data.fileName);
     });
 }

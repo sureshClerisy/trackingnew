@@ -11,32 +11,23 @@ class Drivers extends Admin_Controller {
 		$this->userName = $this->session->loggedUser_username;
 		$this->pathGen = str_replace('application/', '', APPPATH);
 		$this->load->model(array('Driver',"Job", 'User'));
-		$this->load->helper('truckstop_helper');		
-		$this->roleId = $this->session->role;
-		if($this->roleId != 1){
-			$this->userId = $this->session->loggedUser_id;
-		}
 	}
 
 	public function index() {
-
 		$data 		= array();
 		$parent_id 	= null;
-		$parentIdCheck = $this->session->userdata('loggedUser_parentId');
-		if( isset($parentIdCheck) && $parentIdCheck != 0 ) {
-			$parent_id = $this->session->userdata('loggedUser_parentId');
-		}
-		if ( $this->roleId == 2 ) {
-			$parent_id = $this->userId;
+		
+		if ( $this->globalRoleId == 2 ) {
+			$parent_id = $this->userID;
 		}
 
-		$childIds = $this->User->fetchDispatchersChilds($this->userId);
+		$childIds = $this->User->fetchDispatchersChilds($this->userID);	
 		if ( !empty($childIds) ) {
 			$parentId = array();
 			foreach($childIds as $child ) {
 				array_push($parentId,$child['id']);
 			}
-			$parent_id = array_merge($parentId,array($this->userId));
+			$parent_id = array_merge($parentId,array($this->userID));
 		}
 
 		$data['rows'] = $this->Driver->fetchAllRecords($parent_id);
@@ -179,7 +170,7 @@ class Drivers extends Admin_Controller {
 			$data["first_name"] = trim($data["first_name"]);
 			$data["last_name"] = trim($data["last_name"]);
 
-			$result = $this->Driver->addDrivers($data,$this->userId);
+			$result = $this->Driver->addDrivers($data);
 			$message = '<span class="blue-color uname">'.ucfirst($this->userName).'</span> added a new driver <a class="notify-link" href="'.$this->serverAddr.'#/editDrivers/'.$result.'">'.ucfirst($data["first_name"])." ".ucfirst($data["last_name"]).'</a>';
 			logActivityEvent($result, $this->entity["driver"], $this->event["add"], $message, $this->Job);	
 			echo json_encode(array('success' => true,'lastAddedDriver'=>$result));
@@ -199,12 +190,13 @@ class Drivers extends Admin_Controller {
 	*/
 	public function edit( $driver_id = Null )
 	{
+		$this->checkOrganisationIsValid($driver_id,'drivers');
 		$data['drivers'] = $this->Driver->get_driver_data($driver_id);
 		$data['driverDocuments'] = $this->Driver->fetchContractDocuments($driver_id, 'driver');
 		echo json_encode($data);
 	}
 	
-	public function update() 
+	public function skipAcl_update() 
 	{
 		try{
 			$file_name = '';		
@@ -325,25 +317,17 @@ class Drivers extends Admin_Controller {
 	// 	}
 	// }
 	
-	protected function addDrivers() 
-	{
-		$_POST = json_decode(file_get_contents('php://input'), true);
-    	$result = $this->Driver->addDrivers($_POST,$this->userId);
-		echo json_encode(array('success' => true));
-	}
-	
-
 	 
 	public function skipAcl_dispatcherList($driver_id = null)
 	{
 		$data['selected'] = ''; 
-		if ( $this->roleId == 2 )
-			$userId = $this->userId;
+		if ( $this->globalRoleId == 2 )
+			$userId = $this->userID;
 		else
 			$userId = false;
 
 		$data['list'] = $this->Driver->get_dispatcher_list($userId, false);
-		$childIds = $this->Driver->get_dispatcher_list($this->userId, true);
+		$childIds = $this->Driver->get_dispatcher_list($this->userID, true);
 		if ( !empty($childIds) ) {
 			$data['list'] = array_merge($data['list'],$childIds);
 		}
@@ -353,9 +337,9 @@ class Drivers extends Admin_Controller {
 		if(!empty($driver_id)){
 			$data['selected'] = $this->Driver->get_selected_dispatcher($driver_id);
 		} else {
-			if($this->roleId == 2){
+			if($this->globalRoleId == 2){
 				foreach($data['list'] as $list){
-					if($list['id'] == $this->userId){
+					if($list['id'] == $this->userID){
 						$data['selected'] = $list;
 					}
 				}
@@ -404,15 +388,17 @@ class Drivers extends Admin_Controller {
 	*/
 
 	public function skipAcl_checkLicenceNumber( $entityId = null ) {
+		
 		$_POST = json_decode(file_get_contents('php://input'), true);
+		
+		$response = true;
+
 		if ( $_POST['value'] != '') {
+			
 			$result = $this->Driver->checkLicenceNumberExist($_POST['value'], $_POST['name'], $_POST['tblName'], $entityId);
-			if ( $result )
+			if ( $result ){
 				$response = false;
-			else 
-				$response = true;
-		} else {
-			$response = true;
+			}
 		}
 
 		echo json_encode(array('response' => $response));
@@ -423,24 +409,21 @@ class Drivers extends Admin_Controller {
 		$data 		= array();
 		$parent_id 	= null;
 		$content 	= '';
-		$parentIdCheck = $this->session->userdata('loggedUser_parentId');
-		if( isset($parentIdCheck) && $parentIdCheck != 0 ) {
-			$parent_id = $this->session->userdata('loggedUser_parentId');
-		}
-		if ( $this->roleId == 2 ) {
-			$parent_id = $this->userId;
+		
+		if ( $this->globalRoleId == 2 ) {
+			$parent_id = $this->userID;
 		}
 
-		$childIds = $this->User->fetchDispatchersChilds($this->userId);
+		$childIds = $this->User->fetchDispatchersChilds($this->userID);
 		if ( !empty($childIds) ) {
 			$parentId = array();
 			foreach($childIds as $child ) {
 				array_push($parentId,$child['id']);
 			}
-			$parent_id = array_merge($parentId,array($this->userId));
+			$parent_id = array_merge($parentId,array($this->userID));
 		}
 
-        $searchText 	= json_decode(file_get_contents('php://input'), true);
+		$searchText 	= json_decode(file_get_contents('php://input'), true);
 		$keys 			= [['First Name','Last Name','Email','Label','License Number','Dispatcher','Phone','Status','DOB','City','Vehicle ID']];
 		$dataRow 		= $this->Driver->fetchDriversForCSV($parent_id,$searchText);
 		$data = array_merge($keys,$dataRow);

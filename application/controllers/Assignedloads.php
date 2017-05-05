@@ -32,16 +32,18 @@ class Assignedloads extends Admin_Controller{
 	}
 	
 	public function index() {
-		$userId = false;
-		$parentId = false;
-		$tempUserId = $this->userId;
-		$childIds  = array();				// dispatchers child list
+		
+		$userId 	= false;
+		$parentId 	= false;
+		$tempUserId = $this->userID;
+		$childIds  	= array();				// dispatchers child list
+
 		if($this->userRoleId == _DISPATCHER ){
-			$userId = $this->userId;
-			$parentId =  $this->userId;
-			$childIds = $this->User->fetchDispatchersChilds($userId);
+			$userId 	= $this->userID;
+			$parentId 	= $this->userID;
+			$childIds 	= $this->User->fetchDispatchersChilds($userId);
 		} else if ( $this->userRoleId == 4 ) {
-			$parentIdCheck = $this->session->userdata('loggedUser_parentId');
+			$parentIdCheck = $this->session->userdata('dispCord_parent');			
 			if( isset($parentIdCheck) && $parentIdCheck != 0 ) {
 				$userId = $parentIdCheck;
 				$parentId = $parentIdCheck;
@@ -49,20 +51,20 @@ class Assignedloads extends Admin_Controller{
 			}
 		}
 		
-		$allVehicles = $this->Driver->getDriversListNew($userId);
+		$allVehicles 	= $this->Driver->getDriversListNew($userId);
 		$dispatcherList = $this->Driver->getDispatcherList($parentId); 	//for add all drivers under every dispatcher
-		$teamList = $this->Driver->getDriversListAsTeamNew($userId);
+		$teamList 		= $this->Driver->getDriversListAsTeamNew($userId);
 
 		if ( !empty($childIds)) {
-			$childVehicles = array();
-			foreach($childIds as $child ) {
-				$childVehicles = $this->Driver->getDriversListNew($child['id']);
-				$allVehicles = array_merge($allVehicles,$childVehicles);	
-				
-				$childVehicles = $this->Driver->getDriversListAsTeamNew($child['id']);
-				$teamList = array_merge($teamList,$childVehicles);
+			$childVehicles 		= array();
 
-				$childs = $this->Driver->getDispatcherList($child['id']);
+			foreach($childIds as $child ) {
+				$childVehicles 	= $this->Driver->getDriversListNew($child['id']);
+				$allVehicles 	= array_merge($allVehicles,$childVehicles);	
+				
+				$childVehicles 	= $this->Driver->getDriversListAsTeamNew($child['id']);
+				$teamList 		= array_merge($teamList,$childVehicles);
+				$childs 		= $this->Driver->getDispatcherList($child['id']);
 				$dispatcherList = array_merge($dispatcherList,$childs);
 			}
 		}
@@ -80,36 +82,32 @@ class Assignedloads extends Admin_Controller{
 			foreach ($dispatcherList as $key => $value) {
 				array_unshift($vDriversList, $value);
 			}
-			
-			// if($this->userRoleId != _DISPATCHER && $this->userRoleId != 4){
-				$new = array("id"=>"","driverName"=>"All Groups","username"=>"","dispId"=>"","vid"=>"","dispId" => "");
-				array_unshift($vDriversList, $new);
-			// }
 		}
+		$new = array("id"=>"","driverName"=>"All Groups","username"=>"","dispId"=>"","vid"=>"","dispId" => "");
+		array_unshift($vDriversList, $new);
+			
 
-		$newDestlabel = array();
-		$gVehicleId = false;
-		$startDate = $endDate = '' ;
+		$newDestlabel 	= array();
+		$gVehicleId 	= false;
+		$startDate 		= $endDate = '' ;
 		if(isset($_COOKIE["_gDateRange"]) && !empty($_COOKIE["_gDateRange"])){
 			$gDateRange = json_decode($_COOKIE["_gDateRange"],true);
-			$startDate = $gDateRange["startDate"]; $endDate = $gDateRange["endDate"];
+			$startDate 	= $gDateRange["startDate"]; $endDate = $gDateRange["endDate"];
 		}
 
 		if(isset($_COOKIE["_globalDropdown"]) && !empty($_COOKIE["_globalDropdown"])){
-
 			$gDropdown = json_decode($_COOKIE["_globalDropdown"],true);
-			// pr($gDropdown); die;
+			
 			if (isset($gDropdown["label"]) && $gDropdown["label"] == "_idispatcher") {  //A Dispatcher's All drivers
-				$jobs = $this->getSingleVehicleLoads($this->userId,array(),"dispatcher", $gDropdown['dispId'],false,false,$startDate,$endDate); //Fetch Loads by vehicle id(s)
-				$this->data["total"] = $this->Job->fetchSavedJobsTotal($this->userId,array(),"dispatcher",$gDropdown['dispId'],false,false,$startDate,$endDate); 
-
+				$jobs = $this->getSingleVehicleLoads(array(),"dispatcher", $gDropdown['dispId'],false,false,$startDate,$endDate); //Fetch Loads by vehicle id(s)
+				$this->data["total"] = $this->Job->fetchSavedJobsTotal(array(),"dispatcher",$gDropdown['dispId'],false,false,$startDate,$endDate); 
 				$this->data['table_title'] =  "Dispatcher : ".$gDropdown["username"];
 				$this->data['vehicleIdRepeat'] = '';
 			} else if ( !isset($gDropdown["label"]) || empty(trim($gDropdown["label"])) ) { //All Groups
 				$gVehicleId = false;
 				$this->data['table_title'] = "All Groups";
-				$jobs = $this->getSingleVehicleLoads($this->userId,array(),"all",false,false,false,$startDate,$endDate); 
-				$this->data["total"] = $this->Job->fetchSavedJobsTotal($this->userId,array(),"all",false,false,false,$startDate,$endDate); 
+				$jobs = $this->getSingleVehicleLoads(array(),"all",false,false,false,$startDate,$endDate); 
+				$this->data["total"] = $this->Job->fetchSavedJobsTotal(array(),"all",false,false,false,$startDate,$endDate); 
 				$this->data['vehicleIdRepeat'] = '';
 			} else {																//Single Driver
 				$gVehicleId = $gDropdown["vid"];
@@ -118,34 +116,34 @@ class Assignedloads extends Admin_Controller{
 				$results = $this->Vehicle->getLastLoadRecord($gVehicleId, $gDropdown['id']);
 				if ( !empty($results) ){
 					$this->origin_state = $results['DestinationState'];
-					$this->origin_city = $results['DestinationCity'];
+					$this->origin_city 	= $results['DestinationCity'];
 				} else {
 					$this->origin_state = $statesAddress['0']['state'];
-					$this->origin_city = $statesAddress['0']['city'];
+					$this->origin_city 	= $statesAddress['0']['city'];
 				}
 				$this->data['table_title'] = 'Truck-'.@$statesAddress[0]['label'].' '.$this->origin_city.'-'.$this->origin_state;
 				$this->data['vehicleIdRepeat'] = $vehicleIdRepeat;
 				if($gDropdown["label"] == "_team") {
 
-					$jobs = $this->getSingleVehicleLoads($tempUserId, $vehicleIdRepeat,"team", $gDropdown['dispId'], $gDropdown['id'], $gDropdown['team_driver_id'], $startDate,$endDate);	
-					$this->data["total"] = $this->Job->fetchSavedJobsTotal($tempUserId,$vehicleIdRepeat,"team",$gDropdown['dispId'],$gDropdown['id'], $gDropdown['team_driver_id'], $startDate,$endDate); 
+					$jobs = $this->getSingleVehicleLoads($vehicleIdRepeat,"team", $gDropdown['dispId'], $gDropdown['id'], $gDropdown['team_driver_id'], $startDate,$endDate);	
+					$this->data["total"] = $this->Job->fetchSavedJobsTotal($vehicleIdRepeat,"team",$gDropdown['dispId'],$gDropdown['id'], $gDropdown['team_driver_id'], $startDate,$endDate); 
 
 				} else{
-					//pr($gDropdown);die;
-					$jobs = $this->getSingleVehicleLoads($tempUserId, $vehicleIdRepeat, "driver", $gDropdown['dispId'], $gDropdown['id'], $gDropdown['team_driver_id'], $startDate,$endDate);	
-					$this->data["total"] = $this->Job->fetchSavedJobsTotal($this->userId,$vehicleIdRepeat,"driver",$gDropdown['dispId'],$gDropdown['id'], $gDropdown['team_driver_id'], $startDate,$endDate); 
+					
+					$jobs = $this->getSingleVehicleLoads( $vehicleIdRepeat, "driver", $gDropdown['dispId'], $gDropdown['id'], $gDropdown['team_driver_id'], $startDate,$endDate);	
+					$this->data["total"] = $this->Job->fetchSavedJobsTotal($vehicleIdRepeat,"driver",$gDropdown['dispId'],$gDropdown['id'], $gDropdown['team_driver_id'], $startDate,$endDate); 
 				}
 			}
 		} else {
 			if($this->userRoleId == _DISPATCHER || $this->userRoleId == 4 ){
-				$jobs = $this->getSingleVehicleLoads($userId,array(),"dispatcher",$userId,false,false,$startDate,$endDate); //Fetch Loads by vehicle id(s)
-				$this->data["total"] = $this->Job->fetchSavedJobsTotal($userId,array(),"dispatcher",$userId,false,false,$startDate,$endDate); 
+				$jobs = $this->getSingleVehicleLoads(array(),"dispatcher",$userId,false,false,$startDate,$endDate); //Fetch Loads by vehicle id(s)
+				$this->data["total"] = $this->Job->fetchSavedJobsTotal(array(),"dispatcher",$userId,false,false,$startDate,$endDate); 
 				$this->data['table_title'] =  "Dispatcher : ".$this->session->userdata('loggedUser_username');
 				$this->data['vehicleIdRepeat'] = '';
 			} else {
 				$this->data['table_title'] = "All Groups";
-				$jobs = $this->getSingleVehicleLoads($this->userId,array(),"all"); //Fetch Loads by vehicle id(s)
-				$this->data["total"] = $this->Job->fetchSavedJobsTotal($this->userId,array(),"all",false,false,false,$startDate,$endDate); 
+				$jobs = $this->getSingleVehicleLoads(array(),"all"); //Fetch Loads by vehicle id(s)
+				$this->data["total"] = $this->Job->fetchSavedJobsTotal(array(),"all",false,false,false,$startDate,$endDate); 
 				$this->data['vehicleIdRepeat'] = '';
 			}
 		}
@@ -196,8 +194,8 @@ class Assignedloads extends Admin_Controller{
 			$dispatcherId = '';
 		}
 		
-		$jobs = $this->getSingleVehicleLoads($this->userId,$objPost["scope"],$objPost["scopeType"], $dispatcherId, $driverId, $secondDriverId, $startDate, $endDate); //Fetch Loads by vehicle id(s)  // dispatcherId to get loads of dispatcher only
-		$this->data['total'] = $this->Job->fetchSavedJobsTotal($this->userId,$objPost["scope"],$objPost["scopeType"], $dispatcherId, $driverId, $secondDriverId, $startDate, $endDate);  //Fetch Loads by vehicle id(s)  // dispatcherId to get loads of dispatcher only
+		$jobs = $this->getSingleVehicleLoads($objPost["scope"],$objPost["scopeType"], $dispatcherId, $driverId, $secondDriverId, $startDate, $endDate); //Fetch Loads by vehicle id(s)  // dispatcherId to get loads of dispatcher only
+		$this->data['total'] = $this->Job->fetchSavedJobsTotal($objPost["scope"],$objPost["scopeType"], $dispatcherId, $driverId, $secondDriverId, $startDate, $endDate);  //Fetch Loads by vehicle id(s)  // dispatcherId to get loads of dispatcher only
 		
 		
 		$this->data['table_title'] =  $newlabel;
@@ -572,12 +570,12 @@ class Assignedloads extends Admin_Controller{
 		if(isset($_COOKIE["_globalDropdown"]) && !empty($_COOKIE["_globalDropdown"])){
 			$gDropdown = json_decode($_COOKIE["_globalDropdown"],true);
 			if (isset($gDropdown["label"]) && $gDropdown["label"] == "_idispatcher") {  //A Dispatcher's All drivers
-				$jobs = $this->getSingleVehicleLoads($this->userId,array(),"dispatcher", $gDropdown['dispId'],false,false,$params["startDate"],$params["endDate"],$params); //Fetch Loads by vehicle id(s)
-				$total = $this->Job->fetchSavedJobsTotal($this->userId,array(),"dispatcher",$gDropdown['dispId'],false,false,$params["startDate"],$params["endDate"],$params); 
+				$jobs = $this->getSingleVehicleLoads(array(),"dispatcher", $gDropdown['dispId'],false,false,$params["startDate"],$params["endDate"],$params); //Fetch Loads by vehicle id(s)
+				$total = $this->Job->fetchSavedJobsTotal(array(),"dispatcher",$gDropdown['dispId'],false,false,$params["startDate"],$params["endDate"],$params); 
 			} else if ( !isset($gDropdown["label"]) || empty(trim($gDropdown["label"])) ) { //All Groups
-				$jobs = $this->getSingleVehicleLoads($this->userId,array(),"all",false,false,false,$params["startDate"],$params["endDate"],$params); //Fetch Loads by vehicle id(s)
-				$total = $this->Job->fetchSavedJobsTotal($this->userId,array(),"all",false,false,false,$params["startDate"],$params["endDate"],$params); 
-			} else {	//Single Driver
+				$jobs = $this->getSingleVehicleLoads(array(),"all",false,false,false,$params["startDate"],$params["endDate"],$params); //Fetch Loads by vehicle id(s)
+				$total = $this->Job->fetchSavedJobsTotal(array(),"all",false,false,false,$params["startDate"],$params["endDate"],$params); 
+			} else {	//Single Driver 
 				$gVehicleId = $gDropdown["vid"];
 				$statesAddress = $this->Vehicle->get_vehicles_address($this->userId,$gVehicleId);
 
@@ -585,20 +583,20 @@ class Assignedloads extends Admin_Controller{
 				$results = $this->Vehicle->getLastLoadRecord($statesAddress[0]['id'], $statesAddress[0]['driver_id']);
 
 				if($gDropdown["label"] == "_team") {
-					$jobs = $this->getSingleVehicleLoads($this->userId, $vehicleIdRepeat,"team", $gDropdown['dispId'], $gDropdown['id'],$gDropdown['team_driver_id'],$params["startDate"],$params["endDate"],$params);	
-					$total = $this->Job->fetchSavedJobsTotal($this->userId, $vehicleIdRepeat,"team", $gDropdown['dispId'], $gDropdown['id'],$gDropdown['team_driver_id'],$params["startDate"],$params["endDate"],$params);	
+					$jobs = $this->getSingleVehicleLoads($vehicleIdRepeat,"team", $gDropdown['dispId'], $gDropdown['id'],$gDropdown['team_driver_id'],$params["startDate"],$params["endDate"],$params);	
+					$total = $this->Job->fetchSavedJobsTotal($vehicleIdRepeat,"team", $gDropdown['dispId'], $gDropdown['id'],$gDropdown['team_driver_id'],$params["startDate"],$params["endDate"],$params);	
 				} else{
-					$jobs = $this->getSingleVehicleLoads($this->userId, $vehicleIdRepeat, "driver", $gDropdown['dispId'], $gDropdown['id'],$gDropdown['team_driver_id'],$params["startDate"],$params["endDate"],$params);	
-					$total = $this->Job->fetchSavedJobsTotal($this->userId, $vehicleIdRepeat,"driver", $gDropdown['dispId'], $gDropdown['id'],$gDropdown['team_driver_id'],$params["startDate"],$params["endDate"],$params);	
+					$jobs = $this->getSingleVehicleLoads($vehicleIdRepeat, "driver", $gDropdown['dispId'], $gDropdown['id'],$gDropdown['team_driver_id'],$params["startDate"],$params["endDate"],$params);	
+					$total = $this->Job->fetchSavedJobsTotal($vehicleIdRepeat,"driver", $gDropdown['dispId'], $gDropdown['id'],$gDropdown['team_driver_id'],$params["startDate"],$params["endDate"],$params);	
 				}
 			}
 		} else {
 			if($this->userRoleId == _DISPATCHER || $this->userRoleId == 4 ){
-				$jobs  = $this->getSingleVehicleLoads($this->userId,array(),"dispatcher",$this->userId,false,false,$params["startDate"],$params["endDate"],$params); //Fetch Loads by vehicle id(s)
-				$total = $this->Job->fetchSavedJobsTotal($this->userId,array(),"dispatcher",$this->userId,false,false,$params["startDate"],$params["endDate"],$params); 
+				$jobs  = $this->getSingleVehicleLoads(array(),"dispatcher",$this->userId,false,false,$params["startDate"],$params["endDate"],$params); //Fetch Loads by vehicle id(s)
+				$total = $this->Job->fetchSavedJobsTotal(array(),"dispatcher",$this->userId,false,false,$params["startDate"],$params["endDate"],$params); 
 			} else {
-				$jobs  = $this->getSingleVehicleLoads($this->userId,array(),"all",false,false,false,$params["startDate"],$params["endDate"],$params); 
-				$total = $this->Job->fetchSavedJobsTotal($this->userId,array(),"all",false,false,false,$params["startDate"],$params["endDate"],$params); 
+				$jobs  = $this->getSingleVehicleLoads(array(),"all",false,false,false,$params["startDate"],$params["endDate"],$params); 
+				$total = $this->Job->fetchSavedJobsTotal(array(),"all",false,false,false,$params["startDate"],$params["endDate"],$params); 
 			}
 		}
 

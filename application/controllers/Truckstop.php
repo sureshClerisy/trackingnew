@@ -78,7 +78,7 @@ class Truckstop extends Admin_Controller{
 		$this->load_source = 'truckstop.com';
 	}
 	
-	public function index(  $parameter = null )
+	public function skipAcl_index(  $parameter = null )
 	{
 		$newData = array();
 		
@@ -108,7 +108,7 @@ class Truckstop extends Admin_Controller{
 		if ( !empty($loads) ) {
 			$truckAverage = $this->defaultTruckAvg;
 			if ( $vehicleId != '' && $vehicleId != null ) {
-				$vehicle_fuel_consumption = $this->Vehicle->get_vehicles_fuel_consumption($this->userId, $vehicleId);
+				$vehicle_fuel_consumption = $this->Vehicle->get_vehicles_fuel_consumption($vehicleId);
 				if ( !empty($vehicle_fuel_consumption) )
 					$truckAverage =round( 100/$vehicle_fuel_consumption[0]['fuel_consumption'],2);
 					// $truckAverage = (int)($vehicle_fuel_consumption[0]['fuel_consumption']/100);
@@ -412,12 +412,12 @@ class Truckstop extends Admin_Controller{
 	{
 		$_POST = json_decode(file_get_contents('php://input'), true);
 		
-		if ( $truckStopId != '' && $truckStopId != null && $truckStopId != 0 )
-			$loadIdArray = $this->Job->getTruckstopRelatedId( $truckStopId );
+		// if ( $truckStopId != '' && $truckStopId != null && $truckStopId != 0 )
+		// 	$loadIdArray = $this->Job->getTruckstopRelatedId( $truckStopId );
 		
-		if ( !empty($loadIdArray)) {
-			$loadId = $loadIdArray['id'];
-		}
+		// if ( !empty($loadIdArray)) {
+		// 	$loadId = $loadIdArray['id'];
+		// }
 		
 		$data['vehicleInfo'] = array();
 		$data['brokerData'] = array();
@@ -425,6 +425,7 @@ class Truckstop extends Admin_Controller{
 		$truckAverage 		= $this->defaultTruckAvg;
 	
 		if ( $loadId != '' && is_numeric($loadId) ) {
+			$this->checkOrganisationIsValid($loadId,'loads');
 			$checkBillType = $this->Job->fetchLoadBillType($loadId);
 			$checkBillType = (isset($checkBillType) && $checkBillType != '' ) ? $checkBillType : 'broker';
 			$jobRecord = $this->Job->FetchSingleJob($loadId, $checkBillType);
@@ -665,7 +666,7 @@ class Truckstop extends Admin_Controller{
 			$jobRecord['trailer_id'] = '';
 			$jobRecord['dispatcher_id'] = '';
 			$jobRecord['user_id'] = '';
-			$jobRecord['woRefno'] 	 = '';
+			$jobRecord['invoiceNo'] 	 = '';
 			$jobRecord['id'] 		 = '';
 		}
 
@@ -1510,7 +1511,7 @@ class Truckstop extends Admin_Controller{
 			$pickupDate = '';
 		
 		$updateLocations = $this->Vehicle->updateTruckDestination($vehicleId, $pickupDate, $planDeadmiles);
-		$vehicle_fuel_consumption = $this->Vehicle->get_vehicles_fuel_consumption($this->userId,$vehicleId);
+		$vehicle_fuel_consumption = $this->Vehicle->get_vehicles_fuel_consumption($vehicleId);
 
 		if ( !empty($vehicle_fuel_consumption ) ) {
 			$truckAverage =round( 100/$vehicle_fuel_consumption[0]['fuel_consumption'],2);
@@ -1562,7 +1563,7 @@ class Truckstop extends Admin_Controller{
 		}
 		
 		array_push($newDest,$this->origin_state,$this->origin_city);
-		$vehicle_fuel_consumption = $this->Vehicle->get_vehicles_fuel_consumption($this->userId,$vehicleId);
+		$vehicle_fuel_consumption = $this->Vehicle->get_vehicles_fuel_consumption($vehicleId);
 		if ( !empty($vehicle_fuel_consumption ) ) {
 			// $truckAverage =(int)($vehicle_fuel_consumption[0]['fuel_consumption']/100);
 			$truckAverage =round( 100 / $vehicle_fuel_consumption[0]['fuel_consumption'],2);
@@ -1642,7 +1643,7 @@ class Truckstop extends Admin_Controller{
 	 *  Removing Extra stop
 	 */ 
 	
-	public function removeExtraStopRecord( $loadId = null, $tripDetailId = null, $extraStopId = null ) {
+	public function skipAcl_removeExtraStopRecord( $loadId = null, $tripDetailId = null, $extraStopId = null ) {
 		$obj = json_decode(file_get_contents('php://input'),true);
 
 		$vehicleId = (isset($obj['vehicleId']) && $obj['vehicleId'] != '' && $obj['vehicleId'] != null ) ? $obj['vehicleId'] : 0;
@@ -1659,7 +1660,7 @@ class Truckstop extends Admin_Controller{
 		
 		$truckAverage = $this->defaultTruckAvg;
 		if ( $vehicleId != '' && $vehicleId != null ) {
-			$vehicle_fuel_consumption = $this->Vehicle->get_vehicles_fuel_consumption($this->userId,$vehicleId);
+			$vehicle_fuel_consumption = $this->Vehicle->get_vehicles_fuel_consumption($vehicleId);
 			$truckAverage =round( 100/$vehicle_fuel_consumption[0]['fuel_consumption'],2);
 			// $truckAverage =(int)($vehicle_fuel_consumption[0]['fuel_consumption']/100);
 		}
@@ -1980,7 +1981,7 @@ class Truckstop extends Admin_Controller{
 
 	//------------------ Upload Docs Functions --------------------------
 
-	public function uploadDocs( $parameter = '' ){
+	public function skipAcl_uploadDocs( $parameter = '' ){
 
 		if ( $parameter != '' ) {
 			$doc = $parameter;
@@ -2146,12 +2147,11 @@ class Truckstop extends Admin_Controller{
 			   	$config['file_name']   			= $config['_prefix'].time().'.'.$extension;
 				$config['upload_path']          = 'assets/uploads/documents/'.$parameter.'/';
 				$config['upload_thumb_path']    = 'assets/uploads/documents/';
-				$config['allowed_types']        = 'pdf|gif|jpg|png|docx|doc|xls|xlsx|txt|ico|bmp|svg';
+				$config['allowed_types']        = 'pdf|gif|jpg|jpeg|png|docx|doc|xls|xlsx|txt|ico|bmp|svg';
 				
 				$this->load->library('upload', $config);
-			
 
-				if ( $parameter == 'pod' || $parameter == 'rateSheet' &&  strtolower($extension) == 'pdf' ) {
+				if ( ($parameter == 'pod' || $parameter == 'rateSheet') &&  strtolower($extension) == 'pdf' ) {
 					$podRateResult = $this->degradePdfVersion($_FILES,$config,$parameter,$result);
 					return $podRateResult;
 					exit();
@@ -2247,7 +2247,7 @@ class Truckstop extends Admin_Controller{
 
 //------------------ Upload Docs Functions --------------------------
 
-	public function deleteDocument(){
+	public function skipAcl_deleteDocument(){
 		
 		$pathGen = str_replace('application/', '', APPPATH);
 		
@@ -2983,7 +2983,7 @@ class Truckstop extends Admin_Controller{
 					$pickupDate = '';
 				 	
 				$updateLocations = $this->Vehicle->updateTruckDestination($vehicleId, $pickupDate, $setDeadMilePage);
-				$vehicle_fuel_consumption = $this->Vehicle->get_vehicles_fuel_consumption($this->userId,$vehicleId);
+				$vehicle_fuel_consumption = $this->Vehicle->get_vehicles_fuel_consumption($vehicleId);
 				
 				if ( !empty($vehicle_fuel_consumption ) )
 					$truckAverage =round( 100/$vehicle_fuel_consumption[0]['fuel_consumption'],2);
@@ -3021,7 +3021,7 @@ class Truckstop extends Admin_Controller{
 		} else {
 					
 			if ( $vehicleId != '' && @$vehicleId != null ) {
-				$vehicle_fuel_consumption = $this->Vehicle->get_vehicles_fuel_consumption($this->userId,@$vehicleId);
+				$vehicle_fuel_consumption = $this->Vehicle->get_vehicles_fuel_consumption(@$vehicleId);
 				if ( !empty($vehicle_fuel_consumption ) ) {
 					$truckAverage =round( 100/$vehicle_fuel_consumption[0]['fuel_consumption'],2);
 					// $truckAverage =(int)($vehicle_fuel_consumption[0]['fuel_consumption']/100);

@@ -28,7 +28,7 @@ app.controller('brokersController', function(dataFactory,$scope, PubNub ,$http ,
 		angular.element("#confirm-delete").data("index",index);
 	}
 
-	$scope.confirmDelete = function(confirm){
+	$rootScope.confirmDelete = function(confirm){
 		if(confirm == 'yes'){
 			var brokerid = angular.element("#confirm-delete").data("brokerid");
 			var index  = angular.element("#confirm-delete").data("index");
@@ -139,7 +139,7 @@ app.controller('editBrokersController', function(dataFactory,getBrokersData, $sc
 	
 	$scope.saveBroker = function(){
 		$scope.brokersData.rating = $scope.changedRating;
-		dataFactory.httpRequest(URL + '/brokers/update/'+$scope.brokersData.id,'POST',{},$scope.brokersData).then(function(data) {
+		dataFactory.httpRequest(URL + '/brokers/skipAcl_update/'+$scope.brokersData.id,'POST',{},$scope.brokersData).then(function(data) {
 			PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
 			if ( data.success == true ) {
 				$rootScope.brokerEditMessage = $rootScope.languageArray.brokerUpdatedSuccMsg;

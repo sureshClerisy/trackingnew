@@ -1,56 +1,62 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-	class MY_Model extends CI_Model {
-		function __construct()
-		{
-			parent::__construct();
-			
-		}
+class MY_Model extends CI_Model {
+	function __construct()
+	{
+		parent::__construct();
+
 	}
-	   
-    class Parent_Model extends CI_Model {
+}
 
-		public  $superAdmin;
-		public  $role;
-		public  $userID;
-		public $organisationRoleId; 
+class Parent_Model extends CI_Model {
 
-		function __construct() {
-			
-			parent::__construct();
-			$this->organisationRoleId = 9;
-			$this->userID 	= $this->session->loggedUser_id;
+	public  $superAdmin;
+	public  $role;
+	public  $userID;
+	public 	$selectedOrgId;
+	public  $setOrganisationRoleId;
 
-			$this->role 	= $this->session->role;
-			if(in_array($this->userID, $this->config->item('superAdminIds'))){
-				$this->superAdmin = true;
-			}
-			// echo $this->superAdmin.'<br/>';
-		}
-		
-		/**
-		 * checking required field for load to generate invoice
-		 */
-		 
-		public function checkRequiredFeildsForInvoice( $loadId = null ) {	
-			$this->db->select('loads.JobStatus,loads.id,loads.ready_for_invoice,broker_info.TruckCompanyName');
-			$this->db->join('broker_info','broker_info.id = loads.broker_id','LEFT');
-			$this->db->join('documents','documents.load_id = loads.id','LEFT');
+	function __construct() {
+
+		parent::__construct();
+		$this->userID 	= $this->session->loggedUser_id;
+		$this->role 	= $this->session->role;
+		$this->setOrganisationRoleId = 9;
+
+		if(in_array($this->userID, $this->config->item('superAdminIds'))){
+			$this->superAdmin = true;
+			$res = $this->getSelectedOrganisation($this->userID);
+			$this->selectedOrgId = ( !empty($res)) ? $res['organisation_id'] : 0;
+		} else if ( $this->role == 9 ) {
+			$this->selectedOrgId = $this->userID;
+		} else {
+			$this->selectedOrgId = $this->session->userdata('loggedUser_parentId');
+		}			
+	}
+
+	/**
+	* checking required field for load to generate invoice
+	*/
+
+	public function checkRequiredFeildsForInvoice( $loadId = null ) {	
+		$this->db->select('loads.JobStatus,loads.id,loads.ready_for_invoice,broker_info.TruckCompanyName');
+		$this->db->join('broker_info','broker_info.id = loads.broker_id','LEFT');
+		$this->db->join('documents','documents.load_id = loads.id','LEFT');
 			//~ $this->db->where(array('loads.woRefno !=' => '','billing_details.shipper_name != ' => '', 'billing_details.consignee_name !=' => '', 'billing_details.transportComp_name !=' => '','loads.vehicle_id != ' => null, 'loads.vehicle_id != ' => 0, 'loads.delete_status' => 0, 'loads.id' => $loadId));			
-			$this->db->where(array('loads.vehicle_id != ' => null, 'loads.vehicle_id != ' => 0, 'loads.delete_status' => 0, 'loads.id' => $loadId, 'loads.broker_id != ' => null, 'loads.broker_id !=' => 0,'loads.JobStatus' => 'completed' ));			
-			$this->db->where_IN('documents.doc_type',array('pod','rateSheet'));
-			$this->db->group_by('documents.load_id');
-			$this->db->having('count(*) > 1', null, false );
-			$result = $this->db->get('loads');
-			if ( $result->num_rows() > 0 ) {
-				$data['ready_for_invoice'] = 1;
-				$this->db->where('loads.id',$loadId);
-				$this->db->update('loads',$data);
-			} 		
-			return true;
-		}
-		
+		$this->db->where(array('loads.vehicle_id != ' => null, 'loads.vehicle_id != ' => 0, 'loads.delete_status' => 0, 'loads.id' => $loadId, 'loads.broker_id != ' => null, 'loads.broker_id !=' => 0,'loads.JobStatus' => 'completed' ));			
+		$this->db->where_IN('documents.doc_type',array('pod','rateSheet'));
+		$this->db->group_by('documents.load_id');
+		$this->db->having('count(*) > 1', null, false );
+		$result = $this->db->get('loads');
+		if ( $result->num_rows() > 0 ) {
+			$data['ready_for_invoice'] = 1;
+			$this->db->where('loads.id',$loadId);
+			$this->db->update('loads',$data);
+		} 		
+		return true;
+	}
+
 		/**
 		* Request URL: 
 		* Method  : get
@@ -112,15 +118,15 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 			$table = "drivers";
 			switch ($entityType) {
 				case 'driver' : $this->db->select("drivers.id,contract_docs.document_name, drivers.first_name, drivers.last_name");
-							    $this->db->join("contract_docs","contract_docs.entity_id = drivers.id","inner"); 	$table = "drivers"; break;
+				$this->db->join("contract_docs","contract_docs.entity_id = drivers.id","inner"); 	$table = "drivers"; break;
 				case 'truck'  : $this->db->select("vehicles.id,contract_docs.document_name, vehicles.label");
-							    $this->db->join("contract_docs","contract_docs.entity_id = vehicles.id","inner"); 	$table = "vehicles"; break;
+				$this->db->join("contract_docs","contract_docs.entity_id = vehicles.id","inner"); 	$table = "vehicles"; break;
 				case 'trailer': $this->db->select("trailers.id, contract_docs.document_name, trailers.unit_id");
-							    $this->db->join("contract_docs","contract_docs.entity_id = trailers.id","inner"); 	$table = "trailers"; break;
+				$this->db->join("contract_docs","contract_docs.entity_id = trailers.id","inner"); 	$table = "trailers"; break;
 				case 'broker' : $this->db->select("broker_info.id, contract_docs.document_name, broker_info.TruckCompanyName");
-							    $this->db->join("contract_docs","contract_docs.entity_id = broker_info.id","inner"); 	$table = "broker_info"; break;
+				$this->db->join("contract_docs","contract_docs.entity_id = broker_info.id","inner"); 	$table = "broker_info"; break;
 				case 'shipper': $this->db->select("shippers.id, contract_docs.document_name, shippers.shipperCompanyName");
-							    $this->db->join("contract_docs","contract_docs.entity_id = shippers.id","inner"); 	$table = "shippers"; break;
+				$this->db->join("contract_docs","contract_docs.entity_id = shippers.id","inner"); 	$table = "shippers"; break;
 			}
 			$this->db->where('contract_docs.id', $docId);
 			$this->db->where('contract_docs.entity_type', $entityType);
@@ -145,11 +151,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 			switch ($entityType) {
 				case 'dispatcher'  : $this->db->select("users.id, users.first_name, users.last_name"); $table = "users"; break;
 				case 'driver'  	   : $this->db->select('drivers.id, case loads.driver_type
-															when "team" then concat(drivers.first_name," + ",team.first_name)
-															ELSE concat(drivers.first_name," ",drivers.last_name) end as driverName'); 
-									 $this->db->join('drivers','drivers.id = loads.driver_id','LEFT');
-									 $this->db->join('drivers as team','team.id = loads.second_driver_id','LEFT');
-									 $table = "loads"; break;
+					when "team" then concat(drivers.first_name," + ",team.first_name)
+					ELSE concat(drivers.first_name," ",drivers.last_name) end as driverName'); 
+				$this->db->join('drivers','drivers.id = loads.driver_id','LEFT');
+				$this->db->join('drivers as team','team.id = loads.second_driver_id','LEFT');
+				$table = "loads"; break;
 				case 'truck'	   : $this->db->select("vehicles.id, vehicles.label"); $table = "vehicles";  break;
 				case 'broker'	   : $this->db->select("broker_info.TruckCompanyName"); $table = "broker_info";  break;
 				case 'shipper'	   : $this->db->select("shippers.shipperCompanyName as TruckCompanyName"); $table = "shippers";  break;
@@ -200,7 +206,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 					$dispatcherId = $newDispatcherId;
 				else
 					$dispatcherId = $oldDispatcherId;
-					
+
 				if ( !empty($dispatcherId) && $dispatcherId != 0 ) {
 					$driversList = $this->getDispatcherDriverList($dispatcherId);
 					$driver = array();
@@ -235,7 +241,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 						'team'				=> $teamDrivers,
 						'idle'				=> $idleCount,
 						'created'			=> date('Y-m-d H:i:s')
-					);
+						);
 					
 					$this->db->insert('disp_dri_logs',$data);
 				}
@@ -266,10 +272,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 		}
 
 		/**
-		* method 	: Get
-		* @param 	: dispatcherId
-		* @return  	: return drivers list array
-		* Comment 	: used to fetch list of drivers to dispatcher
+		* method 	: getColumnsList
+		* @param 	: Table Name,Column List, Condition
+		* @return  	: Return columns array
+		* Comment 	: used to fetch list of columns
 		*/
 
 		public function getColumnsList( $table, $coumns = [],$condition = [] ) {
@@ -278,4 +284,57 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 			}
 			return $this->db->select(implode(',',$coumns))->get($table)->result_array();
 		}
+
+	/**
+	* fetch permissions given to role
+	*
+	*/	
+	public function getAssignedModules() {
+		
+		$assignedModules = [];
+		if( $this->role == 8 ) {
+			$data = $this->db->select('GROUP_CONCAT(LOWER(acl_actions.action)) as module')
+					->where('parent_id',NULL)
+			->get('acl_actions')
+			->result_array();
+			if(!empty($data[0]['module'])){
+				$assignedModules = explode(',', $data[0]['module']);
+			}
+		} else if( $this->role == 9 ) {
+			$data = $this->db->select('GROUP_CONCAT(LOWER(module_name)) as module')
+			->where(['organisation_module.status'=>1,'organization_id'=>$this->userID])
+			->get('organisation_module')
+			->result_array();
+			if(!empty($data[0]['module'])){
+				$assignedModules = explode(',', $data[0]['module']);
+			}
+		} else {
+			$this->db->select('LOWER(slug) as module');
+			$this->db->join('acl_actions','acl_actions.id = role_permissions.aco_id');
+			$this->db->where(['role_permissions.permission' => 1 , 'role_permissions.parent_id !=' => 0, 'role_permissions.role_id' => $this->role]);
+			$data = $this->db->get('role_permissions');
+			if($data->num_rows() > 0 ){
+				$assignedModules = $data->result_array();
+				$assignedModules = array_column($assignedModules, 'module');
+			}
+
+		}
+		
+		return $assignedModules;
 	}
+
+	/**
+	* Get selected organisation id
+	*/
+
+	public function getSelectedOrganisation( $userId = null) {
+		$this->db->select('name,organisation_id');
+		$this->db->where('user_id',$userId);
+		$result = $this->db->get('selected_organisation');
+		if( $result->num_rows() > 0 )
+			return $result->row_array();
+		else
+			return array();
+	}
+
+}

@@ -121,6 +121,8 @@ class Utility extends Parent_Model
 		$this->db->join("drivers as d", "pj.driver_id = d.id","Left");
 		$this->db->join('drivers as team','pj.team_driver_id = team.id','left');	
 		
+		// $this->db->where(["d.organisation_id"=>$this->selectedOrgId]);	
+
 		if($dispId){
 			$this->db->where( "dispatcher_id", $dispId );	
 		}
@@ -141,7 +143,7 @@ class Utility extends Parent_Model
 
 		$result = $this->db->get('perdict_next_jobs as pj');
 		//pr($args);die;
-		//echo $this->db->last_query();die;
+		// echo $this->db->last_query();die;
 		if ($result->num_rows() > 0) {
 			return $result->result_array();
 		} else {

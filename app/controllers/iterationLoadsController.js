@@ -475,7 +475,7 @@ app.controller('iterationLoadsController', ["dataFactory","$scope","$http","$roo
 		$scope.setDeleteIndex = index;
 	}
 
-	$scope.confirmDelete = function(confirm){
+	$rootScope.confirmDelete = function(confirm){
 		if(confirm == 'yes'){
 			var truckstopId =  angular.element("#confirm-delete").data("item");
 			var x = $("#data").find("tr[data-uinfo='"+truckstopId+"']");
@@ -499,7 +499,7 @@ app.controller('iterationLoadsController', ["dataFactory","$scope","$http","$roo
 		$scope.chainValuesArray = valuesArray;
 	}
 
-	$scope.confirmDeleteChainItem = function(confirm) {
+	$rootScope.confirmDeleteChainItem = function(confirm) {
 		if(confirm == 'yes'){
 			var truckstopId = angular.element("#confirm-delete").data("truckstopId");
 			var pickupdate = angular.element("#confirm-delete").data("pickupdate");

@@ -1,0 +1,57 @@
+<div class="page-content-wrapper">
+	<div class="content sm-gutter">
+		<div class="container-fluid padding-25 sm-padding-10">
+			<div class="row">
+				<div class="col-md-12 col-xlg-12">
+					<div class="commen-heading">
+						<h2 class="oprate-dashbord" style="padding-left: 0px;"><i class="fa fa-cogs"></i>
+                            {{languageArray.managepermission }} : {{aclRoles.roleName }}
+                        </h2>
+                        <div ng-show="aclRoles.type == 'success'" class="alert alert-success" role="alert">
+                            <button ng-click = "aclRoles.hideMessage()" class="close"></button>                     
+                            {{aclRoles.message}}
+                        </div>
+					</div>
+				</div>
+			</div>
+			<div class="row invocie-block-row ">
+				<div class="col-md-12 col-xlg-12">
+					<div class="load-new-block-table check-outer-block-list">
+                       	<div class="add-new-data fix-page">
+							<div class="load-tabe-auto map-load-section">
+                            
+                                <div class="truck-detail-block" ng-repeat="(key,value) in aclRoles.aclData">
+                                    <div class="truck-detail-heading controller-listing" ng-class="{'yellow': value.checkAll == 'Yes'}">                                    
+                                        <div class="check-box-listing-blk">
+                                            <input ng-click="aclRoles.checkUncheckAll(value.children[0].parent_id,key.split('~')[1],key.split('~')[2])" type="checkbox" ng-model="aclRoles.parentCheck['parent_'+value.children[0].parent_id]" name="manageRole_{{value.children[0].parent_id}}" ng-checked="value.checkAll =='Yes'" id="ck1-{{$index}}">
+                                            <label for="ck1-{{$index}}">{{ key.split('~')[1] }}  </label> 
+                                            <i class="fa fa-plus new-fa-class" aria-hidden="true" ng-click="aclRoles.showActions($event,key.split('~')[0])"></i>
+                                            <p class="content-blk" class="actino-label"> {{ key.split('~')[2] }} </p>    
+                                        </div>
+                                        <div class="action-list" style="display: none">
+                                            <ul>
+                                                <li ng-repeat = "action in value.children">
+                                                    <div class="check-box-listing-blk-inner">
+                                                        <input id="ck2-{{$index}}-{{key.split('~')[0]}}" type='checkbox' name='manageRolesChild_{{action.id}}' ng-click="aclRoles.checkSingleChild(action.id, action.parent_id,key.split('~')[1],key.split('~')[2])" ng-model="aclRoles.child['child_'+action.id]" ng-checked="aclRoles.parentCheck['parent_'+action.parent_id] || action.selected == 1">
+                                                        
+                                                        <label for="ck2-{{$index}}-{{key.split('~')[0]}}" class="actino-label"> {{ action.name }} </label>
+                                                        <p class="content-blk" class="actino-label"> {{ action.description }} </p>
+
+
+                                                    </div>
+
+                                                    <!--input type='checkbox' name='manageRolesChild_{{action.id}}' ng-click="aclRoles.checkSingleChild(action.id, action.parent_id,key.split('-')[1])" ng-model="aclRoles.child['child_'+action.id]" ng-checked="aclRoles.parentCheck['parent_'+action.parent_id] || aclRoles.permsissionDone[key.split('-')[0]][action.id]"-->
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<ng-include src="'./assets/templates/common_modals.html'"></ng-include>

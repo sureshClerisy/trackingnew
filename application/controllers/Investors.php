@@ -101,7 +101,7 @@ class Investors extends Admin_Controller {
 	* @return: list array
 	* comment: fetch data for all portlets on investor dashboard
 	**/
-	public function getSpecificPortletData( $portlet ){
+	public function skipAcl_getSpecificPortletData( $portlet ){
 		$args = json_decode( file_get_contents("php://input"), true );
 		$vehicleId = "";
 		$response  = array();
@@ -157,7 +157,7 @@ class Investors extends Admin_Controller {
 	* @return: array
 	* comment: fetch all jobs done by vehicles
 	**/
-	public function getVehiclesJobs( $filters, $vehicleId = false, $purpose = "" ){
+	protected function getVehiclesJobs( $filters, $vehicleId = false, $purpose = "" ){
 		if( $vehicleId ){
 			$jobs = $this->Investor->getVehiclesJobs( $filters, array($vehicleId), $purpose );
 		}else{ 

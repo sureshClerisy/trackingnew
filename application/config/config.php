@@ -531,7 +531,7 @@ $config['truck_id'] 		= '271425';
 
 
 //Billing and Admin Users
-$config['with_admin_role'] = array(1,3,5);
+$config['with_admin_role'] = array(1,3,5,8,9);
 $config['WEEKDAYS'] = array("2"=>"Saturday","1"=>"Sunday");
 define("_DISPATCHER", 2);
 define("_INVESTOR", 7);

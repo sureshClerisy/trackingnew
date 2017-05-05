@@ -1,0 +1,181 @@
+
+<div class="popup-container-wid1" data-jquery-scrollbar="jqueryScrollbarOptions">
+		<div class="container-fluid padding-25 sm-padding-10">
+			
+			
+			<div class="row">
+				<div class="col-md-12 col-xlg-12">
+					<a href="javascript:void(0)" class="close-btn-poup close-btn1" data-dismiss="modal"><img src="./pages/img/close-icon.png"></a>
+					<div class="commen-heading trailer-page">
+						<h2 class="oprate-dashbord">{{trailerHeading}}</h2>
+					</div>
+				</div>
+			</div>
+		
+			<div class="row new-block-padding">
+				<div class="col-lg-12 col-md-12">
+					<div class="panel panel-transparent">
+						<div class="panel-body">
+							<div  class="alert alert-danger m-b-20" role="alert">
+								<button ng-click = "hideloadmessage()" class="close"></button>
+								{{errorMessage}}vgdfgdfagefg
+							</div>
+							<form id="form-project" name="newTrailer" role="form" autocomplete="off" ng-submit="newTrailer.$valid && saveTrailer(submitType)" novalidate >
+								<div class="pop-gry-blk">
+					            	<div class="summer-blk-heading">
+					            		Summarydfd
+					            		<i class="fa fa-plus plus-pop-main" ></i>
+					            	</div>
+					            	<div class="content-blk-frm-sum">
+					            		<!--row-->
+										<div class="row clearfix">
+											<div class="col-sm-6">
+												<div pg-form-group class="form-group form-group-default th-select">
+													<label>{{languageArray.trailerTruckeNumber }}</label>
+													<ui-select class="mdrivers" ng-model="trailerData.truck_id" theme="bootstrap" on-select="onSelectTruckCallback($item, $model);">
+															<ui-select-match class="ui-select-match" placeholder="Select Truck">{{trailerData.truckName}}</ui-select-match>
+															<ui-select-choices class="ui-select-choices" repeat="item in trucksList | filter: $select.search">
+																<span ng-bind-html="trustAsHtml((item.vehicleName | highlight: $select.search))"></span>
+															</ui-select-choices>
+													</ui-select>
+												</div>
+											</div>
+											<div class="col-sm-6">
+												<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':newTrailer.trailerUnitId.$invalid && !newTrailer.trailerUnitId.$pristine || newTrailer.$submitted && newTrailer.trailerUnitId.$invalid}">
+													<label>{{languageArray.trailerUnitId }}</label>
+													<input type="text" class="form-control" name="trailerUnitId" ng-model="trailerData.unit_id" ng-change="checkTrailerUnitExist(trailerData.unit_id, trailerData.id)" ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }" required />
+												</div>
+												<label class="error" for="drivername" ng-show="newTrailer.trailerUnitId.$invalid && !newTrailer.trailerUnitId.$pristine || newTrailer.$submitted && newTrailer.trailerUnitId.$invalid">Please enter trailer unit id.</label>
+											</div>
+										</div>
+										<!--row-end-->
+										
+										<input type="hidden" name="id" ng-model="trailerData.id" />
+										<!--row-->
+										<div class="row clearfix">
+											<div class="col-sm-6">
+												<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':newTrailer.year.$invalid && !newTrailer.year.$pristine || newTrailer.$submitted && newTrailer.year.$invalid}">
+													<label>{{languageArray.trailerYear }}</label>
+													<input type="text" class="form-control" name="year" ng-model="trailerData.year" required ng-pattern="/^(\d)+$/"/>
+												</div>
+												<label class="error" for="year" ng-show="newTrailer.$submitted && !newTrailer.year.$error.pattern && newTrailer.year.$error.required">Please enter trailer year.</label>		
+												<label class="error" for="year" ng-show="newTrailer.year.$error.pattern">Please enter valid year number.</label>
+											</div>
+											<div class="col-sm-6">
+												<div pg-form-group class="form-group form-group-default required" ng-class="{'has-error':newTrailer.vin.$invalid && !newTrailer.vin.$pristine || newTrailer.$submitted && newTrailer.vin.$invalid, 'has-error-new': uniqueFieldsValue == false}">
+													<label>{{languageArray.trailerVin }}</label>
+													<input type="text" class="form-control" name="vin" ng-model="trailerData.vin" required ng-blur="checkUniqueFields(trailerData.vin,'vin','trailers', trailerData.id)" />
+												</div>
+												<label class="error" ng-show="newTrailer.vin.$invalid && !newTrailer.vin.$pristine || newTrailer.$submitted && newTrailer.vin.$invalid">Please enter trailer vin number.</label>
+												<label class="error" ng-if="uniqueFieldsValue == false">This vin number is already alloted to another trailer.</label>
+											</div>
+										</div>
+										<!--row-end-->
+										<!--row-->
+										<div class="row clearfix">
+											<div class="col-sm-6">
+												<div pg-form-group class="form-group form-group-default">
+													<label>{{languageArray.trailerOwner }}</label>
+													<input type="text" class="form-control" name="owner" ng-model="trailerData.owner" >
+												</div>
+											</div>
+											<div class="col-sm-6">
+												<div pg-form-group class="form-group form-group-default">
+													<label>{{languageArray.trailerType }}</label>
+													<input type="text" class="form-control" name="type" ng-model="trailerData.type">
+												</div>
+											</div>
+										</div>
+										<!--row-end-->
+										<!--row-->
+										<div class="row clearfix">
+											<div class="col-sm-6">
+												<div pg-form-group class="form-group form-group-default">
+													<label>{{languageArray.trailerDescription }}</label>
+													<input type="text" class="form-control" name="description" ng-model="trailerData.description">
+												</div>
+											</div>
+											<div class="col-sm-6">
+												<div pg-form-group class="form-group form-group-default">
+													<label>{{languageArray.trailerMonthlyPayment }}</label>
+													<input type="text" class="form-control" name="payment" ng-model="trailerData.monthly_payment" data-a-sign="$" ui-jq="autoNumeric" ui-options="'init'" >
+												</div>
+											</div>
+										</div>
+										<!--row-end-->
+										<!--row-->
+										<div class="row clearfix">
+											<div class="col-sm-6">
+												<div pg-form-group class="form-group form-group-default">
+													<label>{{languageArray.trailerDueDate }}</label>
+													<div class="input-group date" ui-jq="datepicker" ui-options='{format: "yyyy-mm-dd",autoclose: true}'>
+														<input type="text" ng-click="refreshDatepicker($event)" ng-model="trailerData.due_date"  class="form-control"><span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+													</div>
+												</div>
+											</div>
+											<div class="col-sm-6">
+												<div pg-form-group class="form-group form-group-default">
+													<label>{{languageArray.trailerPurchasePrice }}</label>
+													<input type="text" class="form-control" name="purchase_price" ng-model="trailerData.purchase_price" data-a-sign="$" ui-jq="autoNumeric" ui-options="'init'" >
+												</div>
+											</div>
+										</div>
+										<!--row-end-->
+										<!--row-->
+										<div class="row clearfix">
+											<div class="col-sm-6">
+												<div pg-form-group class="form-group form-group-default">
+													<label>{{languageArray.trailerInterestRate }}</label>
+													<input type="text" class="form-control" name="interest_rate" ng-model="trailerData.interest_rate">
+												</div>
+											</div>
+											<div class="col-sm-6">
+												<div pg-form-group class="form-group form-group-default">
+													<label>{{languageArray.trailerNote }}</label>
+													<input type="text" class="form-control" name="notes" ng-model="trailerData.notes">
+												</div>
+											</div>
+										</div>
+										<!--row-end-->
+										<!--row-->
+										<div class="row clearfix">
+											<div class="col-sm-12">
+												
+												<div ng-show="trailerAddEditType == 'add'" id="addDocs" class="dropzone" ng-dropzone dropzone="dropzone" dropzone-config="dropzoneConfigTrailerAdd" ></div>
+												<div ng-show="trailerAddEditType != 'add' " id="editDocs" class="dropzone" ng-dropzone dropzone="dropzone" dropzone-config="dropzoneConfigTrailerEdit" ></div>
+											</div>
+											<div class="col-sm-12 m-t-10 no-padding">
+												<section class="truck-load-pdf no-margin-top">
+		                                            <div class="truck-load-pdf-left" ng-repeat="docs in trailerDocs">
+														<div class="row1">
+															<button class="btn btn-danger" type="button" ng-click="deleteDocument(docs.id,docs.document_name, $index);">X</button>
+															<div class="pdf-cover" data-url="assets/uploads/documents/trailer/{{docs.document_name}}" ng-click="perviewDoc($event)">
+																<img ng-src="assets/uploads/documents/thumb_trailer/thumb_{{docs.document_name | filetoimg}} " on-error-src="pages/img/pdf.png" />
+															</div>
+														</div>
+													</div>
+												</section>
+											</div>
+										</div>
+										<!--row-end-->
+
+					            	</div>
+					            </div>
+
+							
+								<div class="update-truck-block-btn">
+									<button class="btn btn-primary btn-cons m-b-10" type="submit"><i class="fa fa-plus"></i><span class="bold"> {{ saveButton |capitalize }} </span>
+									</button>
+									<a href="#/trailers"><button class="btn btn-danger btn-cons m-b-10" type="button"><i class="fa fa-ban"></i><span class="bold"> {{ languageCommonVariables.cancelbutton|capitalize }} </span></button></a>
+								</div>
+							</form>
+						</div>
+					<!---->
+					</div>
+				</div>
+			</div>
+			
+		</div>
+</div>
+
+

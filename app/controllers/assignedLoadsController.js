@@ -521,7 +521,7 @@ app.controller('assignedLoadsController', ["dataFactory","$scope", "PubNub", "$h
 	}
 
 
-	$scope.confirmDelete = function(confirm){
+	$rootScope.confirmDelete = function(confirm){
 		if(confirm == 'yes'){
 			var loadId = angular.element("#confirm-delete").data("loadId");
 			var index  = angular.element("#confirm-delete").data("index");

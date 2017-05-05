@@ -51,7 +51,7 @@ class Job extends Parent_Model {
 			$this->db->where('loads.driver_type = ',"team");
 		}
 		
-		$this->db->where(array('loads.delete_status' => 0));
+		$this->db->where(array('loads.delete_status' => 0,'loads.organisation_id'=>$this->selectedOrgId));
 
 		if($reportType == "booked"){
 			$this->db->where( "DATE(loads.PickupDate) ",  $date);	
@@ -70,6 +70,8 @@ class Job extends Parent_Model {
 
 				)");	
 		}
+		
+		// $this->db->where(['organisation_id'=>$this->selectedOrgId]);
 
 		$this->db->order_by("loads.DeliveryDate DESC");
 		$query = $this->db->get('loads');
@@ -138,6 +140,7 @@ class Job extends Parent_Model {
 						");
 	
 		
+		$this->db->where(['d.organisation_id'=>$this->selectedOrgId]);
 		$this->db->order_by("CONCAT(u.first_name, ' ' , u.last_name)");
 
 		$query = $this->db->get('drivers as d');
@@ -456,7 +459,7 @@ class Job extends Parent_Model {
 
 
 
-	public function fetchSavedJobsNew( $loggedUserId = null, $vehicleId = null, $scopeType = '', $dispatcherId = null, $driverId = null, $secondDriverId = null, $startDate = '', $endDate = '',$filters = array()) {
+	public function fetchSavedJobsNew( $vehicleId = null, $scopeType = '', $dispatcherId = null, $driverId = null, $secondDriverId = null, $startDate = '', $endDate = '',$filters = array()) {
 
 		if(count($filters) <= 0){
 			$filters = array("itemsPerPage"=>20, "limitStart"=>1, "sortColumn"=>"DeliveryDate", "sortType"=>"DESC","status"=>"");
@@ -491,9 +494,9 @@ class Job extends Parent_Model {
 		}
 		
 		if ( $startDate != '' && $startDate != 'undefined' ) {
-			$startDate = date('Y-m-d',strtotime($startDate)); 
-			$endDate = date('Y-m-d',strtotime($endDate)); 
-			$string = " (`loads`.`PickupDate` >='".$startDate."' AND `loads`.`PickupDate` <= '".$endDate."')";
+			$startDate 	= date('Y-m-d',strtotime($startDate)); 
+			$endDate 	= date('Y-m-d',strtotime($endDate)); 
+			$string 	= " (`loads`.`PickupDate` >='".$startDate."' AND `loads`.`PickupDate` <= '".$endDate."')";
 			$this->db->where($string);
 		}
 
@@ -501,7 +504,7 @@ class Job extends Parent_Model {
 			$this->db->where('loads.JobStatus',$filters["status"]);
 		}
 		
-		$this->db->where('loads.delete_status',0);
+		$this->db->where(['loads.delete_status'=>0,'loads.organisation_id'=>$this->selectedOrgId]);
 		if(isset($filters["searchQuery"]) && !empty($filters["searchQuery"])){
 
             $this->db->group_start();
@@ -556,19 +559,20 @@ class Job extends Parent_Model {
 		//Bypass limit when you want to export saved load as csv
 		if(empty($filters["export"])){
 			$filters["limitStart"] = $filters["limitStart"] == 1 ? 0 : $filters["limitStart"];
-			$this->db->limit($filters["itemsPerPage"],$filters["limitStart"]);
+			@$this->db->limit($filters["itemsPerPage"],$filters["limitStart"]);
 		}
 
 		$query = $this->db->get('loads');
+		// echo $this->db->last_query();
 
 		if ($query->num_rows() > 0) {
 			return $query->result_array();
 		} else {
-			return false;
+			return [];
 		}
 	}
 
-	public function fetchSavedJobsTotal( $loggedUserId = null, $vehicleId = null, $scopeType = '', $dispatcherId = null, $driverId = null, $secondDriverId = null, $startDate = '', $endDate = '',$filters = array() ) {
+	public function fetchSavedJobsTotal( $vehicleId = null, $scopeType = '', $dispatcherId = null, $driverId = null, $secondDriverId = null, $startDate = '', $endDate = '',$filters = array() ) {
 		if(count($filters) <= 0){
 			$filters = array("status"=>"");
 		}		
@@ -591,9 +595,9 @@ class Job extends Parent_Model {
 		}
 		
 		if ( $startDate != '' && $startDate != 'undefined' ) {
-			$startDate = date('Y-m-d',strtotime($startDate)); 
-			$endDate = date('Y-m-d',strtotime($endDate)); 
-			$string = " (`PickupDate` >='".$startDate."' AND `PickupDate` <= '".$endDate."')";
+			$startDate 	= date('Y-m-d',strtotime($startDate)); 
+			$endDate 	= date('Y-m-d',strtotime($endDate)); 
+			$string 	= " (`PickupDate` >='".$startDate."' AND `PickupDate` <= '".$endDate."')";
 			$this->db->where($string);
 		}
 		
@@ -601,7 +605,8 @@ class Job extends Parent_Model {
 			$this->db->where('loads.JobStatus',$filters["status"]);
 		}
 
-		$this->db->where('loads.delete_status',0);
+		$this->db->where(['loads.delete_status'=>0,'loads.organisation_id'=>$this->selectedOrgId]);
+
 		if(isset($filters["searchQuery"]) && !empty($filters["searchQuery"])){
 
             $this->db->group_start();
@@ -677,6 +682,7 @@ class Job extends Parent_Model {
 			$this->db->where('loads.driver_type = ',"team");
 		}
 		$this->db->where('delete_status',0);
+		$this->db->where('loads.organisation_id',$this->selectedOrgId);
 		
 		$this->db->group_by('JobStatus');
 
@@ -780,6 +786,7 @@ class Job extends Parent_Model {
 		$this->db->where(array('loads.sent_for_payment' => 0, 'loads.delete_status' => 0,'loads.ready_for_invoice' => 0));
 		$this->db->where("(SELECT  count(documents.load_id) as c FROM  documents WHERE  documents.load_id  =  loads.id and documents.doc_type in ('pod','rateSheet') )< 2  ");
 		$this->db->where("loads.DeliveryDate <",date("Y-m-d"));
+		$this->db->where('loads.organisation_id',$this->selectedOrgId);
 		$this->db->where_IN('loads.JobStatus',$this->config->item('loadStatus'));
 		$query = $this->db->get('loads');
 		//echo $this->db->last_query();die;
@@ -985,7 +992,6 @@ class Job extends Parent_Model {
 		return $this->db->get('vehicles')->result_array();
 	}
 	
-	// public function FindVehicles( $jobSpec = '', $jobCollect = '', $jobDeliver = '', $jobVehicle = '' ,$fetchAssignedTruck = null , $jobVehicleType = '' ,$jobId = null ,$loggedUserId = null, $jobWidth = 0, $jobLength = 0, $vehicleId = null) {
 	public function FindVehicles( $vehicleId = null ) {
 		$this->db->select('vehicles.id,vehicles.fuel_consumption,vehicles.destination_address');
 		$this->db->join('drivers', 'drivers.id = vehicles.driver_id','LEFT');
@@ -1083,8 +1089,6 @@ class Job extends Parent_Model {
 	  
 	public function update_job( $id=null, $vehicle_id = null, $saveData = array(), $extraStopsArray = array(), $posting_address = '', $posting_phone = '', $broker_rating = '' ){
 		$assigned_truckId = '';
-		$loggedUserId = $this->session->loggedUser_id;
-	
 		$saveData['truckstopID'] = $saveData['ID'];
 		$saveData['vehicle_id'] = $vehicle_id;
 	
@@ -1182,7 +1186,7 @@ class Job extends Parent_Model {
 			if ( !isset($saveData['load_source']) || $saveData['load_source'] == '' )
 				$saveData['load_source'] = 'truckstop.com';
 
-			$saveData['user_id'] = $loggedUserId;
+			$saveData['user_id'] = $this->userID;
 			$saveData['created'] = date('Y-m-d H:i:s');
 			$res = $this->db->insert('loads',$saveData);
 			$last_id = $this->db->insert_id();
@@ -1297,8 +1301,7 @@ class Job extends Parent_Model {
 	 
 	public function save_Job( $saveData = array() , $extraStopsArray = array(), $loadId = null ){
 		
-		$loggedUserId = $this->session->loggedUser_id;
-		
+	
 		$saveData['load_source'] = 'Vika Dispatch';
 
 		unset($saveData['totalMiles']);
@@ -1365,7 +1368,8 @@ class Job extends Parent_Model {
 				$res = $this->db->update('loads',$saveData);
 				$last_id = $saveData['id'];
 			} else {
-				$saveData['user_id'] 	= $loggedUserId;
+				$saveData['organisation_id'] = $this->selectedOrgId;
+				$saveData['user_id'] 	= $this->userID;	
 				$saveData['postedDate'] = date('Y-m-d H:i:s'); 
 				$saveData['created'] 	= date('Y-m-d H:i:s');
 				$res = $this->db->insert('loads',$saveData);
@@ -2035,6 +2039,7 @@ class Job extends Parent_Model {
 	public function logActivityEvent($entityId, $entityType, $eventType, $message, $srcPage){
 		$logs = array();
 		$logs['user_id']  	 = $this->session->loggedUser_id;
+		$logs['organisation_id'] = $this->selectedOrgId;
 		$logs['entity_id'] 	 = $entityId;
 		$logs['entity_name'] = $entityType;
 		$logs['event_type']	 = $eventType;
@@ -2093,6 +2098,7 @@ class Job extends Parent_Model {
 		
 		if ( $loadId != '' && $docType == 'invoice' ) {
 			$data['flag'] = 0;
+			$data['flag_perm'] = 0;
 			$this->db->where('loads.id',$loadId);
 			$this->db->update('loads',$data);
 		}		
@@ -2575,7 +2581,9 @@ class Job extends Parent_Model {
 
 
 		$this->db->where('broker_id is NOT NULL', NULL, FALSE);
-		$this->db->where(array('loads.vehicle_id != ' => null, 'loads.vehicle_id != ' => 0, 'loads.delete_status' => 0 ));			
+		
+		$this->db->where(array('loads.vehicle_id != ' => null, 'loads.vehicle_id != ' => 0, 'loads.delete_status' => 0, 'loads.JobStatus !=' => 'cancel','loads.organisation_id'=>$this->selectedOrgId));
+
 		$this->db->where_IN('documents.doc_type',array('pod','rateSheet'));
 		$this->db->group_by('documents.load_id');
 		$this->db->having('count(*) < 2', null, false );

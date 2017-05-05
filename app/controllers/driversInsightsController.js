@@ -55,14 +55,14 @@ app.controller('driversInsightsController', ["dataFactory","$scope","$rootScope"
     };
 
     vmInsights.exportInsights = function(search){
-        dataFactory.httpRequest(URL+'/Loads/getDriversInsightsRecords/','Post',{} ,{ pageNo:'', itemsPerPage:vmInsights.itemsPerPage,searchQuery: search, sortColumn:'', sortType:'',filterArgs:vmInsights.filterArgs,'export':1}).then(function(data){
+        dataFactory.httpRequest(URL+'/Loads/skipAcl_getDriversInsightsRecords/','Post',{} ,{ pageNo:'', itemsPerPage:vmInsights.itemsPerPage,searchQuery: search, sortColumn:'', sortType:'',filterArgs:vmInsights.filterArgs,'export':1}).then(function(data){
             $rootScope.donwloadExcelFile(data.fileName);
         });
     }
 
     vmInsights.loadNextPage = function(pageNumber,search,sortColumn,sortType){
     	vmInsights.autoFetchLoads = true;
-        dataFactory.httpRequest(URL+'/Loads/getDriversInsightsRecords/','Post',{} ,{ pageNo:pageNumber, itemsPerPage:vmInsights.itemsPerPage,searchQuery: search, sortColumn:sortColumn, sortType:sortType,filterArgs:vmInsights.filterArgs }).then(function(data){
+        dataFactory.httpRequest(URL+'/Loads/skipAcl_getDriversInsightsRecords/','Post',{} ,{ pageNo:pageNumber, itemsPerPage:vmInsights.itemsPerPage,searchQuery: search, sortColumn:sortColumn, sortType:sortType,filterArgs:vmInsights.filterArgs }).then(function(data){
         	vmInsights.autoFetchLoads = false;
         	vmInsights.drivers = data.data;
 

@@ -1,14 +1,8 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class MY_Controller extends CI_Controller {
-	function __construct()
-	{
-		parent::__construct();
-	}
-}
 
-class Admin_Controller extends MY_Controller
+class Admin_Controller extends CI_Controller
 {
 	public $finalArray;
 	public $username;
@@ -22,16 +16,23 @@ class Admin_Controller extends MY_Controller
 	public $protocol;
 	protected $userID;
 	protected $superAdmin = 0;
-	protected $selectedOrgId;
+	public $selectedOrgId;
+	public $globalRoleId;
 
 
 	function __construct() {
 
 		parent::__construct();
+		
 		$this->load->library(array('session'));
+		
+
+		$this->load->helper('truckstop_helper');
 		$loggedUser_username 	= $this->session->userdata('loggedUser_username');
+		
 		$this->userID   		= $loggedUser_id = $this->session->userdata('loggedUser_id');
 		$user_logged_in 		= $this->session->userdata('loggedUser_loggedin');
+		$this->globalRoleId		= $this->session->userdata('role');
 
 		$this->entity     = $this->config->item('entity');
 		$this->event      = $this->config->item('event');
@@ -41,13 +42,6 @@ class Admin_Controller extends MY_Controller
 
 		$this->protocol   = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
 		$this->serverAddr = base_url();
-
-		if( (isset($loggedUser_username) && $loggedUser_username != '') && (isset($loggedUser_id) && $loggedUser_id != '') && (isset($user_logged_in) && $user_logged_in == true) ) {
-		} else {
-			
-			redirect($this->config->item('base_url'));
-			die('//');
-		}
 
 		$this->id 			= $this->config->item('truck_id');	
 		$this->username 	= $this->config->item('truck_username');
@@ -61,9 +55,53 @@ class Admin_Controller extends MY_Controller
 			$this->superAdmin = 1;
 			$res = $this->User->getSelectedOrganisation($this->userID);
 			$this->selectedOrgId = ( !empty($res)) ? $res['organisation_id'] : 0;
+		} else if ( $this->globalRoleId == 9 ) {
+			$this->selectedOrgId = $this->userID;
+		} else {
+			$this->selectedOrgId = $this->session->userdata('loggedUser_parentId');
+		}
+
+		$allowedControllers = array('login','triumph','states');
+
+		if( (isset($loggedUser_username) && $loggedUser_username != '') && (isset($loggedUser_id) && $loggedUser_id != '') && (isset($user_logged_in) && $user_logged_in == true) ) {
+				if ( $this->superAdmin == 1 ) {
+
+				} else {
+					
+					$this->load->model('AclModel');
+					$controllerName =  strtolower($this->uri->segment(1));
+					$actionName = strtolower(( $this->uri->segment(2) != '' ) ? $this->uri->segment(2) : 'index');
+					if ( strpos($actionName,'skipacl_') !== false || in_array($controllerName,$allowedControllers)) 
+						return true;
+
+					if ( $this->globalRoleId == 9) {
+						$allowed = $this->AclModel->checkOrgPermission($controllerName);
+						if ( $allowed  == 1 ) {
+
+						} else {
+							echo json_encode(array('loginStatus' => 'permissionNotAllowed'));
+							exit();
+						}
+					} else {
+						$allowed = $this->AclModel->checkRolesPermission($controllerName,$actionName);
+						if ( $allowed  == 1 ) {
+
+						} else {
+							echo json_encode(array('loginStatus' => 'permissionNotAllowed'));
+							exit();
+						}
+					}			
+				}
+		} else {			
+			echo json_encode(array('loginStatus' => false));
+			exit();
 		}
 	}
-		
+	
+	/**
+	* Fetching records from truckstop Api
+	*/
+
 	protected function commonApiHits($abbreviation = 'F', $dateTime = array() , $hoursOld = '', $origin_country = 'USA', $origin_range = 300 ,$destination_city = '', $destination_states = '', $destination_range = 300, $dest_country = 'USA', $load_type = 'Full') {
 			if ( strpos($this->origin_state,',') !== false ) {
 				$states = explode(',',$this->origin_state);
@@ -151,9 +189,9 @@ class Admin_Controller extends MY_Controller
 		 * Fetching saved loads for one vehicle
 		 */
 		
-		protected function getSingleVehicleLoads($userId = null , $vehicleId = null ,$scopeType = '', $dispatcherId = null, $driverId = null, $secondDriverId = null, $startDate = '', $endDate = '',$filters = array() ) {	//dispatcher id to get loads of particular dispatcher only if driver is selected
+		protected function getSingleVehicleLoads($vehicleId = null ,$scopeType = '', $dispatcherId = null, $driverId = null, $secondDriverId = null, $startDate = '', $endDate = '',$filters = array() ) {	//dispatcher id to get loads of particular dispatcher only if driver is selected
 			$jobs = array();
-			$jobs = $this->Job->fetchSavedJobsNew($userId, $vehicleId, $scopeType, $dispatcherId, $driverId, $secondDriverId, $startDate, $endDate,$filters);
+			$jobs = $this->Job->fetchSavedJobsNew($vehicleId, $scopeType, $dispatcherId, $driverId, $secondDriverId, $startDate, $endDate,$filters);
 			if( !empty($jobs) && count($jobs) > 0){
 				foreach ($jobs as $key => $value) {
 					if($jobs[$key]['invoiceNo']==0){
@@ -356,50 +394,42 @@ class Admin_Controller extends MY_Controller
 			$CHARGES 		= 0;
 			$deadMiles 		= 0;
 			$totalRPM 		= 0;
+			$newArray[] 	= [];
 
-			foreach ($loads as $key => $load) {
-				
-				$newArray[$key]['LOADID'] 		= $load['id'];
-				$newArray[$key]['INVOICEID'] 	= ($load['invoiceNo'])?$load['invoiceNo']:'';
-				$newArray[$key]['DATE'] 		= date('d/m/Y',strtotime($load['created']));
-				$newArray[$key]['STATUS'] 		= ucfirst($load['JobStatus']);
-				$newArray[$key]['CUSTOMERNAME'] = (!empty($load['companyName']))?$load['companyName']:@$load['TruckCompanyName'];
-				$newArray[$key]['DRIVERS'] 		= $load['driverName'];
-				$newArray[$key]['INVOICE'] 		= $load['PaymentAmount'];
-				$newArray[$key]['CHARGES'] 		= $load['totalCost'];
-				$newArray[$key]['PROFIT'] 		= $load['overallTotalProfit'];
+			if(!empty($loads)){
+				foreach ($loads as $key => $load) {
+					
+					$newArray[$key]['LOADID'] 		= $load['id'];
+					$newArray[$key]['INVOICEID'] 	= ($load['invoiceNo'])?$load['invoiceNo']:'';
+					$newArray[$key]['DATE'] 		= date('d/m/Y',strtotime($load['created']));
+					$newArray[$key]['STATUS'] 		= ucfirst($load['JobStatus']);
+					$newArray[$key]['CUSTOMERNAME'] = (!empty($load['companyName']))?$load['companyName']:@$load['TruckCompanyName'];
+					$newArray[$key]['DRIVERS'] 		= $load['driverName'];
+					$newArray[$key]['INVOICE'] 		= $load['PaymentAmount'];
+					$newArray[$key]['CHARGES'] 		= $load['totalCost'];
+					$newArray[$key]['PROFIT'] 		= $load['overallTotalProfit'];
+					$PaymentAmount 					= ($load['PaymentAmount']!=0)?$load['PaymentAmount']:1;
+					$profit 						= ($load['overallTotalProfit']/$PaymentAmount)*100;
+					$newArray[$key]['%PROFIT'] 		= number_format($profit,2).'%'; 
+					$newArray[$key]['MILES'] 		= $load['Mileage'];
+					$newArray[$key]['DEADMILES'] 	= $load['deadmiles'];
+					$newArray[$key]['RATE/MILE'] 	= number_format((!empty($load['rpm']))?$load['rpm']:@$load['RPM'],2);
+					$newArray[$key]['DATEP/U'] 		= date('d/m/Y',strtotime($load['pickDate']));
+					$newArray[$key]['PICKUP'] 		= $load['OriginCity'].', '.$load['OriginState'];
+					$newArray[$key]['DATEDE'] 		= date('d/m/Y',strtotime($load['DeliveryDate']));
+					$newArray[$key]['DELIVERY'] 	= $load['DestinationCity'].', '.$load['DestinationState'];
+					//Last row data
+					$totalInvoice 					+=$load['PaymentAmount'];
+					$totalMiles 					+=$load['Mileage'];
+					$totalDeadMiles 				+=$load['deadmiles'];
+					$overallTotalProfit      		+=$load['overallTotalProfit'];
+					$CHARGES 						+=$load['totalCost'];
+					$totalRPM 						+=$newArray[$key]['RATE/MILE'];
+				}
 
-				
-				$PaymentAmount 					= ($load['PaymentAmount']!=0)?$load['PaymentAmount']:1;
-				$profit 						= ($load['overallTotalProfit']/$PaymentAmount)*100;
-
-
-				$newArray[$key]['%PROFIT'] 		= number_format($profit,2).'%'; 
-
-
-				$newArray[$key]['MILES'] 		= $load['Mileage'];
-				$newArray[$key]['DEADMILES'] 	= $load['deadmiles'];
-				$newArray[$key]['RATE/MILE'] 	= number_format((!empty($load['rpm']))?$load['rpm']:@$load['RPM'],2);
-				$newArray[$key]['DATEP/U'] 		= date('d/m/Y',strtotime($load['pickDate']));
-				$newArray[$key]['PICKUP'] 		= $load['OriginCity'].', '.$load['OriginState'];
-				$newArray[$key]['DATEDE'] 		= date('d/m/Y',strtotime($load['DeliveryDate']));
-				$newArray[$key]['DELIVERY'] 	= $load['DestinationCity'].', '.$load['DestinationState'];
-				//Last row data
-				$totalInvoice 					+=$load['PaymentAmount'];
-				$totalMiles 					+=$load['Mileage'];
-				$totalDeadMiles 				+=$load['deadmiles'];
-				$overallTotalProfit      		+=$load['overallTotalProfit'];
-				$CHARGES 						+=$load['totalCost'];
-				$totalRPM 						+=$newArray[$key]['RATE/MILE'];
-			}
-
-			$totalRows 	= count($newArray) ;
-			$totalRPM 	= number_format($totalRPM/$totalRows,2);
-
-			$overallTotalProfitPercent = number_format(($overallTotalProfit/$totalInvoice)*100,2);
-
-			
-			$newArray[] =[];
+			$totalRows 					= count($newArray) ;
+			$totalRPM 					= number_format($totalRPM/$totalRows,2);
+			$overallTotalProfitPercent 	= number_format(($overallTotalProfit/$totalInvoice)*100,2);
 			
 			$newArray[] = [
 							'',
@@ -420,10 +450,25 @@ class Admin_Controller extends MY_Controller
 							'',
 							''
 						];
+			}
 			
 			array_unshift($newArray, ['LOADID','INVOICE ID','DATE','STATUS','CUSTOMER NAME','DRIVERS','INVOICE','CHARGES','PROFIT','%PROFIT','MILES','DEAD MILES','RATE/MILE','DATE P/U','PICK UP','DATE DE','DELIVERY']);
 
 			echo json_encode(array('fileName'=>$this->createExcell($fileLabel,$newArray,TRUE)));
 			die();
+		}
+
+		/**
+		* function to check if edited entity is of same organisation
+		*/
+
+		protected function checkOrganisationIsValid( $entityId = null, $tableName = '') {
+			$result = $this->User->checkOrganisationIdValid($entityId, $tableName);
+			if( $result == 1 )
+				return true;
+			else {
+				echo json_encode(array('loginStatus' => 'invalidOrganisationId'));
+				exit();
+			}
 		}
 }

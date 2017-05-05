@@ -6,6 +6,7 @@ class Brokers extends Admin_Controller {
 	public $roleId;
 	public $data;
 	public $userName;
+	protected $table = 'broker_info';
 
 	function __construct()
 	{ 
@@ -35,6 +36,7 @@ class Brokers extends Admin_Controller {
 	public function index() {
 		$this->data['rows'] = $this->BrokersModel->get_brokers();
 		$this->data['total_records'] = count($this->data['rows']);
+
 		foreach($this->data['rows']  as $key =>  $d ) {
 			if ( $d['CarrierMC'] == 0 ) {
 				$this->data['rows'][$key]['CarrierMC'] = '';
@@ -50,6 +52,9 @@ class Brokers extends Admin_Controller {
 	}
 
 	public function edit( $broker_id = Null ){
+		
+		$this->checkOrganisationIsValid($broker_id,$this->table);
+
 		$this->data['brokerData'] = $this->BrokersModel->getRelatedBroker($broker_id);
 		if($this->data['brokerData']['CarrierMC'] == 0){
 			$this->data['brokerData']['CarrierMC'] = '';
@@ -73,8 +78,9 @@ class Brokers extends Admin_Controller {
 	* Comment: Used for update broker
 	*/
 	
-	public function update() 
+	public function skipAcl_update() 
 	{
+		
 		try{
 
 			$_POST = json_decode(file_get_contents('php://input'), true);

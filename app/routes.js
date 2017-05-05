@@ -1,6 +1,6 @@
-//
 var app = angular.module('app',['gantt','gantt.table','gantt.tooltips','signature','ngDropzone',"highcharts-ng",
-	/*'gantt.sortable',
+	/*
+    'gantt.sortable',
     'gantt.movable',
     'gantt.drawtask',
     'gantt.tooltips',
@@ -10,30 +10,48 @@ var app = angular.module('app',['gantt','gantt.table','gantt.tooltips','signatur
     'gantt.table',
     'gantt.groups',
     'gantt.overlap',
-    'gantt.resizeSensor',*/
+    'gantt.resizeSensor',
+    */
     "pubnub.angular.service",
 	'angularUtils.directives.dirPagination','ngCookies','ui.router','ngStorage','jQueryScrollbar','ui.utils',
-    'oc.lazyLoad','datatables','ngSanitize','ui.select','angular-sortable-view','dcbImgFallback']);
+    'oc.lazyLoad','datatables','ngSanitize','ui.select','angular-sortable-view','dcbImgFallback','oitozero.ngSweetAlert','ngStorage', 'elasticsearch','iso.directives','ui.bootstrap']);
+
     
 app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$ocLazyLoadProvider','$provide','$httpProvider',
     function($stateProvider, $urlRouterProvider, $localStorageProvider,$ocLazyLoadProvider,$provide,$httpProvider) {
-        $httpProvider.interceptors.push(['$cookies', function ($cookies) {
+        $httpProvider.interceptors.push(['$cookies','$rootScope', function ($cookies,$rootScope) {
             return {
                 'request': function (config) {
                     if ( config.headers.typeCheck != undefined && config.headers.typeCheck == 'type') {
                        config.headers = {};
                     } else {
                         config.headers = config.headers || {};
-                        config.headers['Content-Type'] = 'application/x-www-form-urlencoded';
-                        config.headers.Accept = 'application/json;odata=verbose';
+
+                        //config.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+                       //config.headers.Accept = 'application/json;odata=verbose';
+                        //config.headers['X-Requested-With'] = 'XMLHttpRequest';
                     }
-                    var token = $cookies.get('authToken');
+                    /*var token = $cookies.get('authToken');
                     if (token) {
                         config.headers.Authorization = 'Bearer ' + token;
-                    }
+                    }*/
                     return config;
+                },
+                'response': function (response) {
+                     var status = (response.data.loginStatus != undefined) ? response.data.loginStatus : '';
                     
-                }
+                    if(status === 401) {
+                        $rootScope.logoutUser();
+                    } else if(status === 'permissionNotAllowed') {
+                        $rootScope.permissionNotAllowed('showAlertPopup');
+                    } else if(status === 'invalidOrganisationId') {
+                        $rootScope.permissionNotAllowed('notshowAlertPopup');
+                    } else if( status === false )  {
+                        $rootScope.logoutUser();
+                    } else {
+                       return response;  
+                    }
+                }  
             };
        }]);
 
@@ -69,9 +87,9 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
                 controllerAs: 'dashboard',
                 moduleName: 'dashboard',
                   resolve: {
-                  	/*getAllVehicles: function(dataFactory, $stateParams) {
-						return dataFactory.httpRequest(URL+'/dashboard/index');
-					},*/
+                  	getDashboardData: function(dataFactory) {
+						return dataFactory.httpRequest(URL+'/dashboard/index/'+false+'/checkPermissionAllowed');
+					},
                     deps: ['$ocLazyLoad', function($ocLazyLoad) {
                         return $ocLazyLoad.load([
                         		'datepicker',
@@ -93,16 +111,44 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
                 title: 'Login',
                 templateUrl: 'assets/templates/login.html',
                 controller: 'authCtrl',
+                controllerAs: 'login',
                 moduleName: 'login',
                 showHeader : false,
+                params : {
+                    type : '',
+                    message : ''
+                },
                  deps: ['$ocLazyLoad', function($ocLazyLoad) {
                         return $ocLazyLoad.load([
-                        		'datepicker',
-                                'bubbleAnimation'
-                                ], {
-                                insertBefore: '#lazyload_placeholder'
-                            })
-					}]
+                    		'bubbleAnimation'
+                        ], {
+                        insertBefore: '#lazyload_placeholder'
+                    })
+				}]//http://54.237.201.176/admin/#resetpassword?Mg==
+            })
+            .state('forgotPassword', {
+                url: '/forgotPassword',
+                showHeader : false,
+                title: 'Forgot Password',
+                templateUrl: 'assets/templates/forgotPassword.html',
+                controller : 'forgotPassword',
+                controllerAs: 'forgot',
+                moduleName: 'login',
+                authunticate: 'no',
+            }).state('resetpassword', {
+                url: '/resetpassword?:q',
+                showHeader : false,
+                title: 'Reset Password',
+                templateUrl: 'assets/templates/resetPassword.html',
+                controller : 'resetPassword',
+                controllerAs: 'reset',
+                moduleName: 'login',
+                authunticate: 'no',
+                resolve:{            
+                    getbase64Data: function(dataFactory, $stateParams,$location) {
+                        return dataFactory.httpRequest(URL+'/login/resetPassword?hash='+$location.$$search.hash);
+                    }
+                }
             })
             .state('trucks', {
 				url: '/trucks',
@@ -139,12 +185,7 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
 
 				}
 			})
-            .state('departments', {
-				url: '/departments',
-				title: 'Departments',
-				templateUrl: 'assets/templates/departments/departmentsListing.html',
-                controller: 'departmentsController',
-            })
+            
             .state('drivers', {
 				url: '/drivers',
 				title: 'Drivers',
@@ -200,7 +241,7 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
                                 });
                         }],
 					getAllTrucksStopData: function(dataFactory, $stateParams) {
-						return dataFactory.httpRequest(URL+'/truckstop/index');
+						return dataFactory.httpRequest(URL+'/truckstop/skipAcl_index');
 					},
 				},
 			})
@@ -916,7 +957,7 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
             }).state('organizations', {
                 url: '/organizations',
                 title: 'Management Section',
-                moduleName: 'loads',
+                moduleName: 'users',
                 templateUrl : 'assets/templates/acl/organisations.html',
                 controller : 'organisationController',
                 controllerAs: 'org',
@@ -932,7 +973,7 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
             }).state('addOrganization', {
                 url: '/addOrganization',
                 title: 'Add New Organization',
-                moduleName: 'loads',
+                moduleName: 'users',
                 templateUrl: 'assets/templates/acl/add_organisations.html',
                 controller: 'organisationController',
                 controllerAs: 'org',
@@ -951,7 +992,7 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
             }).state('editOrganization', {
                 url: '/editOrganization/:id',
                 title: 'Update Organization',
-                moduleName: 'loads',
+                moduleName: 'users',
                 templateUrl: 'assets/templates/acl/add_organisations.html',
                 controller: 'organisationController',
                 controllerAs: 'org',
@@ -970,7 +1011,7 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
             }).state('manage', {
                 url: '/manage/:id',
                 title: 'Management Company',
-                moduleName: 'loads',
+                moduleName: 'users',
                 templateUrl: 'assets/templates/acl/manageCompany.html',
                 controller: 'aclManage',
                 controllerAs: 'acl',
@@ -979,10 +1020,28 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
                         return dataFactory.httpRequest(URL+'/acl/get_module/'+$stateParams.id);
                     }
                 }              
-            }).state('roles', {
+            })
+            .state('manageRoles', {
+                url: '/manageRoles/:id',
+                title: 'Manage Roles permissions Company',
+                moduleName: 'users',
+                templateUrl: 'assets/templates/acl/manageRoles.html',
+                controller: 'manageRolesPermissionsCtrl',
+                controllerAs: 'aclRoles',
+                params: {
+                    type : '',
+                    message: ''
+                },
+                resolve:{
+                    getRolesAction: function(rolesService, $stateParams) {
+                        return rolesService.manageRoles($stateParams.id);
+                    }
+                }              
+            })
+            .state('roles', {
                 url: '/roles',
                 title: 'Roles',
-                moduleName: 'loads',
+                moduleName: 'users',
                 templateUrl: 'assets/templates/acl/role.html',
                 controller: 'roleManage',
                 controllerAs: 'roles',
@@ -992,13 +1051,13 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
                 },
                 resolve:{
                     getRoles: function(dataFactory,$rootScope) {
-                        return dataFactory.httpRequest(URL+'/acl/getRoles/'+$rootScope.activeUser);
+                        return dataFactory.httpRequest(URL+'/roles/roles_listing/'+$rootScope.activeUser);
                     }
                 }              
             }).state('addrole', {
                 url: '/addrole',
                 title: 'Add Roles',
-                moduleName: 'loads',
+                moduleName: 'users',
                 templateUrl: 'assets/templates/acl/addRole.html',
                 controller: 'roleManage',
                 controllerAs: 'roles',
@@ -1010,19 +1069,19 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
             }).state('editrole', {
                 url: '/editrole/:id',
                 title: 'Update Roles',
-                moduleName: 'loads',
+                moduleName: 'users',
                 templateUrl: 'assets/templates/acl/addRole.html',
                 controller: 'roleManage',
                 controllerAs: 'roles',
                 resolve:{
                     getRoles: function(dataFactory, $stateParams) {
-                        return dataFactory.httpRequest(URL+'/acl/editRole/'+$stateParams.id);
+                        return dataFactory.httpRequest(URL+'/roles/edit_role/'+$stateParams.id);
                     }
                 }
             }).state('users', {
                 url: '/users',
                 title: 'User List',
-                moduleName: 'loads',
+                moduleName: 'users',
                 templateUrl: 'assets/templates/users/usersList.html',
                 controller: 'usersController',
                 controllerAs: 'users',
@@ -1038,25 +1097,25 @@ app.config(['$stateProvider', '$urlRouterProvider','$localStorageProvider', '$oc
             }).state('addUser', {
                 url: '/addUser',
                 title: 'Add User',
-                moduleName: 'loads',
+                moduleName: 'users',
                 templateUrl: 'assets/templates/users/userAdd.html',
                 controller: 'usersController',
                 controllerAs: 'users',
                 resolve:{
                     getData: function(dataFactory, $stateParams) {
-                        return dataFactory.httpRequest(URL+'/users/getAddEdit');
+                        return dataFactory.httpRequest(URL+'/users/add_user');
                     }
                 }
             }).state('editUser', {
                 url: '/editUser/:id',
                 title: 'Update User',
-                moduleName: 'loads',
+                moduleName: 'users',
                 templateUrl: 'assets/templates/users/userAdd.html',
                 controller: 'usersController',
                 controllerAs: 'users',
                 resolve:{
                     getData: function(dataFactory, $stateParams) {
-                        return dataFactory.httpRequest(URL+'/users/getAddEdit/'+$stateParams.id);
+                        return dataFactory.httpRequest(URL+'/users/edit_user/'+$stateParams.id);
                     },
                      deps: ['$ocLazyLoad', function($ocLazyLoad) {
                         return $ocLazyLoad.load([
@@ -1077,10 +1136,13 @@ app.run(function ($rootScope,$location,$state,$cookies,dataFactory, $document) {
     */
 
 	$rootScope.$on( '$stateChangeStart', function(e, toState  , toParams , fromState, fromParams) {
+
 		$rootScope.srcPage = fromState.name;
 		$rootScope.changeState = toState.name;
-		$rootScope.loginCheck($rootScope.changeState);
-		$rootScope.languageArray = $rootScope.LangArr[toState.moduleName];
+
+        if( toState.authunticate != 'no')
+            $rootScope.loginCheck($rootScope.changeState);
+      
 		if ($rootScope.changeState.indexOf('?') !== -1 ) {
 			$rootScope.statesArr = $rootScope.changeState.split('?');
 		} else {
@@ -1088,8 +1150,8 @@ app.run(function ($rootScope,$location,$state,$cookies,dataFactory, $document) {
 		}
 	});
 	
-	$rootScope.$on('$stateChangeSuccess', function (event,data) {
-		
+	$rootScope.$on('$stateChangeSuccess', function (event,data , toState) {
+        $rootScope.languageArray = $rootScope.LangArr[data.moduleName];
 		$rootScope.absUrl = $location.search();
 		$('#headerFixed').removeClass('headerFixed');
         $rootScope.pageTitle = data.title;

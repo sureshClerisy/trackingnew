@@ -9,6 +9,11 @@ $lang['loginPasswordLabel'] = 'Senha';
 $lang['loginSignInButton'] = 'Assinar em';
 $lang['InvalidUsernamePassword'] = 'Nome de usuário ou senha inválidos';
 $lang['Inactivity5Minutes'] = 'Incapacidade desde os últimos 5 minutos! Por favor entre!';
+$lang['FrogotPassword'] = 'Esqueceu a senha.';
+$lang['EmailReq'] = 'Insira o endereço de e-mail';
+$lang['Submit'] = 'Enviar';
+$lang['EmailedPassword'] = 'Nova senha foi gerada e enviada para seu endereço de e-mail.';
+$lang['EmailNotRegistered'] = 'Erro! : Este endereço de e-mail não existe. Tente outro.';
 /***Login page ends**/
 
 
@@ -365,3 +370,26 @@ $lang['daterange'] = 'Intervalo de datas';
 $lang['generatedby'] = 'Gerado por';
 $lang['timezone'] = 'Fuso horário';
 $lang['eastern'] = 'Oriental';
+
+// //user
+$lang['id'] = 'Identidade';
+$lang['fullname'] = 'Nome completo';
+$lang['email'] = 'O email';
+$lang['phone'] = 'telefone';
+$lang['rolename'] = 'Nome do papel';
+
+
+$lang['firstname'] = 'Primeiro nome';
+$lang['lastname'] = 'Último nome';
+$lang['password'] = 'Senha';
+
+// /*commonValidationErrors*/
+
+$lang['validationEmail'] = 'Por favor insira o endereço de e-mail válido.';
+$lang['validationPhone'] = 'Digite o telefone.';
+$lang['validationZip'] = 'Introduza o código postal.';
+$lang['validationAddress'] = 'Insira o endereço.';
+$lang['validationPassword'] = 'Introduza a palavra-passe.';
+$lang['roleHeader'] 	= 'Funções';
+$lang['orgHeaderAdd'] 	= 'Adicionar Organização';
+$lang['orgHeaderEdit'] 	= 'Editar organização';

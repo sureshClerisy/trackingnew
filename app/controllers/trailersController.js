@@ -1,4 +1,4 @@
-app.controller('trailersController', function(dataFactory,$scope, PubNub, $rootScope , $location , $cookies, $localStorage, getTrailersListing){
+app.controller('trailersController', function(dataFactory,$scope, PubNub, $rootScope , $location , $cookies, $localStorage, getTrailersListing,$uibModal){
 	
 	if($rootScope.loggedInUser == false)
 		$location.path('login');
@@ -20,38 +20,7 @@ app.controller('trailersController', function(dataFactory,$scope, PubNub, $rootS
 	}
 
 	$rootScope.dataTableOpts(10,7);			 //set datatable options   -r288
-	
-	$scope.removeTrailer = function(trailerId,index){
-		angular.element("#confirm-delete").modal('show');
-		angular.element("#confirm-delete").data("trailerId",trailerId);
-		angular.element("#confirm-delete").data("index",index);
-	}
-
-	$scope.confirmDelete = function(confirm){
-		if(confirm == 'yes'){
-			var trailerId = angular.element("#confirm-delete").data("trailerId");
-			var index  = angular.element("#confirm-delete").data("index");
-			if ( trailerId != '' && trailerId != undefined ) {
-				dataFactory.httpRequest(URL + '/trailers/delete/'+trailerId).then(function(data) {
-					if ( data.success == true ) {
-						$scope.Message = '';
-						$scope.Message = $rootScope.languageArray.trailerDeleteMsg;
-						$scope.alertmsg = true;
-						$scope.trailers.splice(index,1);
-					} else {
-						$scope.errMessage = $rootScope.languageArray.trailerDeleteErrMsg;
-						$scope.alertdeletemsg = true;
-					}
-		      	});
-			}
-		}else{
-			angular.element("#confirm-delete").removeData("trailerId");
-			angular.element("#confirm-delete").removeData("index");
-
-		}
-		angular.element("#confirm-delete").modal('hide');
-	}
-	
+		
 	/** Change Driver Status **/
   
 	$scope.changeTrailerStatus = function( trailerId, status, index) {
@@ -78,6 +47,21 @@ app.controller('trailersController', function(dataFactory,$scope, PubNub, $rootS
 		} 
 		angular.element("#vehicle-list-status").modal('hide');
 	}   
+
+	$scope.openAddPopup = function() {
+		var modalInstance = $uibModal.open({
+            templateUrl: 'assets/templates/trailers/addEditTrailer.html',
+            controller: 'addEditTrailerController',
+            controllerAs: 'trailers',
+            openedClass: 'main-popup-custom',
+            size: 'lg',
+            resolve: {
+               getAddTrailerData: function(dataFactory, $stateParams) {
+					return dataFactory.httpRequest(URL+'/trailers/edit/1');
+				}
+            }
+        });
+	}
    
 		
 });
@@ -86,6 +70,7 @@ app.controller('addEditTrailerController', function(dataFactory, getAddTrailerDa
 	if($rootScope.loggedInUser == false)
 		$location.path('logout');
 		
+	console.log(getAddTrailerData);
 	$scope.trailerData = {};
 	$scope.trailerData.truckName = '';
 	$scope.trucksList = getAddTrailerData.fetchTrucks;
@@ -111,7 +96,7 @@ app.controller('addEditTrailerController', function(dataFactory, getAddTrailerDa
 		$scope.trailerHeading = $rootScope.languageArray.trailerHeadingForEdit;
 		$scope.saveButton = 'Update';
 		$scope.trailerData = getAddTrailerData.trailerData;
-		$scope.editTrailerId = getAddTrailerData.trailerData.id
+		$scope.editTrailerId = getAddTrailerData.trailerData.id;
 		
 		if ( $scope.trailerData.due_date == '' || $scope.trailerData.due_date == '0000-00-00' )
 			$scope.trailerData.due_date = '';
@@ -202,7 +187,7 @@ app.controller('addEditTrailerController', function(dataFactory, getAddTrailerDa
 			return false;
 		}
 
-		dataFactory.httpRequest(URL+'/trailers/addEditTrailer/'+submitType,'POST',{},$scope.trailerData).then(function(data) {
+		dataFactory.httpRequest(URL+'/trailers/skipAcl_addEditTrailer/'+submitType,'POST',{},$scope.trailerData).then(function(data) {
 			PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
 			if ( data.success == true ) {
 				if ( submitType == 'add') {

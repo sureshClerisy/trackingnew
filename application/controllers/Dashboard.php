@@ -42,7 +42,7 @@ class Dashboard extends Admin_Controller {
 		$this->singleMilesGoal				 	= 0;
 	}
 
-	public function getTodayReport($type){
+	public function skipAcl_getTodayReport($type){
 		
 		$gDropdown = $vList = $rparam = array(); 
 		$lPerformance = '';
@@ -110,7 +110,12 @@ class Dashboard extends Admin_Controller {
 	}
 
 
-	public function index($vehicleID = false){
+	public function index($vehicleID = false, $checkPermission = '' ){
+
+		if( $checkPermission == 'checkPermissionAllowed' ) {		// just checking permission in case of resolve functionality for dashboard
+			echo json_encode(['success' => true ]);
+			exit();
+		}
 
 		$latitude 	= "";
 		$longitude 	= "";
@@ -328,13 +333,9 @@ class Dashboard extends Admin_Controller {
 			foreach ($dispatcherList as $key => $value) {
 				array_unshift($vehicleList, $value);
 			}
-
-			// if($this->userRoleId != _DISPATCHER && $this->userRoleId != 4){
-				$new = array("id"=>"","profile_image"=>"","driverName"=>"All Groups","label"=>"","username"=>"","latitude"=>"","longitude"=>"","vid"=>"","city"=>"","vehicle_address"=>"","state"=>"");
-				array_unshift($vehicleList, $new);
-			// }
 		}
-
+		$new = array("id"=>"","profile_image"=>"","driverName"=>"All Groups","label"=>"","username"=>"","latitude"=>"","longitude"=>"","vid"=>"","city"=>"","vehicle_address"=>"","state"=>"");
+		array_unshift($vehicleList, $new);
 		$weatherNotFound['status'] = false;
 		$latitude = $lat;
 		$longitude = $lng;
@@ -710,7 +711,7 @@ class Dashboard extends Admin_Controller {
 		$vehicleInfo['vehicle_address'] = $args['address'];
 
 		$output  = '';
-		if((empty($lat) || empty($lng)) ){
+		if(!empty($vehicleInfo['vehicle_address']) && (empty($lat) || empty($lng))  ){
 			$output = json_decode(file_get_contents("https://maps.googleapis.com/maps/api/geocode/json?address=".$vehicleInfo['vehicle_address']."&key=AIzaSyBSPVGmxdOqe2yrxzla4iezs00zWe_p6j4"),true);
 			if($output['status'] == 'OK'){
 				$lat = $output['results'][0]['geometry']['location']['lat'];
@@ -721,7 +722,7 @@ class Dashboard extends Admin_Controller {
 		$currentWeather = array();
 		$dailyForecast = array();
 		$weatherNotFound['status'] = false;
-		if(empty($lat) && !empty($lng) ){
+		if(!empty($lat) && !empty($lng) ){
 
 			try{
 				$currentWeather = @json_decode(file_get_contents('http://api.openweathermap.org/data/2.5/weather?lat='.$lat.'&lon='.$lng.'&mode=json&units=imperial&appid=51b18a47eee105fcac60c7c2e832f587'),true);
@@ -1377,9 +1378,7 @@ class Dashboard extends Admin_Controller {
 								$this->teamFinancialGoal	+= $driversList[$i]['team'] * $goalValues['teamFinancial'] * $daysdiff;
 								$this->singleMilesGoal		+= $driversList[$i]['single'] * $goalValues['singleMiles'] * $daysdiff;
 								$this->teamMilesGoal	 	+= $driversList[$i]['team'] * $goalValues['teamMiles'] * $daysdiff;
-							}
-
-							
+							}							
 						}
 					} else {
 						$endCreated = date('Y-m-d',(strtotime ( '-1 day' , strtotime ( $driversList[$i]['createdDate']) ) ));
@@ -1453,8 +1452,8 @@ class Dashboard extends Admin_Controller {
 			$value['deadmiles']  = isset($value['deadmiles']) ? $value['deadmiles'] : 0;
 			$value['username']   = isset($value['username']) ? $value['username'] : '';
 
-			$this->totalFinancialGoal 				 	  = $this->singleFinancialGoal + $this->teamFinancialGoal; 		
-			$this->totalMilesGoal 						  = $this->singleMilesGoal + $this->teamMilesGoal;
+			$this->totalFinancialGoal 				  = $this->singleFinancialGoal + $this->teamFinancialGoal; 		
+			$this->totalMilesGoal 					  = $this->singleMilesGoal + $this->teamMilesGoal;
 			$plusMinusFinancialGoal 				  = $value['invoice'] - $this->totalFinancialGoal;
 			$plusMinusMilesGoal 					  = $value['miles'] - $this->totalMilesGoal;
 			$lPResult[$key]["financialGoal"] 		  = $this->totalFinancialGoal;
@@ -1555,34 +1554,24 @@ class Dashboard extends Admin_Controller {
 		$args = json_decode(file_get_contents('php://input'),true);
 
 		$cmpName = $this->BrokersModel->getTopFiveCustomer($args);
-		$data["paymentAmount"] = array();
-		$data["cName"]['cmpName'] = array();
+		$data["paymentAmount"] 		= array();
+		$data["cName"]['cmpName'] 	= array();
 		$data["cName"]['brokerIds'] = array();
-		$data["xAxis"] = array();
-		$data["valueIds"] = array();
-		$colors =  array('rgba(7, 126, 208, 1)','rgba(109,92,174,1)','rgba(52, 214, 199, 1)','rgba(245,87,83,1)','#626262');
-		$filters = $args;
+		$data["xAxis"] 		= array();
+		$data["valueIds"] 	= array();
+		$colors 			=  array('rgba(7, 126, 208, 1)','rgba(109,92,174,1)','rgba(52, 214, 199, 1)','rgba(245,87,83,1)','#626262');
+		$filters 			= $args;
 		$filters["itemsPerPage"] =20; 
-		$filters["limitStart"] =1; 
-		$filters["sortColumn"] ="DeliveryDate"; 
-		$filters["sortType"] ="DESC"; 
+		$filters["limitStart"] 	=1; 
+		$filters["sortColumn"] 	= "DeliveryDate"; 
+		$filters["sortType"] 	= "DESC"; 
 
-		$driversWithoutTruck   = $this->Driver->fetchDriversWithoutTruck($filters,true);
-		$trucksNotReporting    = $this->Driver->trucksReporting($filters,true);
-		$vehiclesWithoutDriver = $this->Driver->fetchTrucksWithoutDriver($filters,true);
-		$pastLoadsIncomplete   = count($this->Job->fetchPastLoadsIncomplete($filters,true));
-		$predictedJobs  = array();
-		/*$predictedJobs         = $this->Utility->getNextPredictedJobs();
-		if( count($predictedJobs) > 0 && is_array($predictedJobs) ){
-			foreach ($predictedJobs as $key => $value) {
-				$predictedJobs[$key]["jobs"] = unserialize($value["jobs"]);
-			}	
-		}else{
-			$predictedJobs = array();
-		}*/
-		//$predictedJobs = json_decode(json_encode($predictedJobs), true);
-
-	
+		$driversWithoutTruck   	= $this->Driver->fetchDriversWithoutTruck($filters,true);
+		$trucksNotReporting    	= $this->Driver->trucksReporting($filters,true);
+		$vehiclesWithoutDriver 	= $this->Driver->fetchTrucksWithoutDriver($filters,true);
+		$pastLoadsIncomplete   	= count($this->Job->fetchPastLoadsIncomplete($filters,true));
+		$predictedJobs  		= array();
+			
 		$dispatcherId = isset($args['dispatcherId']) ? $args['dispatcherId'] : '';
 		$driverId = isset($args['driverId']) ? $args['driverId'] : '';
 		$secondDriverId = isset($args['secondDriverId']) ? $args['secondDriverId'] : '';
@@ -1648,21 +1637,6 @@ class Dashboard extends Admin_Controller {
 		}
 		echo json_encode(array('fileName'=>$this->createExcell('top5cuatomers',$exportableData)));die();
 	}
-
-	/**
-	* Fetch active drivers without truck assigned
-	*/
-
-	/*public function fetchActiveDriversWithoutTruck() {
-		$totalDrivers = 0;
-		$drivers = $this->Driver->fetchDriversWithoutTruck();
-		if ( !empty($drivers)) 
-			$totalDrivers = $drivers['totalCount'];
-
-		
-		echo json_encode($data);
-	}*/
-
 	
 	/**
 	* @method exportWeather
@@ -1671,7 +1645,7 @@ class Dashboard extends Admin_Controller {
 	* @description Create excel file for current weather
 	*/
 
-	public function exportWeather($rawData=null){
+	public function skipAcl_exportWeather($rawData=null){
 		
 		$args = json_decode(file_get_contents('php://input'),true);
 

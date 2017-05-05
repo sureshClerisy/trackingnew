@@ -31,7 +31,7 @@ projectName = 'Fuel stops Tracking'
 Api key = 'AIzaSyCJxKWkyvOhA6pAl0mXuGe0phOPWbkCebM' -> iterationLoad
 Server key = 'AIzaSyB62sujBjnYX2EIlvE0fSc_6RJ5d3h_KGs'
 
-
+AIzaSyCJxKWkyvOhA6pAl0mXuGe0phOPWbkCebM   clerisy##212
 emailId = "clerisysolution123@gmail.com"
 Password = "clerisy##212"
 projectName = 'Tracking Iterations'

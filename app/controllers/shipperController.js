@@ -5,19 +5,18 @@ app.controller('shipperController', function(dataFactory, $scope, PubNub , $http
 	$rootScope.dataNotFound = false;	
 	$rootScope.showHeader 	= true;
 
-	var shp = this;
-	shp.type = $stateParams.type;
-	shp.message = $stateParams.message;
-	shp.shipperData  = getShipperListing.rows;
+	var shp 		= this;
+	shp.type 		= $stateParams.type;
+	shp.message 	= $stateParams.message;
+	shp.shipperData = getShipperListing.rows;
 	shp.totalRecords = getShipperListing.total;
 	shp.lastSortedColumn = 'id';
 	shp.currentPage  = 1;
 	shp.lastSortType = 'DESC';
-	shp.searchFilter  = '';
+	shp.searchFilter = '';
 
 	$scope.changedRating 	= 1;
-	
-	shp.states_data = fetchStatesList;
+	shp.states_data 		= fetchStatesList;
 
 	$scope.trustAsHtml = function(value) {
 		return $sce.trustAsHtml(value);
@@ -103,7 +102,7 @@ app.controller('shipperController', function(dataFactory, $scope, PubNub , $http
 		angular.element("#confirm-delete").data("shipperStatus",status);
 	}
 
-	$scope.confirmDelete = function(confirm){
+	$rootScope.confirmDelete = function(confirm){
 		
 		shp.type 	= '';
 		if(confirm == 'yes'){
@@ -128,7 +127,6 @@ app.controller('shipperController', function(dataFactory, $scope, PubNub , $http
 							}
 					});
 				} else {
-					alert('sdf');
 					shipperService.deleteShipper(shipperId)
 						.then(function (response) {
 							PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
@@ -198,7 +196,7 @@ $scope.toggleRow = function($event,index){
 		$scope.addBrokersData.rating = $scope.changedRating == 0 ? 1: $scope.changedRating;
 		shipperService.addShipperData($scope.addBrokersData,$rootScope.srcPage)
 			.then(function (response) {
-				console.log(response);
+				
 				PubNub.ngPublish({ channel: $rootScope.notificationChannel, message: {content:"activity", sender_uuid : $rootScope.activeUser } });
 				if ( response.success == true ) {
 					$scope.Message = $rootScope.languageArray.shipperSavedSuccMsg;
@@ -207,7 +205,6 @@ $scope.toggleRow = function($event,index){
 				} else {
 					$scope.Message = $rootScope.languageArray.shipperSavedErrMsg;
 				}
-				console.log($scope.Message);
 				$state.go('shipper',{ type: 'success', message: $scope.Message });
 			});
 	};
